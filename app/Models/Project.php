@@ -4,9 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-class Project extends Model
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+class Project extends Model implements HasMedia
 {
+    use InteractsWithMedia;
     protected $fillable = [
         'category_id',
         'parent_category_id',
@@ -15,6 +17,12 @@ class Project extends Model
         'location',
         'budget',
         'image_path',
+        'latitude',
+        'longitude',
+        'address',
+        'city',
+        'district',
+        'country',
     ];
 
     public function category(): BelongsTo

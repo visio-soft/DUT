@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ProjectResource extends Resource
 {
@@ -27,67 +28,147 @@ class ProjectResource extends Resource
             ->schema([
                 Forms\Components\Section::make()
                     ->schema([
-                        Forms\Components\Wizard::make([
-                            Forms\Components\Wizard\Step::make('Ana Kategori')
-                                ->icon('heroicon-o-rectangle-group')
-                                ->description('Lütfen ana kategoriyi seçin')
-                                ->schema([
-                                    Forms\Components\Select::make('parent_category_id')
-                                        ->label('Ana Kategori')
-                                        ->options(\App\Models\Category::whereNull('parent_id')->pluck('name', 'id'))
-                                        ->required()
-                                ]),
-
-                    Forms\Components\Wizard\Step::make('Başlık')
-                        ->icon('heroicon-o-pencil-square')
-                        ->description('Proje başlığını girin')
-                        ->columns(1)
-                        ->schema([
-                            Forms\Components\TextInput::make('title')
-                                ->label('Başlık')
-                                ->required(),
-                        ]),
-                    Forms\Components\Wizard\Step::make('Açıklama')
-                        ->icon('heroicon-o-chat-bubble-left-ellipsis')
-                        ->description('Proje açıklamasını girin')
-                        ->columns(1)
-                        ->schema([
-                            Forms\Components\Textarea::make('description')
-                                ->label('Açıklama'),
-                        ]),
-                    Forms\Components\Wizard\Step::make('Konum')
-                        ->icon('heroicon-o-map-pin')
-                        ->description('Projenin konumunu belirtin')
-                        ->columns(1)
-                        ->schema([
-                            Forms\Components\TextInput::make('location')
-                                ->label('Konum'),
-                        ]),
-                    Forms\Components\Wizard\Step::make('Bütçe')
-                        ->icon('heroicon-o-currency-dollar')
-                        ->description('Proje için bütçe belirleyin')
-                        ->columns(1)
-                        ->schema([
-                            Forms\Components\TextInput::make('budget')
-                                ->label('Bütçe')
-                                ->numeric()
-                                ->prefix('₺'),
-                        ]),
-                    Forms\Components\Wizard\Step::make('Resim')
-                        ->icon('heroicon-o-photo')
-                        ->description('Proje için bir görsel yükleyin (isteğe bağlı)')
-                        ->columns(1)
-                        ->schema([
-                            Forms\Components\FileUpload::make('image_path')
-                                ->label('Resim')
-                                ->image()
-                                ->directory('projects')
-                                ->maxSize(2048),
-                        ]),
-                ])
-                    ->columnSpanFull()
+                        Forms\Components\Select::make('category_id')
+                            ->label('Ana Kategori')
+                            ->relationship('category', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        
+                        Forms\Components\TextInput::make('title')
+                            ->label('Başlık')
+                            ->required()
+                            ->maxLength(255),
+                        
+                        Forms\Components\Textarea::make('description')
+                            ->label('Açıklama')
+                            ->required()
+                            ->rows(3),
+                        
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Başlangıç Tarihi')
+                            ->required(),
+                        
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label('Bitiş Tarihi')
+                            ->required(),
+                        
+                        Forms\Components\TextInput::make('budget')
+                            ->label('Bütçe')
+                            ->numeric()
+                            ->required()
+                            ->prefix('₺'),
+                        
+                        SpatieMediaLibraryFileUpload::make('image_path')
+                            ->label('Resim')
+                            ->image()
+                            ->directory('projects')
+                            ->maxSize(2048)
+                            ->required(),
+                        
+                        // Form butonları
+                        Forms\Components\ViewField::make('form_actions')
+                            ->label('')
+                            ->view('custom.form-actions')
+                            ->columnSpanFull(),
+                    ])
+                    ->columnSpan(1),
+                Forms\Components\Section::make('Konum')
+                    ->schema([
+                        Forms\Components\Toggle::make('use_google_maps')
+                            ->label('Haritadan Seç')
+                            ->default(false)
+                            ->reactive()
+                            ->columnSpanFull(),
+                        
+                        // Manual Konum Girişi (Google Maps kapalıyken)
+                        Forms\Components\Group::make([
+                            Forms\Components\Select::make('city')
+                                ->label('İl')
+                                ->options([
+                                    'İstanbul' => 'İstanbul',
+                                ])
+                                ->default('İstanbul')
+                                ->required()
+                                ->columnSpanFull(),
+                            
+                            Forms\Components\Select::make('district')
+                                ->label('İlçe')
+                                ->options([
+                                    'Adalar' => 'Adalar',
+                                    'Arnavutköy' => 'Arnavutköy',
+                                    'Ataşehir' => 'Ataşehir',
+                                    'Avcılar' => 'Avcılar',
+                                    'Bağcılar' => 'Bağcılar',
+                                    'Bahçelievler' => 'Bahçelievler',
+                                    'Bakırköy' => 'Bakırköy',
+                                    'Başakşehir' => 'Başakşehir',
+                                    'Bayrampaşa' => 'Bayrampaşa',
+                                    'Beşiktaş' => 'Beşiktaş',
+                                    'Beykoz' => 'Beykoz',
+                                    'Beylikdüzü' => 'Beylikdüzü',
+                                    'Beyoğlu' => 'Beyoğlu',
+                                    'Büyükçekmece' => 'Büyükçekmece',
+                                    'Çatalca' => 'Çatalca',
+                                    'Çekmeköy' => 'Çekmeköy',
+                                    'Esenler' => 'Esenler',
+                                    'Esenyurt' => 'Esenyurt',
+                                    'Eyüpsultan' => 'Eyüpsultan',
+                                    'Fatih' => 'Fatih',
+                                    'Gaziosmanpaşa' => 'Gaziosmanpaşa',
+                                    'Güngören' => 'Güngören',
+                                    'Kadıköy' => 'Kadıköy',
+                                    'Kağıthane' => 'Kağıthane',
+                                    'Kartal' => 'Kartal',
+                                    'Küçükçekmece' => 'Küçükçekmece',
+                                    'Maltepe' => 'Maltepe',
+                                    'Pendik' => 'Pendik',
+                                    'Sancaktepe' => 'Sancaktepe',
+                                    'Sarıyer' => 'Sarıyer',
+                                    'Silivri' => 'Silivri',
+                                    'Sultanbeyli' => 'Sultanbeyli',
+                                    'Sultangazi' => 'Sultangazi',
+                                    'Şile' => 'Şile',
+                                    'Şişli' => 'Şişli',
+                                    'Tuzla' => 'Tuzla',
+                                    'Ümraniye' => 'Ümraniye',
+                                    'Üsküdar' => 'Üsküdar',
+                                    'Zeytinburnu' => 'Zeytinburnu',
+                                ])
+                                ->searchable()
+                                ->required()
+                                ->columnSpanFull(),
+                            
+                            Forms\Components\TextInput::make('address')
+                                ->label('Detay Adres')
+                                ->placeholder('Mahalle, sokak, bina no vb.')
+                                ->maxLength(500)
+                                ->required()
+                                ->columnSpanFull(),
+                        ])
+                        ->hidden(fn (callable $get) => $get('use_google_maps')),
+                        
+                        // Google Maps Konum Seçimi (Google Maps açıkken)
+                        Forms\Components\Group::make([
+                            Forms\Components\TextInput::make('search_address')
+                                ->label('Adres Ara')
+                                ->placeholder('Bir adres yazın ve haritada bulun...')
+                                ->live()
+                                ->columnSpanFull(),
+                            
+                            Forms\Components\ViewField::make('google_maps')
+                                ->label('Harita - Tıklayarak Konum Seçin')
+                                ->view('custom.google-maps-picker')
+                                ->columnSpanFull(),
+                        ])
+                        ->visible(fn (callable $get) => $get('use_google_maps')),
+                        
+                        Forms\Components\Hidden::make('latitude'),
+                        Forms\Components\Hidden::make('longitude'),
+                    ])
+                    ->columnSpan(1),
             ])
-        ]);
+            ->columns(2);
     }
 
     public static function table(Table $table): Table
@@ -97,6 +178,9 @@ class ProjectResource extends Resource
                 Tables\Columns\TextColumn::make('id')->sortable(),
                 Tables\Columns\TextColumn::make('category.name')->label('Kategori'),
                 Tables\Columns\TextColumn::make('title')->label('Başlık'),
+                Tables\Columns\TextColumn::make('city')->label('İl'),
+                Tables\Columns\TextColumn::make('district')->label('İlçe'),
+                Tables\Columns\TextColumn::make('address')->label('Adres')->limit(30),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma'),
             ])
