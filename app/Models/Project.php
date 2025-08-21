@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Project extends Model
 {
@@ -16,7 +17,7 @@ class Project extends Model
         'image_path',
     ];
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Category::class, 'category_id');
     }

@@ -37,20 +37,7 @@ class ProjectResource extends Resource
                                         ->options(\App\Models\Category::whereNull('parent_id')->pluck('name', 'id'))
                                         ->required()
                                 ]),
-                    Forms\Components\Wizard\Step::make('Alt Kategori')
-                        ->icon('heroicon-o-list-bullet')
-                        ->description('Seçilen ana kategoriye ait alt kategoriyi seçin')
-                        ->columns(1)
-                        ->schema([
-                            Forms\Components\Select::make('category_id')
-                                ->label('Alt Kategori')
-                                ->options(function ($get) {
-                                    $parentId = $get('parent_category_id');
-                                    if (!$parentId) return [];
-                                    return \App\Models\Category::where('parent_id', $parentId)->pluck('name', 'id');
-                                })
-                                ->required(),
-                        ]),
+
                     Forms\Components\Wizard\Step::make('Başlık')
                         ->icon('heroicon-o-pencil-square')
                         ->description('Proje başlığını girin')
