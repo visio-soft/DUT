@@ -11,7 +11,7 @@ class Category extends Model
 {
     use SoftDeletes;
     protected $fillable = ['name', 'parent_id', 'icon'];
-    public function parent():BelongsTo
+    public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
     }
