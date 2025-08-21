@@ -41,6 +41,7 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('parent.name')
+                    ->label('Üst Kategori')
                     ->sortable()->searchable()->default('-'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Kategori Adı')
