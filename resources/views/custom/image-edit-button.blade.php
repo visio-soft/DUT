@@ -23,25 +23,23 @@
         {{ $hasImage ? 'Düzenle' : 'Önce Resim Yükleyin' }}
     </button>
     
-    @if($hasImage)
-        <div class="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 border-2 border-white rounded-full animate-pulse"></div>
-    @endif
 </div>
 
 <!-- Modal for Image Editor -->
 <div x-data="{ showModal: @entangle('showImageEditor') }" 
      x-show="showModal" 
      x-cloak
-     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+     class="fixed inset-0 z-50 bg-black bg-opacity-50"
      x-transition:enter="transition ease-out duration-300"
      x-transition:enter-start="opacity-0"
      x-transition:enter-end="opacity-100"
      x-transition:leave="transition ease-in duration-200"
      x-transition:leave-start="opacity-100"
      x-transition:leave-end="opacity-0">
-    
+    <!-- popup page - TAM EKRAN -->
     <div @click.away="showModal = false" 
-         class="relative bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-[80vw] h-[80vh] max-w-7xl max-h-[80vh] overflow-hidden"
+         class="absolute inset-4 bg-white dark:bg-gray-800 rounded-lg shadow-2xl overflow-hidden"
+         style="width: calc(95vw - 2rem); height: calc(100vh - 2rem); top: 1rem; left: 3rem;"
          x-transition:enter="transition ease-out duration-300 transform"
          x-transition:enter-start="opacity-0 scale-95"
          x-transition:enter-end="opacity-100 scale-100"
@@ -63,10 +61,21 @@
         </div>
         
         <!-- Modal Content - Iframe for drag_droptest page -->
-        <div class="p-0 h-[calc(80vh-4rem)] overflow-hidden">
-            <iframe src="/admin/drag-droptest" 
+        <div class="p-0 overflow-hidden" style="height: calc(100vh - 6rem);">
+            @php
+                $imageUrl = '';
+                if ($hasImage && isset($this->data['image_path'])) {
+                    if (is_array($this->data['image_path']) && !empty($this->data['image_path'])) {
+                        $imageUrl = $this->data['image_path'][0] ?? '';
+                    } else {
+                        $imageUrl = $this->data['image_path'];
+                    }
+                }
+            @endphp
+            <iframe :src="'/admin/drag-droptest?image=' + encodeURIComponent('{{ $imageUrl }}')" 
                     class="w-full h-full border-0" 
-                    frameborder="0">
+                    frameborder="0"
+                    style="width: 100%; height: 100%;">
             </iframe>
         </div>
     </div>
