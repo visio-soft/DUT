@@ -63,21 +63,24 @@ class ProjectResource extends Resource
                         
                         Forms\Components\Grid::make()
                             ->schema([
-                                SpatieMediaLibraryFileUpload::make('image_path')
-                                    ->label('Resim')
+                                Forms\Components\ViewField::make('image_upload_row')
+                                   ->view('custom.image-upload-row') 
                                     ->columnSpan(1)
-                                    ->image()
-                                    ->directory('projects')
-                                    ->maxSize(2048)
-                                    ->required()
-                                    ->extraAttributes(['style' => 'max-height:8rem; overflow:hidden;']),
-                                Forms\Components\ViewField::make('image_edit_button')
-                                    ->view('custom.image-edit-button')
-                                    ->columnSpan(1)
-                                    ->extraAttributes(['style' => 'max-height:8rem; overflow:hidden;']),
+                                    ->childComponents([
+                                        SpatieMediaLibraryFileUpload::make('image_path')
+                                            ->label('Resim')
+                                            ->image()
+                                            ->directory('projects')
+                                            ->maxSize(5048)
+                                            ->required()
+                                            ->extraAttributes(['style' => 'overflow:hidden;']),
+                                        Forms\Components\ViewField::make('image_edit_button')
+                                            
+                                            ->view('custom.image-edit-button')
+                                    ])
                             ])
-                            ->columns(2)
-                            ->extraAttributes(['class' => 'grid grid-cols-1 md:grid-cols-2 gap-3'])
+                            ->columns(1)
+                            ->extraAttributes(['class' => 'gap-3'])
 
                     ])
                     ->columnSpan(1),
