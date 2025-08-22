@@ -16,8 +16,8 @@ return new class extends Migration
     {
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(User::class,'created_by_id');
-            $table->foreignIdFor(User::class,'updated_by_id');
+            $table->foreignIdFor(User::class,'created_by_id')->nullable();
+            $table->foreignIdFor(User::class,'updated_by_id')->nullable();
             $table->foreignIdFor(Category::class);
             $table->string('name')->index();
             $table->text('description')->nullable();
