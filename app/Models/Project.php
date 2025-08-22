@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use App\Observers\ProjectObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+#[ObservedBy([ProjectObserver::class])]
 class Project extends Model implements HasMedia
 {
     use InteractsWithMedia;
+
     protected $fillable = [
         'category_id',
-        'title',
         'name',
         'description',
         'start_date',
@@ -30,15 +33,7 @@ class Project extends Model implements HasMedia
 
     public function category(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Category::class, 'category_id');
+        return $this->belongsTo(Category::class, 'category_id');
     }
-    
-    protected static function booted()
-    {
-        static::creating(function ($project) {
-            if (empty($project->name) && !empty($project->title)) {
-                $project->name = $project->title;
-            }
-        });
-    }
+
 }

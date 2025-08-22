@@ -37,14 +37,7 @@ return new class extends Migration
             }
         });
 
-        // name ve title arasındaki tutarsızlığı düzelt
-        // Önce title boş olan kayıtları name ile doldur
-        DB::statement('UPDATE projects SET title = name WHERE title IS NULL AND name IS NOT NULL');
-        
-        // Sonra name boş olan kayıtları title ile doldur  
-        DB::statement('UPDATE projects SET name = title WHERE name IS NULL AND title IS NOT NULL');
 
-        // name sütununu nullable yap (güvenli)
         Schema::table('projects', function (Blueprint $table) {
             $table->string('name')->nullable()->change();
         });
@@ -57,13 +50,13 @@ return new class extends Migration
     {
         Schema::table('projects', function (Blueprint $table) {
             $columns = ['start_date', 'end_date', 'neighborhood', 'street_cadde', 'street_sokak', 'address_details', 'image_path'];
-            
+
             foreach ($columns as $column) {
                 if (Schema::hasColumn('projects', $column)) {
                     $table->dropColumn($column);
                 }
             }
-            
+
             // name'i tekrar not null yap
             $table->string('name')->nullable(false)->change();
         });
