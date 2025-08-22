@@ -10,6 +10,8 @@ class CreateProject extends CreateRecord
 {
     protected static string $resource = ProjectResource::class;
     
+    public $showImageEditor = false;
+    
     protected function getFormActions(): array
     {
         return []; // Default butonları gizle
@@ -42,5 +44,11 @@ class CreateProject extends CreateRecord
         
         $this->getCreatedNotification()?->send();
         $this->redirect($this->getResource()::getUrl('create'));
+    }
+    
+    // Image editor modal'ını açmak için
+    public function openImageEditor(): void
+    {
+        $this->showImageEditor = true;
     }
 }

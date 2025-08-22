@@ -36,52 +36,43 @@ class ProjectResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required(),
-                        
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
                             ->required()
                             ->maxLength(255),
-                        
                         Forms\Components\Textarea::make('description')
                             ->label('Açıklama')
                             ->required()
                             ->rows(3),
-                        
                         Forms\Components\DatePicker::make('start_date')
                             ->label('Başlangıç Tarihi')
                             ->required(),
-                        
                         Forms\Components\DatePicker::make('end_date')
                             ->label('Bitiş Tarihi')
                             ->required(),
-                        
                         Forms\Components\TextInput::make('budget')
                             ->label('Bütçe')
                             ->numeric()
                             ->required()
                             ->prefix('₺'),
-                        
+                        // Tek bir grid içinde upload ve edit butonu yan yana
                         Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\ViewField::make('image_upload_row')
-                                   ->view('custom.image-upload-row') 
-                                    ->columnSpan(1)
-                                    ->childComponents([
-                                        SpatieMediaLibraryFileUpload::make('image_path')
-                                            ->label('Resim')
-                                            ->image()
-                                            ->directory('projects')
-                                            ->maxSize(5048)
-                                            ->required()
-                                            ->extraAttributes(['style' => 'overflow:hidden;']),
-                                        Forms\Components\ViewField::make('image_edit_button')
-                                            
-                                            ->view('custom.image-edit-button')
-                                    ])
+                                SpatieMediaLibraryFileUpload::make('image_path')
+                                    ->label('Resim')
+                                    ->image()
+                                    ->directory('projects')
+                                    ->maxSize(5048)
+                                    ->required()
+                                    ->reactive()
+                                    ->extraAttributes(['style' => 'overflow:hidden;'])
+                                    ->rules(['required']),
+                                    // düzenle butonu
+                                Forms\Components\ViewField::make('image_edit_button')
+                                    ->view('custom.image-edit-button')
                             ])
-                            ->columns(1)
+                            ->columns(2)
                             ->extraAttributes(['class' => 'gap-3'])
-
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')

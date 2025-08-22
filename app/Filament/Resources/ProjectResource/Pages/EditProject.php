@@ -9,11 +9,19 @@ use Filament\Resources\Pages\EditRecord;
 class EditProject extends EditRecord
 {
     protected static string $resource = ProjectResource::class;
+    
+    public $showImageEditor = false;
 
     protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make(),
         ];
+    }
+    
+    // Image editor modal'ını açmak için
+    public function openImageEditor(): void
+    {
+        $this->showImageEditor = true;
     }
 }
