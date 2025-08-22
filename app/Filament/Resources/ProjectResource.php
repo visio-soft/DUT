@@ -61,12 +61,24 @@ class ProjectResource extends Resource
                             ->required()
                             ->prefix('₺'),
                         
-                        SpatieMediaLibraryFileUpload::make('image_path')
-                            ->label('Resim')
-                            ->image()
-                            ->directory('projects')
-                            ->maxSize(2048)
-                            ->required(),
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('image_path')
+                                    ->label('Resim')
+                                    ->columnSpan(1)
+                                    ->image()
+                                    ->directory('projects')
+                                    ->maxSize(2048)
+                                    ->required()
+                                    ->extraAttributes(['style' => 'max-height:8rem; overflow:hidden;']),
+                                Forms\Components\ViewField::make('image_edit_button')
+                                    ->view('custom.image-edit-button')
+                                    ->columnSpan(1)
+                                    ->extraAttributes(['style' => 'max-height:8rem; overflow:hidden;']),
+                            ])
+                            ->columns(2)
+                            ->extraAttributes(['class' => 'grid grid-cols-1 md:grid-cols-2 gap-3'])
+
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
@@ -79,7 +91,7 @@ class ProjectResource extends Resource
                             ->columnSpanFull(),
                         
                         // Manual Konum Girişi (Google Maps kapalıyken)
-                        Forms\Components\Group::make([
+                        Forms\Components\Group::make()->schema([
                             // Şehir sabit: İstanbul (saklama için Hidden, gösterim için disabled TextInput)
                             Forms\Components\Hidden::make('city')
                                 ->default('İstanbul'),
@@ -203,11 +215,11 @@ class ProjectResource extends Resource
                                 ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
                                 ->rows(3)
                                 ->columnSpanFull(),
-                        ])
-                        ->hidden(fn (callable $get) => $get('use_google_maps')),
+                        ])->hidden(fn (callable $get) => $get('use_google_maps')),
                         
                         // Google Maps Konum Seçimi (Google Maps açıkken)
-                        Forms\Components\Group::make([
+                        // Google Maps Konum Seçimi (Google Maps açıkken)
+                        Forms\Components\Group::make()->schema([
                             Forms\Components\TextInput::make('search_address')
                                 ->label('Adres Ara')
                                 ->placeholder('Bir adres yazın ve haritada bulun...')
@@ -218,9 +230,7 @@ class ProjectResource extends Resource
                                 ->label('Harita - Tıklayarak Konum Seçin')
                                 ->view('custom.google-maps-picker')
                                 ->columnSpanFull(),
-                        ])
-                        ->visible(fn (callable $get) => $get('use_google_maps')),
-                        
+                        ])->visible(fn (callable $get) => $get('use_google_maps')),
                         Forms\Components\Hidden::make('latitude'),
                         Forms\Components\Hidden::make('longitude'),
                     ])
