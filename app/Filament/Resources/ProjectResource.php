@@ -12,6 +12,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 
 class ProjectResource extends Resource
@@ -65,15 +67,10 @@ class ProjectResource extends Resource
                             ->directory('projects')
                             ->maxSize(2048)
                             ->required(),
-                        
-                        // Form butonları
-                        Forms\Components\ViewField::make('form_actions')
-                            ->label('')
-                            ->view('custom.form-actions')
-                            ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
+                    ->extraAttributes(['class' => 'mx-auto max-w-2xl p-4 ml-auto'])
                     ->schema([
                         Forms\Components\Toggle::make('use_google_maps')
                             ->label('Haritadan Seç')
@@ -83,13 +80,15 @@ class ProjectResource extends Resource
                         
                         // Manual Konum Girişi (Google Maps kapalıyken)
                         Forms\Components\Group::make([
-                            Forms\Components\Select::make('city')
+                            // Şehir sabit: İstanbul (saklama için Hidden, gösterim için disabled TextInput)
+                            Forms\Components\Hidden::make('city')
+                                ->default('İstanbul'),
+
+                            Forms\Components\TextInput::make('city_display')
                                 ->label('İl')
-                                ->options([
-                                    'İstanbul' => 'İstanbul',
-                                ])
                                 ->default('İstanbul')
-                                ->required()
+                                ->disabled()
+                                ->dehydrated(false)
                                 ->columnSpanFull(),
                             
                             Forms\Components\Select::make('district')
@@ -137,13 +136,72 @@ class ProjectResource extends Resource
                                 ])
                                 ->searchable()
                                 ->required()
+                                ->reactive()
                                 ->columnSpanFull(),
                             
-                            Forms\Components\TextInput::make('address')
-                                ->label('Detay Adres')
-                                ->placeholder('Mahalle, sokak, bina no vb.')
-                                ->maxLength(500)
+                            Forms\Components\Select::make('neighborhood')
+                                ->label('Mahalle')
+                                ->options(function (callable $get) {
+                                    $district = $get('district');
+                                    $map = config('istanbul_neighborhoods', []);
+
+                                    $options = $map[$district] ?? [];
+                                    // '__other' seçeneği kullanıcı kendi mahalle adını yazabilsin diye
+                                    return array_merge($options, ['__other' => 'Diğer..']);
+                                })
+                                ->reactive()
+                                ->searchable()
                                 ->required()
+                                ->placeholder(fn (callable $get) => $get('district') ? 'Mahalle seçin veya Diğer seçin' : 'Önce ilçe seçin')
+                                ->disabled(fn (callable $get) => !$get('district'))
+                                ->columnSpanFull()
+                                ->dehydrateStateUsing(function ($state, callable $get) {
+                                    // Eğer '__other' seçildiyse custom değeri kullan
+                                    if ($state === '__other') {
+                                        return $get('neighborhood_custom') ?: null;
+                                    }
+
+                                    return $state;
+                                }),
+
+                            // Kullanıcı "Diğer" seçerse kendi mahalle adını yazsın
+                            Forms\Components\TextInput::make('neighborhood_custom')
+                                ->label('Diğer Mahalle')
+                                ->placeholder('Mahallenizi yazın')
+                                ->visible(fn (callable $get) => $get('neighborhood') === '__other')
+                                ->required(fn (callable $get) => $get('neighborhood') === '__other')
+                                ->afterStateHydrated(function ($state, callable $set, callable $get) {
+                                    // Eğer kayıt düzenleniyorsa ve kayıtlı mahalle neighborhood alanında değilse
+                                    // (örneğin önceki kayıt custom girilmişse), neighborhood alanını '__other' yap
+                                    if ($state && $get('neighborhood') !== '__other') {
+                                        $set('neighborhood', '__other');
+                                    }
+                                })
+                                ->dehydrated(false)
+                                ->columnSpanFull(),
+
+                            // Sokak / Cadde alanları yan yana olacak şekilde (Grid ile 2 sütun)
+                            Forms\Components\Grid::make()
+                                ->schema([
+                                    Forms\Components\TextInput::make('street_cadde')
+                                        ->label('Cadde')
+                                        ->placeholder('Cadde adı')
+                                        ->columnSpan(1),
+
+                                    Forms\Components\TextInput::make('street_sokak')
+                                        ->label('Sokak')
+                                        ->placeholder('Sokak adı')
+                                        ->columnSpan(1),
+                                ])
+                                ->columns(2)
+                                ->extraAttributes(['class' => 'grid grid-cols-2 gap-3'])
+                                ->columnSpanFull(),
+
+                            // Detaylı tarif (mahallenin altına)
+                            Forms\Components\Textarea::make('address_details')
+                                ->label('Detaylı Tarif')
+                                ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
+                                ->rows(3)
                                 ->columnSpanFull(),
                         ])
                         ->hidden(fn (callable $get) => $get('use_google_maps')),
@@ -167,6 +225,12 @@ class ProjectResource extends Resource
                         Forms\Components\Hidden::make('longitude'),
                     ])
                     ->columnSpan(1),
+                // Form butonlarını form şemasının sonuna taşıyoruz, böylece mobilde
+                // sütunlar alt alta geldiğinde butonlar formun altında kalır.
+                Forms\Components\ViewField::make('form_actions')
+                    ->label('')
+                    ->view('custom.form-actions')
+                    ->columnSpanFull(),
             ])
             ->columns(2);
     }
@@ -176,16 +240,81 @@ class ProjectResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable(),
-                Tables\Columns\TextColumn::make('category.name')->label('Kategori'),
-                Tables\Columns\TextColumn::make('title')->label('Başlık'),
-                Tables\Columns\TextColumn::make('city')->label('İl'),
-                Tables\Columns\TextColumn::make('district')->label('İlçe'),
-                Tables\Columns\TextColumn::make('address')->label('Adres')->limit(30),
+                // Proje adı kategoriden önce gösterilsin
+                Tables\Columns\TextColumn::make('name')->label('Adı')->limit(30)->searchable(),
+                Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable(),
+                Tables\Columns\TextColumn::make('title')->label('Başlık')->searchable(),
+                Tables\Columns\TextColumn::make('city')->label('İl')->searchable(),
+                Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable(),
+                Tables\Columns\TextColumn::make('address')->label('Adres')->limit(30)->searchable(),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe'),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma'),
             ])
             ->filters([
-                //
+                SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->relationship('category', 'name'),
+
+                // Konum filtresi: İlçe ve Mahalle dropdownları
+                Filter::make('location')
+                    ->label('Konum')
+                    ->form([
+                        Forms\Components\Select::make('district')
+                            ->label('İlçe')
+                            ->options(function () {
+                                $keys = array_keys(config('istanbul_neighborhoods', []));
+                                return array_combine($keys, $keys);
+                            })
+                            ->searchable(),
+
+                        Forms\Components\Select::make('neighborhood')
+                            ->label('Mahalle')
+                            ->options(function (callable $get) {
+                                $district = $get('district');
+                                $map = config('istanbul_neighborhoods', []);
+                                return $map[$district] ?? [];
+                            })
+                            ->searchable(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['district'])) {
+                            $query->where('district', $data['district']);
+                        }
+
+                        if (!empty($data['neighborhood'])) {
+                            $query->where('neighborhood', $data['neighborhood']);
+                        }
+                    }),
+
+                // Bütçe filtresi: miktar + az/çok toggle
+                Filter::make('budget_filter')
+                    ->label('Bütçe')
+                    ->form([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('amount')
+                                    ->label('Bütçe')
+                                    ->numeric()
+                                    ->default(0),
+
+                                Forms\Components\Toggle::make('is_more')
+                                    ->label(fn (callable $get) => $get('amount') ? ($get('amount') . "₺'dan fazla?") : 'Bütçe Belirleyin')
+                                    ->inline(false),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (empty($data['amount'])) {
+                            return;
+                        }
+
+                        $amount = $data['amount'];
+                        if (!empty($data['is_more'])) {
+                            $query->where('budget', '>=', $amount);
+                        } else {
+                            $query->where('budget', '<=', $amount);
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

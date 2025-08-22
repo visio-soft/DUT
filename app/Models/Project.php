@@ -11,22 +11,34 @@ class Project extends Model implements HasMedia
     use InteractsWithMedia;
     protected $fillable = [
         'category_id',
-        'parent_category_id',
         'title',
+        'name',
         'description',
-        'location',
+        'start_date',
+        'end_date',
         'budget',
-        'image_path',
         'latitude',
         'longitude',
         'address',
+        'address_details',
         'city',
         'district',
-        'country',
+        'neighborhood',
+        'street_cadde',
+        'street_sokak',
     ];
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Category::class, 'category_id');
+    }
+    
+    protected static function booted()
+    {
+        static::creating(function ($project) {
+            if (empty($project->name) && !empty($project->title)) {
+                $project->name = $project->title;
+            }
+        });
     }
 }

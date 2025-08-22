@@ -1,4 +1,4 @@
-<div class="mt-6 flex flex-wrap gap-3">
+<div class="mt-6 flex flex-wrap gap-3 justify-center items-center w-full">
     <button 
         type="button"
         wire:click="submitForm"
