@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         // Kullanıcı ekle
         $this->call([
             UserSeeder::class,
+            BelediyecilikKategorileriSeeder::class,
         ]);
     }
 }

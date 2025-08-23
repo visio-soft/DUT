@@ -58,45 +58,27 @@ class ProjectResource extends Resource
                             ->numeric()
                             ->required()
                             ->prefix('₺'),
-                        // Tek bir grid içinde upload ve edit butonu yan yana
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                // durum flag'i: upload sonrası butonu görünür yapmak için
-                                Forms\Components\Hidden::make('image_uploaded')
-                                    ->default(false)
-                                    ->dehydrated(false),
-
-                                SpatieMediaLibraryFileUpload::make('images')
-                                    ->label('Resim')
-                                    ->collection('images')
-                                    ->image()
-                                    ->directory('projects')
-                                    ->maxSize(5120) // 5MB
-                                    ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'])
-                                    ->required()
-                                    ->imagePreviewHeight('150')
-                                    ->panelLayout('integrated')
-                                    ->maxFiles(1)
-                                    ->helperText('Desteklenen formatlar: JPEG, JPG, PNG, GIF, WebP, BMP, SVG. Boyut: 200x200 - 6000x6000 piksel arası. Maksimum dosya boyutu: 5MB. Bu alan zorunludur.')
-                                    ->hintColor('warning')
-                                    ->reactive()
-                                    ->rules([
-                                        new ImageFormatRule([], 'projeler')
-                                    ])
-                                    ->extraAttributes(['style' => 'overflow:hidden;'])
-                                    ->afterStateUpdated(function ($state, $set) {
-                                        // yükleme gerçekleştiğinde flag'i güncelle
-                                        $set('image_uploaded', (bool) $state);
-                                    })
-                                    ->helperText('Önerilen: Proje ile ilgili açıklayıcı bir resim.'),
-
-                                // düzenle butonu - yalnızca resim yüklüyse veya zaten kayıtlı bir medya varsa göster
-                                Forms\Components\ViewField::make('image_edit_button')
-                                    ->view('custom.image-edit-button')
-                                    ->visible(fn (callable $get) => (bool) $get('image_uploaded') || (bool) $get('images'))
+                        // Resim upload - Filament'in standart özellikleriyle
+                        SpatieMediaLibraryFileUpload::make('images')
+                            ->label('Resim')
+                            ->collection('images')
+                            ->image()
+                            ->directory('projects')
+                            ->maxSize(5120) // 5MB
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'])
+                            ->required()
+                            ->imagePreviewHeight('150')
+                            ->panelLayout('integrated')
+                            ->maxFiles(1)
+                            ->helperText('Desteklenen formatlar: JPEG, JPG, PNG, GIF, WebP, BMP, SVG. Boyut: 200x200 - 6000x6000 piksel arası. Maksimum dosya boyutu: 5MB.')
+                            ->hintColor('primary')
+                            ->uploadButtonPosition('left')
+                            ->removeUploadedFileButtonPosition('right')
+                            ->uploadProgressIndicatorPosition('left')
+                            ->rules([
+                                new ImageFormatRule([], 'projeler')
                             ])
-                            ->columns(2)
-                            ->extraAttributes(['class' => 'gap-3'])
+                            ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
@@ -253,8 +235,7 @@ class ProjectResource extends Resource
                         Forms\Components\Hidden::make('longitude'),
                     ])
                     ->columnSpan(1),
-                // Form butonlarını form şemasının sonuna taşıyoruz, böylece mobilde
-                // sütunlar alt alta geldiğinde butonlar formun altında kalır.
+                // Form butonları ekle - CategoryResource'taki gibi
                 Forms\Components\ViewField::make('form_actions')
                     ->label('')
                     ->view('custom.form-actions')
@@ -286,8 +267,10 @@ class ProjectResource extends Resource
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
                     ->money('TRY')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable(),
-                Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable(),
+                Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -381,6 +364,18 @@ class ProjectResource extends Resource
             'index' => Pages\ListProjects::route('/'),
             'create' => Pages\CreateProject::route('/create'),
             'edit' => Pages\EditProject::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('create_with_design')
+                ->label('Yeni Proje Oluştur')
+                ->icon('heroicon-o-plus')
+                ->color('primary')
+                ->url(fn (): string => static::getUrl('create'))
+                ->openUrlInNewTab(false),
         ];
     }
 }

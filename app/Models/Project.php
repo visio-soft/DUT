@@ -17,6 +17,7 @@ class Project extends Model implements HasMedia
 
     protected $fillable = [
         'category_id',
+        'created_by_id',
         'title',
         'description',
         'start_date',
@@ -44,6 +45,11 @@ class Project extends Model implements HasMedia
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by_id');
     }
 
     public function registerMediaCollections(): void

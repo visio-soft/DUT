@@ -19,6 +19,7 @@
 /storage/*.key
 /storage/pail
 /storage/media-library/temp/
+/storage/app/media-temp/
 /vendor
 Homestead.json
 Homestead.yaml
