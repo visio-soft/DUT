@@ -1,6 +1,7 @@
 <x-filament-panels::page>
-    @push('styles')
-    <style>
+    <div class="landscape-designer-wrapper">
+        @push('styles')
+        <style>
         .landscape-designer-wrapper {
             width: 100%;
             height: 100%;
