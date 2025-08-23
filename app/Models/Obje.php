@@ -31,7 +31,8 @@ class Obje extends Model implements HasMedia
                 'image/bmp', 
                 'image/svg+xml'
             ])
-            ->singleFile();
+            ->singleFile()
+            ->useDisk('public');
     }
     
     public function registerMediaConversions(?Media $media = null): void

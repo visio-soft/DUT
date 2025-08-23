@@ -40,7 +40,7 @@ class ObjeResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Obje ismini girin'),
-                        SpatieMediaLibraryFileUpload::make('image')
+                        SpatieMediaLibraryFileUpload::make('images')
                             ->label('Resim Yükle')
                             ->collection('images')
                             ->image()
@@ -52,15 +52,17 @@ class ObjeResource extends Resource
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'])
                             ->helperText('Önerilen: Arka planı kırpılmış (şeffaf) PNG formatında bir resim.')
                             ->hintColor('info')
-                            ->reactive()
-                            ->responsiveImages() // Bu resim boyutlandırma işlemlerini optimize eder
-                            ->rules([
-                                new ImageFormatRule([], 'objeler')
-                            ])
-                            ->afterStateUpdated(function ($state, $set) {
-                                // Resim yüklendikten sonra preview'ı göster
-                                $set('image_preview', $state);
-                            }),
+                            ->preserveFilenames()
+                            ->enableOpen()
+                            ->enableDownload()
+                            ->columnSpanFull()
+                            ->visibility('public')
+                            ->disk('public')
+                            ->nullable()
+                            ->imageResizeMode('contain')
+                            ->imageCropAspectRatio(null)
+                            ->imageResizeTargetWidth('2000')
+                            ->imageResizeTargetHeight('2000'),
                     ])
                     ->columnSpanFull(),
             ]);
@@ -73,17 +75,14 @@ class ObjeResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
-                Tables\Columns\ImageColumn::make('first_media_url')
+                SpatieMediaLibraryImageColumn::make('images')
                     ->label('Resim')
+                    ->collection('images')
                     ->height(60)
                     ->width(60)
                     ->square()
-                    ->defaultImageUrl(url('/images/no-image.png'))
-                    ->getStateUsing(function ($record) {
-                        $media = $record->getFirstMedia('images');
-                        return $media ? $media->getUrl() : null;
-                    })
-                    ->extraImgAttributes(['style' => 'object-fit: contain; background: transparent;']),
+                    ->disk('public')
+                    ->visibility('public'),
                 Tables\Columns\TextColumn::make('isim')
                     ->label('İsim')
                     ->searchable()

@@ -6,6 +6,7 @@ use App\Filament\Resources\ObjeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Actions\Action;
+use Illuminate\Support\Facades\Log;
 
 class CreateObje extends CreateRecord
 {
@@ -49,5 +50,18 @@ class CreateObje extends CreateRecord
     public function getTitle(): string
     {
         return 'Yeni Obje Oluştur';
+    }
+
+    protected function afterCreate(): void
+    {
+        // Media yükleme sonrası log kaydı
+        if ($this->record) {
+            $mediaCount = $this->record->getMedia('images')->count();
+            Log::info('Obje oluşturuldu', [
+                'obje_id' => $this->record->id,
+                'obje_isim' => $this->record->isim,
+                'media_sayisi' => $mediaCount
+            ]);
+        }
     }
 }

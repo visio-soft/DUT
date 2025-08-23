@@ -79,6 +79,47 @@ class ProjectResource extends Resource
                                 new ImageFormatRule([], 'projeler')
                             ])
                             ->columnSpanFull(),
+                        
+                        // Landscape Designer Button
+                        Forms\Components\Actions::make([
+                            Forms\Components\Actions\Action::make('landscape_designer')
+                                ->label('Tasarlamaya Başla')
+                                ->color('warning')
+                                ->icon('heroicon-o-paint-brush')
+                                ->size('lg')
+                                ->action(function ($livewire, $state) {
+                                    // Önce resmin yüklenip yüklenmediğini kontrol et
+                                    $images = $state['images'] ?? [];
+                                    if (empty($images)) {
+                                        // Notification göster
+                                        \Filament\Notifications\Notification::make()
+                                            ->title('Uyarı!')
+                                            ->body('Önce bir resim yüklemelisiniz.')
+                                            ->warning()
+                                            ->send();
+                                        return;
+                                    }
+                                    
+                                    // Geçici resim path'ini al
+                                    $imagePath = is_array($images) ? reset($images) : $images;
+                                    
+                                    // Eğer bu bir Livewire temporary upload ise
+                                    if (is_object($imagePath) && method_exists($imagePath, 'getClientOriginalName')) {
+                                        // Geçici dosyayı storage'a kaydet
+                                        $tempPath = $imagePath->store('temp-landscape', 'public');
+                                        $imagePath = $tempPath;
+                                    }
+                                    
+                                    // Landscape Designer sayfasına yönlendir
+                                    $url = url('/admin/drag-drop-test') . '?image=' . urlencode($imagePath);
+                                    
+                                    // Yeni tab'da aç
+                                    $livewire->js("window.open('{$url}', '_blank')");
+                                })
+                                ->visible(fn($state) => !empty($state['images']))
+                                ->extraAttributes(['class' => 'w-full'])
+                        ])
+                        ->columnSpanFull()
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
