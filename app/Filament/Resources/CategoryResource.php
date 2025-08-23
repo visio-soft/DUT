@@ -25,14 +25,24 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('parent_id')
-                    ->preload()->searchable()->columnSpanFull()
-                    ->relationship('parent', 'name')->label('Üst Kategori'),
                 Forms\Components\TextInput::make('name')->label('Kategori Adı')
                     ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('icon')->label('Ikon')
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->placeholder('Kategori adını girin'),
+                Forms\Components\TextInput::make('icon')->label('Ikon (İsteğe Bağlı)')
+                    ->maxLength(255)
+                    ->placeholder('Ör: heroicon-o-home')
+                    ->helperText('Heroicon, FontAwesome veya başka ikon kütüphanelerinden ikon adı'),
+                Forms\Components\Select::make('parent_id')
+                    ->relationship('parent', 'name')
+                    ->label('Üst Kategori (İsteğe Bağlı)')
+                    ->placeholder('Ana kategori için boş bırakın')
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\ViewField::make('form_actions')
+                    ->label('')
+                    ->view('custom.form-actions')
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -40,45 +50,47 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('parent.name')
-                    ->label('Üst Kategori')
-                    ->sortable()->searchable()->default('-'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Kategori Adı')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('icon')->label('Ikon')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()->label('Oluşturulma Tarihi')
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Güncellenme Tarihi')
-                    ->dateTime()
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label('Üst Kategori')
                     ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('deleted_at')
-                    ->label('Silinme Tarihi')
-                    ->dateTime()
+                    ->searchable()
+                    ->placeholder('Ana Kategori'),
+                Tables\Columns\TextColumn::make('icon')
+                    ->label('Ikon')
+                    ->searchable()
+                    ->placeholder('-'),
+                Tables\Columns\TextColumn::make('projects_count')
+                    ->label('Proje Sayısı')
+                    ->counts('projects')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label('Oluşturulma')
+                    ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('name')
             ->filters([
-                Tables\Filters\TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('parent_id')
                     ->relationship('parent', 'name')
                     ->label('Üst Kategori')
-                    ->multiple()->searchable()->preload(),
+                    ->placeholder('Tüm Kategoriler')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->requiresConfirmation(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation(),
                 ]),
             ]);
     }
@@ -103,8 +115,6 @@ class CategoryResource extends Resource
     {
         return parent::getEloquentQuery()
             ->with(['parent:id,name'])
-            ->withoutGlobalScopes([
-                SoftDeletingScope::class,
-            ]);
+            ->withCount('projects');
     }
 }
