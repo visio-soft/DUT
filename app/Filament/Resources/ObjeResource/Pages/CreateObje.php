@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\CategoryResource\Pages;
+namespace App\Filament\Resources\ObjeResource\Pages;
 
-use App\Filament\Resources\CategoryResource;
+use App\Filament\Resources\ObjeResource;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 
-class CreateCategory extends CreateRecord
+class CreateObje extends CreateRecord
 {
-    protected static string $resource = CategoryResource::class;
+    protected static string $resource = ObjeResource::class;
 
     public function submitForm()
     {
@@ -29,9 +30,9 @@ class CreateCategory extends CreateRecord
         
         // Başarı bildirimi
         Notification::make()
-            ->title('Kategori başarıyla oluşturuldu!')
+            ->title('Obje başarıyla oluşturuldu!')
             ->success()
-            ->body('Yeni bir kategori daha ekleyebilirsiniz.')
+            ->body('Yeni bir obje daha ekleyebilirsiniz.')
             ->send();
         
         // Sayfayı yenile
@@ -40,7 +41,7 @@ class CreateCategory extends CreateRecord
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Kategori başarıyla oluşturuldu!';
+        return 'Obje başarıyla oluşturuldu!';
     }
 
     protected function getHeaderActions(): array
@@ -48,13 +49,13 @@ class CreateCategory extends CreateRecord
         return [];
     }
 
+    public function getTitle(): string
+    {
+        return 'Yeni Obje Oluştur';
+    }
+
     protected function getFormActions(): array
     {
         return [];
-    }
-
-    public function getTitle(): string
-    {
-        return 'Yeni Kategori Oluştur';
     }
 }
