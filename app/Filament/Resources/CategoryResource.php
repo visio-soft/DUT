@@ -39,10 +39,6 @@ class CategoryResource extends Resource
                     ->placeholder('Ana kategori için boş bırakın')
                     ->searchable()
                     ->preload(),
-                Forms\Components\ViewField::make('form_actions')
-                    ->label('')
-                    ->view('custom.form-actions')
-                    ->columnSpanFull(),
             ]);
     }
 

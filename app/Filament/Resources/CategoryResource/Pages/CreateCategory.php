@@ -4,39 +4,11 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Notifications\Notification;
+use Filament\Actions\Action;
 
 class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
-
-    public function submitForm()
-    {
-        $this->create();
-    }
-
-    public function submitAndCreateAnother()
-    {
-        // Formu validate et
-        $this->form->getState();
-        
-        // Kayıt oluştur
-        $data = $this->form->getState();
-        $record = $this->handleRecordCreation($data);
-        
-        // Form'u temizle
-        $this->form->fill();
-        
-        // Başarı bildirimi
-        Notification::make()
-            ->title('Kategori başarıyla oluşturuldu!')
-            ->success()
-            ->body('Yeni bir kategori daha ekleyebilirsiniz.')
-            ->send();
-        
-        // Sayfayı yenile
-        $this->redirect(static::getResource()::getUrl('create'));
-    }
 
     protected function getCreatedNotificationTitle(): ?string
     {
@@ -48,9 +20,29 @@ class CreateCategory extends CreateRecord
         return [];
     }
 
-    protected function getFormActions(): array
+    protected function getCreateFormAction(): Action
     {
-        return [];
+        return Action::make('create')
+            ->label('Oluştur')
+            ->submit('create')
+            ->keyBindings(['mod+s']);
+    }
+
+    protected function getCreateAnotherFormAction(): Action
+    {
+        return Action::make('createAnother')
+            ->label('Oluştur ve Yenisini Ekle')
+            ->action('createAnother')
+            ->keyBindings(['mod+shift+s'])
+            ->color('gray');
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('İptal')
+            ->url($this->getResource()::getUrl('index'))
+            ->color('gray');
     }
 
     public function getTitle(): string

@@ -5,39 +5,11 @@ namespace App\Filament\Resources\ObjeResource\Pages;
 use App\Filament\Resources\ObjeResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Notifications\Notification;
+use Filament\Actions\Action;
 
 class CreateObje extends CreateRecord
 {
     protected static string $resource = ObjeResource::class;
-
-    public function submitForm()
-    {
-        $this->create();
-    }
-
-    public function submitAndCreateAnother()
-    {
-        // Formu validate et
-        $this->form->getState();
-        
-        // Kayıt oluştur
-        $data = $this->form->getState();
-        $record = $this->handleRecordCreation($data);
-        
-        // Form'u temizle
-        $this->form->fill();
-        
-        // Başarı bildirimi
-        Notification::make()
-            ->title('Obje başarıyla oluşturuldu!')
-            ->success()
-            ->body('Yeni bir obje daha ekleyebilirsiniz.')
-            ->send();
-        
-        // Sayfayı yenile
-        $this->redirect(static::getResource()::getUrl('create'));
-    }
 
     protected function getCreatedNotificationTitle(): ?string
     {
@@ -49,13 +21,33 @@ class CreateObje extends CreateRecord
         return [];
     }
 
+    protected function getCreateFormAction(): Action
+    {
+        return Action::make('create')
+            ->label('Oluştur')
+            ->submit('create')
+            ->keyBindings(['mod+s']);
+    }
+
+    protected function getCreateAnotherFormAction(): Action
+    {
+        return Action::make('createAnother')
+            ->label('Oluştur ve Yenisini Ekle')
+            ->action('createAnother')
+            ->keyBindings(['mod+shift+s'])
+            ->color('gray');
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('İptal')
+            ->url($this->getResource()::getUrl('index'))
+            ->color('gray');
+    }
+
     public function getTitle(): string
     {
         return 'Yeni Obje Oluştur';
-    }
-
-    protected function getFormActions(): array
-    {
-        return [];
     }
 }

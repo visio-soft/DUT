@@ -5,15 +5,11 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Actions\Action;
 
 class EditCategory extends EditRecord
 {
     protected static string $resource = CategoryResource::class;
-
-    public function submitForm()
-    {
-        $this->save();
-    }
 
     protected function getSavedNotificationTitle(): ?string
     {
@@ -29,9 +25,20 @@ class EditCategory extends EditRecord
         ];
     }
 
-    protected function getFormActions(): array
+    protected function getSaveFormAction(): Action
     {
-        return [];
+        return Action::make('save')
+            ->label('Kaydet')
+            ->submit('save')
+            ->keyBindings(['mod+s']);
+    }
+
+    protected function getCancelFormAction(): Action
+    {
+        return Action::make('cancel')
+            ->label('İptal')
+            ->url($this->getResource()::getUrl('index'))
+            ->color('gray');
     }
 
     public function getTitle(): string

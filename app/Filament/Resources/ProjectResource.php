@@ -235,11 +235,6 @@ class ProjectResource extends Resource
                         Forms\Components\Hidden::make('longitude'),
                     ])
                     ->columnSpan(1),
-                // Form butonları ekle - CategoryResource'taki gibi
-                Forms\Components\ViewField::make('form_actions')
-                    ->label('')
-                    ->view('custom.form-actions')
-                    ->columnSpanFull(),
             ])
             ->columns(2);
     }

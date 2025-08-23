@@ -6,6 +6,7 @@ use App\Filament\Resources\ProjectResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class CreateProject extends CreateRecord
 {
@@ -22,82 +23,27 @@ class CreateProject extends CreateRecord
     
     protected function getFormActions(): array
     {
-        return []; // Default butonları gizle - custom view kullanıyoruz
+        return [
+            $this->getCreateFormAction()
+                ->label('Oluştur'),
+            $this->getCreateAnotherFormAction()
+                ->label('Oluştur ve Yeni')
+                ->icon('heroicon-m-plus')
+                ->color('success'),
+            $this->getCancelFormAction(),
+        ];
+    }
+    
+    // Override Filament's afterCreate method to add popup
+    protected function afterCreate(): void
+    {
+        // Drag-drop sayfasını popup olarak aç
+        $this->js("window.open('/admin/drag-droptest', 'dragdrop', 'width=1200,height=800,scrollbars=yes,resizable=yes')");
     }
     
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
-    }
-    
-    // Custom create method
-    public function createProject(): void
-    {
-        $this->authorizeAccess();
-
-        try {
-            $this->callHook('beforeValidate');
-
-            $data = $this->form->getState();
-
-            $this->callHook('afterValidate');
-
-            $data = $this->mutateFormDataBeforeCreate($data);
-
-            $this->callHook('beforeCreate');
-
-            $this->record = $this->handleRecordCreation($data);
-
-            $this->form->model($this->getRecord())->saveRelationships();
-
-            $this->callHook('afterCreate');
-
-            $this->getCreatedNotification()?->send();
-            
-            // Drag-drop sayfasını popup olarak aç
-            $this->js("window.open('/admin/drag-droptest', 'dragdrop', 'width=1200,height=800,scrollbars=yes,resizable=yes')");
-
-            $this->redirect($this->getRedirectUrl());
-        } catch (\Illuminate\Validation\ValidationException $exception) {
-            $this->handleRecordCreationValidationError($exception);
-        } catch (\Exception $exception) {
-            $this->handleRecordCreationError($exception);
-        }
-    }
-
-    // Custom create another method
-    public function createProjectAnother(): void
-    {
-        $this->authorizeAccess();
-
-        try {
-            $this->callHook('beforeValidate');
-
-            $data = $this->form->getState();
-
-            $this->callHook('afterValidate');
-
-            $data = $this->mutateFormDataBeforeCreate($data);
-
-            $this->callHook('beforeCreate');
-
-            $this->record = $this->handleRecordCreation($data);
-
-            $this->form->model($this->getRecord())->saveRelationships();
-
-            $this->callHook('afterCreate');
-
-            $this->getCreatedNotification()?->send();
-            
-            // Drag-drop sayfasını popup olarak aç
-            $this->js("window.open('/admin/drag-droptest', 'dragdrop', 'width=1200,height=800,scrollbars=yes,resizable=yes')");
-
-            $this->redirect($this->getResource()::getUrl('create'));
-        } catch (\Illuminate\Validation\ValidationException $exception) {
-            $this->handleRecordCreationValidationError($exception);
-        } catch (\Exception $exception) {
-            $this->handleRecordCreationError($exception);
-        }
     }
     
     // Image editor modal'ını açmak için

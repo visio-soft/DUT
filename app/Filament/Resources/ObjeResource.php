@@ -63,10 +63,6 @@ class ObjeResource extends Resource
                             }),
                     ])
                     ->columnSpanFull(),
-                Forms\Components\ViewField::make('form_actions')
-                    ->label('')
-                    ->view('custom.form-actions')
-                    ->columnSpanFull(),
             ]);
     }
 
