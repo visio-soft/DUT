@@ -5,7 +5,6 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProjectResource\Pages;
 use App\Filament\Resources\ProjectResource\RelationManagers;
 use App\Models\Project;
-use App\Rules\ImageFormatRule;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -16,7 +15,6 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class ProjectResource extends Resource
 {
@@ -33,12 +31,11 @@ class ProjectResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('category_id')
-                            ->label('Kategori')
+                            ->label('Ana Kategori')
                             ->relationship('category', 'name')
                             ->searchable()
                             ->preload()
-                            ->required()
-                            ->placeholder('Kategori seçin'),
+                            ->required(),
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
                             ->required()
@@ -61,39 +58,18 @@ class ProjectResource extends Resource
                         // Tek bir grid içinde upload ve edit butonu yan yana
                         Forms\Components\Grid::make()
                             ->schema([
-                                // durum flag'i: upload sonrası butonu görünür yapmak için
-                                Forms\Components\Hidden::make('image_uploaded')
-                                    ->default(false)
-                                    ->dehydrated(false),
-
-                                SpatieMediaLibraryFileUpload::make('images')
+                                SpatieMediaLibraryFileUpload::make('image_path')
                                     ->label('Resim')
-                                    ->collection('images')
                                     ->image()
                                     ->directory('projects')
-                                    ->maxSize(5120) // 5MB
-                                    ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'])
+                                    ->maxSize(5048)
                                     ->required()
-                                    ->imagePreviewHeight('150')
-                                    ->panelLayout('integrated')
-                                    ->maxFiles(1)
-                                    ->helperText('Desteklenen formatlar: JPEG, JPG, PNG, GIF, WebP, BMP, SVG. Boyut: 200x200 - 6000x6000 piksel arası. Maksimum dosya boyutu: 5MB. Bu alan zorunludur.')
-                                    ->hintColor('warning')
                                     ->reactive()
-                                    ->rules([
-                                        new ImageFormatRule([], 'projeler')
-                                    ])
                                     ->extraAttributes(['style' => 'overflow:hidden;'])
-                                    ->afterStateUpdated(function ($state, $set) {
-                                        // yükleme gerçekleştiğinde flag'i güncelle
-                                        $set('image_uploaded', (bool) $state);
-                                    })
-                                    ->helperText('Önerilen: Proje ile ilgili açıklayıcı bir resim.'),
-
-                                // düzenle butonu - yalnızca resim yüklüyse veya zaten kayıtlı bir medya varsa göster
+                                    ->rules(['required']),
+                                    // düzenle butonu
                                 Forms\Components\ViewField::make('image_edit_button')
                                     ->view('custom.image-edit-button')
-                                    ->visible(fn (callable $get) => (bool) $get('image_uploaded') || (bool) $get('images'))
                             ])
                             ->columns(2)
                             ->extraAttributes(['class' => 'gap-3'])
@@ -267,30 +243,16 @@ class ProjectResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
-                Tables\Columns\ImageColumn::make('first_media_url')
-                    ->label('Resim')
-                    ->height(60)
-                    ->width(60)
-                    ->square()
-                    ->defaultImageUrl(url('/images/no-image.png'))
-                    ->getStateUsing(function ($record) {
-                        $media = $record->getFirstMedia('images');
-                        return $media ? $media->getUrl() : null;
-                    })
-                    ->extraImgAttributes(['style' => 'object-fit: cover; border-radius: 6px;']),
-                Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label('Bütçe')
-                    ->money('TRY')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable(),
-                Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable(),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('id')->sortable(),
+                // Proje adı kategoriden önce gösterilsin
+                Tables\Columns\TextColumn::make('name')->label('Adı')->limit(30)->searchable(),
+                Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable(),
+                Tables\Columns\TextColumn::make('title')->label('Başlık')->searchable(),
+                Tables\Columns\TextColumn::make('city')->label('İl')->searchable(),
+                Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable(),
+                Tables\Columns\TextColumn::make('address')->label('Adres')->limit(30)->searchable(),
+                Tables\Columns\TextColumn::make('budget')->label('Bütçe'),
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma'),
             ])
             ->filters([
                 SelectFilter::make('category')

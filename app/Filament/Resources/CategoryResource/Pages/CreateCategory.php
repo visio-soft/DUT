@@ -4,57 +4,8 @@ namespace App\Filament\Resources\CategoryResource\Pages;
 
 use App\Filament\Resources\CategoryResource;
 use Filament\Resources\Pages\CreateRecord;
-use Filament\Notifications\Notification;
 
 class CreateCategory extends CreateRecord
 {
     protected static string $resource = CategoryResource::class;
-
-    public function submitForm()
-    {
-        $this->create();
-    }
-
-    public function submitAndCreateAnother()
-    {
-        // Formu validate et
-        $this->form->getState();
-        
-        // Kayıt oluştur
-        $data = $this->form->getState();
-        $record = $this->handleRecordCreation($data);
-        
-        // Form'u temizle
-        $this->form->fill();
-        
-        // Başarı bildirimi
-        Notification::make()
-            ->title('Kategori başarıyla oluşturuldu!')
-            ->success()
-            ->body('Yeni bir kategori daha ekleyebilirsiniz.')
-            ->send();
-        
-        // Sayfayı yenile
-        $this->redirect(static::getResource()::getUrl('create'));
-    }
-
-    protected function getCreatedNotificationTitle(): ?string
-    {
-        return 'Kategori başarıyla oluşturuldu!';
-    }
-
-    protected function getHeaderActions(): array
-    {
-        return [];
-    }
-
-    protected function getFormActions(): array
-    {
-        return [];
-    }
-
-    public function getTitle(): string
-    {
-        return 'Yeni Kategori Oluştur';
-    }
 }

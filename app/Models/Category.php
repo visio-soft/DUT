@@ -10,9 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Category extends Model
 {
     use SoftDeletes;
-    
     protected $fillable = ['name', 'parent_id', 'icon'];
-
     public function parent(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'parent_id');
@@ -21,10 +19,5 @@ class Category extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Category::class, 'parent_id');
-    }
-
-    public function projects(): HasMany
-    {
-        return $this->hasMany(Project::class, 'category_id');
     }
 }

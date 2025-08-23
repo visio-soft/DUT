@@ -8,8 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
-
 #[ObservedBy([ProjectObserver::class])]
 class Project extends Model implements HasMedia
 {
@@ -17,7 +15,7 @@ class Project extends Model implements HasMedia
 
     protected $fillable = [
         'category_id',
-        'title',
+        'name',
         'description',
         'start_date',
         'end_date',
@@ -33,78 +31,9 @@ class Project extends Model implements HasMedia
         'street_sokak',
     ];
 
-    protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
-        'budget' => 'decimal:2',
-        'latitude' => 'decimal:8',
-        'longitude' => 'decimal:8',
-    ];
-
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function registerMediaCollections(): void
-    {
-        $this->addMediaCollection('images')
-            ->acceptsMimeTypes([
-                'image/jpeg', 
-                'image/jpg', 
-                'image/png', 
-                'image/gif', 
-                'image/webp', 
-                'image/bmp', 
-                'image/svg+xml'
-            ])
-            ->singleFile();
-    }
-
-    public function registerMediaConversions(?Media $media = null): void
-    {
-        // Conversion'ları devre dışı bırak - hata kaynağı
-        // Eğer thumbnail gerekirse frontend'de CSS ile küçültelim
-        
-        /*
-        // Sadece raster (bitmap) resimler için conversion yapılır
-        $this->addMediaConversion('preview')
-            ->width(800)
-            ->height(600)
-            ->nonQueued()
-            ->performOnCollections('images')
-            ->optimize()
-            ->skipOnFailure() // Hata durumunda conversion'u atla
-            ->performOnlyOnMimeTypes([
-                'image/jpeg',
-                'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp'
-            ]);
-            
-        $this->addMediaConversion('thumb')
-            ->width(300)
-            ->height(200)
-            ->nonQueued()
-            ->performOnCollections('images')
-            ->optimize()
-            ->skipOnFailure() // Hata durumunda conversion'u atla
-            ->performOnlyOnMimeTypes([
-                'image/jpeg',
-                'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp'
-            ]);
-        */
-    }
-
-    // Getter for backward compatibility if needed
-    public function getNameAttribute()
-    {
-        return $this->title;
-    }
 }
