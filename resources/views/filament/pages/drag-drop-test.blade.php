@@ -1,3 +1,4 @@
+<div id="filament-designer-root">
 <x-filament-panels::page>
     <div>
         <style>
@@ -10,11 +11,50 @@
                 margin: 0;
             }
 
-            .landscape-designer-wrapper {
-                width: 100%;
-                max-width: 1400px;
-                margin: auto;
+            /* Filament-aware theme variables (fall back to sensible defaults) */
+            :root {
+                --fd-bg: var(--filament-background, #f8fafc);
+                --fd-panel-bg: var(--filament-panel, #ffffff);
+                --fd-border: var(--filament-border, #e5e7eb);
+                --fd-text: var(--filament-text, #374151);
+                --fd-accent: var(--filament-primary, #10b981);
+                --fd-accent-2: var(--filament-accent, #64614eff);
+                --fd-muted-white: rgba(255,255,255,0.95);
+                /* opacity applied to the background image so we can control "wash" above it */
+                --fd-bg-image-opacity: 1;
+                /* element card background (keeps elements readable but avoids washing the whole image) */
+                --fd-element-bg: rgba(0, 0, 0, 0);
+                /* name badge background for element labels */
+                --fd-name-bg: rgba(255,255,255,0.85);
+                --fd-name-text: #ffffffff;
+                --fd-danger: var(--filament-danger, #dc2626);
+                --fd-danger-bg: var(--filament-danger-100, #fee2e2);
+                --fd-info: var(--filament-info, #0ea5e9);
             }
+
+            /* Support Tailwind/Filament dark class (when Dark Mode is toggled via class) */
+            .dark {
+                --fd-bg: #0b1220;
+                --fd-panel-bg: #0f1724;
+                --fd-border: #1f2937;
+                --fd-text: #e6eef6;
+                --fd-accent: #34d399;
+                --fd-accent-2: #60a5fa;
+                --fd-muted-white: rgba(255,255,255,0.03);
+                --fd-bg-image-opacity: 1;
+                --fd-element-bg: rgba(255,255,255,0.03);
+                --fd-name-bg: rgba(0,0,0,0.6);
+                --fd-name-text: var(--fd-text);
+                --fd-danger: #f87171;
+                --fd-danger-bg: rgba(248,113,113,0.06);
+                --fd-info: #38bdf8;
+            }
+
+            .landscape-designer-wrapper {
+                    width: 100%;
+                    max-width: 1400px;
+                    margin: auto;
+                }
 
         .landscape-studio {
             display: flex;
@@ -24,12 +64,54 @@
 
         .element-palette {
             width: 250px;
-            background: white;
+            background: var(--fd-panel-bg);
             border-radius: 12px;
             padding: 20px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--fd-border);
             overflow-y: auto;
+        }
+
+        /* Empty state for palette */
+        .empty-palette {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 10px;
+            background: color-mix(in srgb, var(--fd-panel-bg) 85%, transparent);
+            border: 1px dashed var(--fd-border);
+            color: var(--fd-text);
+        }
+
+        .empty-palette .empty-icon {
+            font-size: 34px;
+            width: 56px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: color-mix(in srgb, var(--fd-accent) 10%, transparent);
+        }
+
+        .empty-palette .empty-content h3 {
+            margin: 0 0 6px 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--fd-text);
+        }
+
+        .empty-palette .empty-content p {
+            margin: 0;
+            font-size: 13px;
+            color: color-mix(in srgb, var(--fd-text) 70%, transparent);
+        }
+
+        .empty-palette .empty-hint {
+            margin-top: 8px;
+            font-size: 12px;
+            color: color-mix(in srgb, var(--fd-text) 50%, transparent);
         }
 
         .palette-item {
@@ -38,7 +120,7 @@
             gap: 10px;
             padding: 12px;
             margin: 8px 0;
-            background: #f9fafb;
+            background: var(--fd-bg);
             border-radius: 8px;
             cursor: grab;
             transition: all 0.2s ease;
@@ -47,10 +129,10 @@
         }
 
         .palette-item:hover {
-            background: #f3f4f6;
-            border-color: #10b981;
+            background: color-mix(in srgb, var(--fd-panel-bg) 90%, transparent);
+            border-color: var(--fd-accent);
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12);
         }
 
         .palette-image {
@@ -62,15 +144,14 @@
 
         .palette-item span {
             font-weight: 500;
-            color: #374151;
+            color: var(--fd-text);
         }
 
         .design-area {
             flex: 1;
-            background: #f8fafc;
             border-radius: 12px;
             position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
             overflow: hidden;
         }
 
@@ -80,8 +161,7 @@
             left: 50px;
             right: 50px;
             bottom: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 4px dashed #10b981;
+            border: 4px dashed var(--fd-accent);
             border-radius: 16px;
             overflow: hidden;
         }
@@ -93,15 +173,19 @@
             left: 0;
             right: 0;
             bottom: 0;
-            z-index: 1;
+            z-index: 2;
         }
 
         .background-image {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            opacity: 0.4;
+            /* Use a variable so we can tweak per-theme without hunting through the file */
+            opacity: var(--fd-bg-image-opacity, 1);
             border-radius: 12px;
+            /* make sure no additional filter dims the image */
+            filter: none;
+            -webkit-filter: none;
         }
 
         .boundary-label {
@@ -113,7 +197,7 @@
             border-radius: 20px;
             font-size: 12px;
             font-weight: 600;
-            color: #374151;
+            color: var(--fd-text);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             z-index: 25;
         }
@@ -125,22 +209,22 @@
             user-select: none;
             touch-action: none;
             border: 3px solid transparent;
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            border-radius: 4px;
+            transition: all 0.1s ease;
             z-index: 10;
             width: 120px;
             height: 120px;
         }
 
         .landscape-element:hover {
-            border-color: #3b82f6;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            border-color: var(--fd-accent-2);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.18);
             z-index: 15;
         }
 
         .landscape-element.selected {
-            border-color: #10b981;
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+            border-color: var(--fd-accent);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.24);
             z-index: 20;
         }
 
@@ -155,18 +239,55 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: rgba(255, 255, 255, 0.95);
+            /* lighter element background so the main image stays visible */
+            background: var(--fd-element-bg, var(--fd-muted-white));
+            position: relative;
             border-radius: 6px;
             padding: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .element-name {
+        /* Name wrapper that sizes to the text */
+        .element-name-wrap {
+            display: inline-block;
+            background: var(--fd-name-bg);
+            color: var(--fd-name-text);
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-top: 6px;
+            max-width: 110px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
             font-size: 11px;
-            font-weight: 500;
-            color: #374151;
-            text-align: center;
-            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* Overlay label on top of the image */
+        .element-label {
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 12;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .element-name {
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+            background: rgba(0,0,0,0.32);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            max-width: 120px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Kontrol handle'ları */
@@ -202,41 +323,41 @@
 
         .toolbar-btn {
             padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid #e5e7eb;
+            background: var(--fd-muted-white);
+            border: 1px solid var(--fd-border);
             border-radius: 8px;
             font-size: 13px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: #374151;
+            color: var(--fd-text);
         }
 
         .toolbar-btn:hover {
-            background: white;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--fd-panel-bg);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
             transform: translateY(-1px);
         }
 
         .toolbar-btn.delete {
-            background: #fee2e2;
-            color: #dc2626;
-            border-color: #fecaca;
+            background: var(--fd-danger-bg);
+            color: var(--fd-danger);
+            border-color: color-mix(in srgb, var(--fd-danger-bg) 80%, transparent);
         }
 
         .toolbar-btn.delete:hover {
-            background: #fecaca;
+            background: color-mix(in srgb, var(--fd-danger-bg) 90%, transparent);
         }
 
         /* Custom image items */
         .custom-image-item {
-            background: #f0f9ff;
-            border-color: #0ea5e9;
+            background: color-mix(in srgb, var(--fd-info) 10%, var(--fd-panel-bg));
+            border-color: var(--fd-info);
         }
 
         .custom-image-item:hover {
-            background: #e0f2fe;
-            border-color: #0284c7;
+            background: color-mix(in srgb, var(--fd-info) 14%, var(--fd-panel-bg));
+            border-color: color-mix(in srgb, var(--fd-info) 90%, black);
         }
 
         .landscape-element img {
@@ -284,58 +405,24 @@
                 @endforeach
 
                 @if($objeler->isEmpty())
-                    <!-- Varsayılan Öğeler (Obje yoksa gösterilecek) -->
-                    <div class="palette-item" data-element="tree" data-image="https://picsum.photos/80/80?random=1" data-name="Ağaç">
-                        <img src="https://picsum.photos/40/40?random=1" alt="Ağaç Resmi" class="palette-image">
-                        <span>Ağaç</span>
-                    </div>
-
-                    <div class="palette-item" data-element="flower" data-image="https://picsum.photos/80/80?random=2" data-name="Çiçek">
-                        <img src="https://picsum.photos/40/40?random=2" alt="Çiçek Resmi" class="palette-image">
-                        <span>Çiçek</span>
-                    </div>
-
-                    <div class="palette-item" data-element="bush" data-image="https://picsum.photos/80/80?random=3" data-name="Çalı">
-                        <img src="https://picsum.photos/40/40?random=3" alt="Çalı Resmi" class="palette-image">
-                        <span>Çalı</span>
-                    </div>
-
-                    <div class="palette-item" data-element="pot" data-image="https://picsum.photos/80/80?random=4" data-name="Saksı">
-                        <img src="https://picsum.photos/40/40?random=4" alt="Saksı Resmi" class="palette-image">
-                        <span>Saksı</span>
-                    </div>
-
-                    <div class="palette-item" data-element="fountain" data-image="https://picsum.photos/80/80?random=5" data-name="Çeşme">
-                        <img src="https://picsum.photos/40/40?random=5" alt="Çeşme Resmi" class="palette-image">
-                        <span>Çeşme</span>
-                    </div>
-
-                    <div class="palette-item" data-element="stone" data-image="https://picsum.photos/80/80?random=6" data-name="Taş">
-                        <img src="https://picsum.photos/40/40?random=6" alt="Taş Resmi" class="palette-image">
-                        <span>Taş</span>
-                    </div>
-
-                    <div class="palette-item" data-element="pool" data-image="https://picsum.photos/80/80?random=7" data-name="Havuz">
-                        <img src="https://picsum.photos/40/40?random=7" alt="Havuz Resmi" class="palette-image">
-                        <span>Havuz</span>
-                    </div>
-
-                    <div class="palette-item" data-element="bench" data-image="https://picsum.photos/80/80?random=8" data-name="Bank">
-                        <img src="https://picsum.photos/40/40?random=8" alt="Bank Resmi" class="palette-image">
-                        <span>Bank</span>
+                    <!-- Empty-state: nicer notification when there are no objects -->
+                    <div class="empty-palette">
+                        <div class="empty-icon" aria-hidden="true">ℹ️</div>
+                        <div class="empty-content">
+                            <h3>Obje veritabanı boş</h3>
+                            <p>Henüz kayıtlı obje bulunmuyor. Yeni obje ekleyerek peyzaj öğelerinizi buraya ekleyebilirsiniz.</p>
+                            <div class="empty-hint">Filament > Obje kaydı üzerinden yeni obje oluşturun.</div>
+                        </div>
                     </div>
                 @endif
             </div>
 
             <div class="design-area">
                 <div class="toolbar">
-                    <button class="toolbar-btn" onclick="clearAll()">🗑️ Temizle</button>
-                    <button class="toolbar-btn" onclick="saveDesign()">💾 Kaydet</button>
                     <button class="toolbar-btn delete" onclick="deleteSelected()" id="deleteBtn" style="display: none;">❌ Sil</button>
                 </div>
 
                 <div class="property-boundary" id="propertyBoundary">
-                    <div class="boundary-label">Tasarım Alanı</div>
                     
                     <!-- Arka plan resmi container -->
                     <div class="background-image-container" id="backgroundImageContainer">
@@ -380,14 +467,12 @@
             const content = document.createElement('div');
             content.className = 'element-content';
             
-            if (type === 'custom') {
-                content.innerHTML = `<img src="${imageUrl}" alt="${name}" />`;
-            } else {
-                content.innerHTML = `
-                    <img src="${imageUrl}" alt="${name}" />
-                    <div class="element-name">${name}</div>
-                `;
-            }
+            // Put the label as an overlay above the image for readability
+            const safeName = name || '';
+            content.innerHTML = `
+                <div class="element-label"><div class="element-name">${safeName}</div></div>
+                <img src="${imageUrl}" alt="${safeName}" />
+            `;
 
             // Resize handles
             const handles = ['se', 'sw', 'ne', 'nw'];
@@ -404,6 +489,9 @@
         function placeElement(element, x, y) {
             const boundary = document.getElementById('propertyBoundary');
             element.style.transform = `translate(${x}px, ${y}px)`;
+            // store coordinates so interact.js has the correct baseline on first drag
+            element.setAttribute('data-x', x);
+            element.setAttribute('data-y', y);
             boundary.appendChild(element);
             makeElementInteractive(element);
             selectElement(element);
@@ -461,36 +549,92 @@
             });
         }
 
-        // Palette dragging with interact.js
-        interact('.palette-item').draggable({
-            listeners: {
-                start(event) {
-                    console.log('Drag started on:', event.target);
-                },
-                move(event) {
-                    // Visual feedback during drag can be added here
-                },
-                end(event) {
-                    const dropzone = document.elementFromPoint(event.clientX, event.clientY);
-                    const boundary = document.getElementById('propertyBoundary');
-                    
-                    // Check if dropped in the design area
-                    if (boundary.contains(dropzone) || dropzone === boundary) {
+        // Palette dragging with interact.js - create a follow-cursor ghost during drag
+        (function() {
+            let currentGhost = null;
+            let ghostSize = 80; // px square for preview
+            let ghostOffset = { x: ghostSize / 2, y: ghostSize / 2 };
+
+            function createGhost(imageUrl) {
+                const g = document.createElement('div');
+                g.className = 'drag-ghost';
+                g.style.position = 'fixed';
+                g.style.left = '0px';
+                g.style.top = '0px';
+                g.style.width = ghostSize + 'px';
+                g.style.height = ghostSize + 'px';
+                g.style.pointerEvents = 'none';
+                g.style.zIndex = 9999;
+                g.style.transition = 'transform 0.02s linear';
+                g.style.display = 'flex';
+                g.style.alignItems = 'center';
+                g.style.justifyContent = 'center';
+
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = 'ghost';
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '6px';
+                img.style.boxShadow = '0 6px 18px rgba(0,0,0,0.18)';
+
+                g.appendChild(img);
+                document.body.appendChild(g);
+                return g;
+            }
+
+            function setGhostPos(g, clientX, clientY) {
+                if (!g) return;
+                const left = clientX - ghostOffset.x;
+                const top = clientY - ghostOffset.y;
+                g.style.transform = `translate3d(${left}px, ${top}px, 0)`;
+            }
+
+            interact('.palette-item').draggable({
+                listeners: {
+                    start(event) {
                         const item = event.target;
-                        const imageUrl = item.getAttribute('data-image');
-                        const name = item.getAttribute('data-name');
-                        const type = item.getAttribute('data-element');
-                        
-                        const boundaryRect = boundary.getBoundingClientRect();
-                        const relativeX = event.clientX - boundaryRect.left - 60;
-                        const relativeY = event.clientY - boundaryRect.top - 60;
-                        
-                        const newElement = createElement(type, imageUrl, name);
-                        placeElement(newElement, relativeX, relativeY);
+                        const imageUrl = item.getAttribute('data-image') || '';
+                        // create ghost preview
+                        currentGhost = createGhost(imageUrl);
+                        // position immediately
+                        setGhostPos(currentGhost, event.clientX, event.clientY);
+                    },
+                    move(event) {
+                        // move ghost to follow cursor
+                        if (currentGhost) {
+                            setGhostPos(currentGhost, event.clientX, event.clientY);
+                        }
+                    },
+                    end(event) {
+                        const boundary = document.getElementById('propertyBoundary');
+                        const dropzone = document.elementFromPoint(event.clientX, event.clientY);
+
+                        if (currentGhost) {
+                            currentGhost.remove();
+                            currentGhost = null;
+                        }
+
+                        // Check if dropped in the design area
+                        if (boundary.contains(dropzone) || dropzone === boundary) {
+                            const item = event.target;
+                            const imageUrl = item.getAttribute('data-image');
+                            const name = item.getAttribute('data-name');
+                            const type = item.getAttribute('data-element');
+
+                            const boundaryRect = boundary.getBoundingClientRect();
+                            // account for ghost offset so element centers where the cursor is
+                            const relativeX = event.clientX - boundaryRect.left - ghostOffset.x;
+                            const relativeY = event.clientY - boundaryRect.top - ghostOffset.y;
+
+                            const newElement = createElement(type, imageUrl, name);
+                            placeElement(newElement, relativeX, relativeY);
+                        }
                     }
                 }
-            }
-        });
+            });
+        })();
 
         function clearAll() {
             if (confirm('Tüm tasarımı temizlemek istediğinizden emin misiniz?')) {
@@ -602,3 +746,4 @@
         </script>
     </div>
 </x-filament-panels::page>
+</div>

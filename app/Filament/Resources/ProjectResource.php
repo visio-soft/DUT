@@ -82,7 +82,7 @@ class ProjectResource extends Resource
                                 ->size('lg')
                                 ->action(function ($livewire, $state) {
                                     // Önce resmin yüklenip yüklenmediğini kontrol et
-                                    $images = $state['images'] ?? [];
+                                    $images = $state['image'] ?? [];
                                     if (empty($images)) {
                                         // Notification göster
                                         \Filament\Notifications\Notification::make()
@@ -109,7 +109,7 @@ class ProjectResource extends Resource
                                     // Yeni tab'da aç
                                     $livewire->js("window.open('{$url}', '_blank')");
                                 })
-                                ->visible(fn($state) => !empty($state['images']))
+                                ->visible(fn($state) => !empty($state['image']))
                                 ->extraAttributes(['class' => 'w-full'])
                         ])
                             ->columnSpanFull()
