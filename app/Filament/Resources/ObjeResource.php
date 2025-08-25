@@ -41,6 +41,7 @@ class ObjeResource extends Resource
                             ->maxLength(255)
                             ->placeholder('Obje ismini girin'),
                         SpatieMediaLibraryFileUpload::make('images')
+                            ->required()
                             ->label('Resim Yükle')
                             ->collection('images')
                             ->image()
@@ -58,7 +59,7 @@ class ObjeResource extends Resource
                             ->columnSpanFull()
                             ->visibility('public')
                             ->disk('public')
-                            ->nullable()
+                            ->rules(['required'])
                             ->imageResizeMode('contain')
                             ->imageCropAspectRatio(null)
                             ->imageResizeTargetWidth('2000')
