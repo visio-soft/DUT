@@ -59,11 +59,11 @@ class ProjectResource extends Resource
                             ->required()
                             ->prefix('₺'),
                         // Resim upload - Filament'in standart özellikleriyle
-                        SpatieMediaLibraryFileUpload::make('images')
+                        SpatieMediaLibraryFileUpload::make('image')
                             ->label('Resim')
                             ->collection('images')
+                            ->disk('media')
                             ->image()
-                            ->directory('projects')
                             ->maxSize(5120) // 5MB
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
                             ->required()
@@ -71,15 +71,8 @@ class ProjectResource extends Resource
                             ->panelLayout('integrated')
                             ->maxFiles(1)
                             ->helperText('Desteklenen formatlar: JPEG, JPG, PNG, WebP, Maksimum dosya boyutu: 5MB.')
-                            ->hintColor('primary')
-                            ->uploadButtonPosition('left')
-                            ->removeUploadedFileButtonPosition('right')
-                            ->uploadProgressIndicatorPosition('left')
-                            ->rules([
-                                new ImageFormatRule([], 'projeler')
-                            ])
                             ->columnSpanFull(),
-                        
+
                         // Landscape Designer Button
                         Forms\Components\Actions::make([
                             Forms\Components\Actions\Action::make('landscape_designer')
@@ -99,27 +92,27 @@ class ProjectResource extends Resource
                                             ->send();
                                         return;
                                     }
-                                    
+
                                     // Geçici resim path'ini al
                                     $imagePath = is_array($images) ? reset($images) : $images;
-                                    
+
                                     // Eğer bu bir Livewire temporary upload ise
                                     if (is_object($imagePath) && method_exists($imagePath, 'getClientOriginalName')) {
                                         // Geçici dosyayı storage'a kaydet
                                         $tempPath = $imagePath->store('temp-landscape', 'public');
                                         $imagePath = $tempPath;
                                     }
-                                    
+
                                     // Landscape Designer sayfasına yönlendir
                                     $url = url('/admin/drag-drop-test') . '?image=' . urlencode($imagePath);
-                                    
+
                                     // Yeni tab'da aç
                                     $livewire->js("window.open('{$url}', '_blank')");
                                 })
                                 ->visible(fn($state) => !empty($state['images']))
                                 ->extraAttributes(['class' => 'w-full'])
                         ])
-                        ->columnSpanFull()
+                            ->columnSpanFull()
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
@@ -130,7 +123,7 @@ class ProjectResource extends Resource
                             ->default(false)
                             ->reactive()
                             ->columnSpanFull(),
-                        
+
                         // Manual Konum Girişi (Google Maps kapalıyken)
                         Forms\Components\Group::make()->schema([
                             // Şehir sabit: İstanbul (saklama için Hidden, gösterim için disabled TextInput)
@@ -143,7 +136,7 @@ class ProjectResource extends Resource
                                 ->disabled()
                                 ->dehydrated(false)
                                 ->columnSpanFull(),
-                            
+
                             Forms\Components\Select::make('district')
                                 ->label('İlçe')
                                 ->options([
@@ -191,7 +184,7 @@ class ProjectResource extends Resource
                                 ->required()
                                 ->reactive()
                                 ->columnSpanFull(),
-                            
+
                             Forms\Components\Select::make('neighborhood')
                                 ->label('Mahalle')
                                 ->options(function (callable $get) {
@@ -205,8 +198,8 @@ class ProjectResource extends Resource
                                 ->reactive()
                                 ->searchable()
                                 ->required()
-                                ->placeholder(fn (callable $get) => $get('district') ? 'Mahalle seçin veya Diğer seçin' : 'Önce ilçe seçin')
-                                ->disabled(fn (callable $get) => !$get('district'))
+                                ->placeholder(fn(callable $get) => $get('district') ? 'Mahalle seçin veya Diğer seçin' : 'Önce ilçe seçin')
+                                ->disabled(fn(callable $get) => !$get('district'))
                                 ->columnSpanFull()
                                 ->dehydrateStateUsing(function ($state, callable $get) {
                                     // Eğer '__other' seçildiyse custom değeri kullan
@@ -221,8 +214,8 @@ class ProjectResource extends Resource
                             Forms\Components\TextInput::make('neighborhood_custom')
                                 ->label('Diğer Mahalle')
                                 ->placeholder('Mahallenizi yazın')
-                                ->visible(fn (callable $get) => $get('neighborhood') === '__other')
-                                ->required(fn (callable $get) => $get('neighborhood') === '__other')
+                                ->visible(fn(callable $get) => $get('neighborhood') === '__other')
+                                ->required(fn(callable $get) => $get('neighborhood') === '__other')
                                 ->afterStateHydrated(function ($state, callable $set, callable $get) {
                                     // Eğer kayıt düzenleniyorsa ve kayıtlı mahalle neighborhood alanında değilse
                                     // (örneğin önceki kayıt custom girilmişse), neighborhood alanını '__other' yap
@@ -256,8 +249,8 @@ class ProjectResource extends Resource
                                 ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
                                 ->rows(3)
                                 ->columnSpanFull(),
-                        ])->hidden(fn (callable $get) => $get('use_google_maps')),
-                        
+                        ])->hidden(fn(callable $get) => $get('use_google_maps')),
+
                         // Google Maps Konum Seçimi (Google Maps açıkken)
                         // Google Maps Konum Seçimi (Google Maps açıkken)
                         Forms\Components\Group::make()->schema([
@@ -266,12 +259,12 @@ class ProjectResource extends Resource
                                 ->placeholder('Bir adres yazın ve haritada bulun...')
                                 ->live()
                                 ->columnSpanFull(),
-                            
+
                             Forms\Components\ViewField::make('google_maps')
                                 ->label('Harita - Tıklayarak Konum Seçin')
                                 ->view('custom.google-maps-picker')
                                 ->columnSpanFull(),
-                        ])->visible(fn (callable $get) => $get('use_google_maps')),
+                        ])->visible(fn(callable $get) => $get('use_google_maps')),
                         Forms\Components\Hidden::make('latitude'),
                         Forms\Components\Hidden::make('longitude'),
                     ])
@@ -285,17 +278,8 @@ class ProjectResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
-                Tables\Columns\ImageColumn::make('first_media_url')
-                    ->label('Resim')
-                    ->height(60)
-                    ->width(60)
-                    ->square()
-                    ->defaultImageUrl(url('/images/no-image.png'))
-                    ->getStateUsing(function ($record) {
-                        $media = $record->getFirstMedia('images');
-                        return $media ? $media->getUrl() : null;
-                    })
-                    ->extraImgAttributes(['style' => 'object-fit: cover; border-radius: 6px;']),
+                SpatieMediaLibraryImageColumn::make('image')->label('Resim')->collection('images')
+                    ->circular()->height(50)->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
@@ -359,7 +343,7 @@ class ProjectResource extends Resource
                                     ->default(0),
 
                                 Forms\Components\Toggle::make('is_more')
-                                    ->label(fn (callable $get) => $get('amount') ? ($get('amount') . "₺'dan fazla?") : 'Bütçe Belirleyin')
+                                    ->label(fn(callable $get) => $get('amount') ? ($get('amount') . "₺'dan fazla?") : 'Bütçe Belirleyin')
                                     ->inline(false),
                             ])
                             ->columns(2),
@@ -410,7 +394,7 @@ class ProjectResource extends Resource
                 ->label('Yeni Proje Oluştur')
                 ->icon('heroicon-o-plus')
                 ->color('primary')
-                ->url(fn (): string => static::getUrl('create'))
+                ->url(fn(): string => static::getUrl('create'))
                 ->openUrlInNewTab(false),
         ];
     }
