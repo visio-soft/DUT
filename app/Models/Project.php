@@ -6,6 +6,7 @@ use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -33,6 +34,7 @@ class Project extends Model implements HasMedia
         'neighborhood',
         'street_cadde',
         'street_sokak',
+        'design_completed',
     ];
 
     protected $casts = [
@@ -41,6 +43,7 @@ class Project extends Model implements HasMedia
         'budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'design_completed' => 'boolean',
     ];
 
     public function category(): BelongsTo
@@ -51,6 +54,11 @@ class Project extends Model implements HasMedia
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function design(): HasOne
+    {
+        return $this->hasOne(ProjectDesign::class);
     }
 
     public function registerMediaCollections(): void

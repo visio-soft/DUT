@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\Log;
 class EditProject extends EditRecord
 {
     protected static string $resource = ProjectResource::class;
-    
-    public $showImageEditor = false;
 
     protected function getFormActions(): array
     {
@@ -24,18 +22,28 @@ class EditProject extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        return [
+        $actions = [
             Actions\DeleteAction::make(),
         ];
+        
+        // Eğer proje tasarımı tamamlandıysa tasarımı düzenle butonu ekle
+        if ($this->record && $this->record->design_completed && $this->record->hasMedia('images')) {
+            $imageUrl = $this->record->getFirstMediaUrl('images');
+            $designUrl = "/admin/drag-drop-test?project_id={$this->record->id}&image=" . urlencode($imageUrl);
+            
+            $actions[] = Actions\Action::make('editDesign')
+                ->label('Tasarımı Düzenle')
+                ->icon('heroicon-o-paint-brush')
+                ->color('warning')
+                ->url($designUrl)
+                ->openUrlInNewTab(false);
+        }
+        
+        return $actions;
     }
+
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
-    }
-    
-    // Image editor modal'ını açmak için
-    public function openImageEditor(): void
-    {
-        $this->showImageEditor = true;
     }
 }

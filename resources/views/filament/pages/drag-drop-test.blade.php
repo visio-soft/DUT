@@ -311,43 +311,8 @@
         .resize-ne { top: -6px; right: -6px; cursor: ne-resize; }
         .resize-nw { top: -6px; left: -6px; cursor: nw-resize; }
 
-        /* Toolbar */
-        .toolbar {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 10px;
-            z-index: 30;
-        }
-
-        .toolbar-btn {
-            padding: 8px 16px;
-            background: var(--fd-muted-white);
-            border: 1px solid var(--fd-border);
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: var(--fd-text);
-        }
-
-        .toolbar-btn:hover {
-            background: var(--fd-panel-bg);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            transform: translateY(-1px);
-        }
-
-        .toolbar-btn.delete {
-            background: var(--fd-danger-bg);
-            color: var(--fd-danger);
-            border-color: color-mix(in srgb, var(--fd-danger-bg) 80%, transparent);
-        }
-
-        .toolbar-btn.delete:hover {
-            background: color-mix(in srgb, var(--fd-danger-bg) 90%, transparent);
-        }
+        /* Resize handles */
+        .resize-handle {
 
         /* Custom image items */
         .custom-image-item {
@@ -395,6 +360,7 @@
                 @foreach($objeler as $obje)
                     <div class="palette-item" 
                          data-element="obje_{{ $obje['id'] }}" 
+                         data-obje-id="{{ $obje['id'] }}"
                          data-image="{{ $obje['image_url'] ?: 'https://picsum.photos/80/80?random=' . $obje['id'] }}" 
                          data-name="{{ $obje['isim'] }}">
                         <img src="{{ $obje['image_url'] ?: 'https://picsum.photos/40/40?random=' . $obje['id'] }}" 
@@ -418,10 +384,6 @@
             </div>
 
             <div class="design-area">
-                <div class="toolbar">
-                    <button class="toolbar-btn delete" onclick="deleteSelected()" id="deleteBtn" style="display: none;">❌ Sil</button>
-                </div>
-
                 <div class="property-boundary" id="propertyBoundary">
                     
                     <!-- Arka plan resmi container -->
@@ -445,7 +407,6 @@
             }
             selectedElement = element;
             element.classList.add('selected');
-            document.getElementById('deleteBtn').style.display = 'block';
         }
 
         function deselectAll() {
@@ -453,16 +414,20 @@
                 selectedElement.classList.remove('selected');
                 selectedElement = null;
             }
-            document.getElementById('deleteBtn').style.display = 'none';
         }
 
-        function createElement(type, imageUrl, name, x = 0, y = 0) {
+        function createElement(type, imageUrl, name, x = 0, y = 0, objeId = null) {
             elementCounter++;
             const elementId = `element_${type}_${elementCounter}`;
             const element = document.createElement('div');
             element.id = elementId;
             element.className = 'landscape-element';
             element.style.transform = `translate(${x}px, ${y}px)`;
+            
+            // Obje ID'sini element'e ekle
+            if (objeId) {
+                element.setAttribute('data-obje-id', objeId);
+            }
 
             const content = document.createElement('div');
             content.className = 'element-content';
@@ -621,71 +586,21 @@
                             const item = event.target;
                             const imageUrl = item.getAttribute('data-image');
                             const name = item.getAttribute('data-name');
-                            const type = item.getAttribute('data-element');
+                            const type = item.getAttribute('data-element') || 'custom';
+                            const objeId = item.getAttribute('data-obje-id'); // Obje ID'sini al
 
                             const boundaryRect = boundary.getBoundingClientRect();
                             // account for ghost offset so element centers where the cursor is
                             const relativeX = event.clientX - boundaryRect.left - ghostOffset.x;
                             const relativeY = event.clientY - boundaryRect.top - ghostOffset.y;
 
-                            const newElement = createElement(type, imageUrl, name);
+                            const newElement = createElement(type, imageUrl, name, 0, 0, objeId);
                             placeElement(newElement, relativeX, relativeY);
                         }
                     }
                 }
             });
         })();
-
-        function clearAll() {
-            if (confirm('Tüm tasarımı temizlemek istediğinizden emin misiniz?')) {
-                const boundary = document.getElementById('propertyBoundary');
-                const elements = boundary.querySelectorAll('.landscape-element');
-                elements.forEach(element => element.remove());
-                deselectAll();
-            }
-        }
-
-        function deleteSelected() {
-            if (selectedElement && confirm('Seçili elementi silmek istediğinizden emin misiniz?')) {
-                selectedElement.remove();
-                deselectAll();
-            }
-        }
-
-        function saveDesign() {
-            const elements = [];
-            const boundary = document.getElementById('propertyBoundary');
-            const landscapeElements = boundary.querySelectorAll('.landscape-element');
-
-            landscapeElements.forEach(element => {
-                const content = element.querySelector('.element-content');
-                const image = content.querySelector('img');
-                const nameElement = content.querySelector('.element-name');
-                const name = nameElement ? nameElement.textContent : 'Custom Image';
-                const imageUrl = image.src;
-                const x = parseFloat(element.getAttribute('data-x')) || 0;
-                const y = parseFloat(element.getAttribute('data-y')) || 0;
-
-                elements.push({
-                    id: element.id,
-                    type: element.id.split('_')[1],
-                    imageUrl: imageUrl,
-                    name: name,
-                    x: x,
-                    y: y,
-                    width: element.style.width,
-                    height: element.style.height
-                });
-            });
-
-            const design = {
-                elements: elements,
-                timestamp: new Date().toISOString()
-            };
-
-            window.savedDesign = design;
-            alert('Tasarım başarıyla kaydedildi! 💾');
-        }
 
         // Event listeners
         document.getElementById('propertyBoundary').addEventListener('click', function (e) {
@@ -697,7 +612,10 @@
         // Keyboard shortcuts
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Delete' && selectedElement) {
-                deleteSelected();
+                if (selectedElement && confirm('Seçili elementi silmek istediğinizden emin misiniz?')) {
+                    selectedElement.remove();
+                    deselectAll();
+                }
             }
             if (e.key === 'Escape') {
                 deselectAll();
@@ -706,43 +624,123 @@
 
         // URL'den proje resmini yükle ve arka plan olarak ayarla
         document.addEventListener('DOMContentLoaded', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const projectImage = urlParams.get('image');
+            // PHP'den gelen verileri JavaScript'e aktar
+            const objeler = @json($objeler ?? []);
+            const projectId = @json($project_id ?? null);
+            const projectImage = @json($project_image ?? null);
+            const existingDesign = @json($existing_design ?? null);
             
+            // Global değişkenleri ayarla
+            window.projectId = projectId;
+            window.objeler = objeler;
+            
+            // Objeleri pallete yükle
+            loadObjectsToPalette(objeler);
+            
+            // Arka plan resmini yükle
             if (projectImage) {
-                const backgroundContainer = document.getElementById('backgroundImageContainer');
-                const img = document.createElement('img');
-                
-                // Resim path'ini düzelt
-                let imageSrc = projectImage;
-                if (!imageSrc.startsWith('http') && !imageSrc.startsWith('/')) {
-                    if (!imageSrc.startsWith('storage/')) {
-                        imageSrc = 'storage/' + imageSrc;
-                    }
-                    imageSrc = '/' + imageSrc;
-                }
-                
-                img.src = imageSrc;
-                img.className = 'background-image';
-                img.alt = 'Proje Arka Plan Resmi';
-                
-                img.onload = function() {
-                    console.log('Proje arka plan resmi yüklendi:', imageSrc);
-                };
-                
-                img.onerror = function() {
-                    console.error('Arka plan resmi yüklenemedi:', imageSrc);
-                    // Hata durumunda gradient arka plan kullan
-                    backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                };
-                
-                backgroundContainer.appendChild(img);
+                loadBackgroundImage(projectImage);
             } else {
                 // Resim yoksa gradient arka plan kullan
                 const backgroundContainer = document.getElementById('backgroundImageContainer');
                 backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             }
+            
+            // Mevcut tasarımı yükle (eğer varsa)
+            if (existingDesign && existingDesign.elements) {
+                loadExistingDesign(existingDesign);
+            }
         });
+        
+        function loadObjectsToPalette(objeler) {
+            const palette = document.querySelector('.element-palette');
+            
+            if (!objeler || objeler.length === 0) {
+                // Boş durum göster
+                palette.innerHTML = `
+                    <div class="empty-palette">
+                        <div class="empty-icon">🌿</div>
+                        <div class="empty-content">
+                            <h3>Obje bulunamadı</h3>
+                            <p>Henüz tasarım objesi eklenmemiş</p>
+                            <div class="empty-hint">Yöneticiden obje eklemesini isteyin</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Objeleri listele
+            let paletteHTML = '';
+            objeler.forEach(obje => {
+                const imageUrl = obje.image_url || '/images/default-object.png';
+                paletteHTML += `
+                    <div class="palette-item" data-obje-id="${obje.id}" data-image="${imageUrl}" data-name="${obje.isim}">
+                        <img src="${imageUrl}" alt="${obje.isim}" class="palette-image" />
+                        <span>${obje.isim}</span>
+                    </div>
+                `;
+            });
+            
+            palette.innerHTML = paletteHTML;
+        }
+        
+        function loadBackgroundImage(projectImage) {
+            const backgroundContainer = document.getElementById('backgroundImageContainer');
+            const img = document.createElement('img');
+            
+            // Resim path'ini düzelt
+            let imageSrc = projectImage;
+            if (!imageSrc.startsWith('http') && !imageSrc.startsWith('/')) {
+                if (!imageSrc.startsWith('storage/')) {
+                    imageSrc = 'storage/' + imageSrc;
+                }
+                imageSrc = '/' + imageSrc;
+            }
+            
+            img.src = imageSrc;
+            img.className = 'background-image';
+            img.alt = 'Proje Arka Plan Resmi';
+            
+            img.onload = function() {
+                console.log('Proje arka plan resmi yüklendi:', imageSrc);
+            };
+            
+            img.onerror = function() {
+                console.error('Arka plan resmi yüklenemedi:', imageSrc);
+                // Hata durumunda gradient arka plan kullan
+                backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+            };
+            
+            backgroundContainer.appendChild(img);
+        }
+        
+        function loadExistingDesign(designData) {
+            // Mevcut tasarımı yükle
+            if (designData.elements && designData.elements.length > 0) {
+                const boundary = document.getElementById('propertyBoundary');
+                
+                designData.elements.forEach(elementData => {
+                    const element = createElement(
+                        'custom',
+                        elementData.image_url,
+                        elementData.name,
+                        elementData.x,
+                        elementData.y,
+                        elementData.obje_id
+                    );
+                    
+                    // Boyutları ayarla
+                    element.style.width = elementData.width + 'px';
+                    element.style.height = elementData.height + 'px';
+                    
+                    boundary.appendChild(element);
+                    makeElementInteractive(element);
+                });
+                
+                console.log('Mevcut tasarım yüklendi:', designData.elements.length + ' element');
+            }
+        }
         </script>
     </div>
 </x-filament-panels::page>
