@@ -69,43 +69,12 @@ class CreateProject extends CreateRecord
                 ->extraAttributes([
                     'class' => 'w-full justify-center',
                     'x-data' => '{}',
-                    'x-init' => '
-                        const requiredFields = ["data.category_id", "data.title", "data.description", "data.start_date", "data.end_date", "data.budget", "data.district", "data.image"];
-                        
-                        const checkFields = () => {
-                            let allFilled = true;
-                            
-                            requiredFields.forEach(field => {
-                                const value = $wire.get(field);
-                                if (!value || (Array.isArray(value) && value.length === 0)) {
-                                    allFilled = false;
-                                }
-                            });
-                            
-                            // Mahalle kontrolü
-                            const neighborhood = $wire.get("data.neighborhood");
-                            const neighborhoodCustom = $wire.get("data.neighborhood_custom");
-                            if (!neighborhood || (neighborhood === "__other" && !neighborhoodCustom)) {
-                                allFilled = false;
-                            }
-                            
-                            $el.disabled = !allFilled;
-                        };
-                        
-                        // İlk kontrolü yap
-                        checkFields();
-                        
-                        // Form değişikliklerini dinle
-                        $wire.on("refresh", checkFields);
-                        setInterval(checkFields, 1000);
-                    '
+                    'x-init' => 'checkProjectForm($el, $wire)',
                 ]),
                 
             $this->getCancelFormAction(),
         ];
     }
-    
-
     
     protected function getRedirectUrl(): string
     {

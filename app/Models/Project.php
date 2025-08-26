@@ -16,6 +16,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $id
  * @property int $category_id
  * @property int $created_by_id
+ * @property int|null $updated_by_id
  * @property string $title
  * @property string $description
  * @property string $start_date
@@ -31,11 +32,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string|null $street_sokak
  * @property string|null $address_details
  * @property bool $design_completed
+ * @property array|null $design_landscape
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property-read Category $category
  * @property-read User $createdBy
+ * @property-read User|null $updatedBy
  * @property-read ProjectDesign|null $design
  */
 #[ObservedBy([ProjectObserver::class])]
@@ -46,6 +49,7 @@ class Project extends Model implements HasMedia
     protected $fillable = [
         'category_id',
         'created_by_id',
+        'updated_by_id',
         'title',
         'description',
         'start_date',
@@ -61,6 +65,7 @@ class Project extends Model implements HasMedia
         'street_cadde',
         'street_sokak',
         'design_completed',
+        'design_landscape',
     ];
 
     protected $casts = [
@@ -70,6 +75,7 @@ class Project extends Model implements HasMedia
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'design_completed' => 'boolean',
+    'design_landscape' => 'array',
     ];
 
     public function category(): BelongsTo
@@ -80,6 +86,11 @@ class Project extends Model implements HasMedia
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_id');
+    }
+
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
     }
 
     public function design(): HasOne

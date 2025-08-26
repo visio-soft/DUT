@@ -203,6 +203,44 @@ class ProjectResource extends Resource
                         }),
                         Forms\Components\Hidden::make('latitude'),
                         Forms\Components\Hidden::make('longitude'),
+                        
+                        // Tasarım ve kullanıcı bilgileri
+                        Forms\Components\Section::make('Tasarım Bilgileri')
+                            ->schema([
+                                Forms\Components\Toggle::make('design_completed')
+                                    ->label('Tasarım Tamamlandı')
+                                    ->default(false)
+                                    ->columnSpanFull(),
+                                    
+                                Forms\Components\Textarea::make('design_landscape')
+                                    ->label('Tasarım Verisi (JSON)')
+                                    ->placeholder('Tasarım verisi JSON formatında...')
+                                    ->rows(4)
+                                    ->columnSpanFull()
+                                    ->visible(function (callable $get) {
+                                        return $get('design_completed');
+                                    })
+                                    ->formatStateUsing(function ($state) {
+                                        return $state ? json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) : '';
+                                    })
+                                    ->dehydrateStateUsing(function ($state) {
+                                        if (empty($state)) {
+                                            return null;
+                                        }
+                                        $decoded = json_decode($state, true);
+                                        return $decoded !== null ? $decoded : $state;
+                                    }),
+                                    
+                                Forms\Components\Select::make('updated_by_id')
+                                    ->label('Son Güncelleyen')
+                                    ->relationship('updatedBy', 'name')
+                                    ->searchable()
+                                    ->preload()
+                                    ->placeholder('Güncelleyen kullanıcı')
+                                    ->columnSpanFull(),
+                            ])
+                            ->collapsible()
+                            ->collapsed(),
                     ])
                     ->columnSpan(1),
             ])
@@ -244,11 +282,33 @@ class ProjectResource extends Resource
                 ->tooltip(function ($record) {
                     return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
                 }),
+            Tables\Columns\TextColumn::make('design_landscape')
+                ->label('Tasarım Data')
+                ->formatStateUsing(function ($state) {
+                    if (empty($state)) {
+                        return 'Boş';
+                    }
+                    return is_array($state) ? count($state) . ' öğe' : 'Var';
+                })
+                ->tooltip(function ($record) {
+                    if (empty($record->design_landscape)) {
+                        return 'Tasarım verisi yok';
+                    }
+                    return 'Tasarım verisi mevcut: ' . (is_array($record->design_landscape) ? count($record->design_landscape) . ' öğe' : 'JSON data');
+                })
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('createdBy.name')->label('Oluşturan')->searchable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('updatedBy.name')->label('Güncelleyen')->searchable()
+                ->toggleable(isToggledHiddenByDefault: true),
             Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
             Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
             Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('updated_at')->dateTime('d.m.Y H:i')->label('Güncellenme')
                 ->sortable()
                 ->toggleable(isToggledHiddenByDefault: true),
         ];
@@ -337,6 +397,13 @@ class ProjectResource extends Resource
     private static function getTableActions(): array
     {
         return [
+            Tables\Actions\Action::make('design')
+                ->label('Tasarım Yap')
+                ->icon('heroicon-o-paint-brush')
+                ->color('success')
+                ->url(fn (Project $record) => route('filament.admin.pages.drag-drop-test', ['project' => $record->id]))
+                ->openUrlInNewTab(false)
+                ->tooltip('Bu proje için peyzaj tasarımı yap'),
             Tables\Actions\EditAction::make(),
         ];
     }
@@ -353,7 +420,7 @@ class ProjectResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\DesignRelationManager::class,
         ];
     }
 

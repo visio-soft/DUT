@@ -34,7 +34,7 @@ class DragDropTest extends Page
 
         // URL'den parametreleri al
         $this->projectImage = request()->get('image');
-        $this->projectId = request()->get('project_id');
+        $this->projectId = request()->get('project_id') ?: request()->get('project'); // URL'den project parametresini de kabul et
         
         // Proje varsa yükle
         if ($this->projectId) {
@@ -71,7 +71,11 @@ class DragDropTest extends Page
 
         // Mevcut tasarımı yükle (eğer varsa)
         $existingDesign = null;
-        if ($this->project && $this->project->design) {
+        // Öncelikle projects.design_landscape alanını kontrol et
+        if ($this->project && isset($this->project->design_landscape) && $this->project->design_landscape) {
+            $existingDesign = $this->project->design_landscape;
+        } elseif ($this->project && $this->project->design) {
+            // Geriye dönük uyumluluk için project_designs tablosunu da kontrol et
             $existingDesign = $this->project->design->design_data;
         }
 
@@ -80,6 +84,7 @@ class DragDropTest extends Page
             'project_id' => $this->projectId,
             'project_image' => $this->projectImage,
             'existing_design' => $existingDesign,
+            'project' => $this->project, // Proje bilgisini view'e gönder
         ];
     }
 
@@ -117,86 +122,59 @@ class DragDropTest extends Page
             return;
         }
 
-        // JavaScript'ten tasarım verilerini al ve kaydet
+        // JavaScript fonksiyonunu çağır
         $this->js('
-            // Tasarım verilerini topla
-            const elements = [];
-            const boundary = document.getElementById("propertyBoundary");
-            const landscapeElements = boundary.querySelectorAll(".landscape-element");
-
-            landscapeElements.forEach(element => {
-                const content = element.querySelector(".element-content");
-                const image = content.querySelector("img");
-                const imageUrl = image ? image.src : "";
-                const name = image ? image.alt : "";
-                
-                // Obje ID\'sini al
-                const objeId = element.getAttribute("data-obje-id");
-                
-                // Position\'u al
-                const x = parseFloat(element.getAttribute("data-x")) || 0;
-                const y = parseFloat(element.getAttribute("data-y")) || 0;
-                
-                // Size\'ı al
-                const width = parseFloat(element.style.width) || 120;
-                const height = parseFloat(element.style.height) || 120;
-
-                elements.push({
-                    id: element.id,
-                    obje_id: objeId,
-                    type: element.id.split("_")[1],
-                    image_url: imageUrl,
-                    name: name,
-                    x: x,
-                    y: y,
-                    width: width,
-                    height: height,
-                    scale: {
-                        x: width / 120,
-                        y: height / 120
-                    }
-                });
-            });
-
-            const design = {
-                project_id: ' . $this->project->id . ',
-                elements: elements,
-                timestamp: new Date().toISOString(),
-                total_elements: elements.length
-            };
-
-            // Livewire metodunu çağır
-            $wire.call("storeDesignData", design);
+            if (typeof window.collectAndSaveDesignData === "function") {
+                window.collectAndSaveDesignData();
+            } else {
+                console.error("collectAndSaveDesignData fonksiyonu bulunamadı");
+                alert("Tasarım kaydetme fonksiyonu bulunamadı. Lütfen sayfayı yenileyin.");
+            }
         ');
     }
 
     public function storeDesignData($designData)
     {
         try {
+            \Log::info('Design data received:', ['project_id' => $this->project->id, 'data' => $designData]);
+            
+            // Veri doğrulama
+            if (!is_array($designData) || !isset($designData['elements'])) {
+                throw new \Exception('Geçersiz tasarım verisi formatı');
+            }
+
             // Tasarım verilerini kaydet veya güncelle
+            // Projeye hem project_designs tablosuna hem de projects.design_landscape alanına kaydet
             ProjectDesign::updateOrCreate(
                 ['project_id' => $this->project->id],
                 ['design_data' => $designData]
             );
 
+            // Projects tablosuna doğrudan JSON alanı olarak kaydet (yeni alan)
+            $this->project->update(['design_landscape' => $designData]);
+            
             // Projeyi tamamlanmış olarak işaretle
             $this->project->update(['design_completed' => true]);
+
+            \Log::info('Design saved successfully', ['project_id' => $this->project->id, 'elements_count' => count($designData['elements'] ?? [])]);
 
             // Başarı mesajı
             \Filament\Notifications\Notification::make()
                 ->title('Başarılı!')
-                ->body('Tasarım başarıyla kaydedildi ve proje tamamlandı.')
+                ->body('Tasarım başarıyla kaydedildi ve proje tamamlandı. (' . count($designData['elements'] ?? []) . ' element)')
                 ->success()
                 ->send();
 
-            // 2 saniye bekle sonra yönlendir
+            // Hemen yönlendir (Filament URL helper kullanarak)
             $this->js("
                 setTimeout(function() {
-                    window.location.href = '/admin/projects';
-                }, 2000);
+                    window.location.href = '" . route('filament.admin.resources.projects.index') . "';
+                }, 1500);
             ");
 
         } catch (\Exception $e) {
+            \Log::error('Design save error:', ['project_id' => $this->project->id, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            
             \Filament\Notifications\Notification::make()
                 ->title('Hata!')
                 ->body('Tasarım kaydedilirken bir hata oluştu: ' . $e->getMessage())
@@ -207,11 +185,17 @@ class DragDropTest extends Page
 
     public function getHeading(): string
     {
+        if ($this->project) {
+            return 'Peyzaj Tasarım Aracı - ' . $this->project->title;
+        }
         return 'Peyzaj Tasarım Aracı';
     }
 
     public function getSubheading(): ?string
     {
+        if ($this->project) {
+            return 'Proje: ' . $this->project->title . ' | ' . $this->project->district . ', ' . $this->project->neighborhood . ' | Bütçe: ₺' . number_format($this->project->budget);
+        }
         return 'Projeniz için peyzaj tasarımı oluşturun. Elementleri sürükleyip bırakarak tasarımınızı yapabilirsiniz.';
     }
 }
