@@ -12,6 +12,32 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * @property int $id
+ * @property int $category_id
+ * @property int $created_by_id
+ * @property string $title
+ * @property string $description
+ * @property string $start_date
+ * @property string $end_date
+ * @property float $budget
+ * @property float|null $latitude
+ * @property float|null $longitude
+ * @property string|null $address
+ * @property string|null $city
+ * @property string|null $district
+ * @property string|null $neighborhood
+ * @property string|null $street_cadde
+ * @property string|null $street_sokak
+ * @property string|null $address_details
+ * @property bool $design_completed
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read Category $category
+ * @property-read User $createdBy
+ * @property-read ProjectDesign|null $design
+ */
 #[ObservedBy([ProjectObserver::class])]
 class Project extends Model implements HasMedia
 {

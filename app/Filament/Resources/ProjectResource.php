@@ -212,112 +212,142 @@ class ProjectResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
-                SpatieMediaLibraryImageColumn::make('image')->label('Resim')->collection('images')
-                    ->circular()->height(50)->width(50),
-                Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label('Bütçe')
-                    ->money('TRY')
-                    ->sortable(),
-                Tables\Columns\IconColumn::make('design_completed')
-                    ->label('Tasarım')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger')
-                    ->tooltip(function ($record) {
-                        return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
-                    }),
-                Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                SelectFilter::make('category')
-                    ->label('Kategori')
-                    ->relationship('category', 'name'),
+            ->columns(static::getTableColumns())
+            ->filters(static::getTableFilters())
+            ->actions(static::getTableActions())
+            ->bulkActions(static::getTableBulkActions());
+    }
 
-                // Konum filtresi: İlçe ve Mahalle dropdownları
-                Filter::make('location')
-                    ->label('Konum')
-                    ->form([
-                        Forms\Components\Select::make('district')
-                            ->label('İlçe')
-                            ->options(function () {
-                                $keys = array_keys(config('istanbul_neighborhoods', []));
-                                return array_combine($keys, $keys);
+    /**
+     * @return array<string, mixed>
+     */
+    private static function getTableColumns(): array
+    {
+        return [
+            Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
+            SpatieMediaLibraryImageColumn::make('image')->label('Resim')->collection('images')
+                ->circular()->height(50)->width(50),
+            Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
+            Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
+            Tables\Columns\TextColumn::make('budget')->label('Bütçe')
+                ->money('TRY')
+                ->sortable(),
+            Tables\Columns\IconColumn::make('design_completed')
+                ->label('Tasarım')
+                ->boolean()
+                ->trueIcon('heroicon-o-check-circle')
+                ->falseIcon('heroicon-o-x-circle')
+                ->trueColor('success')
+                ->falseColor('danger')
+                ->tooltip(function ($record) {
+                    return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
+                }),
+            Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+            Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+        ];
+    }
+
+    private static function getTableFilters(): array
+    {
+        return [
+            SelectFilter::make('category')
+                ->label('Kategori')
+                ->relationship('category', 'name'),
+
+            static::getLocationFilter(),
+            static::getBudgetFilter(),
+        ];
+    }
+
+    private static function getLocationFilter(): Filter
+    {
+        return Filter::make('location')
+            ->label('Konum')
+            ->form([
+                Forms\Components\Select::make('district')
+                    ->label('İlçe')
+                    ->options(function () {
+                        $keys = array_keys(config('istanbul_neighborhoods', []));
+                        return array_combine($keys, $keys);
+                    })
+                    ->searchable(),
+
+                Forms\Components\Select::make('neighborhood')
+                    ->label('Mahalle')
+                    ->options(function (callable $get) {
+                        $district = $get('district');
+                        $map = config('istanbul_neighborhoods', []);
+                        return $map[$district] ?? [];
+                    })
+                    ->searchable(),
+            ])
+            ->query(function (Builder $query, array $data) {
+                if (!empty($data['district'])) {
+                    $query->where('district', $data['district']);
+                }
+
+                if (!empty($data['neighborhood'])) {
+                    $query->where('neighborhood', $data['neighborhood']);
+                }
+            });
+    }
+
+    private static function getBudgetFilter(): Filter
+    {
+        return Filter::make('budget_filter')
+            ->label('Bütçe')
+            ->form([
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('amount')
+                            ->label('Bütçe')
+                            ->numeric()
+                            ->default(0),
+
+                        Forms\Components\Toggle::make('is_more')
+                            ->label(function (callable $get) {
+                                $amount = $get('amount');
+                                return $amount ? ($amount . "₺'dan fazla?") : 'Bütçe Belirleyin';
                             })
-                            ->searchable(),
-
-                        Forms\Components\Select::make('neighborhood')
-                            ->label('Mahalle')
-                            ->options(function (callable $get) {
-                                $district = $get('district');
-                                $map = config('istanbul_neighborhoods', []);
-                                return $map[$district] ?? [];
-                            })
-                            ->searchable(),
+                            ->inline(false),
                     ])
-                    ->query(function (Builder $query, array $data) {
-                        if (!empty($data['district'])) {
-                            $query->where('district', $data['district']);
-                        }
-
-                        if (!empty($data['neighborhood'])) {
-                            $query->where('neighborhood', $data['neighborhood']);
-                        }
-                    }),
-
-                // Bütçe filtresi: miktar + az/çok toggle
-                Filter::make('budget_filter')
-                    ->label('Bütçe')
-                    ->form([
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->label('Bütçe')
-                                    ->numeric()
-                                    ->default(0),
-
-                                Forms\Components\Toggle::make('is_more')
-                                    ->label(function (callable $get) {
-                                        $amount = $get('amount');
-                                        return $amount ? ($amount . "₺'dan fazla?") : 'Bütçe Belirleyin';
-                                    })
-                                    ->inline(false),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (empty($data['amount'])) {
-                            return;
-                        }
-
-                        $amount = $data['amount'];
-                        if (!empty($data['is_more'])) {
-                            $query->where('budget', '>=', $amount);
-                        } else {
-                            $query->where('budget', '<=', $amount);
-                        }
-                    }),
+                    ->columns(2),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->query(function (Builder $query, array $data) {
+                if (empty($data['amount'])) {
+                    return;
+                }
+
+                $amount = $data['amount'];
+                if (!empty($data['is_more'])) {
+                    $query->where('budget', '>=', $amount);
+                } else {
+                    $query->where('budget', '<=', $amount);
+                }
+            });
+    }
+
+    private static function getTableActions(): array
+    {
+        return [
+            Tables\Actions\EditAction::make(),
+        ];
+    }
+
+    private static function getTableBulkActions(): array
+    {
+        return [
+            Tables\Actions\BulkActionGroup::make([
+                Tables\Actions\DeleteBulkAction::make(),
+            ]),
+        ];
     }
 
     public static function getRelations(): array
