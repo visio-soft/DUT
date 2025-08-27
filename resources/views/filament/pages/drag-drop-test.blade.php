@@ -389,34 +389,6 @@
             <div class="element-palette">
                 <h3 style="margin-bottom: 20px; color: #374151; font-weight: 600;">Peyzaj Öğeleri</h3>
 
-                <!-- Debug butonları (geliştirme için) -->
-                <div style="margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px;">
-                    <button onclick="console.log('📋 [DEBUG] Design Array:', getDesignArray())"
-                            style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                        🐛 Array Durumunu Göster
-                    </button>
-
-                    <button onclick="console.log('📊 [DEBUG] Element Counter:', elementCounter); console.log('🎯 [DEBUG] Selected Element:', selectedElement?.id || 'None');"
-                            style="padding: 8px 12px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                        🔢 Sayaçlar ve Seçili
-                    </button>
-
-                    <button onclick="console.log('🌍 [DEBUG] Global Variables:'); console.log('   projectId:', window.projectId); console.log('   objeler:', window.objeler);"
-                            style="padding: 8px 12px; background: #f59e0b; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                        🌍 Global Değişkenler
-                    </button>
-
-                    <button onclick="console.log('🎨 [DEBUG] DOM Elements:'); console.log('   Boundary:', document.getElementById('propertyBoundary')); console.log('   Elements on canvas:', document.querySelectorAll('.landscape-element').length);"
-                            style="padding: 8px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                        🎨 DOM Durumu
-                    </button>
-
-                    <button onclick="const data = { project_id: window.projectId, elements: getDesignArray(), timestamp: new Date().toISOString(), total_elements: getDesignArray().length }; console.log('💾 [DEBUG] Kaydedilecek Veri:', data); console.log('📄 [DEBUG] JSON:', JSON.stringify(data, null, 2));"
-                            style="padding: 8px 12px; background: #8b5cf6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">
-                        💾 Kayıt Verisi Önizle
-                    </button>
-                </div>
-
                 <!-- Veritabanından Gelen Objeler -->
                 @foreach($objeler as $obje)
                     <div class="palette-item"
@@ -514,9 +486,7 @@
 
 
             designElements.push(elementData);
-            console.log('🟢 [ADD] Element eklendi:', elementData);
-            console.log('📊 [ARRAY] Toplam element sayısı:', designElements.length);
-            console.log('📋 [ARRAY] Güncel array:', designElements);
+            console.log('🟢 [ADD] Element eklendi, toplam:', designElements.length);
         }
 
         function updateElementInArray(elementId, updates) {
@@ -535,11 +505,7 @@
                     };
                 }
 
-                console.log('🔄 [UPDATE] Element güncellendi:');
-                console.log('   📝 Eski değerler:', oldElement);
-                console.log('   🆕 Yeni değerler:', designElements[index]);
-                console.log('   📊 Güncellenen alanlar:', updates);
-                console.log('📋 [ARRAY] Güncel array:', designElements);
+                console.log('🔄 [UPDATE] Element güncellendi:', elementId);
             } else {
                 console.warn('⚠️ [UPDATE] Element bulunamadı:', elementId);
             }
@@ -548,17 +514,14 @@
         function removeElementFromArray(elementId) {
             const index = designElements.findIndex(el => el.id === elementId);
             if (index !== -1) {
-                const removedElement = designElements.splice(index, 1)[0];
-                console.log('🔴 [DELETE] Element silindi:', removedElement);
-                console.log('📊 [ARRAY] Kalan element sayısı:', designElements.length);
-                console.log('📋 [ARRAY] Güncel array:', designElements);
+                designElements.splice(index, 1);
+                console.log('🔴 [DELETE] Element silindi, kalan:', designElements.length);
             } else {
                 console.warn('⚠️ [DELETE] Silinecek element bulunamadı:', elementId);
             }
         }
 
         function getDesignArray() {
-            console.log('📋 [GET] Güncel design array:', designElements);
             return designElements;
         }
 
