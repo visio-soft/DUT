@@ -52,7 +52,7 @@ class EditObje extends EditRecord
             $mediaCount = $this->record->getMedia('images')->count();
             Log::info('Obje güncellendi', [
                 'obje_id' => $this->record->id,
-                'obje_isim' => $this->record->isim,
+                'obje_isim' => $this->record->name,
                 'media_sayisi' => $mediaCount
             ]);
         }

@@ -115,7 +115,7 @@ class ProjectResource extends Resource
                                     if (!$district) {
                                         return ['__other' => 'Diğer..'];
                                     }
-                                    
+
                                     $map = config('istanbul_neighborhoods', []);
                                     $options = $map[$district] ?? [];
                                     // '__other' seçeneği kullanıcı kendi mahalle adını yazabilsin diye
@@ -311,7 +311,49 @@ class ProjectResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('open_designer')
+                    ->label('Tasarımcıyı Aç')
+                    ->icon('heroicon-o-paint-brush')
+                    ->color('info')
+                    ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed)
+                    ->url(function ($record) {
+                        $projectImage = '';
+                        if ($record->hasMedia('images')) {
+                            $projectImage = $record->getFirstMediaUrl('images');
+                        }
+
+                        return url('/admin/drag-drop-test?' . http_build_query([
+                            'project_id' => $record->id,
+                            'image' => $projectImage
+                        ]));
+                    })
+                    ->openUrlInNewTab(false),
+
+                Tables\Actions\Action::make('view_design')
+                    ->label('Tasarımı Görüntüle')
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->design_completed)
+                    ->url(function ($record) {
+                        // Projenin tasarım kaydını bul ve view sayfasına git
+                        $design = $record->design;
+                        if ($design && $design->id) {
+                            return url("/admin/project-designs/{$design->id}");
+                        }
+                        
+                        // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
+                        $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
+                        if ($projectDesign) {
+                            return url("/admin/project-designs/{$projectDesign->id}");
+                        }
+                        
+                        // Hiç tasarım yoksa projeler sayfasında kal
+                        return url("/admin/projects");
+                    })
+                    ->openUrlInNewTab(false),
+
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => !$record->design_completed),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

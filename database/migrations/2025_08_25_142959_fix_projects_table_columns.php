@@ -13,21 +13,32 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            // Sadece created_by_id sütununu ekle (diğerleri zaten var)
-            $table->unsignedBigInteger('created_by_id')->nullable()->after('category_id');
-        });
-        
-        // Mevcut kayıtları güncelle - varsayılan user ID ata
-        DB::table('projects')->update([
-            'created_by_id' => 1 // Varsayılan user ID
-        ]);
-        
-        // Şimdi created_by_id'yi not null yap ve foreign key ekle
-        Schema::table('projects', function (Blueprint $table) {
-            $table->unsignedBigInteger('created_by_id')->nullable(false)->change();
-            $table->foreign('created_by_id')->references('id')->on('users');
-        });
+        // Add created_by_id only if it doesn't exist yet
+        if (!Schema::hasColumn('projects', 'created_by_id')) {
+            Schema::table('projects', function (Blueprint $table) {
+                $table->unsignedBigInteger('created_by_id')->nullable()->after('category_id');
+            });
+
+            // Update existing records with a sensible default
+            DB::table('projects')->update([
+                'created_by_id' => 1 // Default user id for legacy rows
+            ]);
+
+            // Make the column non-nullable and add foreign key if possible
+            Schema::table('projects', function (Blueprint $table) {
+                $table->unsignedBigInteger('created_by_id')->nullable(false)->change();
+                $table->foreign('created_by_id')->references('id')->on('users');
+            });
+        } else {
+            // If column exists, ensure foreign key exists (guarded)
+            Schema::table('projects', function (Blueprint $table) {
+                try {
+                    $table->foreign('created_by_id')->references('id')->on('users');
+                } catch (\Throwable $e) {
+                    // foreign key may already exist or DB doesn't allow adding it now; ignore
+                }
+            });
+        }
     }
 
     /**

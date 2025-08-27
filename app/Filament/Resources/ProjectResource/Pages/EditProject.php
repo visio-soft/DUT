@@ -26,15 +26,15 @@ class EditProject extends EditRecord
             Actions\DeleteAction::make(),
         ];
         
-        // Eğer proje tasarımı tamamlandıysa tasarımı düzenle butonu ekle
-        if ($this->record && $this->record->design_completed && $this->record->hasMedia('images')) {
-            $imageUrl = $this->record->getFirstMediaUrl('images');
-            $designUrl = "/admin/drag-drop-test?project_id={$this->record->id}&image=" . urlencode($imageUrl);
-            
-            $actions[] = Actions\Action::make('editDesign')
-                ->label('Tasarımı Düzenle')
-                ->icon('heroicon-o-paint-brush')
-                ->color('warning')
+        // Eğer proje tasarımı tamamlandıysa düzenleme yerine tasarımı görüntüle butonu ekle
+        if ($this->record && $this->record->design_completed && $this->record->design) {
+            $designId = $this->record->design->id;
+            $designUrl = "/admin/project-designs/{$designId}";
+
+            $actions[] = Actions\Action::make('viewDesign')
+                ->label('Tasarımı Görüntüle')
+                ->icon('heroicon-o-eye')
+                ->color('success')
                 ->url($designUrl)
                 ->openUrlInNewTab(false);
         }
@@ -45,5 +45,16 @@ class EditProject extends EditRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+
+    // If a project already has a completed design, redirect edit attempts to the design view
+    public function mount($record): void
+    {
+        parent::mount($record);
+
+        if ($this->record && $this->record->design_completed && $this->record->design) {
+            $designId = $this->record->design->id;
+            redirect()->to(url("/admin/project-designs/{$designId}"))->send();
+        }
     }
 }

@@ -16,7 +16,7 @@ class Obje extends Model implements HasMedia
     protected $table = 'objeler';
     
     protected $fillable = [
-        'isim',
+        'name',
     ];
     
     public function registerMediaCollections(): void

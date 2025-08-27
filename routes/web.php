@@ -2,9 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\ProjectController;
-
+// Ana sayfa Filament admin paneline yönlendir
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/admin');
 });
-

@@ -35,7 +35,7 @@ class ObjeResource extends Resource
                 Forms\Components\Section::make('Obje Bilgileri')
                     ->description('Objenizin bilgilerini girin')
                     ->schema([
-                        Forms\Components\TextInput::make('isim')
+                        Forms\Components\TextInput::make('name')
                             ->label('İsim')
                             ->required()
                             ->maxLength(255)
@@ -84,7 +84,7 @@ class ObjeResource extends Resource
                     ->square()
                     ->disk('public')
                     ->visibility('public'),
-                Tables\Columns\TextColumn::make('isim')
+                Tables\Columns\TextColumn::make('name')
                     ->label('İsim')
                     ->searchable()
                     ->sortable(),
@@ -99,7 +99,7 @@ class ObjeResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('isim')
+            ->defaultSort('name')
             ->filters([
                 //
             ])
