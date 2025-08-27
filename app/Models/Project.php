@@ -20,6 +20,7 @@ class Project extends Model implements HasMedia
     protected $fillable = [
         'category_id',
         'created_by_id',
+        'updated_by_id',
         'title',
         'description',
         'start_date',
@@ -56,6 +57,11 @@ class Project extends Model implements HasMedia
         return $this->belongsTo(User::class, 'created_by_id');
     }
 
+    public function updatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
     public function design(): HasOne
     {
         return $this->hasOne(ProjectDesign::class);
@@ -78,43 +84,8 @@ class Project extends Model implements HasMedia
 
     public function registerMediaConversions(?Media $media = null): void
     {
-        // Conversion'ları devre dışı bırak - hata kaynağı
-        // Eğer thumbnail gerekirse frontend'de CSS ile küçültelim
-
-        /*
-        // Sadece raster (bitmap) resimler için conversion yapılır
-        $this->addMediaConversion('preview')
-            ->width(800)
-            ->height(600)
-            ->nonQueued()
-            ->performOnCollections('images')
-            ->optimize()
-            ->skipOnFailure() // Hata durumunda conversion'u atla
-            ->performOnlyOnMimeTypes([
-                'image/jpeg',
-                'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp'
-            ]);
-
-        $this->addMediaConversion('thumb')
-            ->width(300)
-            ->height(200)
-            ->nonQueued()
-            ->performOnCollections('images')
-            ->optimize()
-            ->skipOnFailure() // Hata durumunda conversion'u atla
-            ->performOnlyOnMimeTypes([
-                'image/jpeg',
-                'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp'
-            ]);
-        */
+        // Media conversions disabled to avoid errors
+        // If thumbnails are needed, use CSS resizing in frontend
     }
 
     // Getter for backward compatibility if needed

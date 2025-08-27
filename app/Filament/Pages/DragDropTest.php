@@ -8,7 +8,6 @@ use App\Models\Obje;
 use App\Models\Project;
 use App\Models\ProjectDesign;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class DragDropTest extends Page
 {
@@ -54,50 +53,27 @@ class DragDropTest extends Page
 
     public function getViewData(): array
     {
-        Log::info('📊 [VIEW DATA] getViewData metodu çağrıldı');
-
         // Objeler tablosundan tüm objeleri çek
         $objeler = Obje::all()->map(function ($obje) {
-            $imageUrl = null;
-            if ($obje->hasMedia('images')) {
-                $imageUrl = $obje->getFirstMediaUrl('images');
-            }
             return [
                 'id' => $obje->id,
                 'name' => $obje->name,
-                'image_url' => $imageUrl,
+                'image_url' => $obje->hasMedia('images') ? $obje->getFirstMediaUrl('images') : null,
             ];
         });
 
-        Log::info('🗂️ [VIEW DATA] Objeler yüklendi:', [
-            'obje_count' => $objeler->count()
-        ]);
-
         // Mevcut tasarımı yükle (eğer varsa)
-        $existingDesign = null;
-        if ($this->project && $this->project->design) {
-            $existingDesign = $this->project->design->design_data;
-            Log::info('🎨 [VIEW DATA] Mevcut tasarım bulundu:', [
-                'design_elements_count' => isset($existingDesign['elements']) ? count($existingDesign['elements']) : 0
-            ]);
-        } else {
-            Log::info('🆕 [VIEW DATA] Mevcut tasarım bulunamadı');
-        }
+        $existingDesign = $this->project && $this->project->design 
+            ? $this->project->design->design_data 
+            : null;
 
-        $viewData = [
+        return [
             'objeler' => $objeler,
             'project_id' => $this->projectId,
             'project_image' => $this->projectImage,
             'existing_design' => $existingDesign,
+            'project' => $this->project,
         ];
-
-        Log::info('✅ [VIEW DATA] View data hazırlandı:', [
-            'project_id' => $this->projectId,
-            'project_image' => $this->projectImage,
-            'has_existing_design' => $existingDesign !== null
-        ]);
-
-        return $viewData;
     }
 
     protected function getActions(): array
@@ -107,24 +83,17 @@ class DragDropTest extends Page
                 ->label('Geri Dön')
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray')
-                ->url(url('/admin/projects'))
-                ->openUrlInNewTab(false),
-
+                ->url(url('/admin/projects')),
+                
             Action::make('saveDesign')
                 ->label('Tasarımı Kaydet ve Tamamla')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
-                // Do not show a confirmation modal; run immediately when clicked
-                ->action(function () {
-                    $this->saveDesignData();
-                }),
+                ->action(fn() => $this->saveDesignData()),
         ];
-    }    public function saveDesignData()
+    }
     {
-        Log::info('🎯 [SAVE DESIGN] Tasarım kaydetme işlemi başlatıldı');
-
         if (!$this->project) {
-            Log::error('❌ [SAVE DESIGN] Proje bulunamadı!');
             \Filament\Notifications\Notification::make()
                 ->title('Hata!')
                 ->body('Proje bulunamadı!')
@@ -133,27 +102,16 @@ class DragDropTest extends Page
             return;
         }
 
-        Log::info('📊 [SAVE DESIGN] Proje bilgileri:', [
-            'project_id' => $this->project->id,
-            'project_title' => $this->project->title
-        ]);
-
-        // JavaScript'ten tasarım verilerini al
+        // JavaScript'ten tasarım verilerini al ve kaydet
         $this->js('
-            console.log("💾 [SAVE] Tasarım kaydetme işlemi başlatılıyor...");
-
-            // Global designElements array\'ini kullan
-            const elements = designElements.map((element, index) => {
-                console.log(`   📦 [SAVE] Element ${index + 1}:`, element);
-                return {
-                    obje_id: element.obje_id,
-                    x: element.x,
-                    y: element.y,
-                    width: element.width,
-                    height: element.height,
-                    scale: element.scale
-                };
-            });
+            const elements = designElements.map(element => ({
+                obje_id: element.obje_id,
+                x: element.x,
+                y: element.y,
+                width: element.width,
+                height: element.height,
+                scale: element.scale
+            }));
 
             const design = {
                 project_id: ' . $this->project->id . ',
@@ -162,65 +120,34 @@ class DragDropTest extends Page
                 total_elements: elements.length
             };
 
-            console.log("📊 [SAVE] Kaydedilecek tasarım verisi:", design);
-            console.log("📈 [SAVE] Element sayısı:", design.total_elements);
-
-            // Livewire metodunu çağır
-            console.log("📞 [SAVE] Livewire storeDesignData metodu çağrılıyor...");
             $wire.call("storeDesignData", design);
         ');
     }
 
     public function storeDesignData($designData)
     {
-        Log::info('[STORE] storeDesignData metodu çağrıldı', [
-            'design_data' => $designData
-        ]);
-
         try {
-            Log::info('[STORE] Database işlemi başlatılıyor...');
+            $elementsCount = is_array($designData) && isset($designData['total_elements']) ? $designData['total_elements'] : 0;
 
             // Tasarım verilerini kaydet veya güncelle
-            $projectDesign = ProjectDesign::updateOrCreate(
+            ProjectDesign::updateOrCreate(
                 ['project_id' => $this->project->id],
                 ['design_data' => $designData]
             );
 
-            $elementsCount = is_array($designData) && isset($designData['total_elements']) ? $designData['total_elements'] : 0;
-
-            Log::info('[STORE] ProjectDesign kaydedildi:', [
-                'project_design_id' => $projectDesign->id,
-                'project_id' => $this->project->id,
-                'elements_count' => $elementsCount
-            ]);
-
             // Projeyi tamamlanmış olarak işaretle
             $this->project->update(['design_completed' => true]);
 
-            Log::info('[STORE] Proje tamamlandı olarak işaretlendi');
-
-            // Başarı mesajı
+            // Başarı mesajı ve yönlendirme
             \Filament\Notifications\Notification::make()
                 ->title('Başarılı!')
                 ->body('Tasarım başarıyla kaydedildi ve proje tamamlandı.')
                 ->success()
                 ->send();
 
-            // 2 saniye bekle sonra yönlendir
-            $this->js("
-                setTimeout(function() {
-                    window.location.href = '/admin/projects';
-                }, 100);
-            ");
+            $this->js("setTimeout(() => window.location.href = '/admin/projects', 100);");
 
         } catch (\Exception $e) {
-            Log::error('[STORE] Tasarım kaydetme hatası:', [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
             \Filament\Notifications\Notification::make()
                 ->title('Hata!')
                 ->body('Tasarım kaydedilirken bir hata oluştu: ' . $e->getMessage())
