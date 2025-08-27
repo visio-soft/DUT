@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('objeler', function (Blueprint $table) {
-            $table->renameColumn('isim', 'name');
+        Schema::table('projects', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('objeler', function (Blueprint $table) {
-            $table->renameColumn('name', 'isim');
+        Schema::table('projects', function (Blueprint $table) {
+            //
         });
     }
 };
