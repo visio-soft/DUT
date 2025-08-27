@@ -311,24 +311,6 @@ class ProjectResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('open_designer')
-                    ->label('Tasarımcıyı Aç')
-                    ->icon('heroicon-o-paint-brush')
-                    ->color('info')
-                    ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed)
-                    ->url(function ($record) {
-                        $projectImage = '';
-                        if ($record->hasMedia('images')) {
-                            $projectImage = $record->getFirstMediaUrl('images');
-                        }
-
-                        return url('/admin/drag-drop-test?' . http_build_query([
-                            'project_id' => $record->id,
-                            'image' => $projectImage
-                        ]));
-                    })
-                    ->openUrlInNewTab(false),
-
                 Tables\Actions\Action::make('view_design')
                     ->label('Tasarımı Görüntüle')
                     ->icon('heroicon-o-eye')
@@ -349,6 +331,52 @@ class ProjectResource extends Resource
                         
                         // Hiç tasarım yoksa projeler sayfasında kal
                         return url("/admin/projects");
+                    })
+                    ->openUrlInNewTab(false),
+
+                Tables\Actions\Action::make('delete_design')
+                    ->label('Tasarımı Sil')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->visible(fn ($record) => $record->design_completed)
+                    ->requiresConfirmation()
+                    ->modalHeading('Tasarımı Sil')
+                    ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                    ->modalSubmitActionLabel('Evet, Sil')
+                    ->action(function ($record) {
+                        // Projenin tasarım kaydını bul ve sil
+                        $design = $record->design;
+                        if ($design) {
+                            $design->delete();
+                            \Filament\Notifications\Notification::make()
+                                ->title('Tasarım silindi')
+                                ->success()
+                                ->send();
+                        } else {
+                            // Eğer design ilişkisi yoksa, projeye ait tüm tasarım kayıtlarını sil
+                            \App\Models\ProjectDesign::where('project_id', $record->id)->delete();
+                            \Filament\Notifications\Notification::make()
+                                ->title('Tasarım silindi')
+                                ->success()
+                                ->send();
+                        }
+                    }),
+
+                Tables\Actions\Action::make('add_design')
+                    ->label('Tasarım Ekle')
+                    ->icon('heroicon-o-plus')
+                    ->color('warning')
+                    ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed)
+                    ->url(function ($record) {
+                        $projectImage = '';
+                        if ($record->hasMedia('images')) {
+                            $projectImage = $record->getFirstMediaUrl('images');
+                        }
+
+                        return url('/admin/drag-drop-test?' . http_build_query([
+                            'project_id' => $record->id,
+                            'image' => $projectImage
+                        ]));
                     })
                     ->openUrlInNewTab(false),
 
