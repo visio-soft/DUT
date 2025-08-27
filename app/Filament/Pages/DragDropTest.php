@@ -92,6 +92,8 @@ class DragDropTest extends Page
                 ->action(fn() => $this->saveDesignData()),
         ];
     }
+
+    public function saveDesignData()
     {
         if (!$this->project) {
             \Filament\Notifications\Notification::make()
