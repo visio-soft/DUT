@@ -2,6 +2,9 @@
     <div class="landscape-designer-wrapper">
         <div class="landscape-studio">
             <div class="design-area">
+                <div class="background-image-container" id="backgroundImageContainer">
+                    <!-- Background image will be loaded here -->
+                </div>
                 <div class="property-boundary" id="propertyBoundary">
                     <!-- Elements will be placed here -->
                 </div>
@@ -11,17 +14,41 @@
 
     <style>
         :root {
-            --fd-bg: #f8fafc;
-            --fd-panel-bg: #ffffff;
-            --fd-border: #e5e7eb;
-            --fd-text: #374151;
-            --fd-accent: #10b981;
-            --fd-accent-2: #64614eff;
+            --fd-bg: var(--filament-background, #f8fafc);
+            --fd-panel-bg: var(--filament-panel, #ffffff);
+            --fd-border: var(--filament-border, #e5e7eb);
+            --fd-text: var(--filament-text, #374151);
+            --fd-accent: var(--filament-primary, #10b981);
+            --fd-accent-2: var(--filament-accent, #64614eff);
             --fd-muted-white: rgba(255,255,255,0.95);
+            /* opacity applied to the background image so we can control "wash" above it */
             --fd-bg-image-opacity: 1;
-            --fd-element-bg: rgba(255,255,255,0.9);
+            /* element card background (keeps elements readable but avoids washing the whole image) */
+            --fd-element-bg: rgba(0, 0, 0, 0);
+            /* name badge background for element labels */
             --fd-name-bg: rgba(255,255,255,0.85);
-            --fd-name-text: #374151;
+            --fd-name-text: #ffffffff;
+            --fd-danger: var(--filament-danger, #dc2626);
+            --fd-danger-bg: var(--filament-danger-100, #fee2e2);
+            --fd-info: var(--filament-info, #0ea5e9);
+        }
+
+        /* Support Tailwind/Filament dark class (when Dark Mode is toggled via class) */
+        .dark {
+            --fd-bg: #0b1220;
+            --fd-panel-bg: #0f1724;
+            --fd-border: #1f2937;
+            --fd-text: #e6eef6;
+            --fd-accent: #34d399;
+            --fd-accent-2: #60a5fa;
+            --fd-muted-white: rgba(255,255,255,0.03);
+            --fd-bg-image-opacity: 1;
+            --fd-element-bg: rgba(255,255,255,0.03);
+            --fd-name-bg: rgba(0,0,0,0.6);
+            --fd-name-text: var(--fd-text);
+            --fd-danger: #f87171;
+            --fd-danger-bg: rgba(248,113,113,0.06);
+            --fd-info: #38bdf8;
         }
 
         .landscape-designer-wrapper {
@@ -33,44 +60,70 @@
         .landscape-studio {
             display: flex;
             gap: 20px;
-            height: 80vh;
-            min-height: 600px;
+            height: 700px;
+            min-height: 700px;
+            max-height: 700px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            justify-content: center;
         }
 
         .design-area {
-            width: 100%;
+            width: 800px;
+            height: 700px;
+            min-width: 800px;
+            min-height: 700px;
             border-radius: 12px;
             position: relative;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
             overflow: hidden;
             background: transparent;
         }
 
         .property-boundary {
             position: absolute;
+            top: 50px;
+            left: 50px;
+            right: 50px;
+            bottom: 50px;
+            border: 4px dashed var(--fd-accent);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        /* Arka plan resmi için container */
+        .background-image-container {
+            position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            border: none;
-            border-radius: 0;
-            overflow: hidden;
-            @if($projectBackgroundImage)
-            background-image: url('{{ $projectBackgroundImage }}');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            @else
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            @endif
+            z-index: 2;
         }
 
+        .background-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: var(--fd-bg-image-opacity, 1);
+            border-radius: 12px;
+            filter: none;
+            -webkit-filter: none;
+        }
+
+        /* Yerleştirilen öğeler */
         .landscape-element {
             position: absolute;
+            cursor: pointer;
+            user-select: none;
+            touch-action: none;
             border: 3px solid transparent;
             border-radius: 4px;
-            transition: all 0.2s ease;
+            transition: all 0.1s ease;
             z-index: 10;
-            cursor: pointer;
+            width: 120px;
+            height: 120px;
         }
 
         .landscape-element:hover {
@@ -86,13 +139,15 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: transparent; /* fully transparent so background image shows through */
+            /* lighter element background so the main image stays visible */
+            background: var(--fd-element-bg, var(--fd-muted-white));
             position: relative;
-            border-radius: 0; /* let images be flush with element bounds */
-            padding: 0; /* remove padding so image fills the element */
-            box-shadow: none; /* remove shadow */
+            border-radius: 6px;
+            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
+        /* Overlay label on top of the image */
         .element-label {
             position: absolute;
             top: 6px;
@@ -119,39 +174,18 @@
             text-overflow: ellipsis;
         }
 
-        .element-image {
+        .landscape-element img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             border-radius: 4px;
         }
 
-        .stats-row {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .stat-box {
-            flex: 1;
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 8px;
-            padding: 12px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--fd-accent);
-            line-height: 1;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #16a34a;
-            margin-top: 4px;
+        .element-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         @media (max-width: 768px) {
@@ -195,6 +229,7 @@
                 const objectInfo = objectData[objeId] || {
                     id: objeId,
                     name: `Obje ${objeId}`,
+                    isim: `Obje ${objeId}`, // Türkçe alan da ekle
                     image_url: `https://picsum.photos/120/120?random=${objeId}`
                 };
                 console.log(`🔍 Getting object info for ID ${objeId}:`, objectInfo);
@@ -209,26 +244,48 @@
                 element.className = 'landscape-element';
                 element.id = `element_${index}`;
 
-                // Set position and size
-                element.style.left = elementData.x + 'px';
-                element.style.top = elementData.y + 'px';
-                element.style.width = elementData.width + 'px';
-                element.style.height = elementData.height + 'px';
+                // Pozisyon ve boyut belirleme - yeni format öncelikli
+                let x = 0, y = 0, width = 120, height = 120;
+
+                // Yeni format kontrol et (location ve scale)
+                if (elementData.location && typeof elementData.location === 'object') {
+                    x = elementData.location.x || 0;
+                    y = elementData.location.y || 0;
+                    console.log(`   📍 Yeni format pozisyon kullanılıyor: x=${x}, y=${y}`);
+
+                    if (elementData.scale && typeof elementData.scale === 'object') {
+                        width = (elementData.scale.x || 1) * 120;
+                        height = (elementData.scale.y || 1) * 120;
+                        console.log(`   📏 Yeni format boyut kullanılıyor: width=${width}, height=${height}`);
+                    }
+                }
+                // Eski format kontrol et
+                else if (elementData.x !== undefined && elementData.y !== undefined) {
+                    x = elementData.x || 0;
+                    y = elementData.y || 0;
+                    width = elementData.width || 120;
+                    height = elementData.height || 120;
+                    console.log(`   📍 Eski format kullanılıyor: x=${x}, y=${y}, width=${width}, height=${height}`);
+                }
+
+                // Transform kullanarak pozisyon ayarla (drag-drop-test ile aynı)
+                element.style.transform = `translate(${x}px, ${y}px)`;
+                element.style.width = width + 'px';
+                element.style.height = height + 'px';
 
                 // Create content
                 const content = document.createElement('div');
                 content.className = 'element-content';
 
-                // Build inner content without opaque backgrounds. Only show name badge when available.
-                content.innerHTML = ``;
-
                 // If name exists and is not null/empty string, add a small badge
-                if (objInfo.name && objInfo.name !== 'null') {
+                // Hem name hem isim alanını kontrol et (drag-drop-test ile uyumlu)
+                const displayName = objInfo.isim || objInfo.name || '';
+                if (displayName && displayName !== 'null') {
                     const labelWrap = document.createElement('div');
                     labelWrap.className = 'element-label';
                     const nameEl = document.createElement('div');
                     nameEl.className = 'element-name';
-                    nameEl.textContent = objInfo.name;
+                    nameEl.textContent = displayName;
                     labelWrap.appendChild(nameEl);
                     content.appendChild(labelWrap);
                 }
@@ -237,16 +294,16 @@
                 const imgEl = document.createElement('img');
                 imgEl.className = 'element-image';
                 imgEl.src = objInfo.image_url || (`https://picsum.photos/120/120?random=${elementData.obje_id}`);
-                imgEl.alt = objInfo.name || `Obje ${elementData.obje_id}`;
+                imgEl.alt = displayName || `Obje ${elementData.obje_id}`;
                 imgEl.onerror = function() { this.src = `https://picsum.photos/120/120?random=${elementData.obje_id}`; };
                 content.appendChild(imgEl);
 
                 element.appendChild(content);
 
                 // Add hover effect with element info
-                element.title = `${objInfo.name} - ${elementData.width}x${elementData.height}px`;
+                element.title = `${displayName || 'Obje'} - ${width}x${height}px - (${x}, ${y})`;
 
-                console.log(`✅ Element ${index} created successfully`);
+                console.log(`✅ Element ${index} created successfully at (${x}, ${y}) with size ${width}x${height}`);
                 return element;
             }
 
@@ -279,16 +336,48 @@
             // Set project background if available
             if (projectBackgroundImage) {
                 console.log('🖼️ Setting project background image:', projectBackgroundImage);
-                const boundary = document.getElementById('propertyBoundary');
-                if (boundary) {
-                    boundary.style.backgroundImage = `url('${projectBackgroundImage}')`;
-                    boundary.style.backgroundSize = 'cover';
-                    boundary.style.backgroundPosition = 'center';
-                    boundary.style.backgroundRepeat = 'no-repeat';
-                    console.log('✅ Background image applied to boundary');
-                }
+                loadBackgroundImage(projectBackgroundImage);
             } else {
-                console.log('⚠️ No project background image available');
+                console.log('⚠️ No project background image available - using gradient');
+                const backgroundContainer = document.getElementById('backgroundImageContainer');
+                if (backgroundContainer) {
+                    backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                }
+            }
+
+            function loadBackgroundImage(projectImage) {
+                console.log('🖼️ [BACKGROUND] Loading project background image:', projectImage);
+
+                const backgroundContainer = document.getElementById('backgroundImageContainer');
+                const img = document.createElement('img');
+
+                // Fix image path
+                let imageSrc = projectImage;
+                if (!imageSrc.startsWith('http') && !imageSrc.startsWith('/')) {
+                    if (!imageSrc.startsWith('storage/')) {
+                        imageSrc = 'storage/' + imageSrc;
+                    }
+                    imageSrc = '/' + imageSrc;
+                }
+
+                console.log('🔗 [BACKGROUND] Corrected image src:', imageSrc);
+
+                img.src = imageSrc;
+                img.className = 'background-image';
+                img.alt = 'Project Background Image';
+
+                img.onload = function() {
+                    console.log('✅ [BACKGROUND] Project background image loaded successfully:', imageSrc);
+                };
+
+                img.onerror = function() {
+                    console.error('❌ [BACKGROUND] Background image failed to load:', imageSrc);
+                    // Fallback to gradient
+                    backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    console.log('🎨 [BACKGROUND] Using gradient background as fallback');
+                };
+
+                backgroundContainer.appendChild(img);
             }
 
             // Add global click handler to remove highlights when clicking outside elements

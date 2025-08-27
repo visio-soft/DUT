@@ -349,7 +349,7 @@
                 max-width: 100%;
                 padding: 10px;
             }
-            
+
             .design-area {
                 width: 100%;
                 height: 500px;
@@ -357,14 +357,14 @@
                 min-height: 500px;
             }
         }
-        
+
         @media (max-width: 768px) {
             .landscape-studio {
                 flex-direction: column;
                 height: auto;
                 padding: 5px;
             }
-            
+
             .design-area {
                 width: 100%;
                 height: 400px;
@@ -511,6 +511,7 @@
                     y: height / 120
                 }
             };
+
 
             designElements.push(elementData);
             console.log('🟢 [ADD] Element eklendi:', elementData);
@@ -990,12 +991,13 @@
             let paletteHTML = '';
             objeler.forEach((obje, index) => {
                 const imageUrl = obje.image_url || '/images/default-object.png';
-                console.log(`   📦 [PALETTE] Obje ${index + 1}:`, { id: obje.id, name: obje.name, imageUrl });
+                const objeAdi = obje.isim || obje.name || `Obje ${obje.id}`;
+                console.log(`   📦 [PALETTE] Obje ${index + 1}:`, { id: obje.id, name: objeAdi, imageUrl });
 
                 paletteHTML += `
-                    <div class="palette-item" data-obje-id="${obje.id}" data-image="${imageUrl}" data-name="${obje.name}">
-                        <img src="${imageUrl}" alt="${obje.name}" class="palette-image" />
-                        <span>${obje.name}</span>
+                    <div class="palette-item" data-obje-id="${obje.id}" data-image="${imageUrl}" data-name="${objeAdi}">
+                        <img src="${imageUrl}" alt="${objeAdi}" class="palette-image" />
+                        <span>${objeAdi}</span>
                     </div>
                 `;
             });
@@ -1059,39 +1061,65 @@
                 designData.elements.forEach((elementData, index) => {
                     console.log(`   🏗️ [LOAD DESIGN] Element ${index + 1} yükleniyor:`, elementData);
 
+                    // Konum bilgilerini doğru şekilde al (yeni format öncelikli)
+                    let x = 0, y = 0, width = 120, height = 120;
+
+                    // Yeni format kontrol et (location ve scale)
+                    if (elementData.location && typeof elementData.location === 'object') {
+                        x = elementData.location.x || 0;
+                        y = elementData.location.y || 0;
+                        console.log(`   📍 [LOAD DESIGN] Yeni format pozisyon kullanılıyor: x=${x}, y=${y}`);
+
+                        if (elementData.scale && typeof elementData.scale === 'object') {
+                            width = (elementData.scale.x || 1) * 120;
+                            height = (elementData.scale.y || 1) * 120;
+                            console.log(`   📏 [LOAD DESIGN] Yeni format boyut kullanılıyor: width=${width}, height=${height}`);
+                        }
+                    }
+                    // Eski format kontrol et
+                    else if (elementData.x !== undefined && elementData.y !== undefined) {
+                        x = elementData.x || 0;
+                        y = elementData.y || 0;
+                        width = elementData.width || 120;
+                        height = elementData.height || 120;
+                        console.log(`   📍 [LOAD DESIGN] Eski format kullanılıyor: x=${x}, y=${y}, width=${width}, height=${height}`);
+                    }
+
                     // If the saved element doesn't include image/name, try to find it from the global objeler list
                     const objeId = elementData.obje_id;
                     const paletteObje = findObjeById(objeId);
 
                     const imageUrl = elementData.image_url || (paletteObje && (paletteObje.image_url || paletteObje.image)) || null;
-                    const name = elementData.name || (paletteObje && paletteObje.name) || '';
+                    const name = elementData.name || (paletteObje && (paletteObje.isim || paletteObje.name)) || '';
 
                     const element = createElement(
                         'custom',
                         imageUrl,
                         name,
-                        elementData.x,
-                        elementData.y,
+                        x,
+                        y,
                         elementData.obje_id
                     );
 
                     // Boyutları ayarla
-                    element.style.width = elementData.width + 'px';
-                    element.style.height = elementData.height + 'px';
+                    element.style.width = width + 'px';
+                    element.style.height = height + 'px';
 
                     console.log(`   📏 [LOAD DESIGN] Element ${index + 1} boyutları ayarlandı:`,
-                        { width: elementData.width, height: elementData.height });
+                        { width: width, height: height });
 
                     boundary.appendChild(element);
                     makeElementInteractive(element);
 
                     // Array'i güncelle (createElement zaten ekliyor ama boyutları güncellememiz gerek)
                     updateElementInArray(element.id, {
-                        width: elementData.width,
-                        height: elementData.height
+                        x: x,
+                        y: y,
+                        width: width,
+                        height: height
                     });
 
-                    console.log(`   ✅ [LOAD DESIGN] Element ${index + 1} başarıyla yüklendi`);
+                    console.log(`   ✅ [LOAD DESIGN] Element ${index + 1} başarıyla yüklendi: x=${x}, y=${y}`);
                 });
 
                 console.log('✅ [LOAD DESIGN] Mevcut tasarım başarıyla yüklendi:', designData.elements.length + ' element');
