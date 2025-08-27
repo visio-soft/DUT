@@ -20,7 +20,6 @@ class ObjeResource extends Resource
 {
     protected static ?string $model = Obje::class;
 
-    protected static ?string $navigationGroup = 'Obje Yönetimi';
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
     
     protected static ?string $navigationLabel = 'Objeler';
@@ -36,11 +35,6 @@ class ObjeResource extends Resource
                 Forms\Components\Section::make('Obje Bilgileri')
                     ->description('Objenizin bilgilerini girin')
                     ->schema([
-                        Forms\Components\Select::make('category')
-                            ->label('Kategori')
-                            ->required()
-                            ->options(\App\Models\Obje::CATEGORIES)
-                            ->placeholder('Obje kategorisini girin'),
                         Forms\Components\TextInput::make('name')
                             ->label('İsim')
                             ->required()
@@ -60,6 +54,8 @@ class ObjeResource extends Resource
                             ->helperText('Önerilen: Arka planı kırpılmış (şeffaf) PNG formatında bir resim.')
                             ->hintColor('info')
                             ->preserveFilenames()
+                            ->enableOpen()
+                            ->enableDownload()
                             ->columnSpanFull()
                             ->visibility('public')
                             ->disk('public')
@@ -83,17 +79,14 @@ class ObjeResource extends Resource
                 SpatieMediaLibraryImageColumn::make('images')
                     ->label('Resim')
                     ->collection('images')
-                    ->height(50)
-                    ->width(50)
+                    ->height(60)
+                    ->width(60)
                     ->square()
                     ->disk('public')
                     ->visibility('public'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('İsim')
-                    ->searchable(['name'])
-                    ->sortable('name'),
-                Tables\Columns\TextColumn::make('category')
-                    ->label('Kategori')
+                    ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturma Tarihi')
@@ -108,12 +101,7 @@ class ObjeResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
-                    ->label('Kategori')
-                    ->options(\App\Models\Obje::CATEGORIES)
-                    ->placeholder('Tüm kategoriler')
-                    ->multiple()
-                    ->searchable(),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

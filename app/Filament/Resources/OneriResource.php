@@ -2,18 +2,15 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OneriResource\Pages;
-use App\Filament\Resources\OneriResource\RelationManagers;
-use App\Models\Oneri;
-use App\Models\Category;
+use App\Filament\Resources\ProjectResource\Pages;
+use App\Filament\Resources\ProjectResource\RelationManagers;
+use App\Models\Project;
 use App\Rules\ImageFormatRule;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Tables\Grouping\Group;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
@@ -21,15 +18,13 @@ use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
-class OneriResource extends Resource
+class ProjectResource extends Resource
 {
-    protected static ?string $model = Oneri::class;
-    protected static ?string $pluralModelLabel = 'Öneriler';
-    protected static ?string $modelLabel = 'Öneri';
+    protected static ?string $model = Project::class;
+    protected static ?string $pluralModelLabel = 'Projeler';
+    protected static ?string $modelLabel = 'Proje';
 
-    protected static ?string $navigationLabel = 'Öneriler';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Öneri Yönetimi';
 
     public static function form(Form $form): Form
     {
@@ -38,15 +33,12 @@ class OneriResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('category_id')
-                            ->label('Proje Kategorisi')
-                            ->options(function () {
-                                // Tüm kategorileri göster
-                                return Category::all()->pluck('name', 'id');
-                            })
+                            ->label('Kategori')
+                            ->relationship('category', 'name')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->placeholder('Proje kategorisi seçin'),
+                            ->placeholder('Kategori seçin'),
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
                             ->required()
@@ -55,14 +47,12 @@ class OneriResource extends Resource
                             ->label('Açıklama')
                             ->required()
                             ->rows(3),
-                        Forms\Components\TextInput::make('estimated_duration')
-                            ->label('Tahmini İşlem Süresi (Gün)')
-                            ->numeric()
-                            ->required()
-                            ->minValue(1)
-                            ->maxValue(365)
-                            ->suffix('gün')
-                            ->helperText('Projenin tahmini tamamlanma süresi (1-365 gün arası)'),
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Başlangıç Tarihi')
+                            ->required(),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label('Bitiş Tarihi')
+                            ->required(),
                         Forms\Components\TextInput::make('budget')
                             ->label('Bütçe')
                             ->numeric()
@@ -87,11 +77,11 @@ class OneriResource extends Resource
                 Forms\Components\Section::make('Konum')
                     ->extraAttributes(['class' => 'mx-auto max-w-2xl p-4 ml-auto'])
                     ->schema([
-                        //Forms\Components\Toggle::make('use_google_maps')
-                            //->label('Haritadan Seç')
-                            //->default(false)
-                            //->reactive()
-                            //->columnSpanFull(),
+                        Forms\Components\Toggle::make('use_google_maps')
+                            ->label('Haritadan Seç')
+                            ->default(false)
+                            ->reactive()
+                            ->columnSpanFull(),
 
                         // Manual Konum Girişi (Google Maps kapalıyken)
                         Forms\Components\Group::make()->schema([
@@ -227,17 +217,12 @@ class OneriResource extends Resource
                 SpatieMediaLibraryImageColumn::make('image')->label('Resim')->collection('images')
                     ->circular()->height(50)->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
                     ->money('TRY')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('likes_count')
-                    ->label('Beğeni Sayısı')
-                    ->sortable()
-                    ->badge()
-                    ->color('success')
-                    ->icon('heroicon-o-heart'),
                 Tables\Columns\IconColumn::make('design_completed')
                     ->label('Tasarım')
                     ->boolean()
@@ -248,10 +233,7 @@ class OneriResource extends Resource
                     ->tooltip(function ($record) {
                         return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
                     }),
-                Tables\Columns\TextColumn::make('estimated_duration')
-                    ->label('Tahmini Süre')
-                    ->suffix(' gün')
-                    ->sortable()
+                Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -327,92 +309,12 @@ class OneriResource extends Resource
                             $query->where('budget', '<=', $amount);
                         }
                     }),
-
-                // Beğeni filtresi
-                Filter::make('likes_filter')
-                    ->label('Beğeni Sayısı')
-                    ->form([
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('min_likes')
-                                    ->label('Minimum Beğeni')
-                                    ->numeric()
-                                    ->default(0),
-
-                                Forms\Components\TextInput::make('max_likes')
-                                    ->label('Maksimum Beğeni')
-                                    ->numeric(),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        $query->withCount('likes');
-                        
-                        if (!empty($data['min_likes'])) {
-                            $query->having('likes_count', '>=', $data['min_likes']);
-                        }
-
-                        if (!empty($data['max_likes'])) {
-                            $query->having('likes_count', '<=', $data['max_likes']);
-                        }
-                    }),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_design')
-                    ->label('Tasarımı Görüntüle')
-                    ->icon('heroicon-o-eye')
-                    ->color('success')
-                    ->visible(fn ($record) => $record->design_completed)
-                    ->url(function ($record) {
-                        // Projenin tasarım kaydını bul ve view sayfasına git
-                        $design = $record->design;
-                        if ($design && $design->id) {
-                            return url("/admin/project-designs/{$design->id}");
-                        }
-
-                        // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
-                        $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
-                        if ($projectDesign) {
-                            return url("/admin/project-designs/{$projectDesign->id}");
-                        }
-
-                        // Hiç tasarım yoksa projeler sayfasında kal
-                        return url("/admin/oneris");
-                    })
-                    ->openUrlInNewTab(false),
-
-                Tables\Actions\Action::make('delete_design')
-                    ->label('Tasarımı Sil')
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->visible(fn ($record) => $record->design_completed)
-                    ->requiresConfirmation()
-                    ->modalHeading('Tasarımı Sil')
-                    ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                    ->modalSubmitActionLabel('Evet, Sil')
-                    ->action(function ($record) {
-                        // Projenin tasarım kaydını bul ve sil
-                        $design = $record->design;
-                        if ($design) {
-                            $design->delete();
-                            \Filament\Notifications\Notification::make()
-                                ->title('Tasarım silindi')
-                                ->success()
-                                ->send();
-                        } else {
-                            // Eğer design ilişkisi yoksa, projeye ait tüm tasarım kayıtlarını sil
-                            \App\Models\ProjectDesign::where('project_id', $record->id)->delete();
-                            \Filament\Notifications\Notification::make()
-                                ->title('Tasarım silindi')
-                                ->success()
-                                ->send();
-                        }
-                    }),
-
-                Tables\Actions\Action::make('add_design')
-                    ->label('Tasarım Ekle')
-                    ->icon('heroicon-o-plus')
-                    ->color('warning')
+                Tables\Actions\Action::make('open_designer')
+                    ->label('Tasarımcıyı Aç')
+                    ->icon('heroicon-o-paint-brush')
+                    ->color('info')
                     ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed)
                     ->url(function ($record) {
                         $projectImage = '';
@@ -427,6 +329,29 @@ class OneriResource extends Resource
                     })
                     ->openUrlInNewTab(false),
 
+                Tables\Actions\Action::make('view_design')
+                    ->label('Tasarımı Görüntüle')
+                    ->icon('heroicon-o-eye')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->design_completed)
+                    ->url(function ($record) {
+                        // Projenin tasarım kaydını bul ve view sayfasına git
+                        $design = $record->design;
+                        if ($design && $design->id) {
+                            return url("/admin/project-designs/{$design->id}");
+                        }
+                        
+                        // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
+                        $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
+                        if ($projectDesign) {
+                            return url("/admin/project-designs/{$projectDesign->id}");
+                        }
+                        
+                        // Hiç tasarım yoksa projeler sayfasında kal
+                        return url("/admin/projects");
+                    })
+                    ->openUrlInNewTab(false),
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn ($record) => !$record->design_completed),
             ])
@@ -434,36 +359,7 @@ class OneriResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->groups([
-                Group::make('category.name')
-                    ->label('Proje')
-                    ->getDescriptionFromRecordUsing(function ($record): string {
-                        $category = $record->category;
-                        $end = 'Belirtilmemiş';
-
-                        if ($category && $category->end_datetime) {
-                            $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
-                        }
-
-                        return "Bitiş: {$end}";
-                    }),
-
-                // Ekstra grup: Tasarım durumu (var / yok) - group by boolean column
-                Group::make('design_completed')
-                    ->label('Tasarım')
-                    ->titlePrefixedWithLabel(false)
-                    ->getTitleFromRecordUsing(function ($record): string {
-                        return $record->design_completed ? 'Tasarımı Var' : 'Tasarımı Yok';
-                    }),
-            ])
-            ->defaultGroup('category.name');
-
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->withCount('likes');
+            ]);
     }
 
     public static function getRelations(): array
@@ -476,9 +372,9 @@ class OneriResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOneriler::route('/'),
-            'create' => Pages\CreateOneri::route('/create'),
-            'edit' => Pages\EditOneri::route('/{record}/edit'),
+            'index' => Pages\ListProjects::route('/'),
+            'create' => Pages\CreateProject::route('/create'),
+            'edit' => Pages\EditProject::route('/{record}/edit'),
         ];
     }
 
@@ -486,7 +382,7 @@ class OneriResource extends Resource
     {
         return [
             \Filament\Actions\Action::make('create_with_design')
-                ->label('Yeni Öneri Oluştur')
+                ->label('Yeni Proje Oluştur')
                 ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->url(function (): string {
