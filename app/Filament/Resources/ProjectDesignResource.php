@@ -22,7 +22,7 @@ class ProjectDesignResource extends Resource
     protected static ?string $navigationGroup = 'Proje Yönetimi';
 
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
-    protected static bool $shouldRegisterNavigation = false; // Navigation'da gösterilmesin
+    protected static bool $shouldRegisterNavigation = true; // Navigation'da gösterilsin
 
     public static function form(Form $form): Form
     {
@@ -38,7 +38,7 @@ class ProjectDesignResource extends Resource
                             ->required()
                             ->disabled(fn ($context) => $context === 'edit'),
                     ]),
-                    
+
                 Forms\Components\Section::make('Tasarım Verileri')
                     ->schema([
                         Forms\Components\Textarea::make('design_data_display')
@@ -52,7 +52,7 @@ class ProjectDesignResource extends Resource
                                 }
                                 return '';
                             }),
-                            
+
                         Forms\Components\KeyValue::make('design_summary')
                             ->label('Tasarım Özeti')
                             ->disabled()
@@ -78,25 +78,42 @@ class ProjectDesignResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->label('ID')
                     ->sortable(),
-                    
+
+                Tables\Columns\ImageColumn::make('project.image')
+                    ->label('Proje Resmi')
+                    ->getStateUsing(function ($record) {
+                        if ($record->project && $record->project->hasMedia('images')) {
+                            return $record->project->getFirstMediaUrl('images');
+                        }
+                        return null;
+                    })
+                    ->defaultImageUrl(url('/images/no-image.png'))
+                    ->size(60)
+                    ->circular(),
+
                 Tables\Columns\TextColumn::make('project.title')
                     ->label('Proje Başlığı')
                     ->searchable()
                     ->sortable()
                     ->limit(40),
-                    
+
+                Tables\Columns\TextColumn::make('project.budget')
+                    ->label('Bütçe')
+                    ->money('TRY')
+                    ->sortable(),
+
                 Tables\Columns\TextColumn::make('project.category.name')
                     ->label('Kategori')
                     ->searchable()
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('elements_count')
                     ->label('Element Sayısı')
                     ->getStateUsing(function ($record) {
                         return $record->design_data['total_elements'] ?? 0;
                     })
                     ->sortable(),
-                    
+
                 Tables\Columns\TextColumn::make('design_timestamp')
                     ->label('Tasarım Tarihi')
                     ->getStateUsing(function ($record) {
@@ -107,7 +124,7 @@ class ProjectDesignResource extends Resource
                         return 'Bilinmiyor';
                     })
                     ->sortable(),
-                    
+
                 Tables\Columns\IconColumn::make('project.design_completed')
                     ->label('Tamamlandı')
                     ->boolean()
@@ -115,13 +132,13 @@ class ProjectDesignResource extends Resource
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger'),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturulma')
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Güncellenme')
                     ->dateTime('d.m.Y H:i')
@@ -133,41 +150,62 @@ class ProjectDesignResource extends Resource
                     ->label('Proje')
                     ->relationship('project', 'title')
                     ->searchable(),
-                    
+
                 Tables\Filters\Filter::make('completed_projects')
                     ->label('Tamamlanan Projeler')
                     ->query(fn (Builder $query): Builder => $query->whereHas('project', fn (Builder $query) => $query->where('design_completed', true))),
-                    
+
                 Tables\Filters\Filter::make('pending_projects')
                     ->label('Bekleyen Projeler')
                     ->query(fn (Builder $query): Builder => $query->whereHas('project', fn (Builder $query) => $query->where('design_completed', false))),
+
+                Tables\Filters\Filter::make('popular_designs')
+                    ->label('Popüler Tasarımlar (3+ Beğeni)')
+                    ->query(fn (Builder $query): Builder => $query->withCount('likes')->having('likes_count', '>=', 3)),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->label('Görüntüle'),
-                    
-                Tables\Actions\Action::make('view_design')
-                    ->label('Tasarımı Aç')
-                    ->icon('heroicon-o-paint-brush')
-                    ->color('info')
-                    ->url(function ($record) {
-                        $projectImage = '';
-                        if ($record->project && $record->project->hasMedia('images')) {
-                            $projectImage = $record->project->getFirstMediaUrl('images');
-                        }
-                        
-                        return url('/admin/drag-drop-test?' . http_build_query([
-                            'project_id' => $record->project_id,
-                            'image' => $projectImage
-                        ]));
-                    })
-                    ->openUrlInNewTab(false),
-                    
-                Tables\Actions\EditAction::make()
-                    ->label('Düzenle'),
-                    
-                Tables\Actions\DeleteAction::make()
-                    ->label('Sil'),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->label('Görüntüle')
+                        ->icon('heroicon-o-eye'),
+
+                    Tables\Actions\Action::make('view_design')
+                        ->label('Tasarımı Aç')
+                        ->icon('heroicon-o-paint-brush')
+                        ->color('info')
+                        ->url(function ($record) {
+                            $projectImage = '';
+                            if ($record->project && $record->project->hasMedia('images')) {
+                                $projectImage = $record->project->getFirstMediaUrl('images');
+                            }
+
+                            return url('/admin/drag-drop-test?' . http_build_query([
+                                'project_id' => $record->project_id,
+                                'image' => $projectImage
+                            ]));
+                        })
+                        ->openUrlInNewTab(false),
+
+                    Tables\Actions\Action::make('view_gallery')
+                        ->label('Galeriye Git')
+                        ->icon('heroicon-o-photo')
+                        ->color('success')
+                        ->url('/admin/project-designs-gallery')
+                        ->openUrlInNewTab(false),
+
+                    Tables\Actions\EditAction::make()
+                        ->label('Düzenle')
+                        ->icon('heroicon-o-pencil'),
+
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Sil')
+                        ->icon('heroicon-o-trash'),
+                ])
+                ->label('Aksiyonlar')
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->size('sm')
+                ->color('gray')
+                ->button()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
