@@ -2,10 +2,10 @@
     <div class="landscape-designer-wrapper">
         <div class="landscape-studio">
             <div class="design-area">
-                <div class="background-image-container" id="backgroundImageContainer">
-                    <!-- Background image will be loaded here -->
-                </div>
                 <div class="property-boundary" id="propertyBoundary">
+                    <div class="background-image-container" id="backgroundImageContainer">
+                        <!-- Background image will be loaded here -->
+                    </div>
                     <!-- Elements will be placed here -->
                 </div>
             </div>
@@ -139,12 +139,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* lighter element background so the main image stays visible */
-            background: var(--fd-element-bg, var(--fd-muted-white));
+            /* Make element container transparent so transparent images render correctly */
+            background: transparent !important;
             position: relative;
             border-radius: 6px;
             padding: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            /* remove inner shadow */
+            box-shadow: none !important;
         }
 
         /* Overlay label on top of the image */
@@ -161,9 +162,10 @@
         }
 
         .element-name {
-            color: #ffffff;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-            background: rgba(0,0,0,0.32);
+            color: inherit;
+            /* remove overlay and shadow to avoid covering transparent images */
+            text-shadow: none !important;
+            background: transparent !important;
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 11px;
@@ -179,6 +181,11 @@
             height: 100%;
             object-fit: cover;
             border-radius: 4px;
+            /* ensure the actual image's transparency is preserved */
+            background: transparent !important;
+            filter: none !important;
+            -webkit-filter: none !important;
+            box-shadow: none !important;
         }
 
         .element-image {
@@ -202,16 +209,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('🎨 Design Viewer: Initializing...');
-
             // Backend'den gelen veriler
             const designData = @json($designData);
             const objectData = @json($objectData);
             const projectBackgroundImage = @json($projectBackgroundImage);
-
-            console.log('📊 Design Data:', designData);
-            console.log('🎯 Object Data:', objectData);
-            console.log('🖼️ Project Background:', projectBackgroundImage);
 
             function formatTimestamp(timestamp) {
                 if (!timestamp) return '-';
@@ -232,13 +233,11 @@
                     isim: `Obje ${objeId}`, // Türkçe alan da ekle
                     image_url: `https://picsum.photos/120/120?random=${objeId}`
                 };
-                console.log(`🔍 Getting object info for ID ${objeId}:`, objectInfo);
                 return objectInfo;
             }
 
             function createElement(elementData, index) {
                 const objInfo = getObjectInfo(elementData.obje_id);
-                console.log(`🎯 Creating element ${index} with data:`, {elementData, objInfo});
 
                 const element = document.createElement('div');
                 element.className = 'landscape-element';
@@ -251,12 +250,10 @@
                 if (elementData.location && typeof elementData.location === 'object') {
                     x = elementData.location.x || 0;
                     y = elementData.location.y || 0;
-                    console.log(`   📍 Yeni format pozisyon kullanılıyor: x=${x}, y=${y}`);
 
                     if (elementData.scale && typeof elementData.scale === 'object') {
                         width = (elementData.scale.x || 1) * 120;
                         height = (elementData.scale.y || 1) * 120;
-                        console.log(`   📏 Yeni format boyut kullanılıyor: width=${width}, height=${height}`);
                     }
                 }
                 // Eski format kontrol et
@@ -265,7 +262,6 @@
                     y = elementData.y || 0;
                     width = elementData.width || 120;
                     height = elementData.height || 120;
-                    console.log(`   📍 Eski format kullanılıyor: x=${x}, y=${y}, width=${width}, height=${height}`);
                 }
 
                 // Transform kullanarak pozisyon ayarla (drag-drop-test ile aynı)
@@ -308,7 +304,6 @@
             }
 
             function loadDesign(data) {
-                console.log('🎨 Loading design data:', data);
 
                 // Clear existing elements
                 const boundary = document.getElementById('propertyBoundary');
@@ -335,10 +330,8 @@
 
             // Set project background if available
             if (projectBackgroundImage) {
-                console.log('🖼️ Setting project background image:', projectBackgroundImage);
                 loadBackgroundImage(projectBackgroundImage);
             } else {
-                console.log('⚠️ No project background image available - using gradient');
                 const backgroundContainer = document.getElementById('backgroundImageContainer');
                 if (backgroundContainer) {
                     backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
@@ -346,7 +339,6 @@
             }
 
             function loadBackgroundImage(projectImage) {
-                console.log('🖼️ [BACKGROUND] Loading project background image:', projectImage);
 
                 const backgroundContainer = document.getElementById('backgroundImageContainer');
                 const img = document.createElement('img');
@@ -360,21 +352,19 @@
                     imageSrc = '/' + imageSrc;
                 }
 
-                console.log('🔗 [BACKGROUND] Corrected image src:', imageSrc);
-
                 img.src = imageSrc;
                 img.className = 'background-image';
                 img.alt = 'Project Background Image';
 
                 img.onload = function() {
-                    console.log('✅ [BACKGROUND] Project background image loaded successfully:', imageSrc);
+                    console.log('[BACKGROUND] Project background image loaded successfully:', imageSrc);
                 };
 
                 img.onerror = function() {
                     console.error('❌ [BACKGROUND] Background image failed to load:', imageSrc);
                     // Fallback to gradient
                     backgroundContainer.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-                    console.log('🎨 [BACKGROUND] Using gradient background as fallback');
+                    console.log('Using gradient background as fallback');
                 };
 
                 backgroundContainer.appendChild(img);

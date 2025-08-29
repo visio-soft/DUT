@@ -38,8 +38,8 @@
                 --fd-panel-bg: #0f1724;
                 --fd-border: #1f2937;
                 --fd-text: #e6eef6;
-                --fd-accent: #34d399;
-                --fd-accent-2: #60a5fa;
+                --fd-accent: #10b981;
+                --fd-accent-2: #10b981;
                 --fd-muted-white: rgba(255,255,255,0.03);
                 --fd-bg-image-opacity: 1;
                 --fd-element-bg: rgba(255,255,255,0.03);
@@ -75,6 +75,34 @@
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.06);
             border: 1px solid var(--fd-border);
             overflow-y: auto;
+        }
+
+        /* Search box styling */
+        #searchBox, #categoryFilter {
+            transition: all 0.2s ease;
+        }
+
+        #searchBox:focus, #categoryFilter:focus {
+            outline: none;
+            border-color: var(--fd-accent);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+        }
+
+        /* Dark mode için search input ve select styling */
+        .dark #searchBox, .dark #categoryFilter {
+            background: var(--fd-element-bg);
+            border-color: var(--fd-border);
+            color: var(--fd-text);
+        }
+
+        .dark #searchBox::placeholder {
+            color: color-mix(in srgb, var(--fd-text) 60%, transparent);
+        }
+
+        /* Category filter styling */
+        #categoryFilter option {
+            background: var(--fd-panel-bg);
+            color: var(--fd-text);
         }
 
         /* Empty state for palette */
@@ -128,13 +156,12 @@
             background: var(--fd-bg);
             border-radius: 8px;
             cursor: grab;
-            transition: all 0.2s ease;
-            border: 2px solid transparent;
+            transition: all 0.22s ease;
             touch-action: none;
         }
 
         .palette-item:hover {
-            background: color-mix(in srgb, var(--fd-panel-bg) 90%, transparent);
+            background: transparent;
             border-color: var(--fd-accent);
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12);
@@ -144,7 +171,6 @@
             width: 40px;
             height: 40px;
             border-radius: 6px;
-            object-fit: cover;
         }
 
         .palette-item span {
@@ -227,13 +253,11 @@
 
         .landscape-element:hover {
             border-color: var(--fd-accent-2);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.18);
             z-index: 15;
         }
 
         .landscape-element.selected {
             border-color: var(--fd-accent);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.24);
             z-index: 20;
         }
 
@@ -248,18 +272,20 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* lighter element background so the main image stays visible */
-            background: var(--fd-element-bg, var(--fd-muted-white));
+            /* Make element container fully transparent so transparent images stay transparent */
+            background: transparent !important;
             position: relative;
             border-radius: 6px;
             padding: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            /* remove shadow so images aren't visually backed by a drop shadow */
+            box-shadow: none !important;
         }
 
         /* Name wrapper that sizes to the text */
         .element-name-wrap {
             display: inline-block;
-            background: var(--fd-name-bg);
+            /* keep label unobtrusive */
+            background: transparent !important;
             color: var(--fd-name-text);
             padding: 4px 8px;
             border-radius: 6px;
@@ -286,9 +312,10 @@
         }
 
         .element-name {
-            color: #ffffff;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-            background: rgba(0,0,0,0.32);
+            color: inherit;
+            /* remove heavy overlay and text shadow so underlying image remains visible */
+            text-shadow: none !important;
+            background: transparent !important;
             padding: 4px 8px;
             border-radius: 6px;
             font-size: 11px;
@@ -304,8 +331,8 @@
             position: absolute;
             width: 12px;
             height: 12px;
-            background: #3b82f6;
-            border: 2px solid white;
+            background: white;
+            border: 3px solid #10b981;
             border-radius: 50%;
             opacity: 0;
             transition: opacity 0.2s ease;
@@ -319,6 +346,39 @@
         .resize-sw { bottom: -6px; left: -6px; cursor: sw-resize; }
         .resize-ne { top: -6px; right: -6px; cursor: ne-resize; }
         .resize-nw { top: -6px; left: -6px; cursor: nw-resize; }
+
+        /* Silme butonu stilleri */
+        .delete-handle {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 20px;
+            height: 20px;
+            background: #dc2626;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 30;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .landscape-element:hover .delete-handle {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .delete-handle:hover {
+            background: #b91c1c;
+            transform: scale(1.2);
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
+        }
 
         /* Resize handles */
         .resize-handle {
@@ -339,6 +399,11 @@
             height: 100%;
             object-fit: cover;
             border-radius: 4px;
+            /* ensure no default background or filter is applied to the image element */
+            background: transparent !important;
+            filter: none !important;
+            -webkit-filter: none !important;
+            box-shadow: none !important;
         }
 
         /* Responsive */
@@ -387,33 +452,63 @@
         <div class="landscape-designer-wrapper">
         <div class="landscape-studio">
             <div class="element-palette">
-                <h3 style="margin-bottom: 20px; color: #374151; font-weight: 600;">Peyzaj Öğeleri</h3>
-
-                <!-- Veritabanından Gelen Objeler -->
-                @foreach($objeler as $obje)
-                    <div class="palette-item"
-                         data-element="obje_{{ $obje['id'] }}"
-                         data-obje-id="{{ $obje['id'] }}"
-                         data-image="{{ $obje['image_url'] ?: 'https://picsum.photos/80/80?random=' . $obje['id'] }}"
-                         data-name="{{ $obje['name'] }}">
-                        <img src="{{ $obje['image_url'] ?: 'https://picsum.photos/40/40?random=' . $obje['id'] }}"
-                             alt="{{ $obje['name'] }}"
-                             class="palette-image">
-                        <span>{{ $obje['name'] }}</span>
-                    </div>
-                @endforeach
-
-                @if($objeler->isEmpty())
-                    <!-- Empty-state: nicer notification when there are no objects -->
-                    <div class="empty-palette">
-                        <div class="empty-icon" aria-hidden="true">ℹ️</div>
-                        <div class="empty-content">
-                            <h3>Obje veritabanı boş</h3>
-                            <p>Henüz kayıtlı obje bulunmuyor. Yeni obje ekleyerek peyzaj öğelerinizi buraya ekleyebilirsiniz.</p>
-                            <div class="empty-hint">Filament > Obje kaydı üzerinden yeni obje oluşturun.</div>
+                <!-- Arama ve Filtre Bölümü -->
+                <div style="margin-bottom: 20px;">
+                    <!-- Başlık ve Butonlar -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 15px;">
+                        <h3 style="margin:0; color: #374151; font-weight: 600;">Peyzaj Öğeleri</h3>
+                        <div>
+                            <button id="toggleAspectBtn" title="Resize: lock/unlock aspect ratio" style="background:var(--fd-accent); color:white; border:none; padding:6px 10px; border-radius:8px; font-weight:600; cursor:pointer;">Symmetric: ON</button>
                         </div>
                     </div>
-                @endif
+                    
+                    <!-- Arama Kutusu -->
+                    <div style="margin-bottom: 12px;">
+                        <input type="text" id="searchBox" placeholder="Obje ara..." 
+                               style="width: 100%; padding: 8px 12px; border: 1px solid var(--fd-border); border-radius: 8px; background: var(--fd-bg); color: var(--fd-text); font-size: 14px;">
+                    </div>
+                    
+                    <!-- Kategori Dropdown -->
+                    <div style="margin-bottom: 12px;">
+                        <select id="categoryFilter" 
+                                style="width: 100%; padding: 8px 12px; border: 1px solid var(--fd-border); border-radius: 8px; background: var(--fd-bg); color: var(--fd-text); font-size: 14px;">
+                            <option value="">Tüm Kategoriler</option>
+                            @foreach($kategoriler as $kategori)
+                                <option value="{{ $kategori['id'] }}">{{ $kategori['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Objeler Listesi -->
+                <div id="objektListesi">
+                    <!-- Veritabanından Gelen Objeler -->
+                    @foreach($objeler as $obje)
+                        <div class="palette-item"
+                             data-element="obje_{{ $obje['id'] }}"
+                             data-obje-id="{{ $obje['id'] }}"
+                             data-category="{{ $obje['kategori'] }}"
+                             data-image="{{ $obje['image_url'] ?: 'https://picsum.photos/80/80?random=' . $obje['id'] }}"
+                             data-name="{{ $obje['name'] }}">
+                            <img src="{{ $obje['image_url'] ?: 'https://picsum.photos/40/40?random=' . $obje['id'] }}"
+                                 alt="{{ $obje['name'] }}"
+                                 class="palette-image">
+                            <span>{{ $obje['name'] }}</span>
+                        </div>
+                    @endforeach
+
+                    @if($objeler->isEmpty())
+                        <!-- Empty-state: nicer notification when there are no objects -->
+                        <div class="empty-palette">
+                            <div class="empty-icon" aria-hidden="true">ℹ️</div>
+                            <div class="empty-content">
+                                <h3>Obje veritabanı boş</h3>
+                                <p>Henüz kayıtlı obje bulunmuyor. Yeni obje ekleyerek peyzaj öğelerinizi buraya ekleyebilirsiniz.</p>
+                                <div class="empty-hint">Filament > Obje kaydı üzerinden yeni obje oluşturun.</div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
             </div>
 
             <div class="design-area">
@@ -470,7 +565,7 @@
         }
 
         // Array yönetimi fonksiyonları
-        function addElementToArray(elementId, objeId, x, y, width, height) {
+        function addElementToArray(elementId, objeId, x, y, width, height, aspectRatio = 1) {
             const elementData = {
                 id: elementId,
                 obje_id: objeId,
@@ -478,12 +573,12 @@
                 y: y,
                 width: width,
                 height: height,
+                aspectRatio: aspectRatio,
                 scale: {
                     x: width / 120, // 120px varsayılan boyut
                     y: height / 120
                 }
             };
-
 
             designElements.push(elementData);
             console.log('🟢 [ADD] Element eklendi, toplam:', designElements.length);
@@ -521,11 +616,38 @@
             }
         }
 
+        function deleteElement(element) {
+            console.log('🗑️ [DELETE] Element silme işlemi başlatılıyor:', element.id);
+            
+            // Eğer seçili element siliniyorsa, seçimi temizle
+            if (selectedElement === element) {
+                selectedElement = null;
+                console.log('🚫 [DELETE] Seçili element temizlendi');
+            }
+            
+            // Array'den elementi sil
+            removeElementFromArray(element.id);
+            
+            // DOM'dan elementi sil
+            element.remove();
+            
+            console.log('✅ [DELETE] Element başarıyla silindi:', element.id);
+            
+            // Silme eventi dispatch et (opsiyonel - gelecekte auto-save için kullanılabilir)
+            try {
+                const deleteEvent = new CustomEvent('element:deleted', { detail: { id: element.id } });
+                document.dispatchEvent(deleteEvent);
+                console.log('📣 [DELETE] event dispatched: element:deleted');
+            } catch (err) {
+                console.warn('⚠️ [DELETE] Could not dispatch delete event', err);
+            }
+        }
+
         function getDesignArray() {
             return designElements;
         }
 
-        function createElement(type, imageUrl, name, x = 0, y = 0, objeId = null) {
+    function createElement(type, imageUrl, name, x = 0, y = 0, objeId = null, options = {}) {
             elementCounter++;
             const elementId = `element_${type}_${elementCounter}`;
 
@@ -541,6 +663,8 @@
             element.id = elementId;
             element.className = 'landscape-element';
             element.style.transform = `translate(${x}px, ${y}px)`;
+            
+            // Başlangıç boyutları - resim yüklendikten sonra güncellenecek
             element.style.width = '120px';
             element.style.height = '120px';
 
@@ -563,9 +687,71 @@
             img.style.height = '100%';
             img.style.objectFit = 'cover';
 
+            // Resim yüklendiğinde boyutları ayarla
+            img.onload = function() {
+                // If caller asked to preserve existing size (e.g. loading saved design),
+                // skip the automatic resize/scale calculations that run on first load.
+                if (options && options.preserveSize) {
+                    console.log('📐 [IMAGE LOAD] preserveSize=true - skipping automatic size calculation for', img.src);
+                    return;
+                }
+                console.log('📐 [IMAGE LOAD] Resim yüklendi, boyutları hesaplanıyor:', img.src);
+                
+                // Resmin gerçek boyutlarını al
+                const naturalWidth = img.naturalWidth;
+                const naturalHeight = img.naturalHeight;
+                console.log('   📏 [IMAGE] Gerçek boyutlar:', { width: naturalWidth, height: naturalHeight });
+
+                // Aspect ratio hesapla
+                const aspectRatio = naturalWidth / naturalHeight;
+                console.log('   📊 [IMAGE] Aspect ratio:', aspectRatio);
+
+                // Varsayılan boyut (120px) bazında yeni boyutları hesapla
+                let newWidth, newHeight;
+                const baseSize = 120;
+
+                if (aspectRatio > 1) {
+                    // Yatay resim - genişlik sabit, yükseklik orantılı
+                    newWidth = baseSize;
+                    newHeight = baseSize / aspectRatio;
+                } else {
+                    // Dikey resim - yükseklik sabit, genişlik orantılı
+                    newHeight = baseSize;
+                    newWidth = baseSize * aspectRatio;
+                }
+
+                // Minimum boyut kontrolü (çok küçük olmasın)
+                const minSize = 60;
+                if (newWidth < minSize || newHeight < minSize) {
+                    const scale = minSize / Math.min(newWidth, newHeight);
+                    newWidth *= scale;
+                    newHeight *= scale;
+                }
+
+                console.log('   ✅ [IMAGE] Hesaplanan boyutlar:', { width: newWidth, height: newHeight });
+
+                // Element boyutlarını güncelle
+                element.style.width = newWidth + 'px';
+                element.style.height = newHeight + 'px';
+
+                // Aspect ratio'yu element'e kaydet (resize sırasında kullanılacak)
+                element.setAttribute('data-aspect-ratio', aspectRatio);
+
+                // Array'i güncelle
+                updateElementInArray(elementId, {
+                    width: newWidth,
+                    height: newHeight,
+                    aspectRatio: aspectRatio
+                });
+
+                console.log('🎯 [IMAGE] Element boyutları resim oranına göre ayarlandı');
+            };
+
             img.onerror = function () {
                 console.error('❌ [IMAGE] Element image failed to load, using placeholder:', img.src);
                 img.src = '/images/default-object.png';
+                // Hata durumunda varsayılan boyutları koru
+                element.setAttribute('data-aspect-ratio', 1); // Kare oran
             };
 
             // If a name is provided and not the literal string 'null', add badge overlay
@@ -589,9 +775,20 @@
                 element.appendChild(handle);
             });
 
+            // Silme butonu ekle
+            const deleteHandle = document.createElement('div');
+            deleteHandle.className = 'delete-handle';
+            deleteHandle.innerHTML = '×';
+            deleteHandle.title = 'Elementi sil';
+            deleteHandle.addEventListener('click', function(e) {
+                e.stopPropagation(); // Event bubbling'i durdur
+                deleteElement(element);
+            });
+            element.appendChild(deleteHandle);
+
             element.appendChild(content);
 
-            // Array'e elemanı ekle
+            // Array'e elemanı ekle (başlangıç boyutları ile)
             addElementToArray(elementId, objeId, x, y, 120, 120);
 
             console.log('✅ [CREATE] Element başarıyla oluşturuldu:', elementId);
@@ -630,6 +827,25 @@
             boundary.appendChild(element);
             makeElementInteractive(element);
             selectElement(element);
+
+            // Immediately record the actual placement into the design array so the
+            // initial position/size is saved once (before any manual drags/resizes).
+            // This ensures createElement's placeholder values are replaced with the
+            // real coordinates where the user dropped the item.
+            const width = parseFloat(element.style.width) || 120;
+            const height = parseFloat(element.style.height) || 120;
+            updateElementInArray(element.id, { x: x, y: y, width: width, height: height });
+            console.log('💾 [PLACE] Initial placement kaydedildi (array updated):', { id: element.id, x, y, width, height });
+
+            // Dispatch a small event so external logic (e.g., autosave) can listen
+            // and persist the placement to server/storage if desired.
+            try {
+                const placementEvent = new CustomEvent('element:placed', { detail: { id: element.id, x, y, width, height } });
+                document.dispatchEvent(placementEvent);
+                console.log('📣 [PLACE] event dispatched: element:placed');
+            } catch (err) {
+                console.warn('⚠️ [PLACE] Could not dispatch placement event', err);
+            }
 
             console.log('✅ [PLACE] Element başarıyla yerleştirildi');
         }
@@ -670,32 +886,80 @@
                 }
             });
 
-            // Resizable
+            // Resizable with custom aspect ratio preservation
             interact(element).resizable({
                 edges: { left: true, right: true, bottom: true, top: true },
                 listeners: {
                     start(event) {
                         console.log('📏 [RESIZE START] Boyutlandırma başladı:', event.target.id);
                         selectElement(event.target);
+                        
+                        // Başlangıç aspect ratio'sunu kaydet
+                        const target = event.target;
+                        const startWidth = parseFloat(target.style.width) || 120;
+                        const startHeight = parseFloat(target.style.height) || 120;
+                        
+                        // Kaydedilmiş aspect ratio'yu kullan ya da mevcut boyutlardan hesapla
+                        let aspectRatio = parseFloat(target.getAttribute('data-aspect-ratio'));
+                        if (!aspectRatio || isNaN(aspectRatio)) {
+                            aspectRatio = startWidth / startHeight;
+                            target.setAttribute('data-aspect-ratio', aspectRatio);
+                        }
+                        
+                        console.log('📐 [RESIZE] Kullanılacak aspect ratio:', aspectRatio);
+                        console.log('📏 [RESIZE] Başlangıç boyutları:', { width: startWidth, height: startHeight });
                     },
                     move(event) {
                         const target = event.target;
-                        let { width, height } = event.rect;
-
-                        const oldWidth = parseFloat(target.style.width) || 120;
-                        const oldHeight = parseFloat(target.style.height) || 120;
-
-                        width = Math.max(50, width);
-                        height = Math.max(50, height);
-
+                        const aspectRatio = parseFloat(target.getAttribute('data-aspect-ratio')) || 1;
+                        
+                        // Orijinal boyutlar
+                        const originalWidth = parseFloat(target.style.width) || 120;
+                        const originalHeight = parseFloat(target.style.height) || 120;
+                        
+                        // Event'ten gelen boyut değişiklikleri
+                        let newWidth = originalWidth + event.deltaRect.width;
+                        let newHeight = originalHeight + event.deltaRect.height;
+                        
+                        // Minimum boyut kontrolü
+                        newWidth = Math.max(50, newWidth);
+                        newHeight = Math.max(50, newHeight);
+                        
+                        // Aspect ratio'ya göre düzelt
+                        // Hangi boyutun daha çok değiştiğine göre diğerini hesapla
+                        const widthChange = Math.abs(event.deltaRect.width);
+                        const heightChange = Math.abs(event.deltaRect.height);
+                        
+                        if (widthChange >= heightChange) {
+                            // Genişlik değişimi dominant - yüksekliği buna göre ayarla
+                            newHeight = newWidth / aspectRatio;
+                        } else {
+                            // Yükseklik değişimi dominant - genişliği buna göre ayarla
+                            newWidth = newHeight * aspectRatio;
+                        }
+                        
+                        // Minimum boyut kontrolü tekrar
+                        if (newWidth < 50) {
+                            newWidth = 50;
+                            newHeight = newWidth / aspectRatio;
+                        }
+                        if (newHeight < 50) {
+                            newHeight = 50;
+                            newWidth = newHeight * aspectRatio;
+                        }
+                        
                         console.log('🔄 [RESIZE MOVE] Boyutlandırma hareketi:');
                         console.log('   🆔 Element:', target.id);
-                        console.log('   📏 Eski boyut:', { width: oldWidth, height: oldHeight });
-                        console.log('   📏 Yeni boyut:', { width, height });
+                        console.log('   � Aspect Ratio:', aspectRatio);
+                        console.log('   �📏 Eski boyut:', { width: originalWidth, height: originalHeight });
+                        console.log('   📏 Yeni boyut:', { width: newWidth, height: newHeight });
+                        console.log('   📊 Delta:', { width: event.deltaRect.width, height: event.deltaRect.height });
 
-                        target.style.width = width + 'px';
-                        target.style.height = height + 'px';
+                        // Boyutları uygula
+                        target.style.width = newWidth + 'px';
+                        target.style.height = newHeight + 'px';
 
+                        // Pozisyon güncelleme
                         const oldX = parseFloat(target.getAttribute('data-x')) || 0;
                         const oldY = parseFloat(target.getAttribute('data-y')) || 0;
                         const x = oldX + event.deltaRect.left;
@@ -713,8 +977,8 @@
                         updateElementInArray(target.id, {
                             x: x,
                             y: y,
-                            width: width,
-                            height: height
+                            width: newWidth,
+                            height: newHeight
                         });
                     },
                     end(event) {
@@ -722,8 +986,13 @@
                     }
                 },
                 modifiers: [
-                    interact.modifiers.restrictSize({
-                        min: { width: 50, height: 50 }
+                    // Sadece temel sınır kontrolü - aspect ratio'yu kendimiz hallediyoruz
+                    interact.modifiers.restrictSize({ 
+                        min: { width: 50, height: 50 },
+                        max: { width: 400, height: 400 }
+                    }),
+                    interact.modifiers.restrictRect({
+                        restriction: 'parent'
                     })
                 ]
             });
@@ -864,16 +1133,7 @@
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Delete' && selectedElement) {
                 console.log('⌨️ [KEYBOARD] Delete tuşuna basıldı:', selectedElement.id);
-                if (selectedElement && confirm('Seçili elementi silmek istediğinizden emin misiniz?')) {
-                    console.log('✅ [DELETE] Kullanıcı silmeyi onayladı');
-                    // Array'den elemanı sil
-                    removeElementFromArray(selectedElement.id);
-                    // DOM'dan elemanı sil
-                    selectedElement.remove();
-                    deselectAll();
-                } else {
-                    console.log('❌ [DELETE] Kullanıcı silmeyi iptal etti');
-                }
+                deleteElement(selectedElement);
             }
             if (e.key === 'Escape') {
                 console.log('⌨️ [KEYBOARD] Escape tuşuna basıldı - selection temizleniyor');
@@ -887,12 +1147,14 @@
 
             // PHP'den gelen verileri JavaScript'e aktar
             const objeler = @json($objeler ?? []);
+            const kategoriler = @json($kategoriler ?? []);
             const projectId = @json($project_id ?? null);
             const projectImage = @json($project_image ?? null);
             const existingDesign = @json($existing_design ?? null);
 
             console.log('📊 [INIT] PHP\'den gelen veriler:');
             console.log('   🗂️ Objeler:', objeler);
+            console.log('   📂 Kategoriler:', kategoriler);
             console.log('   🆔 Project ID:', projectId);
             console.log('   🖼️ Project Image:', projectImage);
             console.log('   🎨 Existing Design:', existingDesign);
@@ -900,8 +1162,12 @@
             // Global değişkenleri ayarla
             window.projectId = projectId;
             window.objeler = objeler;
+            window.kategoriler = kategoriler;
 
             console.log('🌍 [INIT] Global değişkenler ayarlandı');
+
+            // Filtreleme ve arama fonksiyonlarını başlat
+            initializeFiltering();
 
             // Objeleri pallete yükle
             console.log('🎨 [INIT] Objeler palette\'e yükleniyor...');
@@ -929,44 +1195,109 @@
             console.log('✅ [INIT] Sayfa başlatma tamamlandı');
         });
 
+        // Filtreleme ve arama sistemi
+        function initializeFiltering() {
+            console.log('🔍 [FILTER] Filtreleme sistemi başlatılıyor...');
+
+            const searchBox = document.getElementById('searchBox');
+            const categoryFilter = document.getElementById('categoryFilter');
+
+            if (searchBox) {
+                searchBox.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    console.log('🔎 [SEARCH] Arama terimi:', searchTerm);
+                    filterObjects();
+                });
+            }
+
+            if (categoryFilter) {
+                categoryFilter.addEventListener('change', function() {
+                    const selectedCategory = this.value;
+                    console.log('📂 [CATEGORY] Seçili kategori:', selectedCategory);
+                    filterObjects();
+                });
+            }
+
+            console.log('✅ [FILTER] Filtreleme sistemi hazır');
+        }
+
+        function filterObjects() {
+            const searchTerm = document.getElementById('searchBox')?.value.toLowerCase() || '';
+            const selectedCategory = document.getElementById('categoryFilter')?.value || '';
+            
+            console.log('🎯 [FILTER] Filtreleme yapılıyor:', { searchTerm, selectedCategory });
+
+            const paletteItems = document.querySelectorAll('.palette-item');
+            let visibleCount = 0;
+
+            paletteItems.forEach(item => {
+                const name = item.getAttribute('data-name')?.toLowerCase() || '';
+                const category = item.getAttribute('data-category') || '';
+                
+                const matchesSearch = !searchTerm || name.includes(searchTerm);
+                const matchesCategory = !selectedCategory || category === selectedCategory;
+                
+                const shouldShow = matchesSearch && matchesCategory;
+                
+                if (shouldShow) {
+                    item.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            console.log(`📊 [FILTER] ${visibleCount} obje gösteriliyor`);
+
+            // Eğer hiç obje gösterilmiyorsa bilgi mesajı göster
+            showNoResultsMessage(visibleCount === 0);
+        }
+
+        function showNoResultsMessage(show) {
+            let noResultsDiv = document.getElementById('noResultsMessage');
+            
+            if (show && !noResultsDiv) {
+                // Sonuç bulunamadı mesajı oluştur
+                noResultsDiv = document.createElement('div');
+                noResultsDiv.id = 'noResultsMessage';
+                noResultsDiv.className = 'empty-palette';
+                noResultsDiv.innerHTML = `
+                    <div class="empty-icon" aria-hidden="true">🔍</div>
+                    <div class="empty-content">
+                        <h3>Sonuç Bulunamadı</h3>
+                        <p>Arama kriterlerinize uygun obje bulunamadı.</p>
+                        <div class="empty-hint">Farklı anahtar kelimeler deneyin veya kategori filtresini değiştirin.</div>
+                    </div>
+                `;
+                
+                const objektListesi = document.getElementById('objektListesi');
+                if (objektListesi) {
+                    objektListesi.appendChild(noResultsDiv);
+                }
+            } else if (!show && noResultsDiv) {
+                // Mesajı gizle
+                noResultsDiv.remove();
+            }
+        }
+
         function loadObjectsToPalette(objeler) {
             console.log('🎨 [PALETTE] Objeler yükleniyor:', objeler.length + ' adet');
 
-            const palette = document.querySelector('.element-palette');
+            // Bu fonksiyon artık sadece interact.js event'lerini yeniden eklemek için kullanılıyor
+            // Çünkü objeler zaten HTML'de render edildi
 
             if (!objeler || objeler.length === 0) {
-                console.log('⚠️ [PALETTE] Obje bulunamadı - boş durum gösteriliyor');
-                // Boş durum göster
-                palette.innerHTML = `
-                    <div class="empty-palette">
-                        <div class="empty-icon">🌿</div>
-                        <div class="empty-content">
-                            <h3>Obje bulunamadı</h3>
-                            <p>Henüz tasarım objesi eklenmemiş</p>
-                            <div class="empty-hint">Yöneticiden obje eklemesini isteyin</div>
-                        </div>
-                    </div>
-                `;
+                console.log('⚠️ [PALETTE] Obje bulunamadı');
                 return;
             }
 
-            // Objeleri listele
-            let paletteHTML = '';
-            objeler.forEach((obje, index) => {
-                const imageUrl = obje.image_url || '/images/default-object.png';
-                const objeAdi = obje.isim || obje.name || `Obje ${obje.id}`;
-                console.log(`   📦 [PALETTE] Obje ${index + 1}:`, { id: obje.id, name: objeAdi, imageUrl });
-
-                paletteHTML += `
-                    <div class="palette-item" data-obje-id="${obje.id}" data-image="${imageUrl}" data-name="${objeAdi}">
-                        <img src="${imageUrl}" alt="${objeAdi}" class="palette-image" />
-                        <span>${objeAdi}</span>
-                    </div>
-                `;
+            // Palette item'lara interact.js eventlerini ekle
+            const paletteItems = document.querySelectorAll('.palette-item');
+            paletteItems.forEach((item, index) => {
+                console.log(`   📦 [PALETTE] Obje ${index + 1} event'leri ekleniyor:`, item.getAttribute('data-name'));
             });
 
-            palette.innerHTML = paletteHTML;
-            console.log('✅ [PALETTE] Objeler başarıyla yüklendi');
+            console.log('✅ [PALETTE] Objeler başarıyla hazırlandı');
         }
 
         // Helper to find an obje by id from the loaded palette objects
@@ -1061,12 +1392,19 @@
                         name,
                         x,
                         y,
-                        elementData.obje_id
+                        elementData.obje_id,
+                        { preserveSize: true }
                     );
 
                     // Boyutları ayarla
                     element.style.width = width + 'px';
                     element.style.height = height + 'px';
+
+                    // Kaydedilmiş aspect ratio varsa elementte sakla
+                    if (elementData.aspectRatio) {
+                        element.setAttribute('data-aspect-ratio', elementData.aspectRatio);
+                        console.log(`   📐 [LOAD DESIGN] Aspect ratio ayarlandı: ${elementData.aspectRatio}`);
+                    }
 
                     console.log(`   📏 [LOAD DESIGN] Element ${index + 1} boyutları ayarlandı:`,
                         { width: width, height: height });
@@ -1079,7 +1417,8 @@
                         x: x,
                         y: y,
                         width: width,
-                        height: height
+                        height: height,
+                        aspectRatio: elementData.aspectRatio || 1
                     });
 
                     console.log(`   ✅ [LOAD DESIGN] Element ${index + 1} başarıyla yüklendi: x=${x}, y=${y}`);

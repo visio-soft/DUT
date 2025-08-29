@@ -27,6 +27,12 @@ class ProjectDesignsGallery extends Page
 
     public function loadProjectDesigns(): void
     {
+        // If migrations haven't created the table yet, skip loading designs
+        if (!\Illuminate\Support\Facades\Schema::hasTable('project_designs')) {
+            $this->projectDesigns = [];
+            return;
+        }
+
         $designs = ProjectDesign::with(['project', 'project.category', 'likes'])
             ->whereHas('project')
             ->get()

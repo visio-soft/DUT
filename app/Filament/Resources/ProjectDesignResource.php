@@ -167,12 +167,13 @@ class ProjectDesignResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
                         ->label('Görüntüle')
+                        ->color('Gray')
                         ->icon('heroicon-o-eye'),
 
                     Tables\Actions\Action::make('view_design')
-                        ->label('Tasarımı Aç')
+                        ->label('Tasarımı Düzenle')
                         ->icon('heroicon-o-paint-brush')
-                        ->color('info')
+                        ->color('primary')
                         ->url(function ($record) {
                             $projectImage = '';
                             if ($record->project && $record->project->hasMedia('images')) {
@@ -186,15 +187,9 @@ class ProjectDesignResource extends Resource
                         })
                         ->openUrlInNewTab(false),
 
-                    Tables\Actions\Action::make('view_gallery')
-                        ->label('Galeriye Git')
-                        ->icon('heroicon-o-photo')
-                        ->color('success')
-                        ->url('/admin/project-designs-gallery')
-                        ->openUrlInNewTab(false),
-
                     Tables\Actions\EditAction::make()
-                        ->label('Düzenle')
+                        ->label('Veritabanında İncele')
+                        ->color('info')
                         ->icon('heroicon-o-pencil'),
 
                     Tables\Actions\DeleteAction::make()
