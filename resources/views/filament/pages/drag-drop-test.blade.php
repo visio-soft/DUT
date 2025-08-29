@@ -487,7 +487,7 @@
                         <div class="palette-item"
                              data-element="obje_{{ $obje['id'] }}"
                              data-obje-id="{{ $obje['id'] }}"
-                             data-category="{{ $obje['kategori'] }}"
+                             data-category="{{ $obje['category'] }}"
                              data-image="{{ $obje['image_url'] ?: 'https://picsum.photos/80/80?random=' . $obje['id'] }}"
                              data-name="{{ $obje['name'] }}">
                             <img src="{{ $obje['image_url'] ?: 'https://picsum.photos/40/40?random=' . $obje['id'] }}"

@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('objeler', function (Blueprint $table) {
-            if (!Schema::hasColumn('objeler', 'category')) {
-                // place new column after existing 'name' column (İngilizce sütun adları)
-                $table->string('category')->default('doga')->after('name');
-            }
+            // Türkçe 'isim' sütununu İngilizce 'name' olarak yeniden adlandır
+            $table->renameColumn('isim', 'name');
         });
     }
 
@@ -25,9 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('objeler', function (Blueprint $table) {
-            if (Schema::hasColumn('objeler', 'category')) {
-                $table->dropColumn('category');
-            }
+            // Geri alma: 'name' sütununu 'isim' olarak geri adlandır
+            $table->renameColumn('name', 'isim');
         });
     }
 };
