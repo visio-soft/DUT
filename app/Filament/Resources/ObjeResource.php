@@ -35,6 +35,11 @@ class ObjeResource extends Resource
                 Forms\Components\Section::make('Obje Bilgileri')
                     ->description('Objenizin bilgilerini girin')
                     ->schema([
+                        Forms\Components\Select::make('kategori')
+                            ->label('Kategori')
+                            ->required()
+                            ->options(\App\Models\Obje::CATEGORIES)
+                            ->placeholder('Obje kategorisini girin'),
                         Forms\Components\TextInput::make('name')
                             ->label('İsim')
                             ->required()
@@ -54,8 +59,6 @@ class ObjeResource extends Resource
                             ->helperText('Önerilen: Arka planı kırpılmış (şeffaf) PNG formatında bir resim.')
                             ->hintColor('info')
                             ->preserveFilenames()
-                            ->enableOpen()
-                            ->enableDownload()
                             ->columnSpanFull()
                             ->visibility('public')
                             ->disk('public')
@@ -79,14 +82,17 @@ class ObjeResource extends Resource
                 SpatieMediaLibraryImageColumn::make('images')
                     ->label('Resim')
                     ->collection('images')
-                    ->height(60)
-                    ->width(60)
+                    ->height(50)
+                    ->width(50)
                     ->square()
                     ->disk('public')
                     ->visibility('public'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('İsim')
-                    ->searchable()
+                    ->searchable(['isim'])
+                    ->sortable('isim'),
+                Tables\Columns\TextColumn::make('kategori')
+                    ->label('Kategori')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturma Tarihi')
@@ -99,7 +105,7 @@ class ObjeResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('name')
+            ->defaultSort('isim')
             ->filters([
                 //
             ])

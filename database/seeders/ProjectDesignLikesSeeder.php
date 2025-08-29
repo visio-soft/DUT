@@ -14,6 +14,12 @@ class ProjectDesignLikesSeeder extends Seeder
      */
     public function run(): void
     {
+        // If the project_designs table doesn't exist yet (migrations running), skip seeding likes
+        if (!\Illuminate\Support\Facades\Schema::hasTable('project_designs')) {
+            $this->command->info('Table `project_designs` does not exist yet. Skipping ProjectDesignLikesSeeder.');
+            return;
+        }
+
         // Get all users and project designs
         $users = User::all();
         $projectDesigns = ProjectDesign::all();

@@ -16,7 +16,29 @@ class Obje extends Model implements HasMedia
     protected $table = 'objeler';
     
     protected $fillable = [
-        'name',
+        'kategori',
+    // Allow mass-assignment via both Turkish DB column 'isim' and legacy 'name' attribute
+    'isim',
+    'name',
+    ];
+
+    // Map legacy `name` attribute to DB column `isim`
+    public function getNameAttribute()
+    {
+        return $this->attributes['isim'] ?? null;
+    }
+
+    public function setNameAttribute($value)
+    {
+        $this->attributes['isim'] = $value;
+    }
+
+    // Sabit kategori listesi (formlarda ve kontrollerde kullanmak için)
+    public const CATEGORIES = [
+    'doga' => 'Doğa',
+    'isik' => 'Işık',
+    'heykel' => 'Heykel',
+
     ];
     
     public function registerMediaCollections(): void

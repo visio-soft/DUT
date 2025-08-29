@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use App\Models\Obje;
 use App\Models\Project;
 use App\Models\ProjectDesign;
+use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
 
 class DragDropTest extends Page
@@ -53,11 +54,35 @@ class DragDropTest extends Page
 
     public function getViewData(): array
     {
+        // Kategorileri çek
+        $kategoriler = [];
+        
+        // Önce Obje modelindeki sabit kategorileri kullan
+        foreach (Obje::CATEGORIES as $key => $name) {
+            $kategoriler[] = [
+                'id' => $key,
+                'name' => $name,
+                'type' => 'static' // Sabit kategori
+            ];
+        }
+        
+        // Category tablosundan da kategorileri çek (eğer varsa)
+        $dbKategoriler = Category::all();
+        foreach ($dbKategoriler as $kategori) {
+            $kategoriler[] = [
+                'id' => $kategori->id,
+                'name' => $kategori->name,
+                'type' => 'database', // Veritabanı kategorisi
+                'icon' => $kategori->icon
+            ];
+        }
+
         // Objeler tablosundan tüm objeleri çek
         $objeler = Obje::all()->map(function ($obje) {
             return [
                 'id' => $obje->id,
                 'name' => $obje->name,
+                'kategori' => $obje->kategori, // Kategori bilgisini ekle
                 'image_url' => $obje->hasMedia('images') ? $obje->getFirstMediaUrl('images') : null,
             ];
         });
@@ -69,6 +94,7 @@ class DragDropTest extends Page
 
         return [
             'objeler' => $objeler,
+            'kategoriler' => $kategoriler,
             'project_id' => $this->projectId,
             'project_image' => $this->projectImage,
             'existing_design' => $existingDesign,

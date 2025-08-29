@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('objeler', function (Blueprint $table) {
             $table->id();
             $table->string('isim')->index();
-            $table->string('emoji')->nullable();
             $table->timestamps();
         });
     }
