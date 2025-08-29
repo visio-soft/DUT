@@ -81,8 +81,8 @@ class DragDropTest extends Page
         $objeler = Obje::all()->map(function ($obje) {
             return [
                 'id' => $obje->id,
-                'name' => $obje->name,
-                'kategori' => $obje->kategori, // Kategori bilgisini ekle
+                'name' => $obje->name, // Yeni İngilizce sütun adı
+                'category' => $obje->category, // Yeni İngilizce sütun adı
                 'image_url' => $obje->hasMedia('images') ? $obje->getFirstMediaUrl('images') : null,
             ];
         });

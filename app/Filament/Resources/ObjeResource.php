@@ -35,7 +35,7 @@ class ObjeResource extends Resource
                 Forms\Components\Section::make('Obje Bilgileri')
                     ->description('Objenizin bilgilerini girin')
                     ->schema([
-                        Forms\Components\Select::make('kategori')
+                        Forms\Components\Select::make('category')
                             ->label('Kategori')
                             ->required()
                             ->options(\App\Models\Obje::CATEGORIES)
@@ -89,9 +89,9 @@ class ObjeResource extends Resource
                     ->visibility('public'),
                 Tables\Columns\TextColumn::make('name')
                     ->label('İsim')
-                    ->searchable(['isim'])
-                    ->sortable('isim'),
-                Tables\Columns\TextColumn::make('kategori')
+                    ->searchable(['name'])
+                    ->sortable('name'),
+                Tables\Columns\TextColumn::make('category')
                     ->label('Kategori')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -105,7 +105,7 @@ class ObjeResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('isim')
+            ->defaultSort('name')
             ->filters([
                 //
             ])
