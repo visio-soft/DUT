@@ -82,6 +82,41 @@
             transition: all 0.2s ease;
         }
 
+        /* Icons inside inputs/selects */
+        .input-with-icon { position: relative; }
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: color-mix(in srgb, var(--fd-text) 60%, transparent);
+            pointer-events: none;
+            font-size: 14px;
+        }
+
+        .select-with-icon { position: relative; }
+        .category-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+        }
+
+        /* Add padding to inputs so icons don't overlap text */
+        #searchBox { padding-left: 36px; }
+        #categoryFilter { padding-left: 40px; }
+
         #searchBox:focus, #categoryFilter:focus {
             outline: none;
             border-color: var(--fd-accent);
@@ -454,27 +489,24 @@
             <div class="element-palette">
                 <!-- Arama ve Filtre Bölümü -->
                 <div style="margin-bottom: 20px;">
-                    <!-- Başlık ve Butonlar -->
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom: 15px;">
-                        <h3 style="margin:0; color: #374151; font-weight: 600;">Peyzaj Öğeleri</h3>
-                        <div>
-                            <button id="toggleAspectBtn" title="Resize: lock/unlock aspect ratio" style="background:var(--fd-accent); color:white; border:none; padding:6px 10px; border-radius:8px; font-weight:600; cursor:pointer;">Symmetric: ON</button>
-                        </div>
-                    </div>
-                    
+
                     <!-- Arama Kutusu -->
-                    <div style="margin-bottom: 12px;">
-                        <input type="text" id="searchBox" placeholder="Obje ara..." 
+                    <div style="margin-bottom: 12px;" class="input-with-icon">
+                        <div class="search-icon" aria-hidden="true"></div>
+                        <input type="text" id="searchBox" placeholder="Obje ara..."
                                style="width: 100%; padding: 8px 12px; border: 1px solid var(--fd-border); border-radius: 8px; background: var(--fd-bg); color: var(--fd-text); font-size: 14px;">
                     </div>
-                    
+
                     <!-- Kategori Dropdown -->
-                    <div style="margin-bottom: 12px;">
-                        <select id="categoryFilter" 
+                    <div style="margin-bottom: 12px;" class="select-with-icon">
+                        <div class="category-icon" id="selectedCategoryIcon" aria-hidden="true">
+                            <!-- will be populated by JS using data from options -->
+                        </div>
+                        <select id="categoryFilter"
                                 style="width: 100%; padding: 8px 12px; border: 1px solid var(--fd-border); border-radius: 8px; background: var(--fd-bg); color: var(--fd-text); font-size: 14px;">
-                            <option value="">Tüm Kategoriler</option>
+                            <option value="" data-icon="">Tüm Kategoriler</option>
                             @foreach($kategoriler as $kategori)
-                                <option value="{{ $kategori['id'] }}">{{ $kategori['name'] }}</option>
+                                <option value="{{ $kategori['id'] }}" data-icon="{{ $kategori['icon'] ?? '' }}">{{ $kategori['name'] }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -618,21 +650,21 @@
 
         function deleteElement(element) {
             console.log('🗑️ [DELETE] Element silme işlemi başlatılıyor:', element.id);
-            
+
             // Eğer seçili element siliniyorsa, seçimi temizle
             if (selectedElement === element) {
                 selectedElement = null;
                 console.log('🚫 [DELETE] Seçili element temizlendi');
             }
-            
+
             // Array'den elementi sil
             removeElementFromArray(element.id);
-            
+
             // DOM'dan elementi sil
             element.remove();
-            
+
             console.log('✅ [DELETE] Element başarıyla silindi:', element.id);
-            
+
             // Silme eventi dispatch et (opsiyonel - gelecekte auto-save için kullanılabilir)
             try {
                 const deleteEvent = new CustomEvent('element:deleted', { detail: { id: element.id } });
@@ -663,7 +695,7 @@
             element.id = elementId;
             element.className = 'landscape-element';
             element.style.transform = `translate(${x}px, ${y}px)`;
-            
+
             // Başlangıç boyutları - resim yüklendikten sonra güncellenecek
             element.style.width = '120px';
             element.style.height = '120px';
@@ -696,7 +728,7 @@
                     return;
                 }
                 console.log('📐 [IMAGE LOAD] Resim yüklendi, boyutları hesaplanıyor:', img.src);
-                
+
                 // Resmin gerçek boyutlarını al
                 const naturalWidth = img.naturalWidth;
                 const naturalHeight = img.naturalHeight;
@@ -893,43 +925,43 @@
                     start(event) {
                         console.log('📏 [RESIZE START] Boyutlandırma başladı:', event.target.id);
                         selectElement(event.target);
-                        
+
                         // Başlangıç aspect ratio'sunu kaydet
                         const target = event.target;
                         const startWidth = parseFloat(target.style.width) || 120;
                         const startHeight = parseFloat(target.style.height) || 120;
-                        
+
                         // Kaydedilmiş aspect ratio'yu kullan ya da mevcut boyutlardan hesapla
                         let aspectRatio = parseFloat(target.getAttribute('data-aspect-ratio'));
                         if (!aspectRatio || isNaN(aspectRatio)) {
                             aspectRatio = startWidth / startHeight;
                             target.setAttribute('data-aspect-ratio', aspectRatio);
                         }
-                        
+
                         console.log('📐 [RESIZE] Kullanılacak aspect ratio:', aspectRatio);
                         console.log('📏 [RESIZE] Başlangıç boyutları:', { width: startWidth, height: startHeight });
                     },
                     move(event) {
                         const target = event.target;
                         const aspectRatio = parseFloat(target.getAttribute('data-aspect-ratio')) || 1;
-                        
+
                         // Orijinal boyutlar
                         const originalWidth = parseFloat(target.style.width) || 120;
                         const originalHeight = parseFloat(target.style.height) || 120;
-                        
+
                         // Event'ten gelen boyut değişiklikleri
                         let newWidth = originalWidth + event.deltaRect.width;
                         let newHeight = originalHeight + event.deltaRect.height;
-                        
+
                         // Minimum boyut kontrolü
                         newWidth = Math.max(50, newWidth);
                         newHeight = Math.max(50, newHeight);
-                        
+
                         // Aspect ratio'ya göre düzelt
                         // Hangi boyutun daha çok değiştiğine göre diğerini hesapla
                         const widthChange = Math.abs(event.deltaRect.width);
                         const heightChange = Math.abs(event.deltaRect.height);
-                        
+
                         if (widthChange >= heightChange) {
                             // Genişlik değişimi dominant - yüksekliği buna göre ayarla
                             newHeight = newWidth / aspectRatio;
@@ -937,7 +969,7 @@
                             // Yükseklik değişimi dominant - genişliği buna göre ayarla
                             newWidth = newHeight * aspectRatio;
                         }
-                        
+
                         // Minimum boyut kontrolü tekrar
                         if (newWidth < 50) {
                             newWidth = 50;
@@ -947,7 +979,7 @@
                             newHeight = 50;
                             newWidth = newHeight * aspectRatio;
                         }
-                        
+
                         console.log('🔄 [RESIZE MOVE] Boyutlandırma hareketi:');
                         console.log('   🆔 Element:', target.id);
                         console.log('   � Aspect Ratio:', aspectRatio);
@@ -987,7 +1019,7 @@
                 },
                 modifiers: [
                     // Sadece temel sınır kontrolü - aspect ratio'yu kendimiz hallediyoruz
-                    interact.modifiers.restrictSize({ 
+                    interact.modifiers.restrictSize({
                         min: { width: 50, height: 50 },
                         max: { width: 400, height: 400 }
                     }),
@@ -1218,13 +1250,57 @@
                 });
             }
 
+            // populate category icon on change
+            const selectedCategoryIconEl = document.getElementById('selectedCategoryIcon');
+            function renderCategoryIcon(iconName) {
+                if (!selectedCategoryIconEl) return;
+                selectedCategoryIconEl.innerHTML = ''; // clear
+                if (!iconName) return;
+
+                // heroicon naming convention: heroicon-o-... or heroicon-s-... etc.
+                if (iconName.startsWith('heroicon-')) {
+                    // use server-side svg helper (blade directive: &#64;svg) if available by creating a temporary span with the svg markup
+                    // We can't call blade helpers from JS, so insert a simple placeholder text/icon for now
+                    const span = document.createElement('span');
+                    span.className = 'inline-block';
+                    span.textContent = '\u25A0';
+                    selectedCategoryIconEl.appendChild(span);
+                } else if (iconName.startsWith('http') || iconName.startsWith('/')) {
+                    const img = document.createElement('img');
+                    img.src = iconName;
+                    img.alt = '';
+                    img.style.width = '18px';
+                    img.style.height = '18px';
+                    img.style.objectFit = 'contain';
+                    selectedCategoryIconEl.appendChild(img);
+                } else {
+                    // fallback: show text first letter
+                    const span = document.createElement('span');
+                    span.textContent = iconName.charAt(0).toUpperCase();
+                    selectedCategoryIconEl.appendChild(span);
+                }
+            }
+
+            if (categoryFilter) {
+                // initialize icon from current selection
+                const initialOption = categoryFilter.selectedOptions && categoryFilter.selectedOptions[0];
+                if (initialOption) {
+                    renderCategoryIcon(initialOption.getAttribute('data-icon') || '');
+                }
+
+                categoryFilter.addEventListener('change', function() {
+                    const icon = this.selectedOptions[0]?.getAttribute('data-icon') || '';
+                    renderCategoryIcon(icon);
+                });
+            }
+
             console.log('✅ [FILTER] Filtreleme sistemi hazır');
         }
 
         function filterObjects() {
             const searchTerm = document.getElementById('searchBox')?.value.toLowerCase() || '';
             const selectedCategory = document.getElementById('categoryFilter')?.value || '';
-            
+
             console.log('🎯 [FILTER] Filtreleme yapılıyor:', { searchTerm, selectedCategory });
 
             const paletteItems = document.querySelectorAll('.palette-item');
@@ -1233,12 +1309,12 @@
             paletteItems.forEach(item => {
                 const name = item.getAttribute('data-name')?.toLowerCase() || '';
                 const category = item.getAttribute('data-category') || '';
-                
+
                 const matchesSearch = !searchTerm || name.includes(searchTerm);
                 const matchesCategory = !selectedCategory || category === selectedCategory;
-                
+
                 const shouldShow = matchesSearch && matchesCategory;
-                
+
                 if (shouldShow) {
                     item.style.display = 'flex';
                     visibleCount++;
@@ -1255,7 +1331,7 @@
 
         function showNoResultsMessage(show) {
             let noResultsDiv = document.getElementById('noResultsMessage');
-            
+
             if (show && !noResultsDiv) {
                 // Sonuç bulunamadı mesajı oluştur
                 noResultsDiv = document.createElement('div');
@@ -1269,7 +1345,7 @@
                         <div class="empty-hint">Farklı anahtar kelimeler deneyin veya kategori filtresini değiştirin.</div>
                     </div>
                 `;
-                
+
                 const objektListesi = document.getElementById('objektListesi');
                 if (objektListesi) {
                     objektListesi.appendChild(noResultsDiv);
