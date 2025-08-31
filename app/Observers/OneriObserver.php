@@ -5,7 +5,7 @@ namespace App\Observers;
 use App\Models\Oneri;
 use Illuminate\Support\Facades\Auth;
 
-class ProjectObserver
+class OneriObserver
 {
     public function creating(Oneri $oneri): void
     {

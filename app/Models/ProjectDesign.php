@@ -22,7 +22,7 @@ class ProjectDesign extends Model
 
     public function project(): BelongsTo
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Oneri::class, 'project_id');
     }
 
     public function likes(): HasMany

@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Observers\ProjectObserver;
+use App\Observers\OneriObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -12,10 +12,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-#[ObservedBy([ProjectObserver::class])]
+#[ObservedBy([OneriObserver::class])]
 class Oneri extends Model implements HasMedia
 {
     use InteractsWithMedia,SoftDeletes;
+
+    protected $table = 'oneriler';
 
     protected $fillable = [
         'category_id',

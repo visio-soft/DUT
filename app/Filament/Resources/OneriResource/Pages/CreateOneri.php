@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Filament\Resources\ProjectResource\Pages;
+namespace App\Filament\Resources\OneriResource\Pages;
 
-use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\OneriResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class CreateProject extends CreateRecord
+class CreateOneri extends CreateRecord
 {
-    protected static string $resource = ProjectResource::class;
+    protected static string $resource = OneriResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
@@ -37,8 +37,8 @@ class CreateProject extends CreateRecord
                 ->color('success')
                 ->size('lg')
                 ->requiresConfirmation()
-                ->modalHeading('Proje Oluştur ve Tasarıma Başla')
-                ->modalDescription('Projeyi oluşturup direkt tasarım aracına geçmek istediğinize emin misiniz?')
+                ->modalHeading('Öneri Oluştur ve Tasarıma Başla')
+                ->modalDescription('Öneriyi oluşturup direkt tasarım aracına geçmek istediğinize emin misiniz?')
                 ->modalSubmitActionLabel('Evet, Tasarıma Başla')
                 ->action(function () {
                     try {
@@ -47,19 +47,19 @@ class CreateProject extends CreateRecord
                         // Form validation ve kayıt
                         $this->create();
 
-                        Log::info('Proje oluşturuldu', ['project_id' => $this->record->id]);
+                        Log::info('Öneri oluşturuldu', ['oneri_id' => $this->record->id]);
 
-                        // Proje kaydedildikten sonra direkt yönlendirme yap
-                        $project = $this->record;
+                        // Öneri kaydedildikten sonra direkt yönlendirme yap
+                        $oneri = $this->record;
 
-                        // Proje resminin URL'ini al
+                        // Öneri resminin URL'ini al
                         $imageUrl = '';
-                        if ($project && $project->hasMedia('images')) {
-                            $imageUrl = $project->getFirstMediaUrl('images');
+                        if ($oneri && $oneri->hasMedia('images')) {
+                            $imageUrl = $oneri->getFirstMediaUrl('images');
                         }
 
                         // Tasarım sayfasına yönlendir
-                        $designUrl = "/admin/drag-drop-test?project_id={$project->id}&image=" . urlencode($imageUrl);
+                        $designUrl = "/admin/drag-drop-test?project_id={$oneri->id}&image=" . urlencode($imageUrl);
 
                         Log::info('Yönlendirme URL', ['url' => $designUrl]);
 
@@ -70,7 +70,7 @@ class CreateProject extends CreateRecord
 
                         \Filament\Notifications\Notification::make()
                             ->title('Hata!')
-                            ->body('Proje oluşturulurken bir hata oluştu: ' . $e->getMessage())
+                            ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
                             ->danger()
                             ->send();
 

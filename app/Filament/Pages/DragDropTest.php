@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use App\Models\Obje;
-use App\Models\Project;
+use App\Models\Oneri;
 use App\Models\ProjectDesign;
 use App\Models\Category;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +24,7 @@ class DragDropTest extends Page
 
     public ?string $projectImage = null;
     public ?int $projectId = null;
-    public ?Project $project = null;
+    public ?Oneri $project = null;
 
     public function mount(): void
     {
@@ -39,7 +39,7 @@ class DragDropTest extends Page
 
         // Proje varsa yükle
         if ($this->projectId) {
-            $this->project = Project::find($this->projectId);
+            $this->project = Oneri::find($this->projectId);
 
             if (!$this->project) {
                 abort(404, 'Proje bulunamadı');
@@ -56,7 +56,7 @@ class DragDropTest extends Page
     {
         // Kategorileri çek
         $kategoriler = [];
-        
+
         // Önce Obje modelindeki sabit kategorileri kullan
         foreach (Obje::CATEGORIES as $key => $name) {
             $kategoriler[] = [
@@ -65,7 +65,7 @@ class DragDropTest extends Page
                 'type' => 'static' // Sabit kategori
             ];
         }
-        
+
         // Category tablosundan da kategorileri çek (eğer varsa)
         $dbKategoriler = Category::all();
         foreach ($dbKategoriler as $kategori) {
@@ -88,8 +88,8 @@ class DragDropTest extends Page
         });
 
         // Mevcut tasarımı yükle (eğer varsa)
-        $existingDesign = $this->project && $this->project->design 
-            ? $this->project->design->design_data 
+        $existingDesign = $this->project && $this->project->design
+            ? $this->project->design->design_data
             : null;
 
         return [
@@ -109,8 +109,8 @@ class DragDropTest extends Page
                 ->label('Geri Dön')
                 ->icon('heroicon-o-arrow-left')
                 ->color('gray')
-                ->url(url('/admin/projects')),
-                
+                ->url(url('/admin/oneris')),
+
             Action::make('saveDesign')
                 ->label('Tasarımı Kaydet ve Tamamla')
                 ->icon('heroicon-o-check-circle')
@@ -173,7 +173,7 @@ class DragDropTest extends Page
                 ->success()
                 ->send();
 
-            $this->js("setTimeout(() => window.location.href = '/admin/projects', 100);");
+            $this->js("setTimeout(() => window.location.href = '/admin/oneris', 100);");
 
         } catch (\Exception $e) {
             \Filament\Notifications\Notification::make()

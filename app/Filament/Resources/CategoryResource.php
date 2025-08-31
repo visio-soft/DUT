@@ -59,9 +59,9 @@ class CategoryResource extends Resource
                     ->label('Ikon')
                     ->searchable()
                     ->placeholder('-'),
-                Tables\Columns\TextColumn::make('projects_count')
-                    ->label('Proje Sayısı')
-                    ->counts('projects')
+                Tables\Columns\TextColumn::make('oneriler_count')
+                    ->label('Öneri Sayısı')
+                    ->counts('oneriler')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturulma')
@@ -111,6 +111,6 @@ class CategoryResource extends Resource
     {
         return parent::getEloquentQuery()
             ->with(['parent:id,name'])
-            ->withCount('projects');
+            ->withCount('oneriler');
     }
 }

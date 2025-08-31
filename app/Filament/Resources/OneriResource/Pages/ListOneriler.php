@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\ProjectResource\Pages;
+namespace App\Filament\Resources\OneriResource\Pages;
 
-use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\OneriResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListProjects extends ListRecords
+class ListOneriler extends ListRecords
 {
-    protected static string $resource = ProjectResource::class;
+    protected static string $resource = OneriResource::class;
 
     protected function getHeaderActions(): array
     {

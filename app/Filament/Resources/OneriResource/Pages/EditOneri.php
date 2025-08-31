@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\ProjectResource\Pages;
+namespace App\Filament\Resources\OneriResource\Pages;
 
-use App\Filament\Resources\ProjectResource;
+use App\Filament\Resources\OneriResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditProject extends EditRecord
+class EditOneri extends EditRecord
 {
-    protected static string $resource = ProjectResource::class;
+    protected static string $resource = OneriResource::class;
 
     protected function getFormActions(): array
     {
@@ -22,8 +22,8 @@ class EditProject extends EditRecord
     protected function getHeaderActions(): array
     {
         $actions = [Actions\DeleteAction::make()];
-        
-        // Eğer proje tasarımı tamamlandıysa tasarımı görüntüle butonu ekle
+
+        // Eğer öneri tasarımı tamamlandıysa tasarımı görüntüle butonu ekle
         if ($this->record && $this->record->design_completed && $this->record->design) {
             $actions[] = Actions\Action::make('viewDesign')
                 ->label('Tasarımı Görüntüle')
@@ -31,7 +31,7 @@ class EditProject extends EditRecord
                 ->color('success')
                 ->url("/admin/project-designs/{$this->record->design->id}");
         }
-        
+
         return $actions;
     }
 
