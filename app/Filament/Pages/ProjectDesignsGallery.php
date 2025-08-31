@@ -13,9 +13,9 @@ class ProjectDesignsGallery extends Page
 
     protected static string $view = 'filament.pages.project-designs-gallery';
 
-    protected static ?string $title = 'Proje Tasarımları Galerisi';
+    protected static ?string $title = 'Öneri Tasarımları Galerisi';
     protected static ?string $navigationLabel = 'Tasarım Galerisi';
-    protected static ?string $navigationGroup = 'Proje Yönetimi';
+    protected static ?string $navigationGroup = 'Öneri Yönetimi';
     protected static ?int $navigationSort = 10;
 
     public $projectDesigns = [];
@@ -37,19 +37,19 @@ class ProjectDesignsGallery extends Page
             ->whereHas('project')
             ->get()
             ->map(function ($design) {
-                $project = $design->project;
+                $oneri = $design->project;
 
-                // Get project image
-                $projectImage = '';
-                if ($project && $project->hasMedia('images')) {
-                    $projectImage = $project->getFirstMediaUrl('images');
+                // Get oneri image
+                $oneriImage = '';
+                if ($oneri && $oneri->hasMedia('images')) {
+                    $oneriImage = $oneri->getFirstMediaUrl('images');
                 }
 
                 return [
                     'id' => $design->id,
-                    'project_name' => $project->title ?? 'Bilinmeyen Proje',
-                    'project_budget' => $project->budget ?? 0,
-                    'project_image' => $projectImage,
+                    'project_name' => $oneri->title ?? 'Bilinmeyen Öneri',
+                    'project_budget' => $oneri->budget ?? 0,
+                    'project_image' => $oneriImage,
                     'likes_count' => $design->likes->count(),
                     'is_liked' => Auth::check() ? $design->isLikedByUser(Auth::id()) : false,
                     'created_at' => $design->created_at->timestamp,

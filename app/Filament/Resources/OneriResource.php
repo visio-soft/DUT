@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProjectResource\Pages;
-use App\Filament\Resources\ProjectResource\RelationManagers;
-use App\Models\Project;
+use App\Filament\Resources\OneriResource\Pages;
+use App\Filament\Resources\OneriResource\RelationManagers;
+use App\Models\Oneri;
+use App\Models\Category;
 use App\Rules\ImageFormatRule;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -18,13 +19,15 @@ use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
-class ProjectResource extends Resource
+class OneriResource extends Resource
 {
-    protected static ?string $model = Project::class;
-    protected static ?string $pluralModelLabel = 'Projeler';
-    protected static ?string $modelLabel = 'Proje';
+    protected static ?string $model = Oneri::class;
+    protected static ?string $pluralModelLabel = 'Öneriler';
+    protected static ?string $modelLabel = 'Öneri';
 
+    protected static ?string $navigationLabel = 'Öneriler';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Öneri Yönetimi';
 
     public static function form(Form $form): Form
     {
@@ -33,12 +36,21 @@ class ProjectResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('category_id')
-                            ->label('Kategori')
-                            ->relationship('category', 'name')
+                            ->label('Proje Kategorisi')
+                            ->options(function () {
+                                // Sadece alt kategorileri (parent_id olan) göster
+                                return Category::whereNotNull('parent_id')
+                                    ->with('parent')
+                                    ->get()
+                                    ->mapWithKeys(function ($category) {
+                                        $parentName = $category->parent ? $category->parent->name : 'Bilinmeyen';
+                                        return [$category->id => "{$parentName} > {$category->name}"];
+                                    });
+                            })
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->placeholder('Kategori seçin'),
+                            ->placeholder('Proje kategorisi seçin'),
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
                             ->required()
@@ -322,15 +334,15 @@ class ProjectResource extends Resource
                         if ($design && $design->id) {
                             return url("/admin/project-designs/{$design->id}");
                         }
-                        
+
                         // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
                         $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
                         if ($projectDesign) {
                             return url("/admin/project-designs/{$projectDesign->id}");
                         }
-                        
+
                         // Hiç tasarım yoksa projeler sayfasında kal
-                        return url("/admin/projects");
+                        return url("/admin/oneris");
                     })
                     ->openUrlInNewTab(false),
 
@@ -400,9 +412,9 @@ class ProjectResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProjects::route('/'),
-            'create' => Pages\CreateProject::route('/create'),
-            'edit' => Pages\EditProject::route('/{record}/edit'),
+            'index' => Pages\ListOneriler::route('/'),
+            'create' => Pages\CreateOneri::route('/create'),
+            'edit' => Pages\EditOneri::route('/{record}/edit'),
         ];
     }
 
@@ -410,7 +422,7 @@ class ProjectResource extends Resource
     {
         return [
             \Filament\Actions\Action::make('create_with_design')
-                ->label('Yeni Proje Oluştur')
+                ->label('Yeni Öneri Oluştur')
                 ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->url(function (): string {

@@ -66,7 +66,26 @@ return new class extends Migration
             $table->primary(['permission_id', 'role_id'], 'role_has_permissions_permission_id_role_id_primary');
         });
 
-    // ...media tablosu bu dosyada oluşturulmayacak...
+        // Media table (moved from standalone migration so no extra migration is needed)
+        Schema::create('media', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->morphs('model');
+            $table->uuid('uuid')->nullable()->unique();
+            $table->string('collection_name');
+            $table->string('name');
+            $table->string('file_name');
+            $table->string('mime_type')->nullable();
+            $table->string('disk');
+            $table->string('conversions_disk')->nullable();
+            $table->unsignedBigInteger('size');
+            $table->json('manipulations');
+            $table->json('custom_properties');
+            $table->json('generated_conversions');
+            $table->json('responsive_images');
+            $table->timestamp('created_at')->nullable();
+            $table->timestamp('updated_at')->nullable();
+            $table->index(['model_type', 'model_id']);
+        });
 
         // Create categories table
         Schema::create('categories', function (Blueprint $table) {
@@ -74,7 +93,6 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->string('name')->index();
             $table->string('icon')->nullable();
-            $table->boolean('is_main')->default(false)->after('icon');
             $table->timestamps();
             $table->softDeletes();
 
@@ -161,7 +179,8 @@ return new class extends Migration
     Schema::dropIfExists('oneriler');
     Schema::dropIfExists('categories');
     Schema::dropIfExists('objeler');
-    // ...media tablosu bu dosyada silinmeyecek...
+    // Media table
+    Schema::dropIfExists('media');
     Schema::dropIfExists('role_has_permissions');
     Schema::dropIfExists('model_has_roles');
     Schema::dropIfExists('model_has_permissions');

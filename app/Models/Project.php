@@ -13,7 +13,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy([ProjectObserver::class])]
-class Project extends Model implements HasMedia
+class Oneri extends Model implements HasMedia
 {
     use InteractsWithMedia,SoftDeletes;
 

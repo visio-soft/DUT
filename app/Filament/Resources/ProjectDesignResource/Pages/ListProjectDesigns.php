@@ -17,7 +17,7 @@ class ListProjectDesigns extends ListRecords
                 ->label('Yeni Tasarım Oluştur')
                 ->icon('heroicon-o-plus')
                 ->color('primary')
-                ->url(url('/admin/projects'))
+                ->url(url('/admin/oneris'))
                 ->openUrlInNewTab(false),
         ];
     }

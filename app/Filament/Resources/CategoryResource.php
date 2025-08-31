@@ -18,34 +18,27 @@ class CategoryResource extends Resource
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Proje Yönetimi';
-    protected static ?string $pluralModelLabel = 'Projeler';
-    protected static ?string $modelLabel = 'Proje';
+    protected static ?string $pluralModelLabel = 'Kategoriler';
+    protected static ?string $modelLabel = 'Kategori';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->label('Proje Adı')
+                Forms\Components\TextInput::make('name')->label('Kategori Adı')
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('Proje adını girin'),
-
-                Forms\Components\DateTimePicker::make('start_datetime')->label('Başlangıç Tarihi ve Saati')
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->displayFormat('d.m.Y H:i')
-                    ->timezone('Europe/Istanbul')
-                    ->placeholder('01.01.2025 08:00')
-                    ->helperText('Bu projedeki işlerin başlangıç tarihi ve saati (24 saat formatında, örn: 22:00)'),
-
-                Forms\Components\DateTimePicker::make('end_datetime')->label('Bitiş Tarihi ve Saati')
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->displayFormat('d.m.Y H:i')
-                    ->timezone('Europe/Istanbul')
-                    ->placeholder('31.12.2025 22:00')
-                    ->helperText('Bu projedeki işlerin bitiş tarihi ve saati (24 saat formatında, örn: 22:00)'),
+                    ->placeholder('Kategori adını girin'),
+                Forms\Components\TextInput::make('icon')->label('Ikon (İsteğe Bağlı)')
+                    ->maxLength(255)
+                    ->placeholder('Ör: heroicon-o-home')
+                    ->helperText('Heroicon, FontAwesome veya başka ikon kütüphanelerinden ikon adı'),
+                Forms\Components\Select::make('parent_id')
+                    ->relationship('parent', 'name')
+                    ->label('Üst Kategori (İsteğe Bağlı)')
+                    ->placeholder('Ana kategori için boş bırakın')
+                    ->searchable()
+                    ->preload(),
             ]);
     }
 
@@ -54,27 +47,22 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Proje Adı')
+                    ->label('Kategori Adı')
                     ->searchable()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('start_datetime')
-                    ->label('Başlangıç')
-                    ->dateTime('d.m.Y H:i')
-                    ->placeholder('-')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('end_datetime')
-                    ->label('Bitiş')
-                    ->dateTime('d.m.Y H:i')
-                    ->placeholder('-')
-                    ->sortable(),
-
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label('Üst Kategori')
+                    ->sortable()
+                    ->searchable()
+                    ->placeholder('Ana Kategori'),
+                Tables\Columns\TextColumn::make('icon')
+                    ->label('Ikon')
+                    ->searchable()
+                    ->placeholder('-'),
                 Tables\Columns\TextColumn::make('oneriler_count')
                     ->label('Öneri Sayısı')
                     ->counts('oneriler')
                     ->sortable(),
-
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturulma')
                     ->dateTime('d.m.Y H:i')
@@ -83,7 +71,12 @@ class CategoryResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('parent_id')
+                    ->relationship('parent', 'name')
+                    ->label('Üst Kategori')
+                    ->placeholder('Tüm Kategoriler')
+                    ->searchable()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -117,6 +110,7 @@ class CategoryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
+            ->with(['parent:id,name'])
             ->withCount('oneriler');
     }
 }
