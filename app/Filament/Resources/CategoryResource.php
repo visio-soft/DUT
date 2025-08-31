@@ -39,6 +39,9 @@ class CategoryResource extends Resource
                     ->placeholder('Ana kategori için boş bırakın')
                     ->searchable()
                     ->preload(),
+                Forms\Components\Toggle::make('is_main')
+                    ->label('Ana Kategori olarak işaretle')
+                    ->helperText('Bu kategori ana kategori olarak işaretlenecektir.'),
             ]);
     }
 
@@ -59,6 +62,10 @@ class CategoryResource extends Resource
                     ->label('Ikon')
                     ->searchable()
                     ->placeholder('-'),
+                Tables\Columns\IconColumn::make('is_main')
+                    ->label('Ana')
+                    ->boolean()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('oneriler_count')
                     ->label('Öneri Sayısı')
                     ->counts('oneriler')

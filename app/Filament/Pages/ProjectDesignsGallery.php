@@ -35,28 +35,40 @@ class ProjectDesignsGallery extends Page
 
         $designs = ProjectDesign::with(['project', 'project.category', 'likes'])
             ->whereHas('project')
-            ->get()
-            ->map(function ($design) {
-                $oneri = $design->project;
+            ->get();
 
-                // Get oneri image
-                $oneriImage = '';
-                if ($oneri && $oneri->hasMedia('images')) {
-                    $oneriImage = $oneri->getFirstMediaUrl('images');
-                }
+        // Group designs by their project's category name (fallback to "Kategori Yok")
+        $grouped = $designs->groupBy(function ($design) {
+            return $design->project && $design->project->category
+                ? $design->project->category->name
+                : 'Kategori Yok';
+        });
 
-                return [
-                    'id' => $design->id,
-                    'project_name' => $oneri->title ?? 'Bilinmeyen Öneri',
-                    'project_budget' => $oneri->budget ?? 0,
-                    'project_image' => $oneriImage,
-                    'likes_count' => $design->likes->count(),
-                    'is_liked' => Auth::check() ? $design->isLikedByUser(Auth::id()) : false,
-                    'created_at' => $design->created_at->timestamp,
-                ];
-            });
+        // Transform grouped collection into an array suitable for the Blade view
+        $this->projectDesigns = $grouped->map(function ($group, $categoryName) {
+            return [
+                'category_name' => $categoryName,
+                'designs' => $group->map(function ($design) {
+                    $oneri = $design->project;
 
-        $this->projectDesigns = $designs->toArray();
+                    // Get oneri image
+                    $oneriImage = '';
+                    if ($oneri && $oneri->hasMedia('images')) {
+                        $oneriImage = $oneri->getFirstMediaUrl('images');
+                    }
+
+                    return [
+                        'id' => $design->id,
+                        'project_name' => $oneri->title ?? 'Bilinmeyen Öneri',
+                        'project_budget' => $oneri->budget ?? 0,
+                        'project_image' => $oneriImage,
+                        'likes_count' => $design->likes->count(),
+                        'is_liked' => Auth::check() ? $design->isLikedByUser(Auth::id()) : false,
+                        'created_at' => $design->created_at->timestamp,
+                    ];
+                })->toArray(),
+            ];
+        })->values()->toArray();
     }
 
     public function toggleLike($designId)
@@ -66,7 +78,7 @@ class ProjectDesignsGallery extends Page
             return;
         }
 
-        $projectDesign = ProjectDesign::find($designId);
+        $projectDesign = ProjectDesign::with('project')->find($designId);
         if (!$projectDesign) {
             $this->addError('like', 'Tasarım bulunamadı.');
             return;
@@ -75,21 +87,37 @@ class ProjectDesignsGallery extends Page
         $userId = Auth::id();
         $message = '';
 
-        // Check if already liked
+        // If already liked this design -> remove like (toggle off)
         $existingLike = ProjectDesignLike::where('user_id', $userId)
             ->where('project_design_id', $projectDesign->id)
             ->first();
 
         if ($existingLike) {
-            // Unlike - user can remove their like
             $existingLike->delete();
             $message = 'Beğeni kaldırıldı.';
         } else {
-            // Like - ensure only one like per user per design
+            // Enforce one like per category: remove any existing like by this user for other designs in the same category
+            $categoryId = $projectDesign->project?->category_id;
+
+            // Find designs that belong to projects in same category. If category_id is null, match whereNull.
+            $designIdsInCategory = ProjectDesign::whereHas('project', function ($q) use ($categoryId) {
+                if (is_null($categoryId)) {
+                    $q->whereNull('category_id');
+                } else {
+                    $q->where('category_id', $categoryId);
+                }
+            })->pluck('id');
+
+            ProjectDesignLike::where('user_id', $userId)
+                ->whereIn('project_design_id', $designIdsInCategory)
+                ->delete();
+
+            // Create like for the selected design
             ProjectDesignLike::firstOrCreate([
                 'user_id' => $userId,
                 'project_design_id' => $projectDesign->id,
             ]);
+
             $message = 'Beğenildi!';
         }
 

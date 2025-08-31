@@ -9,65 +9,26 @@ class CategorySeeder extends Seeder
 {
     public function run(): void
     {
-        // Projeler (tarih + saat aralıkları ile)
-        Category::create([
-            'name' => 'Ağaçlandırma',
-            'start_datetime' => '2025-01-01 08:00:00',
-            'end_datetime' => '2025-12-31 17:00:00'
-        ]);
+    // Üst (test) kategori - "Ana Kategori"
+    $ana = Category::create(['name' => 'Ana Kategori']);
 
-        Category::create([
-            'name' => 'Çevre Düzenleme',
-            'start_datetime' => '2025-03-01 09:00:00',
-            'end_datetime' => '2025-11-30 18:00:00'
-        ]);
+    // Ana kategoriler (Ana Kategori'nin altı olacak)
+    $tema      = Category::create(['name' => 'Tema', 'parent_id' => $ana->id]);
+    $belediye  = Category::create(['name' => 'Belediye', 'parent_id' => $ana->id]);
+    $iscilik   = Category::create(['name' => 'İşçilik', 'parent_id' => $ana->id]);
+    $park      = Category::create(['name' => 'Park', 'parent_id' => $ana->id]);
+    $metro     = Category::create(['name' => 'Metro', 'parent_id' => $ana->id]);
 
-        Category::create([
-            'name' => 'İmar',
-            'start_datetime' => '2025-01-15 08:30:00',
-            'end_datetime' => '2025-12-15 17:30:00'
-        ]);
-
-        Category::create([
-            'name' => 'Temizlik',
-            'start_datetime' => '2025-01-01 06:00:00',
-            'end_datetime' => '2025-12-31 14:00:00'
-        ]);
-
-        Category::create([
-            'name' => 'Usta',
-            'start_datetime' => '2025-02-01 08:00:00',
-            'end_datetime' => '2025-11-30 17:00:00'
-        ]);
-
-        Category::create([
-            'name' => 'İşçi',
-            'start_datetime' => '2025-02-01 07:00:00',
-            'end_datetime' => '2025-11-30 16:00:00'
-        ]);
-
-        Category::create([
-            'name' => 'Çocuk Parkı',
-            'start_datetime' => '2025-04-01 10:00:00',
-            'end_datetime' => '2025-10-31 19:00:00'
-        ]);
-
-        Category::create([
-            'name' => 'Otopark',
-            'start_datetime' => '2025-01-01 00:00:00',
-            'end_datetime' => '2025-12-31 23:59:00'
-        ]);
-
-        Category::create([
-            'name' => 'Hat 1',
-            'start_datetime' => '2025-01-01 06:00:00',
-            'end_datetime' => '2025-12-31 23:00:00'
-        ]);
-
-        Category::create([
-            'name' => 'Hat 2',
-            'start_datetime' => '2025-01-01 06:30:00',
-            'end_datetime' => '2025-12-31 22:30:00'
-        ]);
+    // Alt kategoriler
+    Category::create(['name' => 'Ağaçlandırma', 'parent_id' => $tema->id]);
+    Category::create(['name' => 'Çevre Düzenleme', 'parent_id' => $tema->id]);
+    Category::create(['name' => 'İmar', 'parent_id' => $belediye->id]);
+    Category::create(['name' => 'Temizlik', 'parent_id' => $belediye->id]);
+    Category::create(['name' => 'Usta', 'parent_id' => $iscilik->id]);
+    Category::create(['name' => 'İşçi', 'parent_id' => $iscilik->id]);
+    Category::create(['name' => 'Çocuk Parkı', 'parent_id' => $park->id]);
+    Category::create(['name' => 'Otopark', 'parent_id' => $park->id]);
+    Category::create(['name' => 'Hat 1', 'parent_id' => $metro->id]);
+    Category::create(['name' => 'Hat 2', 'parent_id' => $metro->id]);
     }
 }
