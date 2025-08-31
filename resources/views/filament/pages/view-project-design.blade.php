@@ -47,7 +47,7 @@
 
             /* Left panel that matches Filament card look */
             .element-palette {
-                width: 250px;
+                width: 220px;
                 background: var(--fd-panel-bg);
                 border-radius: 12px;
                 padding: 18px;
@@ -58,7 +58,7 @@
 
             .panel-title { margin:0 0 12px 0; font-weight:600; color:var(--fd-text); font-size:15px; }
 
-            .palette-list-item { display:flex; gap:12px; align-items:center; padding:10px 6px; border-radius:8px; border-bottom:1px solid color-mix(in srgb, var(--fd-border) 75%, transparent); transition:all .15s ease; }
+            .palette-list-item { display:flex; gap:12px; align-items:center; padding:8px 6px; border-radius:8px; border-bottom:1px solid color-mix(in srgb, var(--fd-border) 75%, transparent); transition:all .15s ease; }
             .palette-list-item:hover { background: color-mix(in srgb, var(--fd-accent) 6%, var(--fd-panel-bg)); transform: translateY(-2px); }
 
             .palette-thumb { width:48px; height:48px; object-fit:cover; border-radius:6px; background: color-mix(in srgb, var(--fd-panel-bg) 90%, transparent); border:1px solid color-mix(in srgb, var(--fd-border) 60%, transparent); }
@@ -220,10 +220,13 @@
             }
         </style>
 
+        <!-- LANDSCAPE WRAPPER START: main container for the landscape designer -->
         <div class="landscape-designer-wrapper">
+            <!-- LAYER: landscape-studio (holds palette and design canvas side-by-side) -->
             <div class="landscape-studio">
+                <!-- LAYER: element-palette (left column — object list / palette) -->
                 <div class="element-palette">
-                    <h3 style="margin:0 0 12px 0; font-weight:600; color:var(--fd-text);">Tasarımdaki Objeler</h3>
+                    <h3 style="margin:0 0 10px 0; font-weight:600; color:var(--fd-text);">Tasarımdaki Objeler</h3>
 
                     @php
                         // Prepare elements list from saved design
@@ -281,7 +284,7 @@
 
                     @if (empty($elements))
                         <div class="empty-state">
-                            <strong>Bu tasarımda obje yok</strong>
+                            <strong>Bu tasarımda obje yok!</strong>
                             <div style="font-size:13px; color:color-mix(in srgb, var(--fd-text) 60%, transparent);">Tasarım kaydı boş veya yüklenemedi.</div>
                         </div>
                     @else
@@ -338,10 +341,12 @@
                     @endif
                 </div>
 
+                <!-- LAYER: design-area (right column — visual design canvas) -->
                 <div class="design-area">
+                    <!-- SUBLAYER: property-boundary (canvas inner boundary where elements are placed) -->
                     <div class="property-boundary" id="propertyBoundary">
 
-                        <!-- Arka plan resmi container -->
+                        <!-- SUBLAYER: background-image-container (background image / gradient) -->
                         <div class="background-image-container" id="backgroundImageContainer">
                             @if(!empty($project_image))
                                 @php
@@ -357,7 +362,7 @@
                             @endif
                         </div>
 
-                        {{-- Render static elements from saved design --}}
+                        {{-- SUBLAYER: elements (static placed elements from saved design) --}}
                         @if(!empty($elements))
                             @foreach($elements as $el)
                                 @php
@@ -406,6 +411,7 @@
                                     $img = $normalizeSrc($img) ?? '/images/default-object.png';
                                 @endphp
 
+                                <!-- ELEMENT: landscape-element (placed object at saved coords) -->
                                 <div class="landscape-element" title="{{ $name }}" style="transform: translate({{ (int)$x }}px, {{ (int)$y }}px); width: {{ (int)$w }}px; height: {{ (int)$h }}px;">
                                     <div class="element-content">
                                         @if($name && $name !== 'null')
@@ -418,10 +424,15 @@
                                 </div>
                             @endforeach
                         @endif
+                        <!-- /SUBLAYER: elements -->
                     </div>
+                    <!-- /SUBLAYER: property-boundary -->
                 </div>
+                <!-- /LAYER: design-area -->
             </div>
+            <!-- /LAYER: landscape-studio -->
         </div>
+        <!-- LANDSCAPE WRAPPER END -->
     </div>
 </x-filament-panels::page>
 </div>
