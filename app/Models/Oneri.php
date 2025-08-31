@@ -66,7 +66,8 @@ class Oneri extends Model implements HasMedia
 
     public function design(): HasOne
     {
-        return $this->hasOne(ProjectDesign::class);
+    // Explicit foreign key: project_designs.project_id (table uses project_id constrained to oneriler)
+    return $this->hasOne(ProjectDesign::class, 'project_id');
     }
 
     public function registerMediaCollections(): void

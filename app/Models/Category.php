@@ -11,7 +11,25 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'parent_id', 'icon'];
+    protected $fillable = ['name', 'parent_id', 'icon', 'is_main'];
+
+    /**
+     * Cast attributes to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'is_main' => 'boolean',
+    ];
+
+    /**
+     * Default attribute values.
+     *
+     * @var array
+     */
+    protected $attributes = [
+        'is_main' => false,
+    ];
 
     public function parent(): BelongsTo
     {
@@ -44,6 +62,14 @@ class Category extends Model
     public static function getChildCategories()
     {
         return self::whereNotNull('parent_id')->get();
+    }
+
+    /**
+     * Scope a query to only main categories.
+     */
+    public function scopeMain($query)
+    {
+        return $query->where('is_main', true);
     }
 
     // Belirli bir üst kategorinin alt kategorilerini getir

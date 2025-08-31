@@ -13,9 +13,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 #[ObservedBy([ProjectObserver::class])]
-class Oneri extends Model implements HasMedia
+class Project extends Model implements HasMedia
 {
     use InteractsWithMedia,SoftDeletes;
+
+    // Map the legacy 'projects' model to the current 'oneriler' table
+    protected $table = 'oneriler';
 
     protected $fillable = [
         'category_id',
@@ -64,7 +67,7 @@ class Oneri extends Model implements HasMedia
 
     public function design(): HasOne
     {
-        return $this->hasOne(ProjectDesign::class);
+    return $this->hasOne(ProjectDesign::class, 'project_id');
     }
 
     public function registerMediaCollections(): void
