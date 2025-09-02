@@ -19,6 +19,8 @@ class ProjectDesignsGallery extends Page
     protected static ?int $navigationSort = 10;
 
     public $projectDesigns = [];
+    public $sortBy = 'newest';
+    public $priceFilter = '';
 
     public function mount(): void
     {
@@ -33,9 +35,25 @@ class ProjectDesignsGallery extends Page
             return;
         }
 
-        $designs = ProjectDesign::with(['project', 'project.category', 'likes'])
-            ->whereHas('project')
-            ->get();
+        $query = ProjectDesign::with(['project', 'project.category', 'likes'])
+            ->whereHas('project');
+
+        // Apply price filter
+        if (!empty($this->priceFilter)) {
+            $query->whereHas('project', function ($q) {
+                if ($this->priceFilter === '0-10000') {
+                    $q->whereBetween('budget', [0, 10000]);
+                } elseif ($this->priceFilter === '10000-25000') {
+                    $q->whereBetween('budget', [10000, 25000]);
+                } elseif ($this->priceFilter === '25000-50000') {
+                    $q->whereBetween('budget', [25000, 50000]);
+                } elseif ($this->priceFilter === '50000+') {
+                    $q->where('budget', '>=', 50000);
+                }
+            });
+        }
+
+        $designs = $query->get();
 
         // Group designs by their project's category name (fallback to "Kategori Yok")
         $grouped = $designs->groupBy(function ($design) {
@@ -46,27 +64,77 @@ class ProjectDesignsGallery extends Page
 
         // Transform grouped collection into an array suitable for the Blade view
         $this->projectDesigns = $grouped->map(function ($group, $categoryName) {
+            $designsArray = $group->map(function ($design) {
+                $oneri = $design->project;
+
+                // Get oneri image
+                $oneriImage = '';
+                if ($oneri && $oneri->hasMedia('images')) {
+                    $oneriImage = $oneri->getFirstMediaUrl('images');
+                }
+
+                // Adres bilgilerini oluştur (mahalle, ilçe, şehir)
+                $projectAddress = '';
+                if ($oneri) {
+                    $addressParts = [];
+                    if (!empty($oneri->neighborhood)) {
+                        $addressParts[] = $oneri->neighborhood;
+                    }
+                    if (!empty($oneri->district)) {
+                        $addressParts[] = $oneri->district;
+                    }
+                    if (!empty($oneri->city)) {
+                        $addressParts[] = $oneri->city;
+                    }
+                    $projectAddress = implode(', ', $addressParts);
+                }
+
+                // Kullanıcı bilgisi (önerilerde title'ı kullan)
+                $userName = $oneri->title ?? 'Kullanıcı';
+
+                return [
+                    'id' => $design->id,
+                    'project_name' => $oneri->title ?? 'Bilinmeyen Öneri',
+                    'project_budget' => $oneri->budget ?? 0,
+                    'project_image' => $oneriImage,
+                    'project_address' => $projectAddress,
+                    'user_name' => $userName,
+                    'likes_count' => $design->likes->count(),
+                    'is_liked' => Auth::check() ? $design->isLikedByUser(Auth::id()) : false,
+                    'created_at' => $design->created_at->timestamp,
+                ];
+            })->toArray();
+
+            // Apply sorting within each category
+            if ($this->sortBy === 'newest') {
+                usort($designsArray, function ($a, $b) {
+                    return $b['created_at'] <=> $a['created_at'];
+                });
+            } elseif ($this->sortBy === 'popular') {
+                usort($designsArray, function ($a, $b) {
+                    return $b['likes_count'] <=> $a['likes_count'];
+                });
+            } elseif ($this->sortBy === 'price_high') {
+                usort($designsArray, function ($a, $b) {
+                    return $b['project_budget'] <=> $a['project_budget'];
+                });
+            } elseif ($this->sortBy === 'price_low') {
+                usort($designsArray, function ($a, $b) {
+                    return $a['project_budget'] <=> $b['project_budget'];
+                });
+            }
+
+            // En son eklenen tasarımı belirle (her kategori için ayrı ayrı)
+            if (!empty($designsArray)) {
+                $latestCreatedAt = max(array_column($designsArray, 'created_at'));
+                foreach ($designsArray as &$design) {
+                    $design['is_latest'] = ($design['created_at'] === $latestCreatedAt);
+                }
+            }
+
             return [
                 'category_name' => $categoryName,
-                'designs' => $group->map(function ($design) {
-                    $oneri = $design->project;
-
-                    // Get oneri image
-                    $oneriImage = '';
-                    if ($oneri && $oneri->hasMedia('images')) {
-                        $oneriImage = $oneri->getFirstMediaUrl('images');
-                    }
-
-                    return [
-                        'id' => $design->id,
-                        'project_name' => $oneri->title ?? 'Bilinmeyen Öneri',
-                        'project_budget' => $oneri->budget ?? 0,
-                        'project_image' => $oneriImage,
-                        'likes_count' => $design->likes->count(),
-                        'is_liked' => Auth::check() ? $design->isLikedByUser(Auth::id()) : false,
-                        'created_at' => $design->created_at->timestamp,
-                    ];
-                })->toArray(),
+                'designs' => $designsArray,
             ];
         })->values()->toArray();
     }
@@ -128,6 +196,16 @@ class ProjectDesignsGallery extends Page
             ->send();
 
         // Reload data
+        $this->loadProjectDesigns();
+    }
+
+    public function updatedSortBy()
+    {
+        $this->loadProjectDesigns();
+    }
+
+    public function updatedPriceFilter()
+    {
         $this->loadProjectDesigns();
     }
 }
