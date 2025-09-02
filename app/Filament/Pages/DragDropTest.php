@@ -54,15 +54,26 @@ class DragDropTest extends Page
 
     public function getViewData(): array
     {
-        // Kategorileri çek - sadece Obje modelindeki sabit kategoriler
+        // Kategorileri çek
         $kategoriler = [];
 
-        // Sadece Obje modelindeki sabit kategorileri kullan
+        // Önce Obje modelindeki sabit kategorileri kullan
         foreach (Obje::CATEGORIES as $key => $name) {
             $kategoriler[] = [
                 'id' => $key,
                 'name' => $name,
                 'type' => 'static' // Sabit kategori
+            ];
+        }
+
+        // Category tablosundan da kategorileri çek (eğer varsa)
+        $dbKategoriler = Category::all();
+        foreach ($dbKategoriler as $kategori) {
+            $kategoriler[] = [
+                'id' => $kategori->id,
+                'name' => $kategori->name,
+                'type' => 'database', // Veritabanı kategorisi
+                'icon' => $kategori->icon
             ];
         }
 

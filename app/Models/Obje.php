@@ -46,13 +46,14 @@ class Obje extends Model implements HasMedia
 
     // Sabit kategori listesi (formlarda ve kontrollerde kullanmak için)
     public const CATEGORIES = [
-    'doga' => 'Doğa',
-    'yasam' => 'Yaşam',
-    'ulasim' => 'Ulaşım',
-    'mimari' => 'Mimari',
-    'sanat' => 'Sanat',
-    'doku' => 'Doku',
-
+        'doga' => 'Doğa',
+        'yasam' => 'Yaşam',
+        'ulasim' => 'Ulaşım',
+        'mimari' => 'Mimari',
+        'sanat' => 'Sanat',
+        'doku' => 'Doku',
+        'isik' => 'Işık',
+        'heykel' => 'Heykel',
     ];
     
     public function registerMediaCollections(): void
