@@ -3,17 +3,7 @@
 require_once __DIR__ . '/vendor/autoload.php';
 
 $app = require_once __DIR__ . '/bootstrap/app.php';
-// Some service providers expect the 'files' binding. Bind a Filesystem
-// instance into the container before booting to avoid a missing binding
-// when running this script standalone.
-$app->instance('files', new \Illuminate\Filesystem\Filesystem());
-// Set Facade application root for providers that use facades during boot.
-\Illuminate\Support\Facades\Facade::setFacadeApplication($app);
-
-// Bootstrap the framework using the Console Kernel so config, DB and
-// other core services are properly initialized.
-$kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
-$kernel->bootstrap();
+$app->boot();
 
 use App\Models\Category;
 use App\Models\Project;
@@ -29,7 +19,7 @@ echo "Şu anki zaman: " . $now->format('Y-m-d H:i:s') . "\n";
 $testCategory = Category::create([
     'name' => 'Test Projesi - Zaman Testi',
     'start_datetime' => $now->format('Y-m-d H:i:s'),
-    'end_datetime' => $now->copy()->addMinutes(1)->format('Y-m-d H:i:s')
+    'end_datetime' => $now->copy()->addMinutes(2)->format('Y-m-d H:i:s')
 ]);
 
 echo "Test kategorisi oluşturuldu!\n";
@@ -69,12 +59,7 @@ echo "Kategori: " . $testProject->category->name . "\n";
 $testDesign = \App\Models\ProjectDesign::create([
     'project_id' => $testProject->id,
     'created_by_id' => $user->id,
-    'design_description' => 'Test tasarımı - Zaman sayacını test etmek için oluşturulmuştur. Bu tasarım sadece test amaçlıdır ve 2 dakika sonra oylama süresi dolacak.',
-    // design_data is required (JSON). Provide a minimal payload.
-    'design_data' => [
-        'title' => 'Test Tasarımı',
-        'notes' => 'Otomatik oluşturulmuş test tasarımı.'
-    ],
+    'design_description' => 'Test tasarımı - Zaman sayacını test etmek için oluşturulmuştur. Bu tasarım sadece test amaçlıdır ve 2 dakika sonra oylama süresi dolacak.'
 ]);
 
 echo "\nTest tasarımı oluşturuldu!\n";
