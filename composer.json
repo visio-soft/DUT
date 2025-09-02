@@ -62,6 +62,8 @@
             "@php artisan config:clear --ansi",
             "@php artisan test"
         ]
+    ,
+    "seed:clean": "@php scripts/seed_clean.php"
     },
     "extra": {
         "laravel": {
