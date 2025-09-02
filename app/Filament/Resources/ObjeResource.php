@@ -107,7 +107,12 @@ class ObjeResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->options(\App\Models\Obje::CATEGORIES)
+                    ->placeholder('Tüm kategoriler')
+                    ->multiple()
+                    ->searchable(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

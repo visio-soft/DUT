@@ -33,15 +33,6 @@ class CategoryResource extends Resource
                     ->maxLength(255)
                     ->placeholder('Ör: heroicon-o-home')
                     ->helperText('Heroicon, FontAwesome veya başka ikon kütüphanelerinden ikon adı'),
-                Forms\Components\Select::make('parent_id')
-                    ->relationship('parent', 'name')
-                    ->label('Üst Kategori (İsteğe Bağlı)')
-                    ->placeholder('Ana kategori için boş bırakın')
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\Toggle::make('is_main')
-                    ->label('Ana Kategori olarak işaretle')
-                    ->helperText('Bu kategori ana kategori olarak işaretlenecektir.'),
             ]);
     }
 
@@ -53,21 +44,12 @@ class CategoryResource extends Resource
                     ->label('Kategori Adı')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('parent.name')
-                    ->label('Üst Kategori')
-                    ->sortable()
-                    ->searchable()
-                    ->placeholder('Ana Kategori'),
                 Tables\Columns\TextColumn::make('icon')
                     ->label('Ikon')
                     ->searchable()
                     ->placeholder('-'),
-                Tables\Columns\IconColumn::make('is_main')
-                    ->label('Ana')
-                    ->boolean()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('oneriler_count')
-                    ->label('Öneri Sayısı')
+                    ->label('Proje Sayısı')
                     ->counts('oneriler')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -78,12 +60,7 @@ class CategoryResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                Tables\Filters\SelectFilter::make('parent_id')
-                    ->relationship('parent', 'name')
-                    ->label('Üst Kategori')
-                    ->placeholder('Tüm Kategoriler')
-                    ->searchable()
-                    ->preload(),
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -117,7 +94,6 @@ class CategoryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['parent:id,name'])
             ->withCount('oneriler');
     }
 }

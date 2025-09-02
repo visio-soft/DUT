@@ -70,26 +70,15 @@ class ViewProjectDesign extends ViewRecord
             }
         }
 
-        // Kategorileri çek (DragDropTest gibi)
+        // Kategorileri çek - sadece Obje modelindeki sabit kategoriler
         $kategoriler = [];
 
-        // Önce Obje modelindeki sabit kategorileri kullan
+        // Sadece Obje modelindeki sabit kategorileri kullan
         foreach (\App\Models\Obje::CATEGORIES as $key => $name) {
             $kategoriler[] = [
                 'id' => $key,
                 'name' => $name,
                 'type' => 'static'
-            ];
-        }
-
-        // Category tablosundan da kategorileri çek (eğer varsa)
-        $dbKategoriler = \App\Models\Category::all();
-        foreach ($dbKategoriler as $kategori) {
-            $kategoriler[] = [
-                'id' => $kategori->id,
-                'name' => $kategori->name,
-                'type' => 'database',
-                'icon' => $kategori->icon ?? null
             ];
         }
 
