@@ -12,9 +12,9 @@ use Spatie\MediaLibrary\Conversions\Conversion;
 class Obje extends Model implements HasMedia
 {
     use InteractsWithMedia;
-    
+
     protected $table = 'objeler';
-    
+
     protected $fillable = [
         'category',
         'name',
@@ -55,28 +55,28 @@ class Obje extends Model implements HasMedia
         'isik' => 'Işık',
         'heykel' => 'Heykel',
     ];
-    
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')
             ->acceptsMimeTypes([
-                'image/jpeg', 
-                'image/jpg', 
-                'image/png', 
-                'image/gif', 
-                'image/webp', 
-                'image/bmp', 
+                'image/jpeg',
+                'image/jpg',
+                'image/png',
+                'image/gif',
+                'image/webp',
+                'image/bmp',
                 'image/svg+xml'
             ])
             ->singleFile()
             ->useDisk('public');
     }
-    
+
     public function registerMediaConversions(?Media $media = null): void
     {
         // Conversion'ları devre dışı bırak - hata kaynağı
         // Eğer thumbnail gerekirse frontend'de CSS ile küçültelim
-        
+
         /*
         // Sadece raster (bitmap) resimler için conversion yapılır
         $this->addMediaConversion('preview')
@@ -89,13 +89,13 @@ class Obje extends Model implements HasMedia
             ->skipOnFailure() // Hata durumunda conversion'u atla
             ->performOnlyOnMimeTypes([
                 'image/jpeg',
-                'image/jpg', 
+                'image/jpg',
                 'image/png',
                 'image/gif',
                 'image/webp',
                 'image/bmp'
             ]);
-            
+
         $this->addMediaConversion('thumb')
             ->width(100)
             ->height(100)
@@ -107,7 +107,7 @@ class Obje extends Model implements HasMedia
             ->performOnlyOnMimeTypes([
                 'image/jpeg',
                 'image/jpg',
-                'image/png', 
+                'image/png',
                 'image/gif',
                 'image/webp',
                 'image/bmp'
