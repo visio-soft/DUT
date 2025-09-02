@@ -1,5 +1,5 @@
 <div class="w-full max-w-none">
-    <input type="hidden" name="parent_category_id" id="parent_category_id" value="{{ old('parent_category_id', $getState()) }}">
+    <input type="hidden" name="category_id" id="category_id" value="{{ old('category_id', $getState()) }}">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-none">
         @foreach($categories as $category)
             <div class="category-block w-full cursor-pointer border-2 rounded-lg p-4 flex flex-col items-center transition-colors duration-200 relative @if($getState() == $category->id) border-primary-500 bg-primary-50 dark:bg-primary-900 selected-block @else border-gray-200 dark:border-gray-700 @endif"
@@ -14,10 +14,13 @@
                     </span>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 mb-2">
-                    @if (str_contains($category->icon, 'heroicon-'))
+                    @if ($category->icon && str_contains($category->icon, 'heroicon-'))
                         @svg($category->icon, 'w-8 h-8')
-                    @else
+                    @elseif ($category->icon)
                         <img src="{{ $category->icon }}" alt="{{ $category->name }}" class="w-8 h-8 object-contain">
+                    @else
+                        {{-- Default category icon --}}
+                        @svg('heroicon-o-tag', 'w-8 h-8')
                     @endif
                 </div>
                 <div class="text-sm font-medium text-center text-gray-900 dark:text-gray-100">
@@ -28,7 +31,7 @@
     </div>
     <script>
     function selectCategory(el, id) {
-        document.getElementById('parent_category_id').value = id;
+        document.getElementById('category_id').value = id;
         document.querySelectorAll('.category-block').forEach(e => {
             e.classList.remove('border-primary-500', 'bg-primary-50', 'dark:bg-primary-900', 'selected-block');
             e.classList.add('border-gray-200', 'dark:border-gray-700');
@@ -46,7 +49,7 @@
         }
     }
     </script>
-    @error('parent_category_id')
+    @error('category_id')
         <div class="text-danger-600 mt-2 text-xs">{{ $message }}</div>
     @enderror
 </div>

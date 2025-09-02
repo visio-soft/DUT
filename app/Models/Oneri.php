@@ -70,6 +70,23 @@ class Oneri extends Model implements HasMedia
     return $this->hasOne(ProjectDesign::class, 'project_id');
     }
 
+    public function likes()
+    {
+        return $this->hasManyThrough(
+            ProjectDesignLike::class,
+            ProjectDesign::class,
+            'project_id', // Foreign key on project_designs table
+            'project_design_id', // Foreign key on project_design_likes table
+            'id', // Local key on oneriler table
+            'id' // Local key on project_designs table
+        );
+    }
+
+    public function getLikesCountAttribute(): int
+    {
+        return $this->likes()->count();
+    }
+
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')
