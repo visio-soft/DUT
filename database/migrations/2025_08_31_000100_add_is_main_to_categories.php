@@ -13,11 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('categories', function (Blueprint $table) {
-            if (!Schema::hasColumn('categories', 'is_main')) {
-                $table->boolean('is_main')->default(false)->after('icon');
-            }
-        });
+    // Artık gerek yok, is_main doğrudan ana tabloda oluşturuluyor.
     }
 
     /**
