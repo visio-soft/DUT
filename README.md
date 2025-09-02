@@ -1,33 +1,30 @@
-## Seeder (tek başına) nasıl çalıştırılır
+## Kısa kullanım notu
 
-Aşağıdaki komutlar, Laravel projesinde tek bir seeder dosyasını çalıştırmak için kullanılabilir.
+Veritabanındaki gereksiz tabloları temizleyip (istenmeyenleri truncate/delete) seed çalıştırmak için küçük bir yardımcı eklendi.
 
-- Basit kullanım (seeder sınıf adı ile):
+Kullanım
 
-```bash
-php artisan db:seed --class=CategorySeeder
+- Varsayılan çalıştırma (varsayılan olarak `migrations` ve `categories` tablolarını korur, `Database\Seeders\DatabaseSeeder` çalıştırır):
+
+```
+php scripts/seed_clean.php
 ```
 
-- Tam namespace gerekiyorsa (özellikle Laravel 8+ veya farklı namespace kullanıyorsanız):
+- Composer üzerinden:
 
-```bash
-php artisan db:seed --class="Database\\Seeders\\CategorySeeder"
+```
+composer seed:clean
 ```
 
-- Eğer `DatabaseSeeder` içinde bir seeder çağrısı varsa, tüm `DatabaseSeeder`'ı çalıştırmak için:
+- Saklanacak tabloları ve çalıştırılacak seedleri özelleştirme:
 
-```bash
-php artisan db:seed
+```
+php scripts/seed_clean.php --keep=categories,users --seeders=Database\\Seeders\\CategorySeeder,Database\\Seeders\\UserSeeder
 ```
 
-Notlar:
-- Komutları çalıştırmadan önce `.env` dosyanızda veritabanı bağlantınızın doğru ayarlı olduğundan emin olun.
-- Genelde önce migration'ları çalıştırmak isterseniz:
+Notlar
 
-```bash
-php artisan migrate
-```
+- Bu işlem veri siler (truncate/delete). Sadece geliştirme ortamında veya yedek alındığından emin olarak kullanın.
+- PgSQL, MySQL ve SQLite ile çalışır.
 
-- Local geliştirme ortamında SQLite kullanıyorsanız, `DB_CONNECTION=sqlite` ve `DB_DATABASE` ayarlarının doğru olduğuna dikkat edin.
 
-Bu kısa bölüm, tek bir seeder çalıştırma adımını gösterir; farklı ihtiyaçlar için seeder içeriğini / namespace ayarlarını kontrol edin.
