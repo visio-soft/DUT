@@ -32,11 +32,11 @@
                     <!-- Rankings Grid -->
                     <div class="rankings-grid category-content-{{ $index }}">
                         @foreach($group['designs'] as $design)
-                            <div class="ranking-card rank-{{ $design['rank'] }} {{ $design['rank_class'] }}" 
-                                 data-design="{{ $design['id'] }}" 
+                            <div class="ranking-card rank-{{ $design['rank'] }} {{ $design['rank_class'] }}"
+                                 data-design="{{ $design['id'] }}"
                                  onclick="viewDesign({{ $design['id'] }})"
                                  title="Detayları görüntülemek için tıklayın">
-                                
+
                                 <!-- Rank Badge -->
                                 <div class="rank-badge rank-{{ $design['rank'] }}">
                                     <span class="rank-number">{{ $design['rank'] }}</span>
@@ -188,20 +188,19 @@
 
         .category-group {
             background: rgb(var(--gray-50));
-            border: 1px solid rgb(var(--gray-200));
+            border: 2px solid rgb(var(--success-400));
             border-radius: 1rem;
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            transition: all 0.3s ease;
         }
 
         .dark .category-group {
             background: rgb(var(--gray-800));
-            border-color: rgb(var(--gray-700));
+            border-color: rgb(var(--success-500));
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 0 15px rgb(var(--success-500) / 0.3);
         }
 
         .category-group:hover {
-            box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.15);
+            box-shadow: 0 10px 25px -3px rgb(0 0 0 / 0.15), 0 0 25px rgb(var(--success-400) / 0.4);
             transform: translateY(-2px);
         }
 
@@ -210,14 +209,14 @@
             align-items: center;
             justify-content: space-between;
             padding: 1.5rem 2rem;
-            background: linear-gradient(135deg, rgb(var(--primary-500)) 0%, rgb(var(--primary-600)) 100%);
+            background: linear-gradient(135deg, rgb(var(--gray-600)) 0%, rgb(var(--gray-700)) 100%);
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .category-header:hover {
-            background: linear-gradient(135deg, rgb(var(--primary-600)) 0%, rgb(var(--primary-700)) 100%);
+            background: linear-gradient(135deg, rgb(var(--gray-700)) 0%, rgb(var(--gray-800)) 100%);
         }
 
         .category-info {
@@ -309,8 +308,8 @@
         }
 
         .ranking-card.third {
-            border: 3px solid rgb(var(--orange-400));
-            box-shadow: 0 0 20px rgb(var(--orange-400) / 0.2);
+            border: 3px solid rgb(var(--gray-400));
+            box-shadow: 0 0 20px rgb(var(--gray-400) / 0.2);
         }
 
         /* Rank Badge */
@@ -348,9 +347,9 @@
         }
 
         .rank-badge.rank-3 {
-            background: linear-gradient(135deg, rgb(var(--orange-400)), rgb(var(--orange-600)));
+            background: linear-gradient(135deg, rgb(var(--gray-400)), rgb(var(--gray-600)));
             color: white;
-            box-shadow: 0 4px 15px rgb(var(--orange-500) / 0.4);
+            box-shadow: 0 4px 15px rgb(var(--gray-500) / 0.4);
         }
 
         .rank-number {
@@ -597,15 +596,15 @@
                 flex-direction: column;
                 text-align: center;
             }
-            
+
             .header-text h1 {
                 font-size: 1.75rem;
             }
-            
+
             .rankings-grid {
                 padding: 1rem;
             }
-            
+
             .category-header {
                 padding: 1rem 1.5rem;
             }
@@ -635,11 +634,11 @@
         function toggleCategory(index) {
             const content = document.querySelector(`.category-content-${index}`);
             const chevron = document.querySelector(`.category-chevron-${index}`);
-            
+
             if (!content || !chevron) return;
-            
+
             const isHidden = content.classList.contains('collapsed');
-            
+
             if (isHidden) {
                 content.classList.remove('collapsed');
                 chevron.style.transform = 'rotate(0deg)';
@@ -657,7 +656,7 @@
         // Add sparkle animation for winner cards
         function addSparkleEffect() {
             const winnerCards = document.querySelectorAll('.ranking-card.winner');
-            
+
             winnerCards.forEach(card => {
                 // Create sparkle elements
                 for (let i = 0; i < 3; i++) {
@@ -685,13 +684,13 @@
         const style = document.createElement('style');
         style.textContent = `
             @keyframes sparkle {
-                0%, 100% { 
-                    opacity: 0; 
-                    transform: scale(0); 
+                0%, 100% {
+                    opacity: 0;
+                    transform: scale(0);
                 }
-                50% { 
-                    opacity: 1; 
-                    transform: scale(1); 
+                50% {
+                    opacity: 1;
+                    transform: scale(1);
                 }
             }
         `;
