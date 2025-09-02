@@ -49,7 +49,7 @@ class CategoryResource extends Resource
                     ->searchable()
                     ->placeholder('-'),
                 Tables\Columns\TextColumn::make('oneriler_count')
-                    ->label('Öneri Sayısı')
+                    ->label('Proje Sayısı')
                     ->counts('oneriler')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -60,7 +60,7 @@ class CategoryResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                // Removed parent category filter since we no longer have parent categories
+                //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -94,7 +94,6 @@ class CategoryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['parent:id,name'])
             ->withCount('oneriler');
     }
 }

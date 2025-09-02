@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.9 (Ubuntu 16.9-0ubuntu0.24.04.1)
--- Dumped by pg_dump version 16.9 (Ubuntu 16.9-0ubuntu0.24.04.1)
+-- Dumped from database version 16.9 (Ubuntu 16.9-0ubuntu0.24.10.1)
+-- Dumped by pg_dump version 16.9 (Ubuntu 16.9-0ubuntu0.24.10.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -51,6 +51,7 @@ CREATE TABLE public.categories (
     parent_id bigint,
     name character varying(255) NOT NULL,
     icon character varying(255),
+    is_main boolean DEFAULT false NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone,
     deleted_at timestamp(0) without time zone
@@ -266,7 +267,9 @@ CREATE TABLE public.model_has_roles (
 
 CREATE TABLE public.objeler (
     id bigint NOT NULL,
-    isim character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
+    original_filename character varying(255),
+    category character varying(255) DEFAULT 'doga'::character varying NOT NULL,
     created_at timestamp(0) without time zone,
     updated_at timestamp(0) without time zone
 );
@@ -289,6 +292,55 @@ CREATE SEQUENCE public.objeler_id_seq
 --
 
 ALTER SEQUENCE public.objeler_id_seq OWNED BY public.objeler.id;
+
+
+--
+-- Name: oneriler; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.oneriler (
+    id bigint NOT NULL,
+    category_id bigint NOT NULL,
+    created_by_id bigint NOT NULL,
+    updated_by_id bigint,
+    title character varying(255) NOT NULL,
+    description text NOT NULL,
+    design_completed boolean DEFAULT false NOT NULL,
+    start_date date NOT NULL,
+    end_date date NOT NULL,
+    budget numeric(15,2) NOT NULL,
+    latitude numeric(10,8),
+    longitude numeric(11,8),
+    address text,
+    address_details text,
+    city character varying(100) DEFAULT 'İstanbul'::character varying NOT NULL,
+    district character varying(100) NOT NULL,
+    neighborhood character varying(100),
+    street_cadde character varying(150),
+    street_sokak character varying(150),
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone,
+    deleted_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: oneriler_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.oneriler_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: oneriler_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.oneriler_id_seq OWNED BY public.oneriler.id;
 
 
 --
@@ -335,43 +387,23 @@ ALTER SEQUENCE public.permissions_id_seq OWNED BY public.permissions.id;
 
 
 --
--- Name: projects; Type: TABLE; Schema: public; Owner: -
+-- Name: project_design_likes; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE public.projects (
+CREATE TABLE public.project_design_likes (
     id bigint NOT NULL,
-    created_by_id bigint,
-    updated_by_id bigint,
-    category_id bigint NOT NULL,
-    name character varying(255),
-    description text,
-    location text,
-    status character varying(255) DEFAULT 'draft'::character varying NOT NULL,
-    start_date date,
-    end_date date,
-    budget numeric(15,2),
+    user_id bigint NOT NULL,
+    project_design_id bigint NOT NULL,
     created_at timestamp(0) without time zone,
-    updated_at timestamp(0) without time zone,
-    deleted_at timestamp(0) without time zone,
-    latitude numeric(10,8),
-    longitude numeric(11,8),
-    address character varying(500),
-    city character varying(100),
-    country character varying(100),
-    district character varying(100),
-    neighborhood character varying(100),
-    street_cadde character varying(150),
-    street_sokak character varying(150),
-    address_details text,
-    image_path character varying(300)
+    updated_at timestamp(0) without time zone
 );
 
 
 --
--- Name: projects_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: project_design_likes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.projects_id_seq
+CREATE SEQUENCE public.project_design_likes_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -380,10 +412,42 @@ CREATE SEQUENCE public.projects_id_seq
 
 
 --
--- Name: projects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: project_design_likes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.projects_id_seq OWNED BY public.projects.id;
+ALTER SEQUENCE public.project_design_likes_id_seq OWNED BY public.project_design_likes.id;
+
+
+--
+-- Name: project_designs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.project_designs (
+    id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    design_data json NOT NULL,
+    created_at timestamp(0) without time zone,
+    updated_at timestamp(0) without time zone
+);
+
+
+--
+-- Name: project_designs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.project_designs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: project_designs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.project_designs_id_seq OWNED BY public.project_designs.id;
 
 
 --
@@ -520,6 +584,13 @@ ALTER TABLE ONLY public.objeler ALTER COLUMN id SET DEFAULT nextval('public.obje
 
 
 --
+-- Name: oneriler id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oneriler ALTER COLUMN id SET DEFAULT nextval('public.oneriler_id_seq'::regclass);
+
+
+--
 -- Name: permissions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -527,10 +598,17 @@ ALTER TABLE ONLY public.permissions ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: projects id; Type: DEFAULT; Schema: public; Owner: -
+-- Name: project_design_likes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.projects ALTER COLUMN id SET DEFAULT nextval('public.projects_id_seq'::regclass);
+ALTER TABLE ONLY public.project_design_likes ALTER COLUMN id SET DEFAULT nextval('public.project_design_likes_id_seq'::regclass);
+
+
+--
+-- Name: project_designs id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_designs ALTER COLUMN id SET DEFAULT nextval('public.project_designs_id_seq'::regclass);
 
 
 --
@@ -652,6 +730,14 @@ ALTER TABLE ONLY public.objeler
 
 
 --
+-- Name: oneriler oneriler_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oneriler
+    ADD CONSTRAINT oneriler_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: password_reset_tokens password_reset_tokens_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -676,11 +762,27 @@ ALTER TABLE ONLY public.permissions
 
 
 --
--- Name: projects projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+-- Name: project_design_likes project_design_likes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.projects
-    ADD CONSTRAINT projects_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY public.project_design_likes
+    ADD CONSTRAINT project_design_likes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: project_design_likes project_design_likes_user_id_project_design_id_unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_design_likes
+    ADD CONSTRAINT project_design_likes_user_id_project_design_id_unique UNIQUE (user_id, project_design_id);
+
+
+--
+-- Name: project_designs project_designs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_designs
+    ADD CONSTRAINT project_designs_pkey PRIMARY KEY (id);
 
 
 --
@@ -732,6 +834,20 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: categories_name_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX categories_name_index ON public.categories USING btree (name);
+
+
+--
+-- Name: categories_parent_id_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX categories_parent_id_index ON public.categories USING btree (parent_id);
+
+
+--
 -- Name: jobs_queue_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -743,13 +859,6 @@ CREATE INDEX jobs_queue_index ON public.jobs USING btree (queue);
 --
 
 CREATE INDEX media_model_type_model_id_index ON public.media USING btree (model_type, model_id);
-
-
---
--- Name: media_order_column_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX media_order_column_index ON public.media USING btree (order_column);
 
 
 --
@@ -767,10 +876,17 @@ CREATE INDEX model_has_roles_model_id_model_type_index ON public.model_has_roles
 
 
 --
--- Name: projects_name_index; Type: INDEX; Schema: public; Owner: -
+-- Name: objeler_name_index; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX projects_name_index ON public.projects USING btree (name);
+CREATE INDEX objeler_name_index ON public.objeler USING btree (name);
+
+
+--
+-- Name: oneriler_title_index; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX oneriler_title_index ON public.oneriler USING btree (title);
 
 
 --
@@ -788,6 +904,14 @@ CREATE INDEX sessions_user_id_index ON public.sessions USING btree (user_id);
 
 
 --
+-- Name: categories categories_parent_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.categories
+    ADD CONSTRAINT categories_parent_id_foreign FOREIGN KEY (parent_id) REFERENCES public.categories(id) ON DELETE SET NULL;
+
+
+--
 -- Name: model_has_permissions model_has_permissions_permission_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -801,6 +925,54 @@ ALTER TABLE ONLY public.model_has_permissions
 
 ALTER TABLE ONLY public.model_has_roles
     ADD CONSTRAINT model_has_roles_role_id_foreign FOREIGN KEY (role_id) REFERENCES public.roles(id) ON DELETE CASCADE;
+
+
+--
+-- Name: oneriler oneriler_category_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oneriler
+    ADD CONSTRAINT oneriler_category_id_foreign FOREIGN KEY (category_id) REFERENCES public.categories(id);
+
+
+--
+-- Name: oneriler oneriler_created_by_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oneriler
+    ADD CONSTRAINT oneriler_created_by_id_foreign FOREIGN KEY (created_by_id) REFERENCES public.users(id);
+
+
+--
+-- Name: oneriler oneriler_updated_by_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.oneriler
+    ADD CONSTRAINT oneriler_updated_by_id_foreign FOREIGN KEY (updated_by_id) REFERENCES public.users(id);
+
+
+--
+-- Name: project_design_likes project_design_likes_project_design_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_design_likes
+    ADD CONSTRAINT project_design_likes_project_design_id_foreign FOREIGN KEY (project_design_id) REFERENCES public.project_designs(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_design_likes project_design_likes_user_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_design_likes
+    ADD CONSTRAINT project_design_likes_user_id_foreign FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: project_designs project_designs_project_id_foreign; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.project_designs
+    ADD CONSTRAINT project_designs_project_id_foreign FOREIGN KEY (project_id) REFERENCES public.oneriler(id) ON DELETE CASCADE;
 
 
 --
@@ -827,8 +999,8 @@ ALTER TABLE ONLY public.role_has_permissions
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 16.9 (Ubuntu 16.9-0ubuntu0.24.04.1)
--- Dumped by pg_dump version 16.9 (Ubuntu 16.9-0ubuntu0.24.04.1)
+-- Dumped from database version 16.9 (Ubuntu 16.9-0ubuntu0.24.10.1)
+-- Dumped by pg_dump version 16.9 (Ubuntu 16.9-0ubuntu0.24.10.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -849,16 +1021,10 @@ COPY public.migrations (id, migration, batch) FROM stdin;
 1	0001_01_01_000000_create_users_table	1
 2	0001_01_01_000001_create_cache_table	1
 3	0001_01_01_000002_create_jobs_table	1
-4	2025_08_20_072017_create_permission_tables	1
-5	2025_08_20_073704_create_media_table	1
-6	2025_08_21_073502_create_categories_table	1
-7	2025_08_21_073502_create_projects_table	1
-8	2025_08_21_122414_add_deleted_at_to_categories_table	1
-9	2025_08_21_140328_add_location_fields_to_projects_table	1
-10	2025_08_21_142047_add_district_field_to_projects_table	1
-11	2025_08_22_102000_cleanup_projects_table	1
-12	2025_08_22_210806_create_objeler_table	1
-13	2025_08_23_110751_remove_emoji_column_from_objeler_table	2
+4	2025_08_31_000000_rename_projects_table_to_oneriler	1
+5	2025_08_31_000100_add_is_main_to_categories	1
+6	2025_08_31_194706_create_database_tables	1
+7	2025_08_31_200231_create_media_table	1
 \.
 
 
@@ -866,7 +1032,7 @@ COPY public.migrations (id, migration, batch) FROM stdin;
 -- Name: migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: -
 --
 
-SELECT pg_catalog.setval('public.migrations_id_seq', 13, true);
+SELECT pg_catalog.setval('public.migrations_id_seq', 7, true);
 
 
 --

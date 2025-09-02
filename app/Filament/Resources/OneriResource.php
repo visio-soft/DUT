@@ -38,9 +38,8 @@ class OneriResource extends Resource
                         Forms\Components\Select::make('category_id')
                             ->label('Proje Kategorisi')
                             ->options(function () {
-                                // Tüm kategorileri göster (artık hiyerarşi yok)
-                                return Category::orderBy('name')
-                                    ->pluck('name', 'id');
+                                // Tüm kategorileri göster
+                                return Category::all()->pluck('name', 'id');
                             })
                             ->searchable()
                             ->preload()
@@ -230,6 +229,12 @@ class OneriResource extends Resource
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
                     ->money('TRY')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('likes_count')
+                    ->label('Beğeni Sayısı')
+                    ->sortable()
+                    ->badge()
+                    ->color('success')
+                    ->icon('heroicon-o-heart'),
                 Tables\Columns\IconColumn::make('design_completed')
                     ->label('Tasarım')
                     ->boolean()
@@ -316,6 +321,35 @@ class OneriResource extends Resource
                             $query->where('budget', '<=', $amount);
                         }
                     }),
+
+                // Beğeni filtresi
+                Filter::make('likes_filter')
+                    ->label('Beğeni Sayısı')
+                    ->form([
+                        Forms\Components\Grid::make()
+                            ->schema([
+                                Forms\Components\TextInput::make('min_likes')
+                                    ->label('Minimum Beğeni')
+                                    ->numeric()
+                                    ->default(0),
+
+                                Forms\Components\TextInput::make('max_likes')
+                                    ->label('Maksimum Beğeni')
+                                    ->numeric(),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $query->withCount('likes');
+                        
+                        if (!empty($data['min_likes'])) {
+                            $query->having('likes_count', '>=', $data['min_likes']);
+                        }
+
+                        if (!empty($data['max_likes'])) {
+                            $query->having('likes_count', '<=', $data['max_likes']);
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\Action::make('view_design')
@@ -395,6 +429,11 @@ class OneriResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withCount('likes');
     }
 
     public static function getRelations(): array

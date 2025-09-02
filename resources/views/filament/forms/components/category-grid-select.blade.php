@@ -14,10 +14,13 @@
                     </span>
                 </div>
                 <div class="text-gray-500 dark:text-gray-400 mb-2">
-                    @if (str_contains($category->icon, 'heroicon-'))
+                    @if ($category->icon && str_contains($category->icon, 'heroicon-'))
                         @svg($category->icon, 'w-8 h-8')
-                    @else
+                    @elseif ($category->icon)
                         <img src="{{ $category->icon }}" alt="{{ $category->name }}" class="w-8 h-8 object-contain">
+                    @else
+                        {{-- Default category icon --}}
+                        @svg('heroicon-o-tag', 'w-8 h-8')
                     @endif
                 </div>
                 <div class="text-sm font-medium text-center text-gray-900 dark:text-gray-100">

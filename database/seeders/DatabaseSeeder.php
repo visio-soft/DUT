@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Category;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,12 +12,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Remove hierarchical categories - use flat categories from seeders only
-        
-        // Kullanıcı ekle
+                // Kullanıcı ekle
         $this->call([
             UserSeeder::class,
-            BelediyecilikKategorileriSeeder::class,
+            DoğaObjelerSeeder::class,
+            UlaşımObjelerSeeder::class,
+            MimarlıkObjelerSeeder::class,
+            SanatObjelerSeeder::class,
+            DokuObjelerSeeder::class,
+            YaşamObjelerSeeder::class,
         ]);
     }
 }
