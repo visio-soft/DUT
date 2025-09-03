@@ -12,6 +12,20 @@ class Category extends Model
 
     protected $fillable = ['name', 'start_datetime', 'end_datetime'];
 
+    /**
+     * Cast attributes to native types.
+     *
+     * @var array
+     */
+    protected $casts = [];
+
+    /**
+     * Default attribute values.
+     *
+     * @var array
+     */
+    protected $attributes = [];
+
     public function oneriler(): HasMany
     {
         return $this->hasMany(Oneri::class, 'category_id');

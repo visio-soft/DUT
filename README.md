@@ -1,3 +1,7 @@
+## Kısa kullanım notu
+
+Veritabanındaki gereksiz tabloları temizleyip (istenmeyenleri truncate/delete) seed çalıştırmak için küçük bir yardımcı eklendi.
+
 ## Seeder (tek başına) nasıl çalıştırılır
 
 Aşağıdaki komutlar, Laravel projesinde tek bir seeder dosyasını çalıştırmak için kullanılabilir.
@@ -31,4 +35,37 @@ php artisan migrate
 
 -   Local geliştirme ortamında SQLite kullanıyorsanız, `DB_CONNECTION=sqlite` ve `DB_DATABASE` ayarlarının doğru olduğuna dikkat edin.
 
-Bu kısa bölüm, tek bir seeder çalıştırma adımını gösterir; farklı ihtiyaçlar için seeder içeriğini / namespace ayarlarını kontrol edin.
+---
+
+## Veritabanını temizleyip seed çalıştırma (seed_clean)
+
+Projeye eklenmiş `scripts/seed_clean.php` yardımcı scripti, belirttiğiniz tabloları koruyarak geri kalan tabloları temizler ve sonrasında seedleri çalıştırır.
+
+Varsayılan davranış:
+
+- Korunan tablolar: `migrations`, `categories`
+- Çalıştırılan seeder: `Database\\Seeders\\DatabaseSeeder`
+
+Kullanım örnekleri:
+
+```bash
+php scripts/seed_clean.php
+```
+
+veya composer üzerinden:
+
+```bash
+composer seed:clean
+```
+
+Özelleştirme (saklanacak tablolar ve seed sınıfları):
+
+```bash
+php scripts/seed_clean.php --keep=categories,users --seeders=Database\\\\Seeders\\\\CategorySeeder,Database\\\\Seeders\\\\UserSeeder
+```
+
+Notlar:
+- Bu script tabloları truncate/delete yaparak veri siler; yalnızca geliştirme ortamında veya yedek alındığında kullanın.
+- PgSQL, MySQL ve SQLite ile uyumludur.
+
+
