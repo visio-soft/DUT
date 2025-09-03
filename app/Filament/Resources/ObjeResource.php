@@ -20,6 +20,7 @@ class ObjeResource extends Resource
 {
     protected static ?string $model = Obje::class;
 
+    protected static ?string $navigationGroup = 'Obje Yönetimi';
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
     
     protected static ?string $navigationLabel = 'Objeler';

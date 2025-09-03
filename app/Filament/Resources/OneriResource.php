@@ -12,6 +12,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Grouping\Group;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
@@ -53,12 +55,14 @@ class OneriResource extends Resource
                             ->label('Açıklama')
                             ->required()
                             ->rows(3),
-                        Forms\Components\DatePicker::make('start_date')
-                            ->label('Başlangıç Tarihi')
-                            ->required(),
-                        Forms\Components\DatePicker::make('end_date')
-                            ->label('Bitiş Tarihi')
-                            ->required(),
+                        Forms\Components\TextInput::make('estimated_duration')
+                            ->label('Tahmini İşlem Süresi (Gün)')
+                            ->numeric()
+                            ->required()
+                            ->minValue(1)
+                            ->maxValue(365)
+                            ->suffix('gün')
+                            ->helperText('Projenin tahmini tamamlanma süresi (1-365 gün arası)'),
                         Forms\Components\TextInput::make('budget')
                             ->label('Bütçe')
                             ->numeric()
@@ -83,11 +87,11 @@ class OneriResource extends Resource
                 Forms\Components\Section::make('Konum')
                     ->extraAttributes(['class' => 'mx-auto max-w-2xl p-4 ml-auto'])
                     ->schema([
-                        Forms\Components\Toggle::make('use_google_maps')
-                            ->label('Haritadan Seç')
-                            ->default(false)
-                            ->reactive()
-                            ->columnSpanFull(),
+                        //Forms\Components\Toggle::make('use_google_maps')
+                            //->label('Haritadan Seç')
+                            //->default(false)
+                            //->reactive()
+                            //->columnSpanFull(),
 
                         // Manual Konum Girişi (Google Maps kapalıyken)
                         Forms\Components\Group::make()->schema([
@@ -223,7 +227,6 @@ class OneriResource extends Resource
                 SpatieMediaLibraryImageColumn::make('image')->label('Resim')->collection('images')
                     ->circular()->height(50)->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('category.name')->label('Kategori')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
@@ -245,7 +248,10 @@ class OneriResource extends Resource
                     ->tooltip(function ($record) {
                         return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
                     }),
-                Tables\Columns\TextColumn::make('start_date')->label('Başlangıç')->date('d.m.Y')->sortable()
+                Tables\Columns\TextColumn::make('estimated_duration')
+                    ->label('Tahmini Süre')
+                    ->suffix(' gün')
+                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -428,7 +434,31 @@ class OneriResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->groups([
+                Group::make('category.name')
+                    ->label('Proje')
+                    ->getDescriptionFromRecordUsing(function ($record): string {
+                        $category = $record->category;
+                        $end = 'Belirtilmemiş';
+
+                        if ($category && $category->end_datetime) {
+                            $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
+                        }
+
+                        return "Bitiş: {$end}";
+                    }),
+
+                // Ekstra grup: Tasarım durumu (var / yok) - group by boolean column
+                Group::make('design_completed')
+                    ->label('Tasarım')
+                    ->titlePrefixedWithLabel(false)
+                    ->getTitleFromRecordUsing(function ($record): string {
+                        return $record->design_completed ? 'Tasarımı Var' : 'Tasarımı Yok';
+                    }),
+            ])
+            ->defaultGroup('category.name');
+
     }
 
     public static function getEloquentQuery(): Builder
