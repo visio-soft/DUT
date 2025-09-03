@@ -32,6 +32,7 @@ class CategoryResource extends Resource
                     ->placeholder('Proje adını girin'),
 
                 Forms\Components\DateTimePicker::make('start_datetime')->label('Başlangıç Tarihi ve Saati')
+                    ->required()
                     ->seconds(false)
                     ->format('Y-m-d H:i')
                     ->displayFormat('d.m.Y H:i')
@@ -40,6 +41,7 @@ class CategoryResource extends Resource
                     ->helperText('Bu projedeki işlerin başlangıç tarihi ve saati (24 saat formatında, örn: 22:00)'),
 
                 Forms\Components\DateTimePicker::make('end_datetime')->label('Bitiş Tarihi ve Saati')
+                    ->required()
                     ->seconds(false)
                     ->format('Y-m-d H:i')
                     ->displayFormat('d.m.Y H:i')

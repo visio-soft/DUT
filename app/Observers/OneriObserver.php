@@ -20,4 +20,16 @@ class OneriObserver
             $oneri->updated_by_id = Auth::id();
         }
     }
+
+    /**
+     * Handle the Oneri "deleting" event.
+     * Parent oneri silinince child design ve design like'ları da silinsin
+     */
+    public function deleting(Oneri $oneri): void
+    {
+        // Önce design varsa onu sil (bu otomatik olarak design like'ları da silecek)
+        if ($oneri->design) {
+            $oneri->design->delete();
+        }
+    }
 }

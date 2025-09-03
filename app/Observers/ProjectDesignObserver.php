@@ -26,6 +26,15 @@ class ProjectDesignObserver
     }
 
     /**
+     * Handle the ProjectDesign "deleting" event.
+     */
+    public function deleting(ProjectDesign $projectDesign): void
+    {
+        // ProjectDesign silinmeden önce like'ları sil
+        $projectDesign->likes()->delete();
+    }
+
+    /**
      * Handle the ProjectDesign "deleted" event.
      */
     public function deleted(ProjectDesign $projectDesign): void
