@@ -25,8 +25,7 @@ class Oneri extends Model implements HasMedia
         'updated_by_id',
         'title',
         'description',
-        'start_date',
-        'end_date',
+        'estimated_duration',
         'budget',
         'latitude',
         'longitude',
@@ -41,12 +40,17 @@ class Oneri extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'estimated_duration' => 'integer',
         'budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'design_completed' => 'boolean',
+    ];
+
+    // Append a human-friendly design status attribute so it can be used in
+    // Filament grouping and table displays.
+    protected $appends = [
+        'design_status',
     ];
 
     public function category(): BelongsTo
@@ -112,5 +116,11 @@ class Oneri extends Model implements HasMedia
     public function getNameAttribute()
     {
         return $this->title;
+    }
+
+    // Human-friendly design status used for grouping in Filament tables.
+    public function getDesignStatusAttribute(): string
+    {
+        return $this->design_completed ? 'Tasarımı Var' : 'Tasarımı Yok';
     }
 }

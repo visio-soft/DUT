@@ -12,8 +12,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            $table->foreignIdFor(User::class, 'updated_by_id')->nullable()->after('created_by_id');
+        // The projects table was renamed to 'oneriler' in a different migration.
+        Schema::table('oneriler', function (Blueprint $table) {
+            if (!Schema::hasColumn('oneriler', 'updated_by_id')) {
+                $table->foreignIdFor(User::class, 'updated_by_id')->nullable()->after('created_by_id');
+            }
         });
     }
 
@@ -22,9 +25,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            $table->dropForeign(['updated_by_id']);
-            $table->dropColumn('updated_by_id');
+        Schema::table('oneriler', function (Blueprint $table) {
+            if (Schema::hasColumn('oneriler', 'updated_by_id')) {
+                $table->dropForeign(['updated_by_id']);
+                $table->dropColumn('updated_by_id');
+            }
         });
     }
 };

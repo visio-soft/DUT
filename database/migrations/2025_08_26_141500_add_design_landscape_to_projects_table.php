@@ -12,22 +12,27 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            $table->json('design_landscape')->nullable()->after('design_completed');
-        });
-
-        // Copy existing design data from project_designs (if any)
-        try {
-            $designs = DB::table('project_designs')->get();
-            foreach ($designs as $d) {
-                if (isset($d->project_id)) {
-                    DB::table('projects')
-                        ->where('id', $d->project_id)
-                        ->update(['design_landscape' => $d->design_data]);
+        // The projects table was renamed to 'oneriler'. Make operations idempotent.
+        if (Schema::hasTable('oneriler')) {
+            Schema::table('oneriler', function (Blueprint $table) {
+                if (!Schema::hasColumn('oneriler', 'design_landscape')) {
+                    $table->json('design_landscape')->nullable()->after('design_completed');
                 }
+            });
+
+            // Copy existing design data from project_designs (if any)
+            try {
+                $designs = DB::table('project_designs')->get();
+                foreach ($designs as $d) {
+                    if (isset($d->project_id)) {
+                        DB::table('oneriler')
+                            ->where('id', $d->project_id)
+                            ->update(['design_landscape' => $d->design_data]);
+                    }
+                }
+            } catch (\Exception $e) {
+                // Ignore if table does not exist yet in some environments
             }
-        } catch (\Exception $e) {
-            // Ignore if table does not exist yet in some environments
         }
     }
 
@@ -36,10 +41,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
-            if (Schema::hasColumn('projects', 'design_landscape')) {
-                $table->dropColumn('design_landscape');
-            }
-        });
+        if (Schema::hasTable('oneriler')) {
+            Schema::table('oneriler', function (Blueprint $table) {
+                if (Schema::hasColumn('oneriler', 'design_landscape')) {
+                    $table->dropColumn('design_landscape');
+                }
+            });
+        }
     }
 };

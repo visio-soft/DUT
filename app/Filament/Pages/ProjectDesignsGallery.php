@@ -132,9 +132,43 @@ class ProjectDesignsGallery extends Page
                 }
             }
 
+            // Derive category-level start/end from the category itself (if available)
+            // Fallback to project dates if category dates are not set
+            $category = $group->first()?->project?->category;
+
+            $startDateTime = null;
+            $endDateTime = null;
+
+            if ($category && ($category->start_datetime || $category->end_datetime)) {
+                // Use category times (they include time, not just date)
+                $startDateTime = $category->start_datetime;
+                $endDateTime = $category->end_datetime;
+            } else {
+                // Fallback to project dates (only dates, so add time)
+                $startDate = $group->map(function ($d) {
+                    return $d->project?->start_date;
+                })->filter()->min();
+
+                $endDate = $group->map(function ($d) {
+                    return $d->project?->end_date;
+                })->filter()->max();
+
+                if ($startDate) {
+                    $startDateTime = \Carbon\Carbon::parse($startDate)->setTime(8, 0, 0); // 08:00
+                }
+                if ($endDate) {
+                    $endDateTime = \Carbon\Carbon::parse($endDate)->setTime(18, 0, 0); // 18:00
+                }
+            }
+
+            $startIso = $startDateTime ? \Carbon\Carbon::parse($startDateTime, 'Europe/Istanbul')->toIso8601String() : null;
+            $endIso = $endDateTime ? \Carbon\Carbon::parse($endDateTime, 'Europe/Istanbul')->toIso8601String() : null;
+
             return [
                 'category_name' => $categoryName,
                 'designs' => $designsArray,
+                'start_datetime' => $startIso,
+                'end_datetime' => $endIso,
             ];
         })->values()->toArray();
     }

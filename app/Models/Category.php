@@ -10,14 +10,14 @@ class Category extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['name', 'icon'];
+    protected $fillable = ['name', 'start_datetime', 'end_datetime'];
 
     public function oneriler(): HasMany
     {
         return $this->hasMany(Oneri::class, 'category_id');
     }
 
-    // Backward compatibility - eski projects() metodunu koruyoruz
+    // eski projects() metodunu koruyoruz
     public function projects(): HasMany
     {
         return $this->oneriler();

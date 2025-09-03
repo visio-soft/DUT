@@ -2,22 +2,22 @@
 
 namespace App\Observers;
 
-use App\Models\Oneri;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 
 class ProjectObserver
 {
-    public function creating(Oneri $oneri): void
+    public function creating(Project $project): void
     {
         if (Auth::check()) {
-            $oneri->created_by_id = Auth::id();
+            $project->created_by_id = Auth::id();
         }
     }
 
-    public function updating(Oneri $oneri): void
+    public function updating(Project $project): void
     {
         if (Auth::check()) {
-            $oneri->updated_by_id = Auth::id();
+            $project->updated_by_id = Auth::id();
         }
     }
 }
