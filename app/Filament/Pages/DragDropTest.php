@@ -21,7 +21,7 @@ class DragDropTest extends Page
 
     protected static ?string $navigationLabel = 'Peyzaj Tasarımcısı';
 
-    protected static bool $shouldRegisterNavigation = true; // Bu sayfayı navigation'da göster
+    protected static bool $shouldRegisterNavigation = false; // Bu sayfayı navigation'da göster
 
     public ?string $projectImage = null;
     public ?int $projectId = null;
@@ -107,7 +107,7 @@ class DragDropTest extends Page
 
         // Mevcut tasarımı yükle (eğer varsa)
         $existingDesign = null;
-        
+
         if ($this->project) {
             // Önce Project modelindeki design_landscape alanını kontrol et
             if ($this->project->design_landscape) {
@@ -174,13 +174,13 @@ class DragDropTest extends Page
         $this->js('
             console.log("🚀 [SAVE] Tasarım kaydetme işlemi başladı");
             console.log("📊 [SAVE] designElements array:", designElements);
-            
+
             if (!designElements || designElements.length === 0) {
                 console.warn("⚠️ [SAVE] Tasarımda hiç element yok!");
                 alert("Kaydetmek için önce tasarıma element eklemelisiniz!");
                 return;
             }
-            
+
             const elements = designElements.map(element => ({
                 obje_id: element.obje_id,
                 x: element.x,
@@ -191,7 +191,7 @@ class DragDropTest extends Page
                 aspectRatio: element.aspectRatio || 1,
                 scale: element.scale
             }));
-            
+
             console.log("📦 [SAVE] Hazırlanan elements:", elements);
 
             const design = {
@@ -204,7 +204,7 @@ class DragDropTest extends Page
                     totalRotation: elements.reduce((sum, el) => sum + Math.abs(el.rotation || 0), 0)
                 }
             };
-            
+
             console.log("💾 [SAVE] Final tasarım verisi:", design);
             console.log("📞 [SAVE] storeDesignData çağrılıyor...");
 

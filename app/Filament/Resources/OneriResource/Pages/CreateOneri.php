@@ -6,7 +6,6 @@ use App\Filament\Resources\OneriResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class CreateOneri extends CreateRecord
 {
@@ -23,31 +22,81 @@ class CreateOneri extends CreateRecord
     protected function getFormActions(): array
     {
         return [
+            // Proje Oluştur & Tasarımı Atla butonu (tek buton)
             $this->getCreateFormAction()
-                ->label('Oluştur')
-                ->hidden(), // Normal oluştur butonunu gizle
-            $this->getCreateAnotherFormAction()
-                ->label('Oluştur ve Yeni')
-                ->hidden(), // Normal oluştur ve yeni butonunu gizle
-
-            // Yeni özel buton - Tasarıma Başla
-            \Filament\Actions\Action::make('createAndDesign')
-                ->label('Tasarıma Başla')
-                ->icon('heroicon-o-paint-brush')
-                ->color('success')
+                ->label('Proje Oluştur')
+                ->icon('heroicon-o-folder-plus')
+                ->color('primary')
                 ->size('lg')
-                ->requiresConfirmation()
-                ->modalHeading('Öneri Oluştur ve Tasarıma Başla')
-                ->modalDescription('Öneriyi oluşturup direkt tasarım aracına geçmek istediğinize emin misiniz?')
-                ->modalSubmitActionLabel('Evet, Tasarıma Başla')
                 ->action(function () {
                     try {
-                        Log::info('Tasarıma Başla butonuna tıklandı');
-
                         // Form validation ve kayıt
                         $this->create();
 
-                        Log::info('Öneri oluşturuldu', ['oneri_id' => $this->record->id]);
+                        \Filament\Notifications\Notification::make()
+                            ->title('Öneri Oluşturuldu!')
+                            ->body('Öneri başarıyla oluşturuldu. Tasarımı daha sonra ekleyebilirsiniz.')
+                            ->success()
+                            ->send();
+
+                        // Öneriler listesine yönlendir
+                        return redirect($this->getResource()::getUrl('index'));
+                    } catch (\Illuminate\Validation\ValidationException $e) {
+                        // Validasyon hatalarını göster
+                        $errors = $e->errors();
+                        if ((isset($errors['images']) && str_contains(json_encode($errors['images']), 'max')) ||
+                            (isset($errors['image']) && str_contains(json_encode($errors['image']), 'max'))) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Dosya Boyutu Hatası!')
+                                ->body('Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.')
+                                ->danger()
+                                ->duration(10000)
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Validasyon Hatası!')
+                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                        return;
+                    } catch (\Exception $e) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Hata!')
+                            ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
+                            ->danger()
+                            ->send();
+                        return;
+                    }
+                })
+                ->extraAttributes([
+                    'class' => 'w-full justify-center mb-2'
+                ]),
+
+            // Tasarım Ekle butonu - resim varsa aktif
+            \Filament\Actions\Action::make('createAndDesign')
+                ->label('Tasarım Ekle')
+                ->icon('heroicon-o-paint-brush')
+                ->color('success')
+                ->size('lg')
+                ->extraAttributes([
+                    'class' => 'w-full justify-center mb-2',
+                ])
+                ->action(function () {
+                    // İlk olarak resim kontrolü yap
+                    $formData = $this->form->getState();
+                    if (empty($formData['images'])) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Resim Gerekli!')
+                            ->body('Tasarım eklemek için önce bir resim yüklemelisiniz.')
+                            ->warning()
+                            ->send();
+                        return;
+                    }
+
+                    try {
+                        // Form validation ve kayıt
+                        $this->create();
 
                         // Öneri kaydedildikten sonra direkt yönlendirme yap
                         $oneri = $this->record;
@@ -61,27 +110,47 @@ class CreateOneri extends CreateRecord
                         // Tasarım sayfasına yönlendir
                         $designUrl = "/admin/drag-drop-test?project_id={$oneri->id}&image=" . urlencode($imageUrl);
 
-                        Log::info('Yönlendirme URL', ['url' => $designUrl]);
-
-                        // Livewire redirect kullan
                         return redirect($designUrl);
+                    } catch (\Illuminate\Validation\ValidationException $e) {
+                        $errors = $e->errors();
+                        if ((isset($errors['images']) && str_contains(json_encode($errors['images']), 'max')) ||
+                            (isset($errors['image']) && str_contains(json_encode($errors['image']), 'max'))) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Dosya Boyutu Hatası!')
+                                ->body('Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.')
+                                ->danger()
+                                ->duration(10000)
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Validasyon Hatası!')
+                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                        return;
                     } catch (\Exception $e) {
-                        Log::error('Tasarıma başla hatası', ['error' => $e->getMessage()]);
-
                         \Filament\Notifications\Notification::make()
                             ->title('Hata!')
                             ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
                             ->danger()
                             ->send();
-
                         return;
                     }
                 })
+                ->requiresConfirmation()
+                ->modalHeading('Öneri Oluştur ve Tasarıma Başla')
+                ->modalDescription('Öneriyi oluşturup direkt tasarım aracına geçmek istediğinize emin misiniz?')
+                ->modalSubmitActionLabel('Evet, Tasarıma Başla'),
+
+            // İptal butonu
+            $this->getCancelFormAction()
+                ->label('İptal')
+                ->color('gray')
+                ->size('lg')
                 ->extraAttributes([
                     'class' => 'w-full justify-center'
                 ]),
-
-            $this->getCancelFormAction(),
         ];
     }
 

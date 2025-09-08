@@ -19,7 +19,7 @@ class ProjectDesignResource extends Resource
     protected static ?string $pluralModelLabel = 'Öneri Tasarımları';
     protected static ?string $modelLabel = 'Öneri Tasarımı';
     protected static ?string $navigationLabel = 'Öneri Tasarımları';
-    protected static ?string $navigationGroup = 'Obje Yönetimi';
+    protected static ?string $navigationGroup = 'Öneri Yönetimi';
 
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
     protected static bool $shouldRegisterNavigation = true; // Navigation'da gösterilsin

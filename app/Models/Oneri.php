@@ -94,15 +94,6 @@ class Oneri extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('images')
-            ->acceptsMimeTypes([
-                'image/jpeg',
-                'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp',
-                'image/svg+xml'
-            ])
             ->singleFile();
     }
 

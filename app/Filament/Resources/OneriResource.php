@@ -53,12 +53,10 @@ class OneriResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
                             ->label('Açıklama')
-                            ->required()
                             ->rows(3),
                         Forms\Components\TextInput::make('estimated_duration')
                             ->label('Tahmini İşlem Süresi (Gün)')
                             ->numeric()
-                            ->required()
                             ->minValue(1)
                             ->maxValue(365)
                             ->suffix('gün')
@@ -66,21 +64,25 @@ class OneriResource extends Resource
                         Forms\Components\TextInput::make('budget')
                             ->label('Bütçe')
                             ->numeric()
-                            ->required()
                             ->prefix('₺'),
-                        // Resim upload - Filament'in standart özellikleriyle
-                        SpatieMediaLibraryFileUpload::make('image')
+                        // Resim upload - Spatie Media Library ile
+                        SpatieMediaLibraryFileUpload::make('images')
                             ->label('Resim')
                             ->collection('images')
-                            ->disk('media')
                             ->image()
-                            ->maxSize(5120) // 5MB
-                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->required()
                             ->imagePreviewHeight('150')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
-                            ->helperText('Desteklenen formatlar: JPEG, JPG, PNG, WebP, Maksimum dosya boyutu: 5MB.')
+                            ->maxSize(10240) // 10MB limit
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('1920')
+                            ->imageResizeTargetHeight('1920')
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
+                            ->disk('public')
+                            ->directory('images')
+                            ->visibility('public')
+                            ->required()
+                            ->helperText('Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP. Resim otomatik olarak optimize edilecektir.')
                             ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
@@ -114,7 +116,6 @@ class OneriResource extends Resource
                                     return array_combine($districtNames, $districtNames);
                                 })
                                 ->searchable()
-                                ->required()
                                 ->reactive()
                                 ->columnSpanFull(),
 
@@ -133,7 +134,6 @@ class OneriResource extends Resource
                                 })
                                 ->reactive()
                                 ->searchable()
-                                ->required()
                                 ->placeholder(function (callable $get) {
                                     return $get('district') ? 'Mahalle seçin veya Diğer seçin' : 'Önce ilçe seçin';
                                 })
@@ -154,9 +154,6 @@ class OneriResource extends Resource
                                 ->label('Diğer Mahalle')
                                 ->placeholder('Mahallenizi yazın')
                                 ->visible(function (callable $get) {
-                                    return $get('neighborhood') === '__other';
-                                })
-                                ->required(function (callable $get) {
                                     return $get('neighborhood') === '__other';
                                 })
                                 ->afterStateHydrated(function ($state, callable $set, callable $get) {
@@ -224,8 +221,11 @@ class OneriResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
-                SpatieMediaLibraryImageColumn::make('image')->label('Resim')->collection('images')
-                    ->circular()->height(50)->width(50),
+                SpatieMediaLibraryImageColumn::make('images')->label('Resim')
+                    ->collection('images')
+                    ->circular()
+                    ->height(50)
+                    ->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
@@ -347,7 +347,7 @@ class OneriResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data) {
                         $query->withCount('likes');
-                        
+
                         if (!empty($data['min_likes'])) {
                             $query->having('likes_count', '>=', $data['min_likes']);
                         }
