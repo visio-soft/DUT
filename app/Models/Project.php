@@ -39,6 +39,7 @@ class Project extends Model implements HasMedia
         'street_cadde',
         'street_sokak',
         'design_completed',
+        'design_landscape',
     ];
 
     protected $casts = [
@@ -48,6 +49,7 @@ class Project extends Model implements HasMedia
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
         'design_completed' => 'boolean',
+        'design_landscape' => 'array',
     ];
 
     public function category(): BelongsTo

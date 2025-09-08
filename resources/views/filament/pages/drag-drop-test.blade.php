@@ -382,6 +382,59 @@
         .resize-ne { top: -6px; right: -6px; cursor: ne-resize; }
         .resize-nw { top: -6px; left: -6px; cursor: nw-resize; }
 
+        /* Döndürme handle'ı stilleri */
+        .rotate-handle {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 18px;
+            height: 18px;
+            background: #10b981;
+            border: 2px solid white;
+            border-radius: 50%;
+            cursor: grab;
+            opacity: 0;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 32; /* Resize handle'larından daha yüksek z-index */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            pointer-events: auto; /* Bu önemli - handle'ın tıklanabilir olması için */
+        }
+
+        .rotate-handle:before {
+            content: '⟲';
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .rotate-handle:hover {
+            background: #059669;
+            transform: translateX(-50%) scale(1.15);
+            cursor: grab;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        .rotate-handle:active {
+            cursor: grabbing;
+            background: #047857;
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        .landscape-element.selected .rotate-handle {
+            opacity: 1;
+        }
+
+        /* Döndürme sırasında özel cursor */
+        .rotating .rotate-handle {
+            cursor: grabbing !important;
+            background: #047857 !important;
+        }
+
         /* Silme butonu stilleri */
         .delete-handle {
             position: absolute;
@@ -597,7 +650,7 @@
         }
 
         // Array yönetimi fonksiyonları
-        function addElementToArray(elementId, objeId, x, y, width, height, aspectRatio = 1) {
+        function addElementToArray(elementId, objeId, x, y, width, height, aspectRatio = 1, rotation = 0) {
             const elementData = {
                 id: elementId,
                 obje_id: objeId,
@@ -606,6 +659,7 @@
                 width: width,
                 height: height,
                 aspectRatio: aspectRatio,
+                rotation: rotation,
                 scale: {
                     x: width / 120, // 120px varsayılan boyut
                     y: height / 120
@@ -676,6 +730,56 @@
         }
 
         function getDesignArray() {
+            console.log('📋 [DEBUG] getDesignArray çağrıldı');
+            console.log('📊 [DEBUG] Toplam element sayısı:', designElements.length);
+            
+            // Element analizi
+            const analysis = {
+                totalElements: designElements.length,
+                elementsWithRotation: 0,
+                elementsWithCustomAspectRatio: 0,
+                elementsWithScale: 0,
+                details: []
+            };
+
+            designElements.forEach((element, index) => {
+                if (element.rotation && element.rotation !== 0) {
+                    analysis.elementsWithRotation++;
+                }
+                if (element.aspectRatio && element.aspectRatio !== 1) {
+                    analysis.elementsWithCustomAspectRatio++;
+                }
+                if (element.scale && (element.scale.x !== 1 || element.scale.y !== 1)) {
+                    analysis.elementsWithScale++;
+                }
+
+                analysis.details.push({
+                    index: index,
+                    id: element.id,
+                    obje_id: element.obje_id,
+                    position: { x: element.x, y: element.y },
+                    size: { width: element.width, height: element.height },
+                    rotation: element.rotation || 0,
+                    aspectRatio: element.aspectRatio || 1,
+                    scale: element.scale || { x: 1, y: 1 }
+                });
+
+                console.log(`📦 [DEBUG] Element ${index + 1}:`, {
+                    id: element.id,
+                    obje_id: element.obje_id,
+                    position: `(${element.x}, ${element.y})`,
+                    size: `${element.width}x${element.height}`,
+                    rotation: `${element.rotation || 0}°`,
+                    aspectRatio: element.aspectRatio || 1,
+                    scale: element.scale || { x: 1, y: 1 }
+                });
+            });
+
+            console.log('📈 [DEBUG] Element Analizi:', analysis);
+            console.log('🔄 [DEBUG] Döndürülmüş elementler:', analysis.elementsWithRotation);
+            console.log('📐 [DEBUG] Özel aspect ratio elementler:', analysis.elementsWithCustomAspectRatio);
+            console.log('📏 [DEBUG] Ölçeklendirilmiş elementler:', analysis.elementsWithScale);
+
             return designElements;
         }
 
@@ -807,6 +911,81 @@
                 element.appendChild(handle);
             });
 
+            // Döndürme handle'ı ekle
+            const rotateHandle = document.createElement('div');
+            rotateHandle.className = 'rotate-handle';
+            rotateHandle.title = 'Elementi döndür (basılı tutarak sürükleyin)';
+            
+            // Mouse event'leri ekle
+            let isRotating = false;
+            let startAngle = 0;
+            let currentRotation = 0;
+            
+            rotateHandle.addEventListener('mousedown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                isRotating = true;
+                document.body.style.cursor = 'grabbing';
+                rotateHandle.style.cursor = 'grabbing';
+                
+                selectElement(element);
+                
+                const elementRect = element.getBoundingClientRect();
+                const centerX = elementRect.left + elementRect.width / 2;
+                const centerY = elementRect.top + elementRect.height / 2;
+                
+                currentRotation = parseFloat(element.getAttribute('data-rotation')) || 0;
+                
+                const startX = e.clientX - centerX;
+                const startY = e.clientY - centerY;
+                startAngle = Math.atan2(startY, startX) * (180 / Math.PI);
+                
+                function onMouseMove(e) {
+                    if (!isRotating) return;
+                    
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const currentX = e.clientX - centerX;
+                    const currentY = e.clientY - centerY;
+                    const currentAngle = Math.atan2(currentY, currentX) * (180 / Math.PI);
+                    
+                    const deltaAngle = currentAngle - startAngle;
+                    let newRotation = currentRotation + deltaAngle;
+                    
+                    // 15 derece snap özelliği (Shift tuşu ile)
+                    if (e.shiftKey) {
+                        newRotation = Math.round(newRotation / 15) * 15;
+                    }
+                    
+                    // Normalize rotation to 0-360 range
+                    newRotation = ((newRotation % 360) + 360) % 360;
+                    
+                    const x = parseFloat(element.getAttribute('data-x')) || 0;
+                    const y = parseFloat(element.getAttribute('data-y')) || 0;
+                    
+                    element.style.transform = `translate(${x}px, ${y}px) rotate(${newRotation}deg)`;
+                    element.setAttribute('data-rotation', newRotation);
+                    
+                    updateElementInArray(element.id, { rotation: newRotation });
+                }
+                
+                function onMouseUp() {
+                    isRotating = false;
+                    document.body.style.cursor = '';
+                    rotateHandle.style.cursor = 'grab';
+                    
+                    document.removeEventListener('mousemove', onMouseMove);
+                    document.removeEventListener('mouseup', onMouseUp);
+                }
+                
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+            
+            element.appendChild(rotateHandle);
+
             // Silme butonu ekle
             const deleteHandle = document.createElement('div');
             deleteHandle.className = 'delete-handle';
@@ -821,7 +1000,7 @@
             element.appendChild(content);
 
             // Array'e elemanı ekle (başlangıç boyutları ile)
-            addElementToArray(elementId, objeId, x, y, 120, 120);
+            addElementToArray(elementId, objeId, x, y, 120, 120, 1, 0);
 
             console.log('✅ [CREATE] Element başarıyla oluşturuldu:', elementId);
 
@@ -852,7 +1031,8 @@
                 return;
             }
 
-            element.style.transform = `translate(${x}px, ${y}px)`;
+            const rotation = parseFloat(element.getAttribute('data-rotation')) || 0;
+            element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
             // store coordinates so interact.js has the correct baseline on first drag
             element.setAttribute('data-x', x);
             element.setAttribute('data-y', y);
@@ -866,13 +1046,13 @@
             // real coordinates where the user dropped the item.
             const width = parseFloat(element.style.width) || 120;
             const height = parseFloat(element.style.height) || 120;
-            updateElementInArray(element.id, { x: x, y: y, width: width, height: height });
-            console.log('💾 [PLACE] Initial placement kaydedildi (array updated):', { id: element.id, x, y, width, height });
+            updateElementInArray(element.id, { x: x, y: y, width: width, height: height, rotation: rotation });
+            console.log('💾 [PLACE] Initial placement kaydedildi (array updated):', { id: element.id, x, y, width, height, rotation });
 
             // Dispatch a small event so external logic (e.g., autosave) can listen
             // and persist the placement to server/storage if desired.
             try {
-                const placementEvent = new CustomEvent('element:placed', { detail: { id: element.id, x, y, width, height } });
+                const placementEvent = new CustomEvent('element:placed', { detail: { id: element.id, x, y, width, height, rotation } });
                 document.dispatchEvent(placementEvent);
                 console.log('📣 [PLACE] event dispatched: element:placed');
             } catch (err) {
@@ -887,6 +1067,8 @@
 
             // Draggable
             interact(element).draggable({
+                // Döndürme handle'ını drag işlemlerinden hariç tut
+                ignoreFrom: '.rotate-handle',
                 listeners: {
                     start(event) {
                         console.log('🖱️ [DRAG START] Sürükleme başladı:', event.target.id);
@@ -905,7 +1087,8 @@
                         console.log('   📍 Yeni pozisyon:', { x, y });
                         console.log('   ➡️ Delta:', { dx: event.dx, dy: event.dy });
 
-                        target.style.transform = `translate(${x}px, ${y}px)`;
+                        const rotation = parseFloat(target.getAttribute('data-rotation')) || 0;
+                        target.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
                         target.setAttribute('data-x', x);
                         target.setAttribute('data-y', y);
 
@@ -921,6 +1104,8 @@
             // Resizable with custom aspect ratio preservation
             interact(element).resizable({
                 edges: { left: true, right: true, bottom: true, top: true },
+                // Döndürme handle'ını resize işlemlerinden hariç tut
+                ignoreFrom: '.rotate-handle',
                 listeners: {
                     start(event) {
                         console.log('📏 [RESIZE START] Boyutlandırma başladı:', event.target.id);
@@ -1001,7 +1186,8 @@
                             console.log('📍 [RESIZE] Pozisyon da değişti:', { oldX, oldY, x, y });
                         }
 
-                        target.style.transform = `translate(${x}px, ${y}px)`;
+                        const rotation = parseFloat(target.getAttribute('data-rotation')) || 0;
+                        target.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
                         target.setAttribute('data-x', x);
                         target.setAttribute('data-y', y);
 
@@ -1028,6 +1214,14 @@
                     })
                 ]
             });
+
+            // Döndürme handle'ı zaten createElement'te event listener'ları ile donatılmış
+            const rotateHandle = element.querySelector('.rotate-handle');
+            if (rotateHandle) {
+                console.log('🔄 [INTERACTIVE] Döndürme handle\'ı bulundu:', element.id);
+            } else {
+                console.warn('⚠️ [INTERACTIVE] Döndürme handle\'ı bulunamadı:', element.id);
+            }
 
             console.log('✅ [INTERACTIVE] Element başarıyla interaktif hale getirildi:', element.id);
         }
@@ -1171,7 +1365,70 @@
                 console.log('⌨️ [KEYBOARD] Escape tuşuna basıldı - selection temizleniyor');
                 deselectAll();
             }
+            if ((e.key === 'r' || e.key === 'R') && selectedElement) {
+                console.log('⌨️ [KEYBOARD] R tuşuna basıldı - element döndürülüyor:', selectedElement.id);
+                e.preventDefault();
+                rotateElement(selectedElement, e.shiftKey ? -15 : 15);
+            }
+            // Q tuşu ile ters yönde döndürme
+            if ((e.key === 'q' || e.key === 'Q') && selectedElement) {
+                console.log('⌨️ [KEYBOARD] Q tuşuna basıldı - element ters yönde döndürülüyor:', selectedElement.id);
+                e.preventDefault();
+                rotateElement(selectedElement, e.shiftKey ? 15 : -15);
+            }
+            // 0 tuşu ile döndürmeyi sıfırla
+            if (e.key === '0' && selectedElement) {
+                console.log('⌨️ [KEYBOARD] 0 tuşuna basıldı - element döndürme sıfırlanıyor:', selectedElement.id);
+                e.preventDefault();
+                resetElementRotation(selectedElement);
+            }
         });
+
+        // Element döndürme fonksiyonu (klavye kısayolu için)
+        function rotateElement(element, degrees) {
+            const currentRotation = parseFloat(element.getAttribute('data-rotation')) || 0;
+            let newRotation = currentRotation + degrees;
+            
+            // Normalize rotation to 0-360 range
+            newRotation = ((newRotation % 360) + 360) % 360;
+            
+            const x = parseFloat(element.getAttribute('data-x')) || 0;
+            const y = parseFloat(element.getAttribute('data-y')) || 0;
+            
+            element.style.transform = `translate(${x}px, ${y}px) rotate(${newRotation}deg)`;
+            element.setAttribute('data-rotation', newRotation);
+            
+            updateElementInArray(element.id, { rotation: newRotation });
+            
+            console.log('🔄 [ROTATE] Element döndürüldü:', {
+                element: element.id,
+                oldRotation: currentRotation,
+                newRotation: newRotation,
+                degrees: degrees
+            });
+
+            // Debug: Array durumunu kontrol et
+            console.log('📊 [ROTATE DEBUG] Updated array element:', 
+                designElements.find(el => el.id === element.id)
+            );
+
+            // Debug: Toplam döndürülmüş elementler
+            const rotatedElements = designElements.filter(el => el.rotation && el.rotation !== 0);
+            console.log('🎯 [ROTATE DEBUG] Total rotated elements:', rotatedElements.length);
+        }
+
+        // Element döndürme sıfırlama fonksiyonu
+        function resetElementRotation(element) {
+            const x = parseFloat(element.getAttribute('data-x')) || 0;
+            const y = parseFloat(element.getAttribute('data-y')) || 0;
+            
+            element.style.transform = `translate(${x}px, ${y}px) rotate(0deg)`;
+            element.setAttribute('data-rotation', 0);
+            
+            updateElementInArray(element.id, { rotation: 0 });
+            
+            console.log('🔄 [ROTATE RESET] Element döndürme sıfırlandı:', element.id);
+        }
 
         // URL'den proje resmini yükle ve arka plan olarak ayarla
         document.addEventListener('DOMContentLoaded', function() {
@@ -1432,7 +1689,7 @@
                     console.log(`   🏗️ [LOAD DESIGN] Element ${index + 1} yükleniyor:`, elementData);
 
                     // Konum bilgilerini doğru şekilde al (yeni format öncelikli)
-                    let x = 0, y = 0, width = 120, height = 120;
+                    let x = 0, y = 0, width = 120, height = 120, rotation = 0;
 
                     // Yeni format kontrol et (location ve scale)
                     if (elementData.location && typeof elementData.location === 'object') {
@@ -1455,6 +1712,10 @@
                         console.log(`   📍 [LOAD DESIGN] Eski format kullanılıyor: x=${x}, y=${y}, width=${width}, height=${height}`);
                     }
 
+                    // Döndürme açısını al
+                    rotation = elementData.rotation || 0;
+                    console.log(`   🔄 [LOAD DESIGN] Döndürme açısı: ${rotation}°`);
+
                     // If the saved element doesn't include image/name, try to find it from the global objeler list
                     const objeId = elementData.obje_id;
                     const paletteObje = findObjeById(objeId);
@@ -1476,6 +1737,10 @@
                     element.style.width = width + 'px';
                     element.style.height = height + 'px';
 
+                    // Döndürme açısını ayarla
+                    element.style.transform = `translate(${x}px, ${y}px) rotate(${rotation}deg)`;
+                    element.setAttribute('data-rotation', rotation);
+
                     // Kaydedilmiş aspect ratio varsa elementte sakla
                     if (elementData.aspectRatio) {
                         element.setAttribute('data-aspect-ratio', elementData.aspectRatio);
@@ -1483,7 +1748,7 @@
                     }
 
                     console.log(`   📏 [LOAD DESIGN] Element ${index + 1} boyutları ayarlandı:`,
-                        { width: width, height: height });
+                        { width: width, height: height, rotation: rotation });
 
                     boundary.appendChild(element);
                     makeElementInteractive(element);
@@ -1494,10 +1759,11 @@
                         y: y,
                         width: width,
                         height: height,
+                        rotation: rotation,
                         aspectRatio: elementData.aspectRatio || 1
                     });
 
-                    console.log(`   ✅ [LOAD DESIGN] Element ${index + 1} başarıyla yüklendi: x=${x}, y=${y}`);
+                    console.log(`   ✅ [LOAD DESIGN] Element ${index + 1} başarıyla yüklendi: x=${x}, y=${y}, rotation=${rotation}°`);
                 });
 
                 console.log('✅ [LOAD DESIGN] Mevcut tasarım başarıyla yüklendi:', designData.elements.length + ' element');

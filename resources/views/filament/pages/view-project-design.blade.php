@@ -366,8 +366,8 @@
                         @if(!empty($elements))
                             @foreach($elements as $el)
                                 @php
-                                    // Determine coordinates and size. Support both new {location, scale} and old {x,y,width,height}
-                                    $x = 0; $y = 0; $w = 120; $h = 120;
+                                    // Determine coordinates, size and rotation. Support both new {location, scale} and old {x,y,width,height}
+                                    $x = 0; $y = 0; $w = 120; $h = 120; $rotation = 0;
                                     if (isset($el['location']) && is_array($el['location'])) {
                                         $x = $el['location']['x'] ?? 0;
                                         $y = $el['location']['y'] ?? 0;
@@ -381,6 +381,9 @@
                                         $w = $el['width'] ?? $w;
                                         $h = $el['height'] ?? $h;
                                     }
+                                    
+                                    // Get rotation value from element data
+                                    $rotation = $el['rotation'] ?? 0;
 
                                     $img = $el['image_url'] ?? null;
                                     $name = $el['name'] ?? null;
@@ -412,7 +415,7 @@
                                 @endphp
 
                                 <!-- ELEMENT: landscape-element (placed object at saved coords) -->
-                                <div class="landscape-element" title="{{ $name }}" style="transform: translate({{ (int)$x }}px, {{ (int)$y }}px); width: {{ (int)$w }}px; height: {{ (int)$h }}px;">
+                                <div class="landscape-element" title="{{ $name }}" style="transform: translate({{ (int)$x }}px, {{ (int)$y }}px) rotate({{ (float)$rotation }}deg); width: {{ (int)$w }}px; height: {{ (int)$h }}px;">
                                     <div class="element-content">
                                         @if($name && $name !== 'null')
                                             <div class="element-label">
