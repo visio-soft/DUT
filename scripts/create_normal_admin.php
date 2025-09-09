@@ -13,6 +13,13 @@ try {
     $email = 'admin2@admin.com';
     $password = 'password';
     
+    // E-posta adresinin kullanılıp kullanılmadığını kontrol et
+    if (User::where('email', $email)->exists()) {
+        echo "Hata: {$email} adresi zaten kullanılıyor.\n";
+        echo "Farklı bir e-posta adresi deneyin.\n";
+        exit(1);
+    }
+    
     // Normal admin kullanıcısı oluştur
     $user = User::create([
         'name' => 'User',
