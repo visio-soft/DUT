@@ -25,14 +25,14 @@ class NormalAdminUserSeeder extends Seeder
         $allPermissions = $userPermissions->merge($oneriPermissions);
         $adminRole->syncPermissions($allPermissions);
         
-        // Normal admin kullanıcısı oluştur
-        $normalAdmin = User::where('email', 'user@admin.com')->first();
+        // Normal admin kullanıcısı oluştur (OMEGA BRANCH VERSION)
+        $normalAdmin = User::where('email', 'omega@admin.com')->first();
         
         if (!$normalAdmin) {
             $normalAdmin = new User();
-            $normalAdmin->name = 'User';
-            $normalAdmin->email = 'user@admin.com';
-            $normalAdmin->password = Hash::make('password');
+            $normalAdmin->name = 'Omega Admin';
+            $normalAdmin->email = 'omega@admin.com';
+            $normalAdmin->password = Hash::make('omega456');
             $normalAdmin->email_verified_at = now();
             $normalAdmin->save();
         }
@@ -40,9 +40,9 @@ class NormalAdminUserSeeder extends Seeder
         // Admin rolünü kullanıcıya ata
         $normalAdmin->assignRole('admin');
         
-        echo "Normal admin kullanıcısı oluşturuldu:\n";
-        echo "Email: user@admin.com\n";
-        echo "Password: password\n";
+        echo "Normal admin kullanıcısı oluşturuldu (OMEGA BRANCH):\n";
+        echo "Email: omega@admin.com\n";
+        echo "Password: omega456\n";
         echo "Bu kullanıcı User yönetimini ve Öneri yönetimini görebilir, Role yönetimini göremez.\n";
     }
 }
