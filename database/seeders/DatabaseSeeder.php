@@ -12,9 +12,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin kullanıcısı ekle
+        // Admin kullanıcıları ekle
         $this->call([
             AdminUserSeeder::class,
+            NormalAdminUserSeeder::class,
             DoğaObjelerSeeder::class,
             UlaşımObjelerSeeder::class,
             MimarlıkObjelerSeeder::class,
