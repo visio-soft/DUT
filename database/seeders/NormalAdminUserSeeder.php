@@ -26,23 +26,37 @@ class NormalAdminUserSeeder extends Seeder
         $adminRole->syncPermissions($allPermissions);
         
         // Normal admin kullanıcısı oluştur (OMEGA BRANCH VERSION)
-        $normalAdmin = User::where('email', 'omega@admin.com')->first();
+        $omegaAdmin = User::where('email', 'omega@admin.com')->first();
+        
+        if (!$omegaAdmin) {
+            $omegaAdmin = new User();
+            $omegaAdmin->name = 'Omega Admin';
+            $omegaAdmin->email = 'omega@admin.com';
+            $omegaAdmin->password = Hash::make('omega456');
+            $omegaAdmin->email_verified_at = now();
+            $omegaAdmin->save();
+        }
+        
+        // Admin rolünü kullanıcıya ata
+        $omegaAdmin->assignRole('admin');
+        
+        // Normal admin kullanıcısı oluştur (MAIN BRANCH VERSION)
+        $normalAdmin = User::where('email', 'normaladmin@dut.com')->first();
         
         if (!$normalAdmin) {
             $normalAdmin = new User();
-            $normalAdmin->name = 'Omega Admin';
-            $normalAdmin->email = 'omega@admin.com';
-            $normalAdmin->password = Hash::make('omega456');
+            $normalAdmin->name = 'Normal Admin Main';
+            $normalAdmin->email = 'normaladmin@dut.com';
+            $normalAdmin->password = Hash::make('main123');
             $normalAdmin->email_verified_at = now();
             $normalAdmin->save();
         }
         
         // Admin rolünü kullanıcıya ata
         $normalAdmin->assignRole('admin');
-        
-        echo "Normal admin kullanıcısı oluşturuldu (OMEGA BRANCH):\n";
-        echo "Email: omega@admin.com\n";
-        echo "Password: omega456\n";
-        echo "Bu kullanıcı User yönetimini ve Öneri yönetimini görebilir, Role yönetimini göremez.\n";
+        echo "Normal admin kullanıcıları oluşturuldu:\n";
+        echo "1. Omega Admin - Email: omega@admin.com, Password: omega456\n";
+        echo "2. Normal Admin Main - Email: normaladmin@dut.com, Password: main123\n";
+        echo "Bu kullanıcılar User yönetimini ve Öneri yönetimini görebilir, Role yönetimini göremez.\n";
     }
 }
