@@ -1861,7 +1861,7 @@
 
         // Countdown helpers
         function formatCountdown(diffMs) {
-            if (diffMs <= 0) return 'Süre doldu';
+            if (diffMs <= 0) return '{{ __("app.time_expired") }}';
 
             const totalSeconds = Math.floor(diffMs / 1000);
             const totalMinutes = Math.floor(totalSeconds / 60);

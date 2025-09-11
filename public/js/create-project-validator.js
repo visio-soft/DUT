@@ -14,7 +14,7 @@ window.checkProjectForm = function(buttonElement, wireInstance) {
     const checkFields = () => {
         let allFilled = true;
         
-        // Ana alanları kontrol et
+        // Main field check
         requiredFields.forEach(field => {
             try {
                 const value = wireInstance.get(field);
@@ -26,7 +26,7 @@ window.checkProjectForm = function(buttonElement, wireInstance) {
             }
         });
         
-        // Mahalle kontrolü
+        // Neighborhood check
         try {
             const neighborhood = wireInstance.get('data.neighborhood');
             const neighborhoodCustom = wireInstance.get('data.neighborhood_custom');
@@ -37,23 +37,23 @@ window.checkProjectForm = function(buttonElement, wireInstance) {
             allFilled = false;
         }
         
-        // Button'u disable/enable et
+        // Enable/disable button
         buttonElement.disabled = !allFilled;
         
         console.log('Form validation result:', allFilled);
     };
     
-    // İlk kontrolü yap
+    // Initial check
     checkFields();
     
-    // Livewire form değişikliklerini dinle
+    // Listen for Livewire form changes
     try {
         wireInstance.on('refresh', checkFields);
     } catch (e) {
         console.log('Livewire event listener error:', e);
     }
     
-    // Periyodik kontrol
+    // Periodic check
     setInterval(checkFields, 1000);
     
     console.log('Project form validator initialized');
