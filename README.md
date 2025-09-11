@@ -2,7 +2,7 @@
 
 Veritabanındaki gereksiz tabloları temizleyip (istenmeyenleri truncate/delete) seed çalıştırmak için küçük bir yardımcı eklendi.
 
-## Seeder (tek başına) nasıl çalıştırılır
+## Seeder nasıl çalıştırılır
 
 Aşağıdaki komutlar, Laravel projesinde tek bir seeder dosyasını çalıştırmak için kullanılabilir.
 
