@@ -13,11 +13,11 @@ class ImageFormatRule implements ValidationRule
 
     public function __construct(array $allowedFormats = [], string $context = 'genel')
     {
+        // Default to only jpeg/jpg/png per project requirement
         $this->allowedFormats = empty($allowedFormats) ? [
-            'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 
-            'image/webp', 'image/bmp', 'image/svg+xml'
+            'image/jpeg', 'image/jpg', 'image/png'
         ] : $allowedFormats;
-        
+
         $this->context = $context;
     }
 
@@ -29,7 +29,7 @@ class ImageFormatRule implements ValidationRule
 
         $mimeType = $value->getMimeType();
         $extension = strtolower($value->getClientOriginalExtension());
-        
+
         // MIME type kontrolü
         if (!in_array($mimeType, $this->allowedFormats)) {
             $allowedExtensions = $this->getAllowedExtensions();
@@ -37,29 +37,7 @@ class ImageFormatRule implements ValidationRule
             return;
         }
 
-        // Dosya boyutu kontrolü (5MB)
-        if ($value->getSize() > 5242880) { // 5MB in bytes
-            $fail('Resim dosyası 5MB\'dan büyük olamaz. Yüklenen dosya boyutu: ' . number_format($value->getSize() / 1024 / 1024, 2) . 'MB');
-            return;
-        }
-
-        // Minimum boyut kontrolü (200x200)
-        if ($mimeType !== 'image/svg+xml') {
-            $imageInfo = @getimagesize($value->getPathname());
-            if ($imageInfo !== false) {
-                [$width, $height] = $imageInfo;
-                
-                if ($width < 200 || $height < 200) {
-                    $fail("Resim en az 200x200 piksel boyutunda olmalıdır. Yüklenen resim: {$width}x{$height} piksel");
-                    return;
-                }
-
-                if ($width > 6000 || $height > 6000) {
-                    $fail("Resim en fazla 6000x6000 piksel boyutunda olabilir. Yüklenen resim: {$width}x{$height} piksel");
-                    return;
-                }
-            }
-        }
+    // Per requirement: no file size or dimension checks here — only MIME type enforcement.
     }
 
     private function getAllowedExtensions(): array
@@ -75,18 +53,6 @@ class ImageFormatRule implements ValidationRule
                     break;
                 case 'image/png':
                     $extensions[] = 'PNG';
-                    break;
-                case 'image/gif':
-                    $extensions[] = 'GIF';
-                    break;
-                case 'image/webp':
-                    $extensions[] = 'WebP';
-                    break;
-                case 'image/bmp':
-                    $extensions[] = 'BMP';
-                    break;
-                case 'image/svg+xml':
-                    $extensions[] = 'SVG';
                     break;
             }
         }

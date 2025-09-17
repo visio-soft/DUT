@@ -6,55 +6,55 @@ return [
     'log_in' => 'Log in',
     'register' => 'Register',
     'admin_panel' => 'Admin Panel',
-    
+
     // Home page
     'homepage_title' => 'DUT - Homepage',
     'design_platform' => 'DUT Design Platform',
     'hero_description' => 'Welcome to the modern design management platform powered by Laravel and Filament. Organize your projects and collaborate with your team.',
     'explore_features' => 'Explore Features',
-    
+
     // Features section
     'platform_features' => 'Platform Features',
     'everything_you_need' => 'Everything you need is here',
-    
+
     'project_management' => 'Project Management',
     'project_management_desc' => 'Organize your design projects, track progress, and easily share with your team.',
-    
+
     'media_gallery' => 'Media Gallery',
     'media_gallery_desc' => 'Securely store your design files and organize them into categories.',
-    
+
     'team_collaboration' => 'Team Collaboration',
     'team_collaboration_desc' => 'Work in real-time with your team members and receive feedback.',
-    
+
     // Stats section
     'completed_projects' => 'Completed Projects',
     'active_users' => 'Active Users',
     'customer_satisfaction' => 'Customer Satisfaction',
-    
+
     // CTA section
     'get_started' => 'Get Started',
     'get_started_desc' => 'Everything you need to manage your design projects is here. Start exploring the platform.',
     'explore_platform' => 'Explore Platform',
-    
+
     // Footer
     'built_with' => 'Built with Laravel & Filament',
     'privacy' => 'Privacy',
     'address_contact_privacy' => 'Address · Contact · Privacy',
-    
+
     // Theme toggle
     'dark_light' => 'Dark/Light',
-    
+
     // Page title
     'page_title' => 'DUT Page',
-    
+
     // Design viewer
     'design_viewer' => [
         'objects_in_design' => 'Objects in Design',
     ],
-    
+
     // Project gallery
     'time_expired' => 'Time expired',
-    
+
     // Filament Resource translations
     'suggestions' => 'Suggestions',
     'suggestion' => 'Suggestion',
@@ -86,7 +86,7 @@ return [
     'inspect_database' => 'Inspect in Database',
     'delete' => 'Delete',
     'edit' => 'Edit',
-    
+
     // User Management
     'users' => 'Users',
     'user' => 'User',
@@ -106,12 +106,12 @@ return [
     'confirm_delete_users' => 'Are you sure you want to delete the selected users? This action cannot be undone.',
     'yes_delete' => 'Yes, Delete',
     'email_copied' => 'Email copied',
-    
+
     // Project Management
     'projects' => 'Projects',
     'project' => 'Project',
     'project_name' => 'Project Name',
-    
+
     // Object Management
     'objects' => 'Objects',
     'object' => 'Object',
@@ -120,7 +120,7 @@ return [
     'object_name' => 'Object Name',
     'upload_image' => 'Upload Image',
     'update_date' => 'Update Date',
-    
+
     // Design Management
     'design_data' => 'Design Data',
     'design_data_desc' => 'View, edit and download design data for projects.',
@@ -133,25 +133,25 @@ return [
     'no_design_found' => 'No design found yet',
     'create_first_design' => 'Create the first project design and let it be displayed here!',
     'voting_time_expired' => 'Voting time expired',
-    
+
     // Suggestion Design Management
     'suggestion_designs' => 'Suggestion Designs',
     'suggestion_design' => 'Suggestion Design',
-    
+
     // Form validations and messages
     'validation_error' => 'Validation Error!',
     'error' => 'Error!',
-    'file_too_large' => 'The uploaded image file is too large. Please upload an image with a maximum size of 10MB.',
+    'file_too_large' => 'The uploaded image file is too large. Please upload a smaller file.',
     'check_required_fields' => 'Please check the required fields:',
     'suggestion_create_error' => 'An error occurred while creating the suggestion:',
-    'max_file_size' => 'Maximum file size: 10MB. Supported formats: JPEG, JPG, PNG, WebP. Image will be automatically optimized.',
+    'max_file_size' => 'Supported formats: JPEG, JPG, PNG. Image will be automatically optimized.',
     'recommended_format' => 'Recommended: An image in PNG format with cropped (transparent) background.',
     'strong_password' => 'Keep your password strong. It must be at least 8 characters.',
     'select_user_roles' => 'Select the roles the user will have',
     'estimated_completion' => 'Estimated completion time of the project (between 1-365 days)',
     'design_waiting' => 'Design waiting',
     'design_completed_tooltip' => 'Design completed',
-    
+
     // Filter and search
     'filter_by_role' => 'Filter by role',
     'start_date' => 'Start Date',
@@ -161,7 +161,7 @@ return [
     'more_than_amount' => 'More than ₺?',
     'estimated_duration_days' => 'Estimated Duration',
     'days' => 'days',
-    
+
     // Address fields
     'istanbul' => 'Istanbul',
     'select_district_first' => 'Select district first',
@@ -171,7 +171,7 @@ return [
     'street_name' => 'Street name',
     'avenue_name' => 'Avenue name',
     'detailed_address' => 'Detailed address description (e.g. building, door, floor, etc.)',
-    
+
     // Common actions
     'save' => 'Save',
     'cancel' => 'Cancel',
@@ -188,7 +188,7 @@ return [
     'paste' => 'Paste',
     'select_all' => 'Select All',
     'deselect_all' => 'Deselect All',
-    
+
     // Time and date
     'today' => 'Today',
     'yesterday' => 'Yesterday',
@@ -196,7 +196,7 @@ return [
     'this_week' => 'This Week',
     'this_month' => 'This Month',
     'this_year' => 'This Year',
-    
+
     // Status
     'active' => 'Active',
     'inactive' => 'Inactive',

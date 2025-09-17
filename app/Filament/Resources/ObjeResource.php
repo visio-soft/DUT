@@ -24,19 +24,19 @@ class ObjeResource extends Resource
     {
         return __('filament.navigation.group.object_management');
     }
-    
+
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
-    
+
     public static function getNavigationLabel(): string
     {
         return __('filament.resources.object.navigation_label');
     }
-    
+
     public static function getModelLabel(): string
     {
         return __('filament.resources.object.label');
     }
-    
+
     public static function getPluralModelLabel(): string
     {
         return __('filament.resources.object.plural_label');
@@ -68,19 +68,15 @@ class ObjeResource extends Resource
                             ->panelLayout('integrated')
                             ->maxFiles(1)
                             ->directory('objeler')
-                            ->maxSize(5120) // 5MB
-                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'])
+                            // Removed size and resize constraints per requirement: only restrict by file type (jpeg/jpg/png)
+                            ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
                             ->helperText(__('filament.helper_texts.recommended_format'))
                             ->hintColor('info')
                             ->preserveFilenames()
                             ->columnSpanFull()
                             ->visibility('public')
                             ->disk('public')
-                            ->rules(['required'])
-                            ->imageResizeMode('contain')
-                            ->imageCropAspectRatio(null)
-                            ->imageResizeTargetWidth('2000')
-                            ->imageResizeTargetHeight('2000'),
+                            ->rules(['required']),
                     ])
                     ->columnSpanFull(),
             ]);

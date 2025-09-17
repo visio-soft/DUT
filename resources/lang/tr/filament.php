@@ -4,13 +4,13 @@ return [
     'navigation' => [
         'group' => [
             'suggestion_management' => 'Öneri Yönetimi',
-            'project_management' => 'Proje Yönetimi', 
+            'project_management' => 'Proje Yönetimi',
             'user_management' => 'Kullanıcı Yönetimi',
             'object_management' => 'Obje Yönetimi',
             'flix_management' => 'Kullanıcı Yönetimi',
         ],
     ],
-    
+
     'resources' => [
         'suggestion' => [
             'label' => 'Öneri',
@@ -48,7 +48,7 @@ return [
                 'delete_design_confirmation' => 'Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
             ],
         ],
-        
+
         'user' => [
             'label' => 'Kullanıcı',
             'plural_label' => 'Kullanıcılar',
@@ -73,7 +73,7 @@ return [
                 'delete_users' => 'Kullanıcıları Sil',
             ],
         ],
-        
+
         'project' => [
             'label' => 'Proje',
             'plural_label' => 'Projeler',
@@ -82,7 +82,7 @@ return [
                 'name' => 'Proje Adı',
             ],
         ],
-        
+
         'object' => [
             'label' => 'Obje',
             'plural_label' => 'Objeler',
@@ -98,7 +98,7 @@ return [
                 'object_information' => 'Obje Bilgileri',
             ],
         ],
-        
+
         'project_design' => [
             'label' => 'Öneri Tasarımı',
             'plural_label' => 'Öneri Tasarımları',
@@ -149,7 +149,7 @@ return [
                 'list' => 'Tüm proje tasarımlarını görüntüleyin ve yönetin.',
             ],
         ],
-        
+
         'category' => [
             'label' => 'Kategori',
             'plural_label' => 'Kategoriler',
@@ -164,7 +164,7 @@ return [
                 'created_at' => 'Oluşturulma',
             ],
         ],
-        
+
         'object' => [
             'label' => 'Obje',
             'plural_label' => 'Objeler',
@@ -181,7 +181,7 @@ return [
             ],
         ],
     ],
-    
+
     'pages' => [
         'design_data_viewer' => [
             'title' => 'Tasarım Verileri',
@@ -215,7 +215,7 @@ return [
             'delete_design' => 'Tasarımı Sil',
             'view_details' => 'Detayları Gör',
             'first_place' => 'BİRİNCİ',
-            'second_place' => 'İKİNCİ', 
+            'second_place' => 'İKİNCİ',
             'third_place' => 'ÜÇÜNCÜ',
             'budget_label' => 'Bütçe',
             'estimated_budget' => 'Tahmini Bütçe',
@@ -223,17 +223,17 @@ return [
             'new_badge' => 'Yeni',
         ],
     ],
-    
+
     'notifications' => [
         'validation_error' => 'Validasyon Hatası!',
         'error' => 'Hata!',
-        'file_too_large' => 'Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.',
+    'file_too_large' => 'Yüklediğiniz resim dosyası çok büyük. Lütfen daha küçük bir dosya yükleyiniz.',
         'check_required_fields' => 'Lütfen gerekli alanları kontrol edin:',
         'suggestion_create_error' => 'Öneri oluşturulurken bir hata oluştu:',
         'email_copied' => 'E-posta kopyalandı',
         'copied' => 'Kopyalandı!',
     ],
-    
+
     'filters' => [
         'category' => 'Kategori',
         'role' => 'Rol',
@@ -242,7 +242,7 @@ return [
         'end_date' => 'Bitiş Tarihi',
         'budget' => 'Bütçe',
     ],
-    
+
     'placeholders' => [
         'select_project_category' => 'Proje kategorisi seçin',
         'select_neighborhood' => 'Mahalle seçin veya Diğer seçin',
@@ -263,7 +263,7 @@ return [
         'filter_by_role' => 'Rolü filtrele',
         'dash' => '-',
     ],
-    
+
         'buttons' => [
         'save' => 'Kaydet',
         'create' => 'Oluştur',
@@ -582,9 +582,9 @@ return [
         'suspending' => 'Askıya Alınıyor',
         'hibernating' => 'Hazırda Bekletiliyor',
     ],
-    
+
     'helper_texts' => [
-        'max_file_size' => 'Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP. Resim otomatik olarak optimize edilecektir.',
+    'max_file_size' => 'Desteklenen formatlar: JPEG, JPG, PNG. Resim otomatik olarak optimize edilecektir.',
         'recommended_format' => 'Önerilen: Arka planı kırpılmış (şeffaf) PNG formatında bir resim.',
         'strong_password' => 'Şifrenizi güçlü tutun. Minimum 8 karakter olmalıdır.',
         'select_user_roles_help' => 'Kullanıcının sahip olacağı rolleri seçin',
@@ -596,7 +596,7 @@ return [
         'common_password' => 'Tüm kullanıcılar için aynı şifre kullanılacak',
         'assign_roles_all' => 'Tüm kullanıcılara atanacak roller',
     ],
-    
+
     'placeholders' => [
         'select_project_category' => 'Proje kategorisi seçin',
         'select_neighborhood' => 'Mahalle seçin veya Diğer seçin',
@@ -618,13 +618,13 @@ return [
         'dash' => '-',
         'email_domain_example' => 'örnek: basaksehir.bel.tr',
     ],
-    
+
     'confirmations' => [
         'delete_user' => 'Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
         'delete_users' => 'Seçilen kullanıcıları silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
         'yes_delete' => 'Evet, Sil',
     ],
-    
+
     'status' => [
         'completed' => 'Tamamlandı',
         'in_progress' => 'Devam Ediyor',
@@ -632,19 +632,19 @@ return [
         'design_completed' => 'Tasarım tamamlandı',
         'voting_time_expired' => 'Oylama süresi doldu',
     ],
-    
+
     'stats' => [
         'total_design' => 'Toplam Tasarım',
         'objects' => 'Objeler',
         'data_size' => 'Veri Boyutu',
         'last_update' => 'Son Güncelleme',
     ],
-    
+
     'empty_states' => [
         'no_design_found' => 'Henüz tasarım bulunmuyor',
         'create_first_design' => 'İlk proje tasarımını oluşturun ve burada görüntülensin!',
     ],
-    
+
     'sections' => [
         'user_information' => 'Kullanıcı Bilgileri',
         'roles_permissions' => 'Roller ve Yetkiler',
@@ -656,7 +656,7 @@ return [
         'bulk_user_settings' => 'Toplu Kullanıcı Ayarları',
         'bulk_user_settings_description' => 'Toplu kullanıcı oluşturma ayarlarını yapın',
     ],
-    
+
     'actions' => [
         'delete_confirm' => 'Evet, Sil',
     ],

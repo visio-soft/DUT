@@ -22,35 +22,40 @@ class MediaService
                 throw new Exception('Geçersiz dosya');
             }
 
-            // MIME type kontrolü
+            // Dosya boyutu kontrolü
+            $fileSize = $file->getSize();
+            if ($fileSize === null || $fileSize === false) {
+                throw new Exception('Dosya boyutu alınamadı');
+            }
+
+            // Dosya varlığını kontrol et
+            $filePath = $file->getRealPath();
+            if (!$filePath || !file_exists($filePath)) {
+                throw new Exception('Dosya okunabilir değil');
+            }
+
+            // Dosya boyutu için dosya sisteminden de kontrol
+            if ($fileSize <= 0) {
+                $fileSize = filesize($filePath);
+                if ($fileSize === false || $fileSize <= 0) {
+                    throw new Exception('Geçersiz dosya boyutu');
+                }
+            }
+
+            $maxFileSize = config('media-library.max_file_size');
+            if ($maxFileSize && $fileSize > $maxFileSize) {
+                $maxSizeMB = round($maxFileSize / (1024 * 1024), 2);
+                $fileSizeMB = round($fileSize / (1024 * 1024), 2);
+                throw new Exception("Dosya boyutu çok büyük ({$fileSizeMB}MB). Maksimum {$maxSizeMB}MB olmalıdır.");
+            }
+
+            // MIME type kontrolü - only allow jpeg, jpg and png (single condition requested)
             $allowedMimes = [
-                'image/jpeg', 'image/jpg', 'image/png', 
-                'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'
+                'image/jpeg', 'image/jpg', 'image/png',
             ];
-            
+
             if (!in_array($file->getMimeType(), $allowedMimes)) {
                 throw new Exception('Desteklenmeyen dosya formatı: ' . $file->getMimeType());
-            }
-
-            // Dosya boyutu kontrolü (5MB)
-            if ($file->getSize() > 5242880) {
-                throw new Exception('Dosya boyutu çok büyük: ' . number_format($file->getSize() / 1024 / 1024, 2) . 'MB');
-            }
-
-            // SVG olmayan dosyalar için boyut kontrolü
-            if ($file->getMimeType() !== 'image/svg+xml') {
-                $imageInfo = @getimagesize($file->getPathname());
-                if ($imageInfo !== false) {
-                    [$width, $height] = $imageInfo;
-                    
-                    if ($width < 200 || $height < 200) {
-                        throw new Exception("Resim en az 200x200 piksel olmalıdır. Mevcut: {$width}x{$height}");
-                    }
-                    
-                    if ($width > 6000 || $height > 6000) {
-                        throw new Exception("Resim en fazla 6000x6000 piksel olabilir. Mevcut: {$width}x{$height}");
-                    }
-                }
             }
 
             // Mevcut dosyaları temizle (singleFile collection için)
@@ -71,7 +76,7 @@ class MediaService
                 'file_size' => $file->getSize(),
                 'mime_type' => $file->getMimeType()
             ]);
-            
+
             throw $e;
         }
     }
@@ -85,7 +90,7 @@ class MediaService
         try {
             /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media|null $media */
             $media = $model->getFirstMedia($collection);
-            
+
             if (!$media) {
                 return null;
             }
@@ -102,7 +107,7 @@ class MediaService
             }
 
             return $conversion ? $media->getUrl($conversion) : $media->getUrl();
-            
+
         } catch (Exception $e) {
             Log::error('Media URL error: ' . $e->getMessage(), [
                 'model' => get_class($model),
@@ -110,7 +115,7 @@ class MediaService
                 'collection' => $collection,
                 'conversion' => $conversion
             ]);
-            
+
             return null;
         }
     }
@@ -124,13 +129,13 @@ class MediaService
         try {
             /** @var \Spatie\MediaLibrary\MediaCollections\Models\Media|null $media */
             $media = $model->getFirstMedia($collection);
-            
+
             if (!$media) {
                 return false;
             }
 
             return $media->disk()->exists($media->getPath());
-            
+
         } catch (Exception $e) {
             Log::error('Media validation error: ' . $e->getMessage());
             return false;

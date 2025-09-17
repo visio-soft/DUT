@@ -78,11 +78,7 @@ class Project extends Model implements HasMedia
             ->acceptsMimeTypes([
                 'image/jpeg',
                 'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp',
-                'image/svg+xml'
+                'image/png'
             ])
             ->singleFile();
     }

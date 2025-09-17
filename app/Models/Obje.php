@@ -61,11 +61,7 @@ class Obje extends Model implements HasMedia
             ->acceptsMimeTypes([
                 'image/jpeg',
                 'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp',
-                'image/svg+xml'
+                'image/png'
             ])
             ->singleFile()
             ->useDisk('public');
@@ -78,7 +74,7 @@ class Obje extends Model implements HasMedia
 
         /*
         // Sadece raster (bitmap) resimler için conversion yapılır
-        $this->addMediaConversion('preview')
+            ->addMediaConversion('preview')
             ->width(400)
             ->height(400)
             ->nonQueued()
@@ -89,10 +85,7 @@ class Obje extends Model implements HasMedia
             ->performOnlyOnMimeTypes([
                 'image/jpeg',
                 'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp'
+                'image/png'
             ]);
 
         $this->addMediaConversion('thumb')
@@ -106,10 +99,7 @@ class Obje extends Model implements HasMedia
             ->performOnlyOnMimeTypes([
                 'image/jpeg',
                 'image/jpg',
-                'image/png',
-                'image/gif',
-                'image/webp',
-                'image/bmp'
+                'image/png'
             ]);
         */
     }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Log;
 use Spatie\Image\Exceptions\CouldNotLoadImage;
+use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 
 class HandleMediaErrors
 {
@@ -30,14 +31,34 @@ class HandleMediaErrors
                 return response()->json([
                     'message' => 'Yüklediğiniz dosya çok büyük.',
                     'errors' => [
-                        'images' => ['Dosya boyutu 10MB\'dan küçük olmalıdır. Lütfen daha küçük bir resim seçin.'],
-                        'image' => ['Dosya boyutu 10MB\'dan küçük olmalıdır. Lütfen daha küçük bir resim seçin.']
+                        'images' => ['Dosya çok büyük. Lütfen daha küçük bir dosya seçin.'],
+                        'image' => ['Dosya çok büyük. Lütfen daha küçük bir dosya seçin.']
                     ]
                 ], 422);
             }
 
             return back()->withErrors([
-                'image' => 'Dosya boyutu çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.'
+                'image' => 'Dosya boyutu çok büyük. Lütfen daha küçük bir dosya yükleyiniz.'
+            ])->withInput();
+        } catch (FileIsTooBig $e) {
+            Log::error('Spatie Media Library file too big: ' . $e->getMessage(), [
+                'url' => $request->url(),
+                'user_id' => Auth::id() ?? 'guest',
+                'ip' => $request->ip()
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Yüklediğiniz dosya çok büyük.',
+                    'errors' => [
+                        'images' => ['Dosya çok büyük. Lütfen daha küçük bir dosya seçin.'],
+                        'image' => ['Dosya çok büyük. Lütfen daha küçük bir dosya seçin.']
+                    ]
+                ], 422);
+            }
+
+            return back()->withErrors([
+                'image' => 'Dosya boyutu çok büyük. Lütfen daha küçük bir dosya yükleyiniz.'
             ])->withInput();
         } catch (CouldNotLoadImage $e) {
             Log::error('Media processing error: ' . $e->getMessage(), [
@@ -55,8 +76,8 @@ class HandleMediaErrors
                 return response()->json([
                     'message' => 'Resim işlenirken bir hata oluştu. Lütfen farklı bir resim deneyin.',
                     'errors' => [
-                        'images' => ['Resim dosyası işlenemedi. Desteklenen formatlardan birini kullanın: JPEG, PNG, GIF, WebP.'],
-                        'image' => ['Resim dosyası işlenemedi. Desteklenen formatlardan birini kullanın: JPEG, PNG, GIF, WebP.']
+                        'images' => ['Resim dosyası işlenemedi. Desteklenen formatlar: JPEG, JPG, PNG.'],
+                        'image' => ['Resim dosyası işlenemedi. Desteklenen formatlar: JPEG, JPG, PNG.']
                     ]
                 ], 422);
             }

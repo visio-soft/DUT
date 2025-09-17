@@ -4,7 +4,7 @@ return [
     'navigation' => [
         'group' => [
             'suggestion_management' => 'Suggestion Management',
-            'project_management' => 'Project Management', 
+            'project_management' => 'Project Management',
             'user_management' => 'User Management',
             'object_management' => 'Object Management',
             'flix_management' => 'User Management',
@@ -52,7 +52,7 @@ return [
             'new_badge' => 'New',
         ],
     ],
-    
+
     'resources' => [
         'suggestion' => [
             'label' => 'Suggestion',
@@ -90,7 +90,7 @@ return [
                 'delete_design_confirmation' => 'Are you sure you want to delete this project\'s design? This action cannot be undone.',
             ],
         ],
-        
+
         'user' => [
             'label' => 'User',
             'plural_label' => 'Users',
@@ -115,7 +115,7 @@ return [
                 'delete_users' => 'Delete Users',
             ],
         ],
-        
+
         'project' => [
             'label' => 'Project',
             'plural_label' => 'Projects',
@@ -124,7 +124,7 @@ return [
                 'name' => 'Project Name',
             ],
         ],
-        
+
         'category' => [
             'label' => 'Category',
             'plural_label' => 'Categories',
@@ -139,7 +139,7 @@ return [
                 'created_at' => 'Created At',
             ],
         ],
-        
+
         'object' => [
             'label' => 'Object',
             'plural_label' => 'Objects',
@@ -155,7 +155,7 @@ return [
                 'object_information' => 'Object Information',
             ],
         ],
-        
+
         'project_design' => [
             'label' => 'Suggestion Design',
             'plural_label' => 'Suggestion Designs',
@@ -207,17 +207,17 @@ return [
             ],
         ],
     ],
-    
+
     'notifications' => [
         'validation_error' => 'Validation Error!',
         'error' => 'Error!',
-        'file_too_large' => 'The uploaded image file is too large. Please upload an image with a maximum size of 10MB.',
+    'file_too_large' => 'The uploaded image file is too large. Please upload a smaller file.',
         'check_required_fields' => 'Please check the required fields:',
         'suggestion_create_error' => 'An error occurred while creating the suggestion:',
         'email_copied' => 'Email copied',
         'copied' => 'Copied!',
     ],
-    
+
     'filters' => [
         'category' => 'Category',
         'role' => 'Role',
@@ -226,7 +226,7 @@ return [
         'end_date' => 'End Date',
         'budget' => 'Budget',
     ],
-    
+
     'placeholders' => [
         'select_project_category' => 'Select project category',
         'select_neighborhood' => 'Select neighborhood or choose Other',
@@ -248,9 +248,9 @@ return [
         'dash' => '-',
         'email_domain_example' => 'example: basaksehir.bel.tr',
     ],
-    
+
     'helper_texts' => [
-        'max_file_size' => 'Maximum file size: 10MB. Supported formats: JPEG, JPG, PNG, WebP. Image will be automatically optimized.',
+    'max_file_size' => 'Supported formats: JPEG, JPG, PNG. Image will be automatically optimized.',
         'recommended_format' => 'Recommended: An image in PNG format with cropped (transparent) background.',
         'strong_password' => 'Keep your password strong. It must be at least 8 characters.',
         'select_user_roles_help' => 'Select the roles the user will have',
@@ -262,7 +262,7 @@ return [
         'common_password' => 'Same password will be used for all users',
         'assign_roles_all' => 'Roles to be assigned to all users',
     ],
-    
+
     'buttons' => [
         'save' => 'Save',
         'create' => 'Create',
@@ -581,13 +581,13 @@ return [
         'suspending' => 'Suspending',
         'hibernating' => 'Hibernating',
     ],
-    
+
     'confirmations' => [
         'delete_user' => 'Are you sure you want to delete this user? This action cannot be undone.',
         'delete_users' => 'Are you sure you want to delete the selected users? This action cannot be undone.',
         'yes_delete' => 'Yes, Delete',
     ],
-    
+
     'status' => [
         'completed' => 'Completed',
         'in_progress' => 'In Progress',
@@ -595,19 +595,19 @@ return [
         'design_completed' => 'Design completed',
         'voting_time_expired' => 'Voting time expired',
     ],
-    
+
     'stats' => [
         'total_design' => 'Total Design',
         'objects' => 'Objects',
         'data_size' => 'Data Size',
         'last_update' => 'Last Update',
     ],
-    
+
     'empty_states' => [
         'no_design_found' => 'No design found yet',
         'create_first_design' => 'Create the first project design and let it be displayed here!',
     ],
-    
+
     'sections' => [
         'user_information' => 'User Information',
         'roles_permissions' => 'Roles and Permissions',
@@ -619,7 +619,7 @@ return [
         'bulk_user_settings' => 'Bulk User Settings',
         'bulk_user_settings_description' => 'Configure bulk user creation settings',
     ],
-    
+
     'actions' => [
         'delete_confirm' => 'Yes, Delete',
     ],
