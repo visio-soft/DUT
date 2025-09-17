@@ -14,7 +14,7 @@ class ListProjectDesigns extends ListRecords
     {
         return [
             Actions\Action::make('new_design')
-                ->label('Yeni Tasarım Oluştur')
+                ->label(__('filament.resources.project_design.actions.new_design'))
                 ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->url(url('/admin/oneris'))
@@ -24,11 +24,11 @@ class ListProjectDesigns extends ListRecords
 
     public function getTitle(): string
     {
-        return 'Proje Tasarımları';
+        return __('filament.resources.project_design.page_titles.list');
     }
 
     public function getSubheading(): ?string
     {
-        return 'Tüm proje tasarımlarını görüntüleyin ve yönetin.';
+        return __('filament.resources.project_design.descriptions.list');
     }
 }

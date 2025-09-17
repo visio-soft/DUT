@@ -18,36 +18,48 @@ class CategoryResource extends Resource
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Proje Yönetimi';
-    protected static ?string $pluralModelLabel = 'Projeler';
-    protected static ?string $modelLabel = 'Proje';
+    
+    public static function getNavigationGroup(): string
+    {
+        return __('filament.navigation.group.project_management');
+    }
+    
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.project.plural_label');
+    }
+    
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.project.label');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->label('Proje Adı')
+                Forms\Components\TextInput::make('name')->label(__('filament.resources.project.fields.name'))
                     ->required()
                     ->maxLength(255)
-                    ->placeholder('Proje adını girin'),
+                    ->placeholder(__('filament.placeholders.enter_project_name')),
 
-                Forms\Components\DateTimePicker::make('start_datetime')->label('Başlangıç Tarihi ve Saati')
+                Forms\Components\DateTimePicker::make('start_datetime')->label(__('filament.resources.category.fields.start_datetime'))
                     ->required()
                     ->seconds(false)
                     ->format('Y-m-d H:i')
                     ->displayFormat('d.m.Y H:i')
                     ->timezone('Europe/Istanbul')
-                    ->placeholder('01.01.2025 08:00')
-                    ->helperText('Bu projedeki işlerin başlangıç tarihi ve saati (24 saat formatında, örn: 22:00)'),
+                    ->placeholder(__('filament.placeholders.start_datetime_placeholder'))
+                    ->helperText(__('filament.helper_texts.start_datetime_help')),
 
-                Forms\Components\DateTimePicker::make('end_datetime')->label('Bitiş Tarihi ve Saati')
+                Forms\Components\DateTimePicker::make('end_datetime')->label(__('filament.resources.category.fields.end_datetime'))
                     ->required()
                     ->seconds(false)
                     ->format('Y-m-d H:i')
                     ->displayFormat('d.m.Y H:i')
                     ->timezone('Europe/Istanbul')
-                    ->placeholder('31.12.2025 22:00')
-                    ->helperText('Bu projedeki işlerin bitiş tarihi ve saati (24 saat formatında, örn: 22:00)'),
+                    ->placeholder(__('filament.placeholders.end_datetime_placeholder'))
+                    ->helperText(__('filament.helper_texts.end_datetime_help')),
             ]);
     }
 
@@ -56,29 +68,29 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Proje Adı')
+                    ->label(__('filament.resources.category.fields.name'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('start_datetime')
-                    ->label('Başlangıç')
+                    ->label(__('filament.resources.category.fields.start_date'))
                     ->dateTime('d.m.Y H:i')
-                    ->placeholder('-')
+                    ->placeholder(__('filament.placeholders.dash'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('end_datetime')
-                    ->label('Bitiş')
+                    ->label(__('filament.resources.category.fields.end_date'))
                     ->dateTime('d.m.Y H:i')
-                    ->placeholder('-')
+                    ->placeholder(__('filament.placeholders.dash'))
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('oneriler_count')
-                    ->label('Öneri Sayısı')
+                    ->label(__('filament.resources.category.fields.suggestions_count'))
                     ->counts('oneriler')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Oluşturulma')
+                    ->label(__('filament.resources.category.fields.created_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),

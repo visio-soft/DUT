@@ -8,10 +8,10 @@
                     </div>
                     <div class="grid flex-1 gap-1">
                         <h3 class="text-base font-semibold leading-6 text-gray-950 dark:text-white">
-                            Tasarım Verileri
+                            {{ __('filament.pages.design_data_viewer.title') }}
                         </h3>
                         <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Projelerin tasarım verilerini görüntüleyin, düzenleyin ve indirin.
+                            {{ __('filament.pages.design_data_viewer.description') }}
                         </p>
                     </div>
                 </div>
@@ -32,7 +32,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-600 dark:text-gray-300">
-                            Toplam Tasarım
+                            {{ __('filament.stats.total_design') }}
                         </p>
                         <p class="text-2xl font-bold text-gray-900 dark:text-white">
                             {{ \App\Models\Project::whereNotNull('design_landscape')->count() }}

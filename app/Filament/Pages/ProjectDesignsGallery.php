@@ -13,9 +13,21 @@ class ProjectDesignsGallery extends Page
 
     protected static string $view = 'filament.pages.project-designs-gallery';
 
-    protected static ?string $title = 'Öneri Tasarımları Galerisi';
-    protected static ?string $navigationLabel = 'Tasarım Galerisi';
-    protected static ?string $navigationGroup = 'Öneri Yönetimi';
+    public function getTitle(): string
+    {
+        return __('filament.pages.design_gallery.title');
+    }
+    
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.pages.design_gallery.navigation_label');
+    }
+    
+    public static function getNavigationGroup(): string
+    {
+        return __('filament.navigation.group.suggestion_management');
+    }
+    
     protected static ?int $navigationSort = 10;
 
     public $projectDesigns = [];

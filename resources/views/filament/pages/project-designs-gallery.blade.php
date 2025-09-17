@@ -4,26 +4,26 @@
         <section class="filter-section">
             <div class="filter-header">
                 <x-heroicon-o-funnel class="w-5 h-5" />
-                <h3>Filtrele & Sırala</h3>
+                <h3>{{ __('filament.pages.design_gallery.filter_sort') }}</h3>
             </div>
 
             <div class="filter-controls">
                 <!-- Sort Options -->
                 <div class="control-group">
-                    <label>Sırala:</label>
+                    <label>{{ __('filament.pages.design_gallery.sort_by') }}</label>
                     <select wire:model.live="sortBy">
-                        <option value="newest">En Yeni</option>
-                        <option value="popular">En Popüler</option>
-                        <option value="price_high">Fiyat (Yüksek-Düşük)</option>
-                        <option value="price_low">Fiyat (Düşük-Yüksek)</option>
+                        <option value="newest">{{ __('filament.pages.design_gallery.newest') }}</option>
+                        <option value="popular">{{ __('filament.pages.design_gallery.popular') }}</option>
+                        <option value="price_high">{{ __('filament.pages.design_gallery.price_high_low') }}</option>
+                        <option value="price_low">{{ __('filament.pages.design_gallery.price_low_high') }}</option>
                     </select>
                 </div>
 
                 <!-- Price Filter -->
                 <div class="control-group">
-                    <label>Fiyat:</label>
+                    <label>{{ __('filament.pages.design_gallery.price') }}</label>
                     <select wire:model.live="priceFilter">
-                        <option value="">Tümü</option>
+                        <option value="">{{ __('filament.pages.design_gallery.all') }}</option>
                         <option value="0-10000">₺0 - ₺10,000</option>
                         <option value="10000-25000">₺10,000 - ₺25,000</option>
                         <option value="25000-50000">₺25,000 - ₺50,000</option>
@@ -37,7 +37,7 @@
         <section class="gallery-section">
             <div class="section-header">
                 <x-heroicon-o-rectangle-stack class="w-6 h-6" />
-                <h2>Proje Tasarımları</h2>
+                <h2>{{ __('filament.pages.design_gallery.project_designs') }}</h2>
             </div>
 
             <!-- Project Categories -->
@@ -49,7 +49,7 @@
                             <x-heroicon-o-folder class="category-icon" />
                             <div class="category-text">
                                 <h3>{{ $group['category_name'] }} </h3>
-                                <span class="category-count">{{ count($group['designs']) }} Öneri</span>
+                                <span class="category-count">{{ count($group['designs']) }} {{ __('filament.pages.design_gallery.suggestions_count') }}</span>
 
                                 @php
                                     // Ensure timezone consistency - Parse times in Istanbul timezone
@@ -81,7 +81,7 @@
                                     data-start="{{ $startIso }}"
                                     data-end="{{ $endIso }}"
                                     aria-live="polite"
-                                    title="Kalan süre"
+                                    title="{{ __('filament.pages.design_gallery.remaining_time') }}"
                                 >
                                 {{-- JS will populate this --}}
                                 </span>
@@ -132,10 +132,10 @@
                             <div class="competition-results-header">
                                 <x-heroicon-o-trophy class="w-8 h-8" />
                                 <div class="header-text">
-                                    <h4>Yarışma Sonuçları</h4>
-                                    <p>En çok beğeni alan ilk 3 tasarım</p>
+                                    <h4>{{ __('filament.pages.design_gallery.competition_results') }}</h4>
+                                    <p>{{ __('filament.pages.design_gallery.most_liked_designs') }}</p>
                                 </div>
-                                <span class="results-badge">Kazananlar Açıklandı</span>
+                                <span class="results-badge">{{ __('filament.pages.design_gallery.winners_announced') }}</span>
                             </div>
 
                             <!-- Top 3 Winners Grid -->
@@ -151,7 +151,7 @@
                                         <!-- Rank Badge -->
                                         <div class="rank-badge rank-2">
                                             <span class="rank-number">2</span>
-                                            <span class="rank-text">İKİNCİ</span>
+                                            <span class="rank-text">{{ __('filament.pages.design_gallery.second_place') }}</span>
                                         </div>
 
                                         <!-- Design Image -->
@@ -182,13 +182,13 @@
 
                                             <div class="project-address">
                                                 <x-heroicon-o-map-pin class="info-icon" />
-                                                <span>{{ $design['project_address'] ?: 'Adres bilgisi mevcut değil' }}</span>
+                                                <span>{{ $design['project_address'] ?: __('filament.pages.design_gallery.no_address') }}</span>
                                             </div>
 
                                             <div class="project-budget">
                                                 <x-heroicon-o-currency-dollar class="info-icon" />
                                                 <div class="budget-info">
-                                                    <span class="budget-label">Bütçe</span>
+                                                    <span class="budget-label">{{ __('filament.pages.design_gallery.budget_label') }}</span>
                                                     <span class="budget-amount">₺{{ number_format($design['project_budget'], 0) }}</span>
                                                 </div>
                                             </div>
@@ -196,7 +196,7 @@
                                             <div class="design-action">
                                                 <a href="{{ url('/admin/project-designs/' . $design['id']) }}" class="btn btn-view">
                                                     <x-heroicon-o-eye class="btn-icon" />
-                                                    Detayları Gör
+                                                    {{ __('filament.pages.design_gallery.view_details') }}
                                                 </a>
                                             </div>
                                         </div>
@@ -214,7 +214,7 @@
                                         <!-- Rank Badge -->
                                         <div class="rank-badge rank-1">
                                             <span class="rank-number">1</span>
-                                            <span class="rank-text">BİRİNCİ</span>
+                                            <span class="rank-text">{{ __('filament.pages.design_gallery.first_place') }}</span>
                                         </div>
 
                                         <!-- Design Image -->
@@ -245,13 +245,13 @@
 
                                             <div class="project-address">
                                                 <x-heroicon-o-map-pin class="info-icon" />
-                                                <span>{{ $design['project_address'] ?: 'Adres bilgisi mevcut değil' }}</span>
+                                                <span>{{ $design['project_address'] ?: __('filament.pages.design_gallery.no_address') }}</span>
                                             </div>
 
                                             <div class="project-budget">
                                                 <x-heroicon-o-currency-dollar class="info-icon" />
                                                 <div class="budget-info">
-                                                    <span class="budget-label">Bütçe</span>
+                                                    <span class="budget-label">{{ __('filament.pages.design_gallery.budget_label') }}</span>
                                                     <span class="budget-amount">₺{{ number_format($design['project_budget'], 0) }}</span>
                                                 </div>
                                             </div>
@@ -259,7 +259,7 @@
                                             <div class="design-action">
                                                 <a href="{{ url('/admin/project-designs/' . $design['id']) }}" class="btn btn-view">
                                                     <x-heroicon-o-eye class="btn-icon" />
-                                                    Detayları Gör
+                                                    {{ __('filament.pages.design_gallery.view_details') }}
                                                 </a>
                                             </div>
                                         </div>
@@ -277,7 +277,7 @@
                                         <!-- Rank Badge -->
                                         <div class="rank-badge rank-3">
                                             <span class="rank-number">3</span>
-                                            <span class="rank-text">ÜÇÜNCÜ</span>
+                                            <span class="rank-text">{{ __('filament.pages.design_gallery.third_place') }}</span>
                                         </div>
 
                                         <!-- Design Image -->
@@ -308,13 +308,13 @@
 
                                             <div class="project-address">
                                                 <x-heroicon-o-map-pin class="info-icon" />
-                                                <span>{{ $design['project_address'] ?: 'Adres bilgisi mevcut değil' }}</span>
+                                                <span>{{ $design['project_address'] ?: __('filament.pages.design_gallery.no_address') }}</span>
                                             </div>
 
                                             <div class="project-budget">
                                                 <x-heroicon-o-currency-dollar class="info-icon" />
                                                 <div class="budget-info">
-                                                    <span class="budget-label">Bütçe</span>
+                                                    <span class="budget-label">{{ __('filament.pages.design_gallery.budget_label') }}</span>
                                                     <span class="budget-amount">₺{{ number_format($design['project_budget'], 0) }}</span>
                                                 </div>
                                             </div>
@@ -322,7 +322,7 @@
                                             <div class="design-action">
                                                 <a href="{{ url('/admin/project-designs/' . $design['id']) }}" class="btn btn-view">
                                                     <x-heroicon-o-eye class="btn-icon" />
-                                                    Detayları Gör
+                                                    {{ __('filament.pages.design_gallery.view_details') }}
                                                 </a>
                                             </div>
                                         </div>
@@ -334,7 +334,7 @@
                             @if($otherDesigns->count() > 0)
                                 <div class="other-designs-section">
                                     <div class="dropdown-toggle" onclick="toggleOtherDesigns({{ $index }})">
-                                        <span class="toggle-text">Diğer Öneriler ({{ $otherDesigns->count() }})</span>
+                                        <span class="toggle-text">{{ __('filament.pages.design_gallery.other_suggestions') }} ({{ $otherDesigns->count() }})</span>
                                         <x-heroicon-o-ellipsis-horizontal class="w-6 h-6 toggle-icon other-designs-toggle-{{ $index }}" />
                                     </div>
 
@@ -373,7 +373,7 @@
                         <!-- Standard Projects Grid -->
                         <div style="margin-top: 1rem;" class="projects-grid category-content-{{ $index }}">
                             @foreach($group['designs'] as $design)
-                                <div class="project-card" data-project="{{ $design['id'] }}" ondblclick="viewDesign({{ $design['id'] }})" title="Çift tıklayarak detayları görüntüle">
+                                <div class="project-card" data-project="{{ $design['id'] }}" ondblclick="viewDesign({{ $design['id'] }})" title="{{ __('filament.pages.design_gallery.double_click_to_view') }}">
                                     <!-- Project Image -->
                                     <div class="project-image">
                                         @if($design['project_image'])
@@ -394,14 +394,14 @@
                                             @if($design['likes_count'] >= 3)
                                                 <span class="badge badge-trending">
                                                     <x-heroicon-s-fire class="badge-icon" />
-                                                    Trend
+                                                    {{ __('filament.pages.design_gallery.trend_badge') }}
                                                 </span>
                                             @endif
 
                                             @if(isset($design['is_latest']) && $design['is_latest'])
                                                 <span class="badge badge-new">
                                                     <x-heroicon-s-sparkles class="badge-icon" />
-                                                    Yeni
+                                                    {{ __('filament.pages.design_gallery.new_badge') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -412,14 +412,14 @@
                                         <!-- Address -->
                                         <div class="project-address">
                                             <x-heroicon-o-map-pin class="info-icon" />
-                                            <span>{{ $design['project_address'] ?: 'Adres bilgisi mevcut değil' }}</span>
+                                            <span>{{ $design['project_address'] ?: __('filament.pages.design_gallery.no_address') }}</span>
                                         </div>
 
                                         <!-- Budget -->
                                         <div class="project-budget">
                                             <x-heroicon-o-currency-dollar class="info-icon" />
                                             <div class="budget-info">
-                                                <span class="budget-label">Tahmini Bütçe</span>
+                                                <span class="budget-label">{{ __('filament.pages.design_gallery.estimated_budget') }}</span>
                                                 <span class="budget-amount">₺{{ number_format($design['project_budget'], 0) }}</span>
                                             </div>
                                         </div>
@@ -428,7 +428,7 @@
                                         <div class="project-actions">
                                             <a href="{{ url('/admin/project-designs/' . $design['id']) }}" class="btn btn-primary">
                                                 <x-heroicon-o-eye class="btn-icon" />
-                                                Detayları Gör
+                                                {{ __('filament.pages.design_gallery.view_details') }}
                                             </a>
 
                                             @if(!$votingEnded)
@@ -444,7 +444,7 @@
                                                     <span>{{ $design['likes_count'] }}</span>
                                                 </button>
                                             @else
-                                                <div class="btn btn-like disabled" title="Oylama süresi doldu">
+                                                <div class="btn btn-like disabled" title="{{ __('filament.pages.design_gallery.voting_time_expired') }}">
                                                     <x-heroicon-s-heart class="btn-icon" />
                                                     <span>{{ $design['likes_count'] }}</span>
                                                 </div>
@@ -461,8 +461,8 @@
                     <div class="empty-icon">
                         <x-heroicon-o-paint-brush class="w-12 h-12" />
                     </div>
-                    <h3>Henüz tasarım bulunmuyor</h3>
-                    <p>İlk proje tasarımını oluşturun ve burada görüntülensin!</p>
+                    <h3>{{ __('filament.pages.design_gallery.no_design_found') }}</h3>
+                    <p>{{ __('filament.pages.design_gallery.create_first_design') }}</p>
                 </div>
             @endforelse
         </section>
@@ -1968,7 +1968,7 @@
                         const diffEnd = item.end.getTime() - now.getTime();
 
                         if (diffEnd <= 0) {
-                            item.el.textContent = 'Oylama süresi doldu';
+                            item.el.textContent = '{{ __('filament.pages.design_gallery.voting_time_expired') }}';
                             item.el.style.color = 'rgb(239 68 68)'; // red-500
 
                             // Debug log for expired voting

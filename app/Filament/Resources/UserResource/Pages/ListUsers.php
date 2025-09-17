@@ -18,46 +18,46 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Yeni Kullanıcı')
+                ->label(__('app.new_user'))
                 ->icon('heroicon-o-plus'),
                 
             Actions\Action::make('create_multiple')
-                ->label('Toplu Kullanıcı Oluştur')
+                ->label(__('app.bulk_create_users'))
                 ->icon('heroicon-o-users')
                 ->color('success')
                 ->form([
-                    Forms\Components\Section::make('Toplu Kullanıcı Ayarları')
-                        ->description('Toplu kullanıcı oluşturma ayarlarını yapın')
+                    Forms\Components\Section::make(__('filament.sections.bulk_user_settings'))
+                        ->description(__('filament.sections.bulk_user_settings_description'))
                         ->schema([
                             Forms\Components\TextInput::make('user_count')
-                                ->label('Kullanıcı Sayısı')
+                                ->label(__('filament.resources.user.fields.user_count'))
                                 ->required()
                                 ->numeric()
                                 ->minValue(1)
                                 ->maxValue(100)
                                 ->default(1)
-                                ->helperText('1-100 arası kullanıcı oluşturabilirsiniz'),
+                                ->helperText(__('filament.helper_texts.user_count_range')),
                                 
                             Forms\Components\TextInput::make('email_domain')
-                                ->label('E-posta Domain')
+                                ->label(__('filament.resources.user.fields.email_domain'))
                                 ->required()
                                 ->default('basaksehir.bel.tr')
-                                ->placeholder('örnek: basaksehir.bel.tr')
-                                ->helperText('E-posta formatı: X@[domain] şeklinde olacak'),
+                                ->placeholder(__('filament.placeholders.email_domain_example'))
+                                ->helperText(__('filament.helper_texts.email_format')),
                                 
                             Forms\Components\TextInput::make('password')
-                                ->label('Ortak Şifre')
+                                ->label(__('filament.resources.user.fields.common_password'))
                                 ->password()
                                 ->required()
-                                ->helperText('Tüm kullanıcılar için aynı şifre kullanılacak'),
+                                ->helperText(__('filament.helper_texts.common_password')),
                                 
                             Forms\Components\Select::make('roles')
-                                ->label('Roller')
+                                ->label(__('filament.resources.user.fields.roles'))
                                 ->multiple()
                                 ->options(Role::all()->pluck('name', 'id'))
                                 ->preload()
                                 ->searchable()
-                                ->helperText('Tüm kullanıcılara atanacak roller'),
+                                ->helperText(__('filament.helper_texts.assign_roles_all')),
                         ])
                         ->columns(2),
                 ])

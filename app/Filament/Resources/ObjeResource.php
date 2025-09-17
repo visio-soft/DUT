@@ -20,35 +20,48 @@ class ObjeResource extends Resource
 {
     protected static ?string $model = Obje::class;
 
-    protected static ?string $navigationGroup = 'Obje Yönetimi';
+    public static function getNavigationGroup(): string
+    {
+        return __('filament.navigation.group.object_management');
+    }
+    
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
     
-    protected static ?string $navigationLabel = 'Objeler';
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.object.navigation_label');
+    }
     
-    protected static ?string $modelLabel = 'Obje';
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.object.label');
+    }
     
-    protected static ?string $pluralModelLabel = 'Objeler';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.object.plural_label');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Obje Bilgileri')
-                    ->description('Objenizin bilgilerini girin')
+                Forms\Components\Section::make(__('filament.sections.object_information'))
+                    ->description(__('app.object_information_description'))
                     ->schema([
                         Forms\Components\Select::make('category')
-                            ->label('Kategori')
+                            ->label(__('filament.resources.object.fields.category'))
                             ->required()
                             ->options(\App\Models\Obje::CATEGORIES)
-                            ->placeholder('Obje kategorisini girin'),
+                            ->placeholder(__('filament.placeholders.enter_object_category')),
                         Forms\Components\TextInput::make('name')
-                            ->label('İsim')
+                            ->label(__('filament.resources.object.fields.name'))
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Obje ismini girin'),
+                            ->placeholder(__('filament.placeholders.enter_object_name')),
                         SpatieMediaLibraryFileUpload::make('images')
                             ->required()
-                            ->label('Resim Yükle')
+                            ->label(__('filament.resources.object.fields.images'))
                             ->collection('images')
                             ->image()
                             ->imagePreviewHeight('200')
@@ -57,7 +70,7 @@ class ObjeResource extends Resource
                             ->directory('objeler')
                             ->maxSize(5120) // 5MB
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/svg+xml'])
-                            ->helperText('Önerilen: Arka planı kırpılmış (şeffaf) PNG formatında bir resim.')
+                            ->helperText(__('filament.helper_texts.recommended_format'))
                             ->hintColor('info')
                             ->preserveFilenames()
                             ->columnSpanFull()
@@ -81,7 +94,7 @@ class ObjeResource extends Resource
                     ->label('ID')
                     ->sortable(),
                 SpatieMediaLibraryImageColumn::make('images')
-                    ->label('Resim')
+                    ->label(__('filament.resources.object.fields.images'))
                     ->collection('images')
                     ->height(50)
                     ->width(50)
@@ -89,19 +102,19 @@ class ObjeResource extends Resource
                     ->disk('public')
                     ->visibility('public'),
                 Tables\Columns\TextColumn::make('name')
-                    ->label('İsim')
+                    ->label(__('filament.resources.object.fields.name'))
                     ->searchable(['name'])
                     ->sortable('name'),
                 Tables\Columns\TextColumn::make('category')
-                    ->label('Kategori')
+                    ->label(__('filament.resources.object.fields.category'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Oluşturma Tarihi')
+                    ->label(__('filament.resources.object.fields.created_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Güncelleme Tarihi')
+                    ->label(__('filament.resources.object.fields.updated_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -109,9 +122,9 @@ class ObjeResource extends Resource
             ->defaultSort('name')
             ->filters([
                 Tables\Filters\SelectFilter::make('category')
-                    ->label('Kategori')
+                    ->label(__('filament.resources.object.fields.category'))
                     ->options(\App\Models\Obje::CATEGORIES)
-                    ->placeholder('Tüm kategoriler')
+                    ->placeholder(__('app.all_categories'))
                     ->multiple()
                     ->searchable(),
             ])

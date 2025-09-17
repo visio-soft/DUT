@@ -226,7 +226,7 @@
             <div class="landscape-studio">
                 <!-- LAYER: element-palette (left column — object list / palette) -->
                 <div class="element-palette">
-                    <h3 style="margin:0 0 10px 0; font-weight:600; color:var(--fd-text);">Tasarımdaki Objeler</h3>
+                    <h3 style="margin:0 0 10px 0; font-weight:600; color:var(--fd-text);">{{ __('app.design_viewer.objects_in_design') }}</h3>
 
                     @php
                         // Prepare elements list from saved design
