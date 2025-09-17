@@ -3,8 +3,10 @@
 return [
     'navigation' => [
         'group' => [
-            'suggestion_management' => 'Öneri Yönetimi',
             'project_management' => 'Proje Yönetimi',
+            'suggestion_management' => 'Öneri Yönetimi',
+            'roles_user_management' => 'Roller & Kullanıcı Yönetimi',
+            // Legacy groups (keeping for compatibility)
             'user_management' => 'Kullanıcı Yönetimi',
             'object_management' => 'Obje Yönetimi',
             'flix_management' => 'Kullanıcı Yönetimi',
@@ -12,6 +14,61 @@ return [
     ],
 
     'resources' => [
+        'obje' => [
+            'label' => 'Obje',
+            'plural_label' => 'Objeler',
+            'navigation_label' => 'Objeler',
+            'fields' => [
+                'name' => 'Obje Adı',
+                'description' => 'Açıklama',
+                'category_id' => 'Kategori',
+                'images' => 'Resimler',
+                'color' => 'Renk',
+                'material' => 'Malzeme',
+                'dimensions' => 'Boyutlar',
+                'price' => 'Fiyat',
+                'stock' => 'Stok',
+                'created_at' => 'Oluşturulma Tarihi',
+                'updated_at' => 'Güncellenme Tarihi',
+            ],
+            'actions' => [
+                'create' => 'Obje Oluştur',
+                'create_another' => 'Oluştur ve Yeni Ekle',
+                'view' => 'Görüntüle',
+                'edit' => 'Düzenle',
+                'delete' => 'Sil',
+                'save' => 'Kaydet',
+                'cancel' => 'İptal',
+            ],
+            'pages' => [
+                'create_title' => 'Yeni Obje Oluştur',
+                'edit_title' => 'Obje Düzenle',
+                'view_title' => 'Obje Görüntüle',
+                'list_title' => 'Objeler',
+            ],
+            'notifications' => [
+                'created' => 'Obje başarıyla oluşturuldu!',
+                'updated' => 'Obje başarıyla güncellendi!',
+                'deleted' => 'Obje başarıyla silindi!',
+            ],
+            'filters' => [
+                'category' => 'Kategoriye Göre Filtrele',
+                'price_range' => 'Fiyat Aralığı',
+                'stock_status' => 'Stok Durumu',
+                'in_stock' => 'Stokta Var',
+                'out_of_stock' => 'Stokta Yok',
+            ],
+            'table' => [
+                'columns' => [
+                    'name' => 'Obje Adı',
+                    'category' => 'Kategori',
+                    'price' => 'Fiyat',
+                    'stock' => 'Stok',
+                    'images_count' => 'Resim Sayısı',
+                ],
+            ],
+        ],
+
         'suggestion' => [
             'label' => 'Öneri',
             'plural_label' => 'Öneriler',
@@ -74,28 +131,31 @@ return [
             ],
         ],
 
+        'category' => [
+            'label' => 'Kategori',
+            'plural_label' => 'Kategoriler',
+            'navigation_label' => 'Kategoriler',
+            'fields' => [
+                'name' => 'Kategori Adı',
+                'start_datetime' => 'Başlangıç Tarihi',
+                'end_datetime' => 'Bitiş Tarihi',
+                'start_date' => 'Başlangıç',
+                'end_date' => 'Bitiş',
+                'suggestions_count' => 'Öneri Sayısı',
+                'created_at' => 'Oluşturma Tarihi',
+            ],
+            'actions' => [
+                'edit' => 'Düzenle',
+                'delete' => 'Sil',
+            ],
+        ],
+
         'project' => [
             'label' => 'Proje',
             'plural_label' => 'Projeler',
             'navigation_label' => 'Projeler',
             'fields' => [
                 'name' => 'Proje Adı',
-            ],
-        ],
-
-        'object' => [
-            'label' => 'Obje',
-            'plural_label' => 'Objeler',
-            'navigation_label' => 'Objeler',
-            'fields' => [
-                'category' => 'Kategori',
-                'name' => 'İsim',
-                'images' => 'Resim Yükle',
-                'created_at' => 'Oluşturma Tarihi',
-                'updated_at' => 'Güncelleme Tarihi',
-            ],
-            'sections' => [
-                'object_information' => 'Obje Bilgileri',
             ],
         ],
 
@@ -150,21 +210,6 @@ return [
             ],
         ],
 
-        'category' => [
-            'label' => 'Kategori',
-            'plural_label' => 'Kategoriler',
-            'navigation_label' => 'Kategoriler',
-            'fields' => [
-                'name' => 'Proje Adı',
-                'start_datetime' => 'Başlangıç Tarihi ve Saati',
-                'end_datetime' => 'Bitiş Tarihi ve Saati',
-                'start_date' => 'Başlangıç',
-                'end_date' => 'Bitiş',
-                'suggestions_count' => 'Öneri Sayısı',
-                'created_at' => 'Oluşturulma',
-            ],
-        ],
-
         'object' => [
             'label' => 'Obje',
             'plural_label' => 'Objeler',
@@ -183,6 +228,10 @@ return [
     ],
 
     'pages' => [
+        'landscape_designer' => [
+            'title' => 'Peyzaj Tasarımcısı',
+            'navigation_label' => 'Peyzaj Tasarımcısı',
+        ],
         'design_data_viewer' => [
             'title' => 'Tasarım Verileri',
             'description' => 'Projelerin tasarım verilerini görüntüleyin, düzenleyin ve indirin.',
@@ -222,16 +271,32 @@ return [
             'trend_badge' => 'Trend',
             'new_badge' => 'Yeni',
         ],
+        'create_new_object' => 'Yeni Obje Oluştur',
     ],
 
     'notifications' => [
         'validation_error' => 'Validasyon Hatası!',
         'error' => 'Hata!',
-    'file_too_large' => 'Yüklediğiniz resim dosyası çok büyük. Lütfen daha küçük bir dosya yükleyiniz.',
+        'file_too_large' => 'Dosya Boyutu Hatası!',
+        'file_too_large_desc' => 'Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.',
         'check_required_fields' => 'Lütfen gerekli alanları kontrol edin:',
         'suggestion_create_error' => 'Öneri oluşturulurken bir hata oluştu:',
         'email_copied' => 'E-posta kopyalandı',
         'copied' => 'Kopyalandı!',
+        'design_deleted' => 'Tasarım silindi',
+        'suggestion_created' => 'Öneri Oluşturuldu!',
+        'suggestion_created_desc' => 'Öneri başarıyla oluşturuldu. Tasarımı daha sonra ekleyebilirsiniz.',
+        'image_required' => 'Resim Gerekli!',
+        'image_required_desc' => 'Tasarım eklemek için önce bir resim yüklemelisiniz.',
+        'user_created' => 'Kullanıcı oluşturuldu',
+        'user_created_desc' => 'Yeni kullanıcı başarıyla oluşturuldu.',
+        'object_created' => 'Obje başarıyla oluşturuldu!',
+    ],
+
+    'modals' => [
+        'create_and_design' => 'Öneri Oluştur ve Tasarıma Başla',
+        'create_and_design_desc' => 'Öneriyi oluşturup direkt tasarım aracına geçmek istediğinize emin misiniz?',
+        'yes_start_design' => 'Evet, Tasarıma Başla',
     ],
 
     'filters' => [
@@ -241,6 +306,8 @@ return [
         'start_date' => 'Başlangıç Tarihi',
         'end_date' => 'Bitiş Tarihi',
         'budget' => 'Bütçe',
+        'min_likes' => 'Minimum Beğeni',
+        'max_likes' => 'Maksimum Beğeni',
     ],
 
     'placeholders' => [
@@ -262,6 +329,12 @@ return [
         'end_datetime_placeholder' => '31.12.2025 22:00',
         'filter_by_role' => 'Rolü filtrele',
         'dash' => '-',
+        'email_domain_example' => 'örnek: basaksehir.bel.tr',
+        'istanbul' => 'İstanbul',
+        'other' => 'Diğer..',
+        'search_address' => 'Adres Ara',
+        'search_address_placeholder' => 'Bir adres yazın ve haritada bulun...',
+        'google_maps_picker' => 'Harita - Tıklayarak Konum Seçin',
     ],
 
         'buttons' => [
@@ -595,28 +668,6 @@ return [
         'email_format' => 'E-posta formatı: X@[domain] şeklinde olacak',
         'common_password' => 'Tüm kullanıcılar için aynı şifre kullanılacak',
         'assign_roles_all' => 'Tüm kullanıcılara atanacak roller',
-    ],
-
-    'placeholders' => [
-        'select_project_category' => 'Proje kategorisi seçin',
-        'select_neighborhood' => 'Mahalle seçin veya Diğer seçin',
-        'select_district_first' => 'Önce ilçe seçin',
-        'write_neighborhood' => 'Mahallenizi yazın',
-        'street_name' => 'Sokak adı',
-        'avenue_name' => 'Cadde adı',
-        'detailed_address' => 'Detaylı adres tarifi (ör. bina, kapı, kat, vb.)',
-        'enter_user_name' => 'Kullanıcı adını girin',
-        'enter_email' => 'E-posta adresini girin',
-        'enter_password' => 'Şifre girin (minimum 8 karakter)',
-        'select_user_roles' => 'Kullanıcı rollerini seçin',
-        'enter_project_name' => 'Proje adını girin',
-        'enter_object_category' => 'Obje kategorisini girin',
-        'enter_object_name' => 'Obje ismini girin',
-        'start_datetime_placeholder' => '01.01.2025 08:00',
-        'end_datetime_placeholder' => '31.12.2025 22:00',
-        'filter_by_role' => 'Rolü filtrele',
-        'dash' => '-',
-        'email_domain_example' => 'örnek: basaksehir.bel.tr',
     ],
 
     'confirmations' => [

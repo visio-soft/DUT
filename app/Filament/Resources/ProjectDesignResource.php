@@ -16,28 +16,29 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class ProjectDesignResource extends Resource
 {
     protected static ?string $model = ProjectDesign::class;
-    
+
     public static function getPluralModelLabel(): string
     {
         return __('filament.resources.project_design.plural_label');
     }
-    
+
     public static function getModelLabel(): string
     {
         return __('filament.resources.project_design.label');
     }
-    
+
     public static function getNavigationLabel(): string
     {
         return __('filament.resources.project_design.navigation_label');
     }
-    
+
     public static function getNavigationGroup(): string
     {
         return __('filament.navigation.group.suggestion_management');
     }
 
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
+    protected static ?int $navigationSort = 2;
     protected static bool $shouldRegisterNavigation = true; // Navigation'da gösterilsin
 
     public static function form(Form $form): Form

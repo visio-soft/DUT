@@ -17,18 +17,18 @@ class ProjectDesignsGallery extends Page
     {
         return __('filament.pages.design_gallery.title');
     }
-    
+
     public static function getNavigationLabel(): string
     {
         return __('filament.pages.design_gallery.navigation_label');
     }
-    
-    public static function getNavigationGroup(): string
+
+    public static function getNavigationGroup(): ?string
     {
-        return __('filament.navigation.group.suggestion_management');
+        return null; // No group - this will appear at the top
     }
-    
-    protected static ?int $navigationSort = 10;
+
+    protected static ?int $navigationSort = -100; // Ensure it appears first
 
     public $projectDesigns = [];
     public $sortBy = 'newest';

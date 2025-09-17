@@ -18,28 +18,28 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    
+
     public static function getNavigationGroup(): string
     {
-        return __('filament.navigation.group.flix_management');
+        return __('filament.navigation.group.roles_user_management');
     }
-    
+
     public static function getPluralModelLabel(): string
     {
         return __('filament.resources.user.plural_label');
     }
-    
+
     public static function getModelLabel(): string
     {
         return __('filament.resources.user.label');
     }
-    
+
     public static function getNavigationLabel(): string
     {
         return __('filament.resources.user.navigation_label');
     }
-    
-    protected static ?int $navigationSort = 10;
+
+    protected static ?int $navigationSort = 100; // En alta koymak için yüksek değer
 
     public static function form(Form $form): Form
     {
@@ -53,7 +53,7 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder(__('filament.placeholders.enter_user_name')),
-                            
+
                         Forms\Components\TextInput::make('email')
                             ->label(__('filament.resources.user.fields.email'))
                             ->email()
@@ -61,7 +61,7 @@ class UserResource extends Resource
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->placeholder(__('filament.placeholders.enter_email')),
-                            
+
                         Forms\Components\TextInput::make('password')
                             ->label(__('filament.resources.user.fields.password'))
                             ->password()
@@ -73,7 +73,7 @@ class UserResource extends Resource
                             ->helperText(__('filament.helper_texts.strong_password')),
                     ])
                     ->columns(2),
-                    
+
                 Forms\Components\Section::make(__('filament.sections.roles_permissions'))
                     ->description(__('filament.sections.roles_permissions_description'))
                     ->schema([
@@ -99,13 +99,13 @@ class UserResource extends Resource
                     ->label('ID')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('filament.resources.user.fields.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
-                    
+
                 Tables\Columns\TextColumn::make('email')
                     ->label(__('filament.resources.user.fields.email'))
                     ->searchable()
@@ -113,20 +113,20 @@ class UserResource extends Resource
                     ->copyable()
                     ->copyMessage(__('filament.notifications.email_copied'))
                     ->copyMessageDuration(1500),
-                    
+
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label(__('filament.resources.user.fields.roles'))
                     ->badge()
                     ->color('primary')
                     ->separator(',')
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('filament.resources.user.fields.created_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label(__('filament.resources.user.fields.updated_at'))
                     ->dateTime('d.m.Y H:i')
@@ -139,7 +139,7 @@ class UserResource extends Resource
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->placeholder(__('filament.placeholders.filter_by_role')),
-                    
+
                 Tables\Filters\Filter::make('created_from')
                     ->label(__('filament.filters.creation_date'))
                     ->form([
@@ -162,7 +162,7 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                
+
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation()
                     ->modalHeading(__('filament.resources.user.actions.delete_user'))

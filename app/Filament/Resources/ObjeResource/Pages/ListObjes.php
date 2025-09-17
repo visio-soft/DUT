@@ -13,7 +13,11 @@ class ListObjes extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()
+                ->label(__('app.create_new') . ' ' . __('filament.resources.object.label'))
+                ->icon('heroicon-o-plus')
+                ->color('primary')
+                ->size('lg'),
         ];
     }
 }

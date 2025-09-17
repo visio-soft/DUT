@@ -86,6 +86,7 @@ return [
     'inspect_database' => 'Veritabanında İncele',
     'delete' => 'Sil',
     'edit' => 'Düzenle',
+    'actions' => 'İşlemler',
 
     // User Management
     'users' => 'Kullanıcılar',
@@ -127,8 +128,6 @@ return [
     'total_design' => 'Toplam Tasarım',
     'design_json_data' => 'JSON Verisi',
     'data_size' => 'Veri Boyutu',
-    'objects' => 'Objeler',
-    'last_update' => 'Son Güncelleme',
     'copied' => 'Kopyalandı!',
     'no_design_found' => 'Henüz tasarım bulunmuyor',
     'create_first_design' => 'İlk proje tasarımını oluşturun ve burada görüntülensin!',
@@ -155,7 +154,6 @@ return [
     // Filter and search
     'filter_by_role' => 'Rolü filtrele',
     'start_date' => 'Başlangıç Tarihi',
-    'end_date' => 'Bitiş Tarihi',
     'filter_by_budget' => 'Bütçe',
     'set_budget' => 'Bütçe Belirleyin',
     'more_than_amount' => "₺'dan fazla?",
@@ -228,4 +226,10 @@ return [
     'user_created' => 'Kullanıcı oluşturuldu',
     'total_users' => 'Toplam kullanıcı sayısı',
     'minimal_oneri_created' => 'Minimal öneri oluşturuldu',
+
+    // Missing OneriResource translations
+    'design' => 'Tasarım',
+    'has_design' => 'Tasarımı Var',
+    'no_design' => 'Tasarımı Yok',
+    'unspecified' => 'Belirtilmemiş',
 ];

@@ -17,21 +17,28 @@ class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    
+    protected static ?string $navigationIcon = 'heroicon-o-briefcase';
+
+    protected static ?int $navigationSort = 1;
+
     public static function getNavigationGroup(): string
     {
         return __('filament.navigation.group.project_management');
     }
-    
+
     public static function getPluralModelLabel(): string
     {
-        return __('filament.resources.project.plural_label');
+        return __('filament.resources.category.plural_label');
     }
-    
+
     public static function getModelLabel(): string
     {
-        return __('filament.resources.project.label');
+        return __('filament.resources.category.label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.category.navigation_label');
     }
 
     public static function form(Form $form): Form
@@ -100,8 +107,14 @@ class CategoryResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->label(__('filament.resources.category.actions.edit'))
+                    ->icon('heroicon-o-pencil')
+                    ->color('warning'),
                 Tables\Actions\DeleteAction::make()
+                    ->label(__('filament.resources.category.actions.delete'))
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
                     ->requiresConfirmation(),
             ])
             ->bulkActions([

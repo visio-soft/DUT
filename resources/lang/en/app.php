@@ -86,6 +86,7 @@ return [
     'inspect_database' => 'Inspect in Database',
     'delete' => 'Delete',
     'edit' => 'Edit',
+    'actions' => 'Actions',
 
     // User Management
     'users' => 'Users',
@@ -127,8 +128,6 @@ return [
     'total_design' => 'Total Design',
     'design_json_data' => 'JSON Data',
     'data_size' => 'Data Size',
-    'objects' => 'Objects',
-    'last_update' => 'Last Update',
     'copied' => 'Copied!',
     'no_design_found' => 'No design found yet',
     'create_first_design' => 'Create the first project design and let it be displayed here!',
@@ -155,7 +154,6 @@ return [
     // Filter and search
     'filter_by_role' => 'Filter by role',
     'start_date' => 'Start Date',
-    'end_date' => 'End Date',
     'filter_by_budget' => 'Budget',
     'set_budget' => 'Set Budget',
     'more_than_amount' => 'More than ₺?',
@@ -205,4 +203,11 @@ return [
     'rejected' => 'Rejected',
     'draft' => 'Draft',
     'published' => 'Published',
+
+    // Missing OneriResource translations
+    'design' => 'Design',
+    'has_design' => 'Has Design',
+    'no_design' => 'No Design',
+    'unspecified' => 'Unspecified',
+    'create_project' => 'Create Project',
 ];

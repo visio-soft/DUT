@@ -24,12 +24,29 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 class OneriResource extends Resource
 {
     protected static ?string $model = Oneri::class;
-    protected static ?string $pluralModelLabel = 'Öneriler';
-    protected static ?string $modelLabel = 'Öneri';
+    protected static ?string $navigationIcon = 'heroicon-o-light-bulb';
 
-    protected static ?string $navigationLabel = 'Öneriler';
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Öneri Yönetimi';
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.suggestion.plural_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.suggestion.label');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.suggestion.navigation_label');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('filament.navigation.group.suggestion_management');
+    }
+    // Ensure ordering in the Filament sidebar: lower numbers appear first within a group
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -38,7 +55,7 @@ class OneriResource extends Resource
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Select::make('category_id')
-                            ->label('Proje Kategorisi')
+                            ->label(__('filament.resources.suggestion.fields.category_id'))
                             ->options(function () {
                                 // Tüm kategorileri göster
                                 return Category::all()->pluck('name', 'id');
@@ -46,47 +63,33 @@ class OneriResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->placeholder('Proje kategorisi seçin'),
+                            ->placeholder(__('filament.placeholders.select_project_category')),
                         Forms\Components\TextInput::make('title')
-                            ->label('Başlık')
+                            ->label(__('filament.resources.suggestion.fields.title'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
-                            ->label('Açıklama')
+                            ->label(__('filament.resources.suggestion.fields.description'))
                             ->rows(3),
-                        Forms\Components\TextInput::make('estimated_duration')
-                            ->label('Tahmini İşlem Süresi (Gün)')
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(365)
-                            ->suffix('gün')
-                            ->helperText('Projenin tahmini tamamlanma süresi (1-365 gün arası)'),
-                        Forms\Components\TextInput::make('budget')
-                            ->label('Bütçe')
-                            ->numeric()
-                            ->prefix('₺'),
                         // Resim upload - Spatie Media Library ile
                         SpatieMediaLibraryFileUpload::make('images')
-                            ->label('Resim')
+                            ->label(__('filament.resources.suggestion.fields.images'))
                             ->collection('images')
                             ->image()
                             ->imagePreviewHeight('150')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
-                            ->maxSize(10240) // 10MB limit
                             ->imageResizeMode('contain')
-                            ->imageResizeTargetWidth('1920')
-                            ->imageResizeTargetHeight('1920')
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
                             ->disk('public')
                             ->directory('images')
                             ->visibility('public')
                             ->required()
-                            ->helperText('Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP. Resim otomatik olarak optimize edilecektir.')
+                            ->helperText(__('filament.helper_texts.max_file_size'))
                             ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
-                Forms\Components\Section::make('Konum')
+                Forms\Components\Section::make(__('filament.resources.suggestion.fields.location'))
                     ->extraAttributes(['class' => 'mx-auto max-w-2xl p-4 ml-auto'])
                     ->schema([
                         //Forms\Components\Toggle::make('use_google_maps')
@@ -99,17 +102,17 @@ class OneriResource extends Resource
                         Forms\Components\Group::make()->schema([
                             // Şehir sabit: İstanbul (saklama için Hidden, gösterim için disabled TextInput)
                             Forms\Components\Hidden::make('city')
-                                ->default('İstanbul'),
+                                ->default(__('filament.placeholders.istanbul')),
 
                             Forms\Components\TextInput::make('city_display')
-                                ->label('İl')
-                                ->default('İstanbul')
+                                ->label(__('filament.resources.suggestion.fields.city'))
+                                ->default(__('filament.placeholders.istanbul'))
                                 ->disabled()
                                 ->dehydrated(false)
                                 ->columnSpanFull(),
 
                             Forms\Components\Select::make('district')
-                                ->label('İlçe')
+                                ->label(__('filament.resources.suggestion.fields.district'))
                                 ->options(function () {
                                     $districts = config('istanbul_neighborhoods', []);
                                     $districtNames = array_keys($districts);
@@ -120,22 +123,22 @@ class OneriResource extends Resource
                                 ->columnSpanFull(),
 
                             Forms\Components\Select::make('neighborhood')
-                                ->label('Mahalle')
+                                ->label(__('filament.resources.suggestion.fields.neighborhood'))
                                 ->options(function (callable $get) {
                                     $district = $get('district');
                                     if (!$district) {
-                                        return ['__other' => 'Diğer..'];
+                                        return ['__other' => __('filament.placeholders.other')];
                                     }
 
                                     $map = config('istanbul_neighborhoods', []);
                                     $options = $map[$district] ?? [];
                                     // '__other' seçeneği kullanıcı kendi mahalle adını yazabilsin diye
-                                    return array_merge($options, ['__other' => 'Diğer..']);
+                                    return array_merge($options, ['__other' => __('filament.placeholders.other')]);
                                 })
                                 ->reactive()
                                 ->searchable()
                                 ->placeholder(function (callable $get) {
-                                    return $get('district') ? 'Mahalle seçin veya Diğer seçin' : 'Önce ilçe seçin';
+                                    return $get('district') ? __('filament.placeholders.select_neighborhood') : __('filament.placeholders.select_district_first');
                                 })
                                 ->disabled(function (callable $get) {
                                     return !$get('district');
@@ -151,8 +154,8 @@ class OneriResource extends Resource
 
                             // Kullanıcı "Diğer" seçerse kendi mahalle adını yazsın
                             Forms\Components\TextInput::make('neighborhood_custom')
-                                ->label('Diğer Mahalle')
-                                ->placeholder('Mahallenizi yazın')
+                                ->label(__('filament.resources.suggestion.fields.neighborhood_custom'))
+                                ->placeholder(__('filament.placeholders.write_neighborhood'))
                                 ->visible(function (callable $get) {
                                     return $get('neighborhood') === '__other';
                                 })
@@ -166,27 +169,10 @@ class OneriResource extends Resource
                                 ->dehydrated(false)
                                 ->columnSpanFull(),
 
-                            // Sokak / Cadde alanları yan yana olacak şekilde (Grid ile 2 sütun)
-                            Forms\Components\Grid::make()
-                                ->schema([
-                                    Forms\Components\TextInput::make('street_cadde')
-                                        ->label('Cadde')
-                                        ->placeholder('Cadde adı')
-                                        ->columnSpan(1),
-
-                                    Forms\Components\TextInput::make('street_sokak')
-                                        ->label('Sokak')
-                                        ->placeholder('Sokak adı')
-                                        ->columnSpan(1),
-                                ])
-                                ->columns(2)
-                                ->extraAttributes(['class' => 'grid grid-cols-2 gap-3'])
-                                ->columnSpanFull(),
-
                             // Detaylı tarif (mahallenin altına)
                             Forms\Components\Textarea::make('address_details')
-                                ->label('Detaylı Tarif')
-                                ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
+                                ->label(__('filament.resources.suggestion.fields.address_details'))
+                                ->placeholder(__('filament.placeholders.detailed_address'))
                                 ->rows(3)
                                 ->columnSpanFull(),
                         ])->hidden(function (callable $get) {
@@ -196,13 +182,13 @@ class OneriResource extends Resource
                         // Google Maps Konum Seçimi (Google Maps açıkken)
                         Forms\Components\Group::make()->schema([
                             Forms\Components\TextInput::make('search_address')
-                                ->label('Adres Ara')
-                                ->placeholder('Bir adres yazın ve haritada bulun...')
+                                ->label(__('filament.placeholders.search_address'))
+                                ->placeholder(__('filament.placeholders.search_address_placeholder'))
                                 ->live()
                                 ->columnSpanFull(),
 
                             Forms\Components\ViewField::make('google_maps')
-                                ->label('Harita - Tıklayarak Konum Seçin')
+                                ->label(__('filament.placeholders.google_maps_picker'))
                                 ->view('custom.google-maps-picker')
                                 ->columnSpanFull(),
                         ])->visible(function (callable $get) {
@@ -221,55 +207,55 @@ class OneriResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
-                SpatieMediaLibraryImageColumn::make('images')->label('Resim')
+                SpatieMediaLibraryImageColumn::make('images')->label(__('filament.resources.suggestion.fields.images'))
                     ->collection('images')
                     ->circular()
                     ->height(50)
                     ->width(50),
-                Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label('Bütçe')
+                Tables\Columns\TextColumn::make('title')->label(__('filament.resources.suggestion.fields.title'))->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('district')->label(__('filament.resources.suggestion.fields.district'))->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('neighborhood')->label(__('filament.resources.suggestion.fields.neighborhood'))->searchable()->limit(30),
+                Tables\Columns\TextColumn::make('budget')->label(__('filament.resources.suggestion.fields.budget'))
                     ->money('TRY')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('likes_count')
-                    ->label('Beğeni Sayısı')
+                    ->label(__('filament.resources.suggestion.fields.likes_count'))
                     ->sortable()
                     ->badge()
                     ->color('success')
                     ->icon('heroicon-o-heart'),
                 Tables\Columns\IconColumn::make('design_completed')
-                    ->label('Tasarım')
+                    ->label(__('filament.resources.suggestion.fields.design_completed'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
                     ->trueColor('success')
                     ->falseColor('danger')
                     ->tooltip(function ($record) {
-                        return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
+                        return $record->design_completed ? __('filament.status.design_completed') : __('filament.status.design_waiting');
                     }),
                 Tables\Columns\TextColumn::make('estimated_duration')
-                    ->label('Tahmini Süre')
-                    ->suffix(' gün')
+                    ->label(__('filament.resources.suggestion.fields.estimated_duration'))
+                    ->suffix(' ' . __('app.days'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
+                Tables\Columns\TextColumn::make('end_date')->label(__('filament.resources.suggestion.fields.end_date'))->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label(__('filament.resources.suggestion.fields.created_at'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('category')
-                    ->label('Kategori')
+                    ->label(__('filament.filters.category'))
                     ->relationship('category', 'name'),
 
                 // Konum filtresi: İlçe ve Mahalle dropdownları
                 Filter::make('location')
-                    ->label('Konum')
+                    ->label(__('filament.resources.suggestion.fields.location'))
                     ->form([
                         Forms\Components\Select::make('district')
-                            ->label('İlçe')
+                            ->label(__('filament.resources.suggestion.fields.district'))
                             ->options(function () {
                                 $keys = array_keys(config('istanbul_neighborhoods', []));
                                 return array_combine($keys, $keys);
@@ -277,7 +263,7 @@ class OneriResource extends Resource
                             ->searchable(),
 
                         Forms\Components\Select::make('neighborhood')
-                            ->label('Mahalle')
+                            ->label(__('filament.resources.suggestion.fields.neighborhood'))
                             ->options(function (callable $get) {
                                 $district = $get('district');
                                 $map = config('istanbul_neighborhoods', []);
@@ -297,19 +283,19 @@ class OneriResource extends Resource
 
                 // Bütçe filtresi: miktar + az/çok toggle
                 Filter::make('budget_filter')
-                    ->label('Bütçe')
+                    ->label(__('filament.filters.budget'))
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('amount')
-                                    ->label('Bütçe')
+                                    ->label(__('filament.filters.budget'))
                                     ->numeric()
                                     ->default(0),
 
                                 Forms\Components\Toggle::make('is_more')
                                     ->label(function (callable $get) {
                                         $amount = $get('amount');
-                                        return $amount ? ($amount . "₺'dan fazla?") : 'Bütçe Belirleyin';
+                                        return $amount ? ($amount . " " . __('app.more_than_amount')) : __('app.set_budget');
                                     })
                                     ->inline(false),
                             ])
@@ -330,17 +316,17 @@ class OneriResource extends Resource
 
                 // Beğeni filtresi
                 Filter::make('likes_filter')
-                    ->label('Beğeni Sayısı')
+                    ->label(__('filament.resources.suggestion.fields.likes_count'))
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('min_likes')
-                                    ->label('Minimum Beğeni')
+                                    ->label(__('filament.filters.min_likes'))
                                     ->numeric()
                                     ->default(0),
 
                                 Forms\Components\TextInput::make('max_likes')
-                                    ->label('Maksimum Beğeni')
+                                    ->label(__('filament.filters.max_likes'))
                                     ->numeric(),
                             ])
                             ->columns(2),
@@ -359,7 +345,7 @@ class OneriResource extends Resource
             ])
             ->actions([
                 Tables\Actions\Action::make('view_design')
-                    ->label('Tasarımı Görüntüle')
+                    ->label(__('filament.resources.suggestion.actions.view_design'))
                     ->icon('heroicon-o-eye')
                     ->color('success')
                     ->visible(fn ($record) => $record->design_completed)
@@ -382,35 +368,35 @@ class OneriResource extends Resource
                     ->openUrlInNewTab(false),
 
                 Tables\Actions\Action::make('delete_design')
-                    ->label('Tasarımı Sil')
+                    ->label(__('filament.resources.suggestion.actions.delete_design'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->visible(fn ($record) => $record->design_completed)
                     ->requiresConfirmation()
-                    ->modalHeading('Tasarımı Sil')
-                    ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                    ->modalSubmitActionLabel('Evet, Sil')
+                    ->modalHeading(__('filament.resources.suggestion.actions.delete_design'))
+                    ->modalDescription(__('filament.resources.suggestion.modals.delete_design_confirmation'))
+                    ->modalSubmitActionLabel(__('filament.confirmations.yes_delete'))
                     ->action(function ($record) {
                         // Projenin tasarım kaydını bul ve sil
                         $design = $record->design;
                         if ($design) {
                             $design->delete();
                             \Filament\Notifications\Notification::make()
-                                ->title('Tasarım silindi')
+                                ->title(__('filament.notifications.design_deleted'))
                                 ->success()
                                 ->send();
                         } else {
                             // Eğer design ilişkisi yoksa, projeye ait tüm tasarım kayıtlarını sil
                             \App\Models\ProjectDesign::where('project_id', $record->id)->delete();
                             \Filament\Notifications\Notification::make()
-                                ->title('Tasarım silindi')
+                                ->title(__('filament.notifications.design_deleted'))
                                 ->success()
                                 ->send();
                         }
                     }),
 
                 Tables\Actions\Action::make('add_design')
-                    ->label('Tasarım Ekle')
+                    ->label(__('app.add_design'))
                     ->icon('heroicon-o-plus')
                     ->color('warning')
                     ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed)
@@ -437,24 +423,24 @@ class OneriResource extends Resource
             ])
             ->groups([
                 Group::make('category.name')
-                    ->label('Proje')
+                    ->label(__('app.project'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
                         $category = $record->category;
-                        $end = 'Belirtilmemiş';
+                        $end = __('app.unspecified');
 
                         if ($category && $category->end_datetime) {
                             $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
                         }
 
-                        return "Bitiş: {$end}";
+                        return __('app.end_date') . ": {$end}";
                     }),
 
                 // Ekstra grup: Tasarım durumu (var / yok) - group by boolean column
                 Group::make('design_completed')
-                    ->label('Tasarım')
+                    ->label(__('app.design'))
                     ->titlePrefixedWithLabel(false)
                     ->getTitleFromRecordUsing(function ($record): string {
-                        return $record->design_completed ? 'Tasarımı Var' : 'Tasarımı Yok';
+                        return $record->design_completed ? __('app.has_design') : __('app.no_design');
                     }),
             ])
             ->defaultGroup('category.name');
@@ -486,7 +472,7 @@ class OneriResource extends Resource
     {
         return [
             \Filament\Actions\Action::make('create_with_design')
-                ->label('Yeni Öneri Oluştur')
+                ->label(__('app.new_suggestion'))
                 ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->url(function (): string {

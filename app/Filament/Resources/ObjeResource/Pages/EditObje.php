@@ -14,20 +14,27 @@ class EditObje extends EditRecord
 
     protected function getSavedNotificationTitle(): ?string
     {
-        return 'Obje başarıyla güncellendi!';
+        return __('filament.resources.obje.notifications.updated');
     }
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\DeleteAction::make(),
+            Actions\ViewAction::make()
+                ->label(__('filament.resources.obje.actions.view'))
+                ->icon('heroicon-o-eye')
+                ->color('info'),
+            Actions\DeleteAction::make()
+                ->label(__('filament.resources.obje.actions.delete'))
+                ->icon('heroicon-o-trash')
+                ->color('danger'),
         ];
     }
 
     protected function getSaveFormAction(): Action
     {
         return Action::make('save')
-            ->label('Kaydet')
+            ->label(__('filament.resources.obje.actions.save'))
             ->submit('save')
             ->keyBindings(['mod+s']);
     }
@@ -35,14 +42,14 @@ class EditObje extends EditRecord
     protected function getCancelFormAction(): Action
     {
         return Action::make('cancel')
-            ->label('İptal')
+            ->label(__('filament.resources.obje.actions.cancel'))
             ->url($this->getResource()::getUrl('index'))
             ->color('gray');
     }
 
     public function getTitle(): string
     {
-        return 'Obje Düzenle';
+        return __('filament.resources.obje.pages.edit_title');
     }
 
     protected function afterSave(): void

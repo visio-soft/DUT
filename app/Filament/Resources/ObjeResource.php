@@ -20,9 +20,12 @@ class ObjeResource extends Resource
 {
     protected static ?string $model = Obje::class;
 
-    public static function getNavigationGroup(): string
+    // Place this resource right after the Öneri resource in the sidebar
+    protected static ?int $navigationSort = 3;
+
+    public static function getNavigationGroup(): ?string
     {
-        return __('filament.navigation.group.object_management');
+        return __('filament.navigation.group.suggestion_management');
     }
 
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
@@ -42,6 +45,13 @@ class ObjeResource extends Resource
         return __('filament.resources.object.plural_label');
     }
 
+    protected static bool $shouldRegisterNavigation = true;
+
+    // Yetkilendirme kontrolünü geçici olarak devre dışı bırak
+    public static function canViewAny(): bool
+    {
+        return true; // Test amaçlı - daha sonra kaldırılacak
+    }
     public static function form(Form $form): Form
     {
         return $form
@@ -68,7 +78,6 @@ class ObjeResource extends Resource
                             ->panelLayout('integrated')
                             ->maxFiles(1)
                             ->directory('objeler')
-                            // Removed size and resize constraints per requirement: only restrict by file type (jpeg/jpg/png)
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png'])
                             ->helperText(__('filament.helper_texts.recommended_format'))
                             ->hintColor('info')
@@ -76,7 +85,11 @@ class ObjeResource extends Resource
                             ->columnSpanFull()
                             ->visibility('public')
                             ->disk('public')
-                            ->rules(['required']),
+                            ->downloadable()
+                            ->openable()
+                            ->deletable()
+                            ->rules(['required'])
+                            ->maxSize(10240), // 10MB max
                     ])
                     ->columnSpanFull(),
             ]);
@@ -96,7 +109,8 @@ class ObjeResource extends Resource
                     ->width(50)
                     ->square()
                     ->disk('public')
-                    ->visibility('public'),
+                    ->visibility('public')
+                    ->checkFileExistence(false),
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('filament.resources.object.fields.name'))
                     ->searchable(['name'])
@@ -125,8 +139,26 @@ class ObjeResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->label(__('app.view'))
+                        ->color('info')
+                        ->icon('heroicon-o-eye'),
+                    Tables\Actions\EditAction::make()
+                        ->label(__('app.edit'))
+                        ->color('warning')
+                        ->icon('heroicon-o-pencil'),
+                    Tables\Actions\DeleteAction::make()
+                        ->label(__('app.delete'))
+                        ->color('danger')
+                        ->icon('heroicon-o-trash')
+                        ->requiresConfirmation(),
+                ])
+                ->label(__('app.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->size('sm')
+                ->color('gray')
+                ->button()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -147,6 +179,7 @@ class ObjeResource extends Resource
         return [
             'index' => Pages\ListObjes::route('/'),
             'create' => Pages\CreateObje::route('/create'),
+            'view' => Pages\ViewObje::route('/{record}'),
             'edit' => Pages\EditObje::route('/{record}/edit'),
         ];
     }

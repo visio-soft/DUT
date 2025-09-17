@@ -24,7 +24,7 @@ class CreateOneri extends CreateRecord
         return [
             // Proje Oluştur & Tasarımı Atla butonu (tek buton)
             $this->getCreateFormAction()
-                ->label('Proje Oluştur')
+                ->label(__('app.create_project'))
                 ->icon('heroicon-o-folder-plus')
                 ->color('primary')
                 ->size('lg')
@@ -34,8 +34,8 @@ class CreateOneri extends CreateRecord
                         $this->create();
 
                         \Filament\Notifications\Notification::make()
-                            ->title('Öneri Oluşturuldu!')
-                            ->body('Öneri başarıyla oluşturuldu. Tasarımı daha sonra ekleyebilirsiniz.')
+                            ->title(__('filament.notifications.suggestion_created'))
+                            ->body(__('filament.notifications.suggestion_created_desc'))
                             ->success()
                             ->send();
 
@@ -47,23 +47,23 @@ class CreateOneri extends CreateRecord
                         if ((isset($errors['images']) && str_contains(json_encode($errors['images']), 'max')) ||
                             (isset($errors['image']) && str_contains(json_encode($errors['image']), 'max'))) {
                             \Filament\Notifications\Notification::make()
-                                ->title('Dosya Boyutu Hatası!')
-                                ->body('Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.')
+                                ->title(__('filament.notifications.file_too_large'))
+                                ->body(__('filament.notifications.file_too_large_desc'))
                                 ->danger()
                                 ->duration(10000)
                                 ->send();
                         } else {
                             \Filament\Notifications\Notification::make()
-                                ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->title(__('filament.notifications.validation_error'))
+                                ->body(__('filament.notifications.check_required_fields') . ' ' . $e->getMessage())
                                 ->danger()
                                 ->send();
                         }
                         return;
                     } catch (\Exception $e) {
                         \Filament\Notifications\Notification::make()
-                            ->title('Hata!')
-                            ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
+                            ->title(__('filament.notifications.error'))
+                            ->body(__('filament.notifications.suggestion_create_error') . ' ' . $e->getMessage())
                             ->danger()
                             ->send();
                         return;
@@ -75,7 +75,7 @@ class CreateOneri extends CreateRecord
 
             // Tasarım Ekle butonu - resim varsa aktif
             \Filament\Actions\Action::make('createAndDesign')
-                ->label('Tasarım Ekle')
+                ->label(__('app.add_design'))
                 ->icon('heroicon-o-paint-brush')
                 ->color('success')
                 ->size('lg')
@@ -87,8 +87,8 @@ class CreateOneri extends CreateRecord
                     $formData = $this->form->getState();
                     if (empty($formData['images'])) {
                         \Filament\Notifications\Notification::make()
-                            ->title('Resim Gerekli!')
-                            ->body('Tasarım eklemek için önce bir resim yüklemelisiniz.')
+                            ->title(__('filament.notifications.image_required'))
+                            ->body(__('filament.notifications.image_required_desc'))
                             ->warning()
                             ->send();
                         return;
@@ -116,36 +116,36 @@ class CreateOneri extends CreateRecord
                         if ((isset($errors['images']) && str_contains(json_encode($errors['images']), 'max')) ||
                             (isset($errors['image']) && str_contains(json_encode($errors['image']), 'max'))) {
                             \Filament\Notifications\Notification::make()
-                                ->title('Dosya Boyutu Hatası!')
-                                ->body('Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.')
+                                ->title(__('filament.notifications.file_too_large'))
+                                ->body(__('filament.notifications.file_too_large_desc'))
                                 ->danger()
                                 ->duration(10000)
                                 ->send();
                         } else {
                             \Filament\Notifications\Notification::make()
-                                ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->title(__('filament.notifications.validation_error'))
+                                ->body(__('filament.notifications.check_required_fields') . ' ' . $e->getMessage())
                                 ->danger()
                                 ->send();
                         }
                         return;
                     } catch (\Exception $e) {
                         \Filament\Notifications\Notification::make()
-                            ->title('Hata!')
-                            ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
+                            ->title(__('filament.notifications.error'))
+                            ->body(__('filament.notifications.suggestion_create_error') . ' ' . $e->getMessage())
                             ->danger()
                             ->send();
                         return;
                     }
                 })
                 ->requiresConfirmation()
-                ->modalHeading('Öneri Oluştur ve Tasarıma Başla')
-                ->modalDescription('Öneriyi oluşturup direkt tasarım aracına geçmek istediğinize emin misiniz?')
-                ->modalSubmitActionLabel('Evet, Tasarıma Başla'),
+                ->modalHeading(__('filament.modals.create_and_design'))
+                ->modalDescription(__('filament.modals.create_and_design_desc'))
+                ->modalSubmitActionLabel(__('filament.modals.yes_start_design')),
 
             // İptal butonu
             $this->getCancelFormAction()
-                ->label('İptal')
+                ->label(__('app.cancel'))
                 ->color('gray')
                 ->size('lg')
                 ->extraAttributes([

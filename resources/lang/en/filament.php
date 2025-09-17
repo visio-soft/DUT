@@ -3,8 +3,10 @@
 return [
     'navigation' => [
         'group' => [
-            'suggestion_management' => 'Suggestion Management',
             'project_management' => 'Project Management',
+            'suggestion_management' => 'Suggestion Management',
+            'roles_user_management' => 'Roles & User Management',
+            // Legacy groups (keeping for compatibility)
             'user_management' => 'User Management',
             'object_management' => 'Object Management',
             'flix_management' => 'User Management',
@@ -12,6 +14,10 @@ return [
     ],
 
     'pages' => [
+        'landscape_designer' => [
+            'title' => 'Landscape Designer',
+            'navigation_label' => 'Landscape Designer',
+        ],
         'design_data_viewer' => [
             'title' => 'Design Data',
             'description' => 'View, edit and download design data of projects.',
@@ -51,9 +57,65 @@ return [
             'trend_badge' => 'Trending',
             'new_badge' => 'New',
         ],
+        'create_new_object' => 'Create New Object',
     ],
 
     'resources' => [
+        'obje' => [
+            'label' => 'Object',
+            'plural_label' => 'Objects',
+            'navigation_label' => 'Objects',
+            'fields' => [
+                'name' => 'Object Name',
+                'description' => 'Description',
+                'category_id' => 'Category',
+                'images' => 'Images',
+                'color' => 'Color',
+                'material' => 'Material',
+                'dimensions' => 'Dimensions',
+                'price' => 'Price',
+                'stock' => 'Stock',
+                'created_at' => 'Created At',
+                'updated_at' => 'Updated At',
+            ],
+            'actions' => [
+                'create' => 'Create Object',
+                'create_another' => 'Create & Add Another',
+                'view' => 'View',
+                'edit' => 'Edit',
+                'delete' => 'Delete',
+                'save' => 'Save',
+                'cancel' => 'Cancel',
+            ],
+            'pages' => [
+                'create_title' => 'Create New Object',
+                'edit_title' => 'Edit Object',
+                'view_title' => 'View Object',
+                'list_title' => 'Objects',
+            ],
+            'notifications' => [
+                'created' => 'Object created successfully!',
+                'updated' => 'Object updated successfully!',
+                'deleted' => 'Object deleted successfully!',
+            ],
+            'filters' => [
+                'category' => 'Filter by Category',
+                'price_range' => 'Price Range',
+                'stock_status' => 'Stock Status',
+                'in_stock' => 'In Stock',
+                'out_of_stock' => 'Out of Stock',
+            ],
+            'table' => [
+                'columns' => [
+                    'name' => 'Object Name',
+                    'category' => 'Category',
+                    'price' => 'Price',
+                    'stock' => 'Stock',
+                    'images_count' => 'Images Count',
+                ],
+            ],
+        ],
+
         'suggestion' => [
             'label' => 'Suggestion',
             'plural_label' => 'Suggestions',
@@ -116,27 +178,31 @@ return [
             ],
         ],
 
-        'project' => [
-            'label' => 'Project',
-            'plural_label' => 'Projects',
-            'navigation_label' => 'Projects',
-            'fields' => [
-                'name' => 'Project Name',
-            ],
-        ],
-
         'category' => [
             'label' => 'Category',
             'plural_label' => 'Categories',
             'navigation_label' => 'Categories',
             'fields' => [
                 'name' => 'Category Name',
-                'start_datetime' => 'Start Date and Time',
-                'end_datetime' => 'End Date and Time',
-                'start_date' => 'Start Date',
-                'end_date' => 'End Date',
+                'start_datetime' => 'Start Date',
+                'end_datetime' => 'End Date',
+                'start_date' => 'Start',
+                'end_date' => 'End',
                 'suggestions_count' => 'Suggestions Count',
                 'created_at' => 'Created At',
+            ],
+            'actions' => [
+                'edit' => 'Edit',
+                'delete' => 'Delete',
+            ],
+        ],
+
+        'project' => [
+            'label' => 'Project',
+            'plural_label' => 'Projects',
+            'navigation_label' => 'Projects',
+            'fields' => [
+                'name' => 'Project Name',
             ],
         ],
 
@@ -153,6 +219,12 @@ return [
             ],
             'sections' => [
                 'object_information' => 'Object Information',
+            ],
+            'actions' => [
+                'view' => 'View',
+                'edit' => 'Edit',
+                'delete' => 'Delete',
+                'actions' => 'Actions',
             ],
         ],
 
@@ -211,11 +283,26 @@ return [
     'notifications' => [
         'validation_error' => 'Validation Error!',
         'error' => 'Error!',
-    'file_too_large' => 'The uploaded image file is too large. Please upload a smaller file.',
+        'file_too_large' => 'File Size Error!',
+        'file_too_large_desc' => 'The uploaded image file is too large. Please upload a maximum 10MB image.',
         'check_required_fields' => 'Please check the required fields:',
         'suggestion_create_error' => 'An error occurred while creating the suggestion:',
         'email_copied' => 'Email copied',
         'copied' => 'Copied!',
+        'design_deleted' => 'Design deleted',
+        'suggestion_created' => 'Suggestion Created!',
+        'suggestion_created_desc' => 'Suggestion successfully created. You can add design later.',
+        'image_required' => 'Image Required!',
+        'image_required_desc' => 'You must upload an image first to add design.',
+        'user_created' => 'User created',
+        'user_created_desc' => 'New user successfully created.',
+        'object_created' => 'Object successfully created!',
+    ],
+
+    'modals' => [
+        'create_and_design' => 'Create Suggestion and Start Design',
+        'create_and_design_desc' => 'Are you sure you want to create the suggestion and go directly to the design tool?',
+        'yes_start_design' => 'Yes, Start Design',
     ],
 
     'filters' => [
@@ -225,6 +312,8 @@ return [
         'start_date' => 'Start Date',
         'end_date' => 'End Date',
         'budget' => 'Budget',
+        'min_likes' => 'Minimum Likes',
+        'max_likes' => 'Maximum Likes',
     ],
 
     'placeholders' => [
@@ -247,6 +336,11 @@ return [
         'filter_by_role' => 'Filter by role',
         'dash' => '-',
         'email_domain_example' => 'example: basaksehir.bel.tr',
+        'istanbul' => 'Istanbul',
+        'other' => 'Other..',
+        'search_address' => 'Search Address',
+        'search_address_placeholder' => 'Enter an address and find it on the map...',
+        'google_maps_picker' => 'Map - Click to Select Location',
     ],
 
     'helper_texts' => [

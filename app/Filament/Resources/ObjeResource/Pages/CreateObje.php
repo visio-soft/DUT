@@ -14,7 +14,7 @@ class CreateObje extends CreateRecord
 
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Obje başarıyla oluşturuldu!';
+        return __('filament.resources.obje.notifications.created');
     }
 
     protected function getHeaderActions(): array
@@ -25,7 +25,7 @@ class CreateObje extends CreateRecord
     protected function getCreateFormAction(): Action
     {
         return Action::make('create')
-            ->label('Oluştur')
+            ->label(__('filament.resources.obje.actions.create'))
             ->submit('create')
             ->keyBindings(['mod+s']);
     }
@@ -33,7 +33,7 @@ class CreateObje extends CreateRecord
     protected function getCreateAnotherFormAction(): Action
     {
         return Action::make('createAnother')
-            ->label('Oluştur ve Yenisini Ekle')
+            ->label(__('filament.resources.obje.actions.create_another'))
             ->action('createAnother')
             ->keyBindings(['mod+shift+s'])
             ->color('gray');
@@ -42,14 +42,14 @@ class CreateObje extends CreateRecord
     protected function getCancelFormAction(): Action
     {
         return Action::make('cancel')
-            ->label('İptal')
+            ->label(__('filament.resources.obje.actions.cancel'))
             ->url($this->getResource()::getUrl('index'))
             ->color('gray');
     }
 
     public function getTitle(): string
     {
-        return 'Yeni Obje Oluştur';
+        return __('filament.resources.obje.pages.create_title');
     }
 
     protected function afterCreate(): void

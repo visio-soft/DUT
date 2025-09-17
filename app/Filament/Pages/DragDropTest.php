@@ -17,9 +17,19 @@ class DragDropTest extends Page
 
     protected static string $view = 'filament.pages.drag-drop-test';
 
-    protected static ?string $title = 'Landscape Designer';
+    protected static ?string $title = null;
 
-    protected static ?string $navigationLabel = 'Peyzaj Tasarımcısı';
+    protected static ?string $navigationLabel = null;
+
+    public function getTitle(): string
+    {
+        return __('filament.pages.landscape_designer.title');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.pages.landscape_designer.navigation_label');
+    }
 
     protected static bool $shouldRegisterNavigation = false; // Bu sayfayı navigation'da göster
 
