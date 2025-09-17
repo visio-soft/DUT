@@ -18,6 +18,4 @@ Route::post('/language/switch', function () {
     return redirect()->back();
 })->name('language.switch');
 
-// Project Designs Table Routes - Moved to admin panel
-// Route::get('/project-designs', [ProjectDesignTableController::class, 'index'])->name('project-designs.index');
-// Route::post('/project-designs/{projectDesign}/like', [ProjectDesignTableController::class, 'like'])->name('project-designs.like');
+
