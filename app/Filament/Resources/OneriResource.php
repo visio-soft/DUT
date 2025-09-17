@@ -92,13 +92,7 @@ class OneriResource extends Resource
                 Forms\Components\Section::make(__('filament.resources.suggestion.fields.location'))
                     ->extraAttributes(['class' => 'mx-auto max-w-2xl p-4 ml-auto'])
                     ->schema([
-                        //Forms\Components\Toggle::make('use_google_maps')
-                            //->label('Haritadan Seç')
-                            //->default(false)
-                            //->reactive()
-                            //->columnSpanFull(),
-
-                        // Manual Konum Girişi (Google Maps kapalıyken)
+                        // Manual Konum Girişi
                         Forms\Components\Group::make()->schema([
                             // Şehir sabit: İstanbul (saklama için Hidden, gösterim için disabled TextInput)
                             Forms\Components\Hidden::make('city')
