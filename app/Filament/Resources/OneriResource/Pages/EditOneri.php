@@ -66,7 +66,7 @@ class EditOneri extends EditRecord
         // Eğer öneri tasarımı tamamlandıysa tasarımı görüntüle butonu ekle
         if ($this->record && $this->record->design_completed && $this->record->design) {
             $actions[] = Actions\Action::make('viewDesign')
-                ->label(__('filament.resources.suggestion.actions.view_design'))
+                ->label('Tasarımı Görüntüle')
                 ->icon('heroicon-o-eye')
                 ->color('success')
                 ->url("/admin/project-designs/{$this->record->design->id}");
