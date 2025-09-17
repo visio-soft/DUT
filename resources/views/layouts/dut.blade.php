@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <title>DUT Sayfa</title>
+    <title>{{ __('app.page_title') }}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
     <style>
         /* Filament-like theme variables with sensible defaults */
@@ -42,7 +42,8 @@
                 <a href="/signin" class="text-sm">Sign in</a>
                 <a href="/signup" class="text-sm">Sign up</a>
             </nav>
-            <button id="themeToggle" class="px-3 py-1 border rounded text-sm border-panel">Karanlık/Açık</button>
+            <x-language-switcher />
+            <button id="themeToggle" class="px-3 py-1 border rounded text-sm border-panel">{{ __('app.dark_light') }}</button>
         </div>
     </div>
 </header>
@@ -55,7 +56,7 @@
     <div class="container mx-auto px-4 py-6 text-sm text-gray-600">
         <div class="flex items-center justify-between">
             <div>© {{ date('Y') }} DUT</div>
-            <div>Adres · İletişim · Gizlilik</div>
+            <div>{{ __('app.address_contact_privacy') }}</div>
         </div>
     </div>
 </footer>

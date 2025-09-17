@@ -23,7 +23,7 @@ class ViewProjectDesign extends ViewRecord
 
     public function getTitle(): string
     {
-        return 'Proje Tasarımı: ' . $this->record->project->title;
+        return __('filament.resources.project_design.page_titles.view') . ' ' . $this->record->project->title;
     }
 
 

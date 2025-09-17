@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>DUT - Anasayfa</title>
+    <title>{{ __('app.homepage_title') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -27,19 +27,18 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
                 <div class="text-center">
                     <h1 class="text-4xl font-bold text-gray-900 dark:text-white sm:text-6xl">
-                        DUT Tasarım Platformu
+                        {{ __('app.design_platform') }}
                     </h1>
                     <p class="mt-6 text-lg leading-8 text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-                        Laravel ve Filament ile güçlendirilmiş modern tasarım yönetim platformuna hoş geldiniz.
-                        Projelerinizi organize edin, ekibinizle işbirliği yapın.
+                        {{ __('app.hero_description') }}
                     </p>
                     <div class="mt-10 flex items-center justify-center gap-x-6">
                         <a href="/admin"
                            class="rounded-md bg-orange-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-orange-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-600">
-                            Yönetim Paneli
+                            {{ __('app.admin_panel') }}
                         </a>
                         <a href="#features" class="text-sm font-semibold leading-6 text-gray-900 dark:text-white">
-                            Özellikleri Keşfet <span aria-hidden="true">→</span>
+                            {{ __('app.explore_features') }} <span aria-hidden="true">→</span>
                         </a>
                     </div>
                 </div>
@@ -50,9 +49,9 @@
         <div id="features" class="py-24 sm:py-32">
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
                 <div class="mx-auto max-w-2xl lg:text-center">
-                    <h2 class="text-base font-semibold leading-7 text-orange-600">Platform Özellikleri</h2>
+                    <h2 class="text-base font-semibold leading-7 text-orange-600">{{ __('app.platform_features') }}</h2>
                     <p class="mt-2 text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl">
-                        İhtiyacınız olan her şey burada
+                        {{ __('app.everything_you_need') }}
                     </p>
                 </div>
                 <div class="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
@@ -66,10 +65,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                                     </svg>
                                 </div>
-                                Proje Yönetimi
+                                {{ __('app.project_management') }}
                             </dt>
                             <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
-                                <p class="flex-auto">Tasarım projelerinizi organize edin, ilerlemeyi takip edin ve ekibinizle kolayca paylaşın.</p>
+                                <p class="flex-auto">{{ __('app.project_management_desc') }}</p>
                             </dd>
                         </div>
 
@@ -81,10 +80,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                                     </svg>
                                 </div>
-                                Medya Galerisi
+                                {{ __('app.media_gallery') }}
                             </dt>
                             <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
-                                <p class="flex-auto">Tasarım dosyalarınızı güvenli bir şekilde depolayın ve kategorilere ayırın.</p>
+                                <p class="flex-auto">{{ __('app.media_gallery_desc') }}</p>
                             </dd>
                         </div>
 
@@ -96,10 +95,10 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                                     </svg>
                                 </div>
-                                Takım Çalışması
+                                {{ __('app.team_collaboration') }}
                             </dt>
                             <dd class="mt-4 flex flex-auto flex-col text-base leading-7 text-gray-600 dark:text-gray-300">
-                                <p class="flex-auto">Ekip üyelerinizle gerçek zamanlı olarak çalışın ve geri bildirim alın.</p>
+                                <p class="flex-auto">{{ __('app.team_collaboration_desc') }}</p>
                             </dd>
                         </div>
                     </dl>
@@ -112,15 +111,15 @@
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
                 <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
                     <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                        <dt class="text-base leading-7 text-gray-600 dark:text-gray-300">Tamamlanan Proje</dt>
+                        <dt class="text-base leading-7 text-gray-600 dark:text-gray-300">{{ __('app.completed_projects') }}</dt>
                         <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">100+</dd>
                     </div>
                     <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                        <dt class="text-base leading-7 text-gray-600 dark:text-gray-300">Aktif Kullanıcı</dt>
+                        <dt class="text-base leading-7 text-gray-600 dark:text-gray-300">{{ __('app.active_users') }}</dt>
                         <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">50+</dd>
                     </div>
                     <div class="mx-auto flex max-w-xs flex-col gap-y-4">
-                        <dt class="text-base leading-7 text-gray-600 dark:text-gray-300">Müşteri Memnuniyeti</dt>
+                        <dt class="text-base leading-7 text-gray-600 dark:text-gray-300">{{ __('app.customer_satisfaction') }}</dt>
                         <dd class="order-first text-3xl font-semibold tracking-tight text-gray-900 dark:text-white sm:text-5xl">99%</dd>
                     </div>
                 </dl>
@@ -132,14 +131,14 @@
             <div class="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">
                 <div class="mx-auto max-w-2xl text-center">
                     <h2 class="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                        Hemen Başlayın
+                        {{ __('app.get_started') }}
                     </h2>
                     <p class="mx-auto mt-6 max-w-xl text-lg leading-8 text-orange-100">
-                        Tasarım projelerinizi yönetmek için gereken her şey burada. Platform keşfetmeye başlayın.
+                        {{ __('app.get_started_desc') }}
                     </p>
                     <div class="mt-10 flex items-center justify-center gap-x-6">
                         <a href="/admin" class="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-orange-600 shadow-sm hover:bg-orange-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                            Platformu Keşfedin
+                            {{ __('app.explore_platform') }}
                         </a>
                     </div>
                 </div>

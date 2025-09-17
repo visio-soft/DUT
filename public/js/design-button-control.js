@@ -1,19 +1,19 @@
 // JavaScript for handling image upload button state
 document.addEventListener('DOMContentLoaded', function() {
-    // Tasarım Ekle butonunu bul
+    // Find the "Add Design" button
     const designButton = document.querySelector('[wire\\:click="mountAction(\'createAndDesign\')"]');
 
     if (designButton) {
-        // İlk kontrol
+        // Initial check
         checkImageAndUpdateButton();
 
-        // Form değişikliklerini dinle
+        // Listen for form changes
         document.addEventListener('livewire:updated', function() {
             checkImageAndUpdateButton();
         });
 
         function checkImageAndUpdateButton() {
-            // Resim input'unu bul
+            // Find image input
             const fileInputs = document.querySelectorAll('input[type="file"]');
             let hasImage = false;
 
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Button durumunu güncelle
+            // Update button state
             if (hasImage) {
                 designButton.disabled = false;
                 designButton.classList.remove('opacity-50', 'cursor-not-allowed');

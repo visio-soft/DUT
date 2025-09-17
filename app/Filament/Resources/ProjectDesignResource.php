@@ -16,10 +16,26 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class ProjectDesignResource extends Resource
 {
     protected static ?string $model = ProjectDesign::class;
-    protected static ?string $pluralModelLabel = 'Öneri Tasarımları';
-    protected static ?string $modelLabel = 'Öneri Tasarımı';
-    protected static ?string $navigationLabel = 'Öneri Tasarımları';
-    protected static ?string $navigationGroup = 'Öneri Yönetimi';
+    
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.project_design.plural_label');
+    }
+    
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.project_design.label');
+    }
+    
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.project_design.navigation_label');
+    }
+    
+    public static function getNavigationGroup(): string
+    {
+        return __('filament.navigation.group.suggestion_management');
+    }
 
     protected static ?string $navigationIcon = 'heroicon-o-paint-brush';
     protected static bool $shouldRegisterNavigation = true; // Navigation'da gösterilsin
@@ -28,10 +44,10 @@ class ProjectDesignResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Proje Bilgileri')
+                Forms\Components\Section::make(__('filament.resources.project_design.sections.project_information'))
                     ->schema([
                         Forms\Components\Select::make('project_id')
-                            ->label('Proje')
+                            ->label(__('filament.resources.project_design.fields.project'))
                             ->relationship('project', 'title')
                             ->searchable()
                             ->preload()
@@ -39,10 +55,10 @@ class ProjectDesignResource extends Resource
                             ->disabled(fn ($context) => $context === 'edit'),
                     ]),
 
-                Forms\Components\Section::make('Tasarım Verileri')
+                Forms\Components\Section::make(__('filament.resources.project_design.sections.design_data'))
                     ->schema([
                         Forms\Components\Textarea::make('design_data_display')
-                            ->label('Tasarım Verisi (JSON)')
+                            ->label(__('filament.resources.project_design.fields.design_data'))
                             ->rows(10)
                             ->disabled()
                             ->dehydrated(false)
@@ -54,15 +70,15 @@ class ProjectDesignResource extends Resource
                             }),
 
                         Forms\Components\KeyValue::make('design_summary')
-                            ->label('Tasarım Özeti')
+                            ->label(__('filament.resources.project_design.fields.design_summary'))
                             ->disabled()
                             ->dehydrated(false)
                             ->formatStateUsing(function ($record) {
                                 if ($record && $record->design_data) {
                                     return [
-                                        'Element Sayısı' => $record->design_data['total_elements'] ?? 0,
-                                        'Oluşturulma Tarihi' => $record->design_data['timestamp'] ?? 'Bilinmiyor',
-                                        'Proje ID' => $record->design_data['project_id'] ?? 'Bilinmiyor',
+                                        __('filament.resources.project_design.fields.element_count') => $record->design_data['total_elements'] ?? 0,
+                                        __('filament.resources.project_design.fields.creation_date') => $record->design_data['timestamp'] ?? __('filament.resources.project_design.fields.unknown'),
+                                        __('filament.resources.project_design.fields.project_id') => $record->design_data['project_id'] ?? __('filament.resources.project_design.fields.unknown'),
                                     ];
                                 }
                                 return [];
@@ -80,7 +96,7 @@ class ProjectDesignResource extends Resource
                     ->sortable(),
 
                 Tables\Columns\ImageColumn::make('project.image')
-                    ->label('Proje Resmi')
+                    ->label(__('filament.resources.project_design.fields.project_image'))
                     ->getStateUsing(function ($record) {
                         if ($record->project && $record->project->hasMedia('images')) {
                             return $record->project->getFirstMediaUrl('images');
@@ -91,42 +107,40 @@ class ProjectDesignResource extends Resource
                     ->size(60)
                     ->circular(),
 
-                Tables\Columns\TextColumn::make('project.title')
-                    ->label('Proje Başlığı')
-                    ->searchable()
-                    ->sortable()
-                    ->limit(40),
-
-                Tables\Columns\TextColumn::make('project.budget')
-                    ->label('Bütçe')
+                    Tables\Columns\TextColumn::make('project.title')
+                        ->label(__('filament.resources.project_design.fields.project_title'))
+                        ->sortable()
+                        ->searchable()
+                        ->wrap(),                Tables\Columns\TextColumn::make('project.budget')
+                    ->label(__('filament.resources.project_design.fields.budget'))
                     ->money('TRY')
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('project.category.name')
-                    ->label('Kategori')
+                    ->label(__('filament.resources.project_design.fields.category'))
                     ->searchable()
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('elements_count')
-                    ->label('Element Sayısı')
+                    ->label(__('filament.resources.project_design.fields.elements_count'))
                     ->getStateUsing(function ($record) {
                         return $record->design_data['total_elements'] ?? 0;
                     })
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('design_timestamp')
-                    ->label('Tasarım Tarihi')
+                    ->label(__('filament.resources.project_design.fields.design_date'))
                     ->getStateUsing(function ($record) {
                         $timestamp = $record->design_data['timestamp'] ?? null;
                         if ($timestamp) {
                             return \Carbon\Carbon::parse($timestamp)->format('d.m.Y H:i');
                         }
-                        return 'Bilinmiyor';
+                        return __('filament.resources.project_design.fields.unknown');
                     })
                     ->sortable(),
 
                 Tables\Columns\IconColumn::make('project.design_completed')
-                    ->label('Tamamlandı')
+                    ->label(__('filament.resources.project_design.fields.completed'))
                     ->boolean()
                     ->trueIcon('heroicon-o-check-circle')
                     ->falseIcon('heroicon-o-x-circle')
@@ -134,44 +148,44 @@ class ProjectDesignResource extends Resource
                     ->falseColor('danger'),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Oluşturulma')
+                    ->label(__('filament.resources.project_design.fields.created_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Güncellenme')
+                    ->label(__('filament.resources.project_design.fields.updated_at'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('project')
-                    ->label('Proje')
+                    ->label(__('filament.resources.project_design.filters.project'))
                     ->relationship('project', 'title')
                     ->searchable(),
 
                 Tables\Filters\Filter::make('completed_projects')
-                    ->label('Tamamlanan Projeler')
+                    ->label(__('filament.resources.project_design.filters.completed_projects'))
                     ->query(fn (Builder $query): Builder => $query->whereHas('project', fn (Builder $query) => $query->where('design_completed', true))),
 
                 Tables\Filters\Filter::make('pending_projects')
-                    ->label('Bekleyen Projeler')
+                    ->label(__('filament.resources.project_design.filters.pending_projects'))
                     ->query(fn (Builder $query): Builder => $query->whereHas('project', fn (Builder $query) => $query->where('design_completed', false))),
 
                 Tables\Filters\Filter::make('popular_designs')
-                    ->label('Popüler Tasarımlar (3+ Beğeni)')
+                    ->label(__('filament.resources.project_design.filters.popular_designs'))
                     ->query(fn (Builder $query): Builder => $query->withCount('likes')->having('likes_count', '>=', 3)),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
-                        ->label('Görüntüle')
+                        ->label(__('filament.resources.project_design.actions.view'))
                         ->color('Gray')
                         ->icon('heroicon-o-eye'),
 
                     Tables\Actions\Action::make('view_design')
-                        ->label('Tasarımı Düzenle')
+                        ->label(__('filament.resources.project_design.actions.edit_design'))
                         ->icon('heroicon-o-paint-brush')
                         ->color('primary')
                         ->url(function ($record) {
@@ -188,15 +202,15 @@ class ProjectDesignResource extends Resource
                         ->openUrlInNewTab(false),
 
                     Tables\Actions\EditAction::make()
-                        ->label('Veritabanında İncele')
+                        ->label(__('filament.resources.project_design.actions.inspect_database'))
                         ->color('info')
                         ->icon('heroicon-o-pencil'),
 
                     Tables\Actions\DeleteAction::make()
-                        ->label('Sil')
+                        ->label(__('filament.resources.project_design.actions.delete'))
                         ->icon('heroicon-o-trash'),
                 ])
-                ->label('Aksiyonlar')
+                ->label(__('filament.resources.project_design.actions.actions'))
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->size('sm')
                 ->color('gray')
