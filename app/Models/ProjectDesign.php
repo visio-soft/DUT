@@ -7,10 +7,13 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy([ProjectDesignObserver::class])]
 class ProjectDesign extends Model
 {
+    use SoftDeletes;
+
     protected $fillable = [
         'project_id',
         'design_data',

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
@@ -260,6 +261,7 @@ class OneriResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TrashedFilter::make(),
                 SelectFilter::make('category')
                     ->label('Kategori')
                     ->relationship('category', 'name'),
@@ -362,7 +364,7 @@ class OneriResource extends Resource
                     ->label('Tasarımı Görüntüle')
                     ->icon('heroicon-o-eye')
                     ->color('success')
-                    ->visible(fn ($record) => $record->design_completed)
+                    ->visible(fn ($record) => $record->design_completed && !$record->trashed())
                     ->url(function ($record) {
                         // Projenin tasarım kaydını bul ve view sayfasına git
                         $design = $record->design;
@@ -385,7 +387,7 @@ class OneriResource extends Resource
                     ->label('Tasarımı Sil')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
-                    ->visible(fn ($record) => $record->design_completed)
+                    ->visible(fn ($record) => $record->design_completed && !$record->trashed())
                     ->requiresConfirmation()
                     ->modalHeading('Tasarımı Sil')
                     ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
@@ -413,7 +415,7 @@ class OneriResource extends Resource
                     ->label('Tasarım Ekle')
                     ->icon('heroicon-o-plus')
                     ->color('warning')
-                    ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed)
+                    ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed && !$record->trashed())
                     ->url(function ($record) {
                         $projectImage = '';
                         if ($record->hasMedia('images')) {
@@ -427,12 +429,57 @@ class OneriResource extends Resource
                     })
                     ->openUrlInNewTab(false),
 
+                Tables\Actions\RestoreAction::make()
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Öneriyi Geri Getir')
+                    ->modalDescription('Bu öneriyi geri getirmek istediğinizden emin misiniz?')
+                    ->modalSubmitActionLabel('Evet, Geri Getir')
+                    ->successNotificationTitle('Öneri başarıyla geri getirildi'),
+
+                Tables\Actions\ForceDeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Öneriyi Kalıcı Olarak Sil')
+                    ->modalDescription('Bu öneriyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                    ->successNotificationTitle('Öneri kalıcı olarak silindi'),
+
                 Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => !$record->design_completed),
+                    ->visible(fn ($record) => !$record->design_completed && !$record->trashed()),
+
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => !$record->trashed())
+                    ->requiresConfirmation()
+                    ->modalHeading('Öneriyi Sil')
+                    ->modalDescription('Bu öneriyi silmek istediğinizden emin misiniz? Silinen öneriler geri getirilebilir.')
+                    ->modalSubmitActionLabel('Evet, Sil')
+                    ->successNotificationTitle('Öneri başarıyla silindi'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Seçili Önerileri Sil')
+                        ->modalDescription('Seçili önerileri silmek istediğinizden emin misiniz? Silinen öneriler geri getirilebilir.')
+                        ->modalSubmitActionLabel('Evet, Sil')
+                        ->successNotificationTitle('Seçili öneriler başarıyla silindi'),
+
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Seçili Önerileri Geri Getir')
+                        ->modalDescription('Seçili önerileri geri getirmek istediğinizden emin misiniz?')
+                        ->modalSubmitActionLabel('Evet, Geri Getir')
+                        ->successNotificationTitle('Seçili öneriler başarıyla geri getirildi'),
+
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Seçili Önerileri Kalıcı Olarak Sil')
+                        ->modalDescription('Seçili önerileri kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                        ->successNotificationTitle('Seçili öneriler kalıcı olarak silindi'),
                 ]),
             ])
             ->groups([
@@ -463,7 +510,10 @@ class OneriResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withCount('likes');
+        // Remove the SoftDeletingScope so TrashedFilter can work (show/only trashed)
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class])
+            ->withCount('likes');
     }
 
     public static function getRelations(): array

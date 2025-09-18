@@ -10,23 +10,25 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
+use Filament\Tables\Filters\TrashedFilter;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
-    
+
     protected static ?string $navigationGroup = 'Kullanıcı Yönetimi';
-    
+
     protected static ?string $pluralModelLabel = 'Kullanıcılar';
-    
+
     protected static ?string $modelLabel = 'Kullanıcı';
-    
+
     protected static ?string $navigationLabel = 'Kullanıcılar';
-    
+
     protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
@@ -41,7 +43,7 @@ class UserResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->placeholder('Kullanıcı adını girin'),
-                            
+
                         Forms\Components\TextInput::make('email')
                             ->label('E-posta')
                             ->email()
@@ -49,7 +51,7 @@ class UserResource extends Resource
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
                             ->placeholder('E-posta adresini girin'),
-                            
+
                         Forms\Components\TextInput::make('password')
                             ->label('Şifre')
                             ->password()
@@ -61,7 +63,7 @@ class UserResource extends Resource
                             ->helperText('Şifrenizi güçlü tutun. Minimum 8 karakter olmalıdır.'),
                     ])
                     ->columns(2),
-                    
+
                 Forms\Components\Section::make('Roller ve Yetkiler')
                     ->description('Kullanıcı rollerini ve yetkilerini ayarlayın')
                     ->schema([
@@ -87,13 +89,13 @@ class UserResource extends Resource
                     ->label('ID')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('name')
                     ->label('Ad Soyad')
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
-                    
+
                 Tables\Columns\TextColumn::make('email')
                     ->label('E-posta')
                     ->searchable()
@@ -101,20 +103,20 @@ class UserResource extends Resource
                     ->copyable()
                     ->copyMessage('E-posta kopyalandı')
                     ->copyMessageDuration(1500),
-                    
+
                 Tables\Columns\TextColumn::make('roles.name')
                     ->label('Roller')
                     ->badge()
                     ->color('primary')
                     ->separator(',')
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Oluşturma Tarihi')
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                    
+
                 Tables\Columns\TextColumn::make('updated_at')
                     ->label('Son Güncelleme')
                     ->dateTime('d.m.Y H:i')
@@ -122,12 +124,14 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TrashedFilter::make(),
+
                 Tables\Filters\SelectFilter::make('roles')
                     ->label('Rol')
                     ->relationship('roles', 'name')
                     ->multiple()
                     ->placeholder('Rolü filtrele'),
-                    
+
                 Tables\Filters\Filter::make('created_from')
                     ->label('Oluşturma Tarihi')
                     ->form([
@@ -150,12 +154,32 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                
+
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation()
                     ->modalHeading('Kullanıcıyı Sil')
-                    ->modalDescription('Bu kullanıcıyı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                    ->modalDescription('Bu kullanıcıyı silmek istediğinizden emin misiniz?')
                     ->modalSubmitActionLabel('Evet, Sil'),
+
+                Tables\Actions\RestoreAction::make()
+                    ->label('Geri Getir')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Kullanıcıyı Geri Getir')
+                    ->modalDescription('Bu kullanıcıyı geri getirmek istediğinizden emin misiniz?')
+                    ->modalSubmitActionLabel('Evet, Geri Getir')
+                    ->successNotificationTitle('Kullanıcı başarıyla geri getirildi'),
+
+                Tables\Actions\ForceDeleteAction::make()
+                    ->label('Kalıcı Sil')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Kullanıcıyı Kalıcı Olarak Sil')
+                    ->modalDescription('Bu kullanıcıyı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                    ->successNotificationTitle('Kullanıcı kalıcı olarak silindi'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -176,6 +200,12 @@ class UserResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 
     public static function getPages(): array

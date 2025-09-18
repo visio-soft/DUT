@@ -24,3 +24,15 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Additional common ignores
+.vagrant/
+npm-debug.log*
+yarn-error.log
+/.cache
+/.sass-cache
+database/database.sqlite
+.env.local
+.env.testing
+.phpunit.cache
+.idea/*/workspace.xml

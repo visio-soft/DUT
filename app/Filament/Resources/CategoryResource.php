@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\TrashedFilter;
 
 class CategoryResource extends Resource
 {
@@ -85,17 +86,60 @@ class CategoryResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
-                //
+                TrashedFilter::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\RestoreAction::make()
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Projeyi Geri Getir')
+                    ->modalDescription('Bu projeyi geri getirmek istediğinizden emin misiniz?')
+                    ->modalSubmitActionLabel('Evet, Geri Getir')
+                    ->successNotificationTitle('Proje başarıyla geri getirildi'),
+
+                Tables\Actions\ForceDeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Projeyi Kalıcı Olarak Sil')
+                    ->modalDescription('Bu projeyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve bu projeye ait tüm öneriler de silinecektir.')
+                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                    ->successNotificationTitle('Proje kalıcı olarak silindi'),
+
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => !$record->trashed()),
+
                 Tables\Actions\DeleteAction::make()
-                    ->requiresConfirmation(),
+                    ->visible(fn ($record) => !$record->trashed())
+                    ->requiresConfirmation()
+                    ->modalHeading('Projeyi Sil')
+                    ->modalDescription('Bu projeyi silmek istediğinizden emin misiniz? Silinen projeler geri getirilebilir.')
+                    ->modalSubmitActionLabel('Evet, Sil')
+                    ->successNotificationTitle('Proje başarıyla silindi'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->modalHeading('Seçili Projeleri Sil')
+                        ->modalDescription('Seçili projeleri silmek istediğinizden emin misiniz? Silinen projeler geri getirilebilir.')
+                        ->modalSubmitActionLabel('Evet, Sil')
+                        ->successNotificationTitle('Seçili projeler başarıyla silindi'),
+
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Seçili Projeleri Geri Getir')
+                        ->modalDescription('Seçili projeleri geri getirmek istediğinizden emin misiniz?')
+                        ->modalSubmitActionLabel('Evet, Geri Getir')
+                        ->successNotificationTitle('Seçili projeler başarıyla geri getirildi'),
+
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Seçili Projeleri Kalıcı Olarak Sil')
+                        ->modalDescription('Seçili projeleri kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve bu projelere ait tüm öneriler de silinecektir.')
+                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                        ->successNotificationTitle('Seçili projeler kalıcı olarak silindi'),
                 ]),
             ]);
     }
@@ -118,7 +162,9 @@ class CategoryResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
+        // Allow TrashedFilter to control deleted rows by removing the soft deleting scope
         return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class])
             ->withCount('oneriler');
     }
 }

@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Filters\TrashedFilter;
 
 class ObjeResource extends Resource
 {
@@ -22,11 +23,11 @@ class ObjeResource extends Resource
 
     protected static ?string $navigationGroup = 'Obje Yönetimi';
     protected static ?string $navigationIcon = 'heroicon-o-puzzle-piece';
-    
+
     protected static ?string $navigationLabel = 'Objeler';
-    
+
     protected static ?string $modelLabel = 'Obje';
-    
+
     protected static ?string $pluralModelLabel = 'Objeler';
 
     public static function form(Form $form): Form
@@ -108,6 +109,8 @@ class ObjeResource extends Resource
             ])
             ->defaultSort('name')
             ->filters([
+                TrashedFilter::make(),
+
                 Tables\Filters\SelectFilter::make('category')
                     ->label('Kategori')
                     ->options(\App\Models\Obje::CATEGORIES)
@@ -118,6 +121,26 @@ class ObjeResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                
+                Tables\Actions\RestoreAction::make()
+                    ->label('Geri Getir')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Objeyi Geri Getir')
+                    ->modalDescription('Bu objeyi geri getirmek istediğinizden emin misiniz?')
+                    ->modalSubmitActionLabel('Evet, Geri Getir')
+                    ->successNotificationTitle('Obje başarıyla geri getirildi'),
+
+                Tables\Actions\ForceDeleteAction::make()
+                    ->label('Kalıcı Sil')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('Objeyi Kalıcı Olarak Sil')
+                    ->modalDescription('Bu objeyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                    ->successNotificationTitle('Obje kalıcı olarak silindi'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -126,11 +149,19 @@ class ObjeResource extends Resource
             ]);
     }
 
+
+
     public static function getRelations(): array
     {
         return [
             //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 
     public static function getPages(): array

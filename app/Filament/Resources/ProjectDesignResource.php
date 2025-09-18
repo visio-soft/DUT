@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Filters\TrashedFilter;
 
 class ProjectDesignResource extends Resource
 {
@@ -146,6 +147,8 @@ class ProjectDesignResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                TrashedFilter::make(),
+
                 Tables\Filters\SelectFilter::make('project')
                     ->label('Proje')
                     ->relationship('project', 'title')
@@ -195,6 +198,26 @@ class ProjectDesignResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->label('Sil')
                         ->icon('heroicon-o-trash'),
+
+                    Tables\Actions\RestoreAction::make()
+                        ->label('Geri Getir')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Tasarımı Geri Getir')
+                        ->modalDescription('Bu tasarımı geri getirmek istediğinizden emin misiniz?')
+                        ->modalSubmitActionLabel('Evet, Geri Getir')
+                        ->successNotificationTitle('Tasarım başarıyla geri getirildi'),
+
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label('Kalıcı Sil')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Tasarımı Kalıcı Olarak Sil')
+                        ->modalDescription('Bu tasarımı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                        ->successNotificationTitle('Tasarım kalıcı olarak silindi'),
                 ])
                 ->label('Aksiyonlar')
                 ->icon('heroicon-m-ellipsis-vertical')
@@ -215,6 +238,12 @@ class ProjectDesignResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 
     public static function getPages(): array

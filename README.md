@@ -43,8 +43,8 @@ Projeye eklenmiş `scripts/seed_clean.php` yardımcı scripti, belirttiğiniz ta
 
 Varsayılan davranış:
 
-- Korunan tablolar: `migrations`, `categories`
-- Çalıştırılan seeder: `Database\\Seeders\\DatabaseSeeder`
+-   Korunan tablolar: `migrations`, `categories`
+-   Çalıştırılan seeder: `Database\\Seeders\\DatabaseSeeder`
 
 Kullanım örnekleri:
 
@@ -65,7 +65,51 @@ php scripts/seed_clean.php --keep=categories,users --seeders=Database\\\\Seeders
 ```
 
 Notlar:
-- Bu script tabloları truncate/delete yaparak veri siler; yalnızca geliştirme ortamında veya yedek alındığında kullanın.
-- PgSQL, MySQL ve SQLite ile uyumludur.
 
+-   Bu script tabloları truncate/delete yaparak veri siler; yalnızca geliştirme ortamında veya yedek alındığında kullanın.
+-   PgSQL, MySQL ve SQLite ile uyumludur.
 
+---
+
+## Hızlı kurulum (kısa ve net)
+
+1. Depoyu hazırlayın ve bağımlılıkları yükleyin:
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+2. SQLite kullanıyorsanız boş dosyayı oluşturun ve migration çalıştırın:
+
+```bash
+php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
+php artisan migrate --force
+```
+
+3. Storage bağlantısını oluşturun (public/storage -> storage/app/public):
+
+```bash
+php artisan storage:link --force
+```
+
+4. Seeder'ları çalıştırın (örnek):
+
+```bash
+php artisan db:seed
+```
+
+5. Oluşturulan örnek admin hesapları (seed tarafından eklenmiştir):
+
+-   Email: admin@admin.com / Password: password (super_admin)
+-   Email: omega@admin.com / Password: omega456 (normal admin)
+-   Email: normaladmin@dut.com / Password: main123 (normal admin)
+
+6. Geliştirme sunucusu:
+
+```bash
+nohup php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-serve.log 2>&1 &
+```
+
+Not: Bu adımlar yerel geliştirme içindir. Üretim kurulumunda farklı konfigürasyon ve izinler gerekebilir.
