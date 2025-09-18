@@ -360,103 +360,127 @@ class OneriResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\Action::make('view_design')
-                    ->label('Tasarımı Görüntüle')
-                    ->icon('heroicon-o-eye')
-                    ->color('success')
-                    ->visible(fn ($record) => $record->design_completed && !$record->trashed())
-                    ->url(function ($record) {
-                        // Projenin tasarım kaydını bul ve view sayfasına git
-                        $design = $record->design;
-                        if ($design && $design->id) {
-                            return url("/admin/project-designs/{$design->id}");
-                        }
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('view_design')
+                        ->label('Tasarımı Görüntüle')
+                        ->icon('heroicon-o-eye')
+                        ->color('success')
+                        ->visible(fn ($record) => $record->design_completed && !$record->trashed())
+                        ->url(function ($record) {
+                            // Projenin tasarım kaydını bul ve view sayfasına git
+                            $design = $record->design;
+                            if ($design && $design->id) {
+                                return url("/admin/project-designs/{$design->id}");
+                            }
 
-                        // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
-                        $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
-                        if ($projectDesign) {
-                            return url("/admin/project-designs/{$projectDesign->id}");
-                        }
+                            // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
+                            $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
+                            if ($projectDesign) {
+                                return url("/admin/project-designs/{$projectDesign->id}");
+                            }
 
-                        // Hiç tasarım yoksa projeler sayfasında kal
-                        return url("/admin/oneris");
-                    })
-                    ->openUrlInNewTab(false),
+                            // Hiç tasarım yoksa projeler sayfasında kal
+                            return url("/admin/oneris");
+                        })
+                        ->openUrlInNewTab(false),
 
-                Tables\Actions\Action::make('delete_design')
-                    ->label('Tasarımı Sil')
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->visible(fn ($record) => $record->design_completed && !$record->trashed())
-                    ->requiresConfirmation()
-                    ->modalHeading('Tasarımı Sil')
-                    ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                    ->modalSubmitActionLabel('Evet, Sil')
-                    ->action(function ($record) {
-                        // Projenin tasarım kaydını bul ve sil
-                        $design = $record->design;
-                        if ($design) {
-                            $design->delete();
-                            \Filament\Notifications\Notification::make()
-                                ->title('Tasarım silindi')
-                                ->success()
-                                ->send();
-                        } else {
-                            // Eğer design ilişkisi yoksa, projeye ait tüm tasarım kayıtlarını sil
-                            \App\Models\ProjectDesign::where('project_id', $record->id)->delete();
-                            \Filament\Notifications\Notification::make()
-                                ->title('Tasarım silindi')
-                                ->success()
-                                ->send();
-                        }
-                    }),
+                    Tables\Actions\Action::make('edit_design')
+                        ->label('Tasarımı Düzenle')
+                        ->icon('heroicon-o-paint-brush')
+                        ->color('primary')
+                        ->visible(fn ($record) => $record->design_completed && !$record->trashed())
+                        ->url(function ($record) {
+                            $projectImage = '';
+                            if ($record->hasMedia('images')) {
+                                $projectImage = $record->getFirstMediaUrl('images');
+                            }
 
-                Tables\Actions\Action::make('add_design')
-                    ->label('Tasarım Ekle')
-                    ->icon('heroicon-o-plus')
-                    ->color('warning')
-                    ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed && !$record->trashed())
-                    ->url(function ($record) {
-                        $projectImage = '';
-                        if ($record->hasMedia('images')) {
-                            $projectImage = $record->getFirstMediaUrl('images');
-                        }
+                            return url('/admin/drag-drop-test?' . http_build_query([
+                                'project_id' => $record->id,
+                                'image' => $projectImage
+                            ]));
+                        })
+                        ->openUrlInNewTab(false),
 
-                        return url('/admin/drag-drop-test?' . http_build_query([
-                            'project_id' => $record->id,
-                            'image' => $projectImage
-                        ]));
-                    })
-                    ->openUrlInNewTab(false),
+                    Tables\Actions\Action::make('add_design')
+                        ->label('Tasarım Ekle')
+                        ->icon('heroicon-o-plus')
+                        ->color('warning')
+                        ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed && !$record->trashed())
+                        ->url(function ($record) {
+                            $projectImage = '';
+                            if ($record->hasMedia('images')) {
+                                $projectImage = $record->getFirstMediaUrl('images');
+                            }
 
-                Tables\Actions\RestoreAction::make()
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading('Öneriyi Geri Getir')
-                    ->modalDescription('Bu öneriyi geri getirmek istediğinizden emin misiniz?')
-                    ->modalSubmitActionLabel('Evet, Geri Getir')
-                    ->successNotificationTitle('Öneri başarıyla geri getirildi'),
+                            return url('/admin/drag-drop-test?' . http_build_query([
+                                'project_id' => $record->id,
+                                'image' => $projectImage
+                            ]));
+                        })
+                        ->openUrlInNewTab(false),
 
-                Tables\Actions\ForceDeleteAction::make()
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading('Öneriyi Kalıcı Olarak Sil')
-                    ->modalDescription('Bu öneriyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
-                    ->successNotificationTitle('Öneri kalıcı olarak silindi'),
+                    Tables\Actions\EditAction::make()
+                        ->visible(fn ($record) => !$record->design_completed && !$record->trashed()),
 
-                Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => !$record->design_completed && !$record->trashed()),
+                    Tables\Actions\Action::make('delete_design')
+                        ->label('Tasarımı Sil')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->visible(fn ($record) => $record->design_completed && !$record->trashed())
+                        ->requiresConfirmation()
+                        ->modalHeading('Tasarımı Sil')
+                        ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                        ->modalSubmitActionLabel('Evet, Sil')
+                        ->action(function ($record) {
+                            // Projenin tasarım kaydını bul ve sil
+                            $design = $record->design;
+                            if ($design) {
+                                $design->delete();
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Tasarım silindi')
+                                    ->success()
+                                    ->send();
+                            } else {
+                                // Eğer design ilişkisi yoksa, projeye ait tüm tasarım kayıtlarını sil
+                                \App\Models\ProjectDesign::where('project_id', $record->id)->delete();
+                                \Filament\Notifications\Notification::make()
+                                    ->title('Tasarım silindi')
+                                    ->success()
+                                    ->send();
+                            }
+                        }),
 
-                Tables\Actions\DeleteAction::make()
-                    ->visible(fn ($record) => !$record->trashed())
-                    ->requiresConfirmation()
-                    ->modalHeading('Öneriyi Sil')
-                    ->modalDescription('Bu öneriyi silmek istediğinizden emin misiniz? Silinen öneriler geri getirilebilir.')
-                    ->modalSubmitActionLabel('Evet, Sil')
-                    ->successNotificationTitle('Öneri başarıyla silindi'),
+                    Tables\Actions\DeleteAction::make()
+                        ->visible(fn ($record) => !$record->trashed())
+                        ->requiresConfirmation()
+                        ->modalHeading('Öneriyi Sil')
+                        ->modalDescription('Bu öneriyi silmek istediğinizden emin misiniz? Silinen öneriler geri getirilebilir.')
+                        ->modalSubmitActionLabel('Evet, Sil')
+                        ->successNotificationTitle('Öneri başarıyla silindi'),
+
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Öneriyi Geri Getir')
+                        ->modalDescription('Bu öneriyi geri getirmek istediğinizden emin misiniz?')
+                        ->modalSubmitActionLabel('Evet, Geri Getir')
+                        ->successNotificationTitle('Öneri başarıyla geri getirildi'),
+
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Öneriyi Kalıcı Olarak Sil')
+                        ->modalDescription('Bu öneriyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                        ->successNotificationTitle('Öneri kalıcı olarak silindi'),
+                ])
+                ->label('Aksiyonlar')
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->size('sm')
+                ->color('gray')
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
