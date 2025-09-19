@@ -60,5 +60,10 @@ class User extends Authenticatable implements FilamentUser
        return true;
     }
 
+    public function oneriComments(): HasMany
+    {
+        return $this->hasMany(OneriComment::class);
+    }
+
     // Design functionality removed - projectDesignLikes relationship no longer needed
 }

@@ -14,6 +14,15 @@ class CreateOneri extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['created_by_id'] = Auth::id();
+
+        // Ensure category_id is set
+        if (empty($data['category_id'])) {
+            $firstCategory = \App\Models\Category::first();
+            if ($firstCategory) {
+                $data['category_id'] = $firstCategory->id;
+            }
+        }
+
         // Design functionality removed
         return $data;
     }

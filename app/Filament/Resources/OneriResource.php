@@ -47,6 +47,10 @@ class OneriResource extends Resource
                             ->searchable()
                             ->preload()
                             ->required()
+                            ->default(function () {
+                                // Set first category as default
+                                return Category::first()?->id;
+                            })
                             ->placeholder('Proje kategorisi seçin'),
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
@@ -69,21 +73,13 @@ class OneriResource extends Resource
                         // Resim upload - Spatie Media Library ile
                         SpatieMediaLibraryFileUpload::make('images')
                             ->label('Resim')
-                            ->collection('images')
+                            ->collection('main_image')
                             ->image()
-                            ->imagePreviewHeight('150')
+                            ->imagePreviewHeight('200')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
-                            ->maxSize(10240) // 10MB limit
-                            ->imageResizeMode('contain')
-                            ->imageResizeTargetWidth('1920')
-                            ->imageResizeTargetHeight('1920')
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->disk('public')
-                            ->directory('images')
-                            ->visibility('public')
-                            ->required()
-                            ->helperText('Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP. Resim otomatik olarak optimize edilecektir.')
+                            ->helperText('Tasarım görseli. Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP.')
                             ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
@@ -232,6 +228,18 @@ class OneriResource extends Resource
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
                     ->money('TRY')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('likes_count')
+                    ->label('Beğeni Sayısı')
+                    ->counts('likes')
+                    ->badge()
+                    ->color('success')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('comments_count')
+                    ->label('Yorum Sayısı')
+                    ->counts('comments')
+                    ->badge()
+                    ->color('info')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('estimated_duration')
                     ->label('Tahmini Süre')
@@ -432,7 +440,7 @@ class OneriResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CommentsRelationManager::class,
         ];
     }
 

@@ -16,12 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminUserSeeder::class,
             NormalAdminUserSeeder::class,
-            DoğaObjelerSeeder::class,
-            UlaşımObjelerSeeder::class,
-            MimarlıkObjelerSeeder::class,
-            SanatObjelerSeeder::class,
-            DokuObjelerSeeder::class,
-            YaşamObjelerSeeder::class,
         ]);
     }
 }

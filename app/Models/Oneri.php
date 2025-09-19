@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -61,6 +62,36 @@ class Oneri extends Model implements HasMedia
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
+    public function likes(): HasMany
+    {
+        return $this->hasMany(OneriLike::class);
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(OneriComment::class);
+    }
+
+    public function approvedComments(): HasMany
+    {
+        return $this->hasMany(OneriComment::class)->where('is_approved', true);
+    }
+
+    public function getLikesCountAttribute(): int
+    {
+        return $this->likes()->count();
+    }
+
+    public function getCommentsCountAttribute(): int
+    {
+        return $this->comments()->count();
+    }
+
+    public function getApprovedCommentsCountAttribute(): int
+    {
+        return $this->approvedComments()->count();
     }
 
     // Design relationships removed - no longer needed

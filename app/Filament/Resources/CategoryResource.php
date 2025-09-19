@@ -20,8 +20,9 @@ class CategoryResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?string $navigationGroup = 'Proje Yönetimi';
-    protected static ?string $pluralModelLabel = 'Projeler';
-    protected static ?string $modelLabel = 'Proje';
+    protected static ?string $navigationLabel = 'Proje Kategorisi';
+    protected static ?string $pluralModelLabel = 'Proje Kategorileri';
+    protected static ?string $modelLabel = 'Proje Kategorisi';
 
     public static function form(Form $form): Form
     {
@@ -31,6 +32,12 @@ class CategoryResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->placeholder('Proje adını girin'),
+
+                Forms\Components\Textarea::make('description')
+                    ->label('Proje Açıklaması')
+                    ->rows(4)
+                    ->placeholder('Proje hakkında detaylı açıklama yazın...')
+                    ->helperText('Bu projenin amacı, kapsamı ve hedefleri hakkında bilgi verin'),
 
                 Forms\Components\DateTimePicker::make('start_datetime')->label('Başlangıç Tarihi ve Saati')
                     ->required()
@@ -49,6 +56,11 @@ class CategoryResource extends Resource
                     ->timezone('Europe/Istanbul')
                     ->placeholder('31.12.2025 22:00')
                     ->helperText('Bu projedeki işlerin bitiş tarihi ve saati (24 saat formatında, örn: 22:00)'),
+
+                Forms\Components\SpatieMediaLibraryFileUpload::make('files')->label('Proje Dosyaları')
+                    ->collection('project_files')
+                    ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'])
+                    ->helperText('Proje ile ilgili tasarımsız dosyaları yükleyin.')
             ]);
     }
 
@@ -56,10 +68,15 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Proje Adı')
+                Tables\Columns\TextColumn::make('name')->label('Proje Adı')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->label('Açıklama')
+                    ->limit(100)
                     ->searchable()
-                    ->sortable(),
+                    ->tooltip(function ($record): ?string {
+                        return $record->description;
+                    })
+                    ->placeholder('Açıklama yok'),
 
                 Tables\Columns\TextColumn::make('start_datetime')
                     ->label('Başlangıç')
@@ -83,6 +100,7 @@ class CategoryResource extends Resource
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+
             ])
             ->defaultSort('name')
             ->filters([
