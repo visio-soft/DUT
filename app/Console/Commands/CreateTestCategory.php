@@ -52,8 +52,7 @@ class CreateTestCategory extends Command
             'city' => 'İstanbul',
             'district' => 'Kadıköy',
             'neighborhood' => 'Moda',
-            'address' => 'Test Adresi',
-            'design_completed' => false
+            'address' => 'Test Adresi'
         ]);
 
         $this->info("\nTest projesi oluşturuldu!");
@@ -61,41 +60,7 @@ class CreateTestCategory extends Command
         $this->info("Başlık: " . $testProject->title);
         $this->info("Kategori: " . $testProject->category->name);
 
-        // Test projesi için tasarım oluştur
-        $testDesign = \App\Models\ProjectDesign::create([
-            'project_id' => $testProject->id,
-            'design_data' => [
-                'project_id' => $testProject->id,
-                'elements' => [
-                    [
-                        'obje_id' => 1,
-                        'x' => 100,
-                        'y' => 100,
-                        'width' => 50,
-                        'height' => 50,
-                        'scale' => 1.0
-                    ],
-                    [
-                        'obje_id' => 2,
-                        'x' => 200,
-                        'y' => 150,
-                        'width' => 60,
-                        'height' => 60,
-                        'scale' => 1.2
-                    ]
-                ],
-                'timestamp' => $now->toIso8601String(),
-                'total_elements' => 2
-            ]
-        ]);
-
-        $this->info("\nTest tasarımı oluşturuldu!");
-        $this->info("Tasarım ID: " . $testDesign->id);
-        $this->info("Element sayısı: " . count($testDesign->design_data['elements']));
-        $this->info("Tasarım timestamp: " . $testDesign->design_data['timestamp']);
-
-        $this->info("\nTest tamamlandı! Şimdi web sayfasına gidip geri sayımı kontrol edebilirsiniz.");
-        $this->info("URL: /admin/project-designs-gallery");
-        $this->info("Zaman sayacı 2 dakika içinde 'Oylama süresi doldu' olarak değişecek.");
+        // Design functionality removed - no longer creating test designs
+        $this->info("\nTest tamamlandı! Proje başarıyla oluşturuldu.");
     }
 }
