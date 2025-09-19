@@ -39,4 +39,13 @@ class Category extends Model implements HasMedia
     {
         return $this->oneriler();
     }
+
+    /**
+     * Register media collections used by Category.
+     */
+    public function registerMediaCollections(): void
+    {
+        // collection for project related files (images, docs, etc.)
+        $this->addMediaCollection('project_files');
+    }
 }

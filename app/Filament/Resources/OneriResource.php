@@ -73,7 +73,8 @@ class OneriResource extends Resource
                         // Resim upload - Spatie Media Library ile
                         SpatieMediaLibraryFileUpload::make('images')
                             ->label('Resim')
-                            ->collection('main_image')
+                            // Match the media collection defined in the model (registerMediaCollections)
+                            ->collection('images')
                             ->image()
                             ->imagePreviewHeight('200')
                             ->panelLayout('integrated')

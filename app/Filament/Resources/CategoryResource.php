@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\TrashedFilter;
@@ -68,6 +69,13 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('files')
+                    ->label('Resim')
+                    ->collection('project_files')
+                    ->circular()
+                    ->height(50)
+                    ->width(50),
+
                 Tables\Columns\TextColumn::make('name')->label('Proje Adı')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Açıklama')
