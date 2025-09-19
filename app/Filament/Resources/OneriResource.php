@@ -80,7 +80,7 @@ class OneriResource extends Resource
                             ->panelLayout('integrated')
                             ->maxFiles(1)
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->helperText('Tasarım görseli. Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP.')
+                            ->helperText('Proje görseli. Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP.')
                             ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
