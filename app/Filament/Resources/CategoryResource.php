@@ -61,7 +61,7 @@ class CategoryResource extends Resource
                 Forms\Components\SpatieMediaLibraryFileUpload::make('files')->label('Proje Dosyaları')
                     ->collection('project_files')
                     ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'])
-                    ->helperText('Proje ile ilgili tasarımsız dosyaları yükleyin.')
+                    ->helperText('Proje ile ilgili dosyaları yükleyin.')
             ]);
     }
 
