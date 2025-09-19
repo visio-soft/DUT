@@ -60,8 +60,5 @@ class User extends Authenticatable implements FilamentUser
        return true;
     }
 
-    public function projectDesignLikes(): HasMany
-    {
-        return $this->hasMany(ProjectDesignLike::class);
-    }
+    // Design functionality removed - projectDesignLikes relationship no longer needed
 }

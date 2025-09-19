@@ -233,22 +233,6 @@ class OneriResource extends Resource
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
                     ->money('TRY')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('likes_count')
-                    ->label('Beğeni Sayısı')
-                    ->sortable()
-                    ->badge()
-                    ->color('success')
-                    ->icon('heroicon-o-heart'),
-                Tables\Columns\IconColumn::make('design_completed')
-                    ->label('Tasarım')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger')
-                    ->tooltip(function ($record) {
-                        return $record->design_completed ? 'Tasarım tamamlandı' : 'Tasarım bekleniyor';
-                    }),
                 Tables\Columns\TextColumn::make('estimated_duration')
                     ->label('Tahmini Süre')
                     ->suffix(' gün')
@@ -361,95 +345,8 @@ class OneriResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\Action::make('view_design')
-                        ->label('Tasarımı Görüntüle')
-                        ->icon('heroicon-o-eye')
-                        ->color('success')
-                        ->visible(fn ($record) => $record->design_completed && !$record->trashed())
-                        ->url(function ($record) {
-                            // Projenin tasarım kaydını bul ve view sayfasına git
-                            $design = $record->design;
-                            if ($design && $design->id) {
-                                return url("/admin/project-designs/{$design->id}");
-                            }
-
-                            // Eğer design ilişkisi yoksa, projeye ait ilk tasarım kaydını bul
-                            $projectDesign = \App\Models\ProjectDesign::where('project_id', $record->id)->first();
-                            if ($projectDesign) {
-                                return url("/admin/project-designs/{$projectDesign->id}");
-                            }
-
-                            // Hiç tasarım yoksa projeler sayfasında kal
-                            return url("/admin/oneris");
-                        })
-                        ->openUrlInNewTab(false),
-
-                    Tables\Actions\Action::make('edit_design')
-                        ->label('Tasarımı Düzenle')
-                        ->icon('heroicon-o-paint-brush')
-                        ->color('primary')
-                        ->visible(fn ($record) => $record->design_completed && !$record->trashed())
-                        ->url(function ($record) {
-                            $projectImage = '';
-                            if ($record->hasMedia('images')) {
-                                $projectImage = $record->getFirstMediaUrl('images');
-                            }
-
-                            return url('/admin/drag-drop-test?' . http_build_query([
-                                'project_id' => $record->id,
-                                'image' => $projectImage
-                            ]));
-                        })
-                        ->openUrlInNewTab(false),
-
-                    Tables\Actions\Action::make('add_design')
-                        ->label('Tasarım Ekle')
-                        ->icon('heroicon-o-plus')
-                        ->color('warning')
-                        ->visible(fn ($record) => $record->hasMedia('images') && !$record->design_completed && !$record->trashed())
-                        ->url(function ($record) {
-                            $projectImage = '';
-                            if ($record->hasMedia('images')) {
-                                $projectImage = $record->getFirstMediaUrl('images');
-                            }
-
-                            return url('/admin/drag-drop-test?' . http_build_query([
-                                'project_id' => $record->id,
-                                'image' => $projectImage
-                            ]));
-                        })
-                        ->openUrlInNewTab(false),
-
                     Tables\Actions\EditAction::make()
-                        ->visible(fn ($record) => !$record->design_completed && !$record->trashed()),
-
-                    Tables\Actions\Action::make('delete_design')
-                        ->label('Tasarımı Sil')
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->visible(fn ($record) => $record->design_completed && !$record->trashed())
-                        ->requiresConfirmation()
-                        ->modalHeading('Tasarımı Sil')
-                        ->modalDescription('Bu projenin tasarımını silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                        ->modalSubmitActionLabel('Evet, Sil')
-                        ->action(function ($record) {
-                            // Projenin tasarım kaydını bul ve sil
-                            $design = $record->design;
-                            if ($design) {
-                                $design->delete();
-                                \Filament\Notifications\Notification::make()
-                                    ->title('Tasarım silindi')
-                                    ->success()
-                                    ->send();
-                            } else {
-                                // Eğer design ilişkisi yoksa, projeye ait tüm tasarım kayıtlarını sil
-                                \App\Models\ProjectDesign::where('project_id', $record->id)->delete();
-                                \Filament\Notifications\Notification::make()
-                                    ->title('Tasarım silindi')
-                                    ->success()
-                                    ->send();
-                            }
-                        }),
+                        ->visible(fn ($record) => !$record->trashed()),
 
                     Tables\Actions\DeleteAction::make()
                         ->visible(fn ($record) => !$record->trashed())
@@ -520,13 +417,6 @@ class OneriResource extends Resource
                         return "Bitiş: {$end}";
                     }),
 
-                // Ekstra grup: Tasarım durumu (var / yok) - group by boolean column
-                Group::make('design_completed')
-                    ->label('Tasarım')
-                    ->titlePrefixedWithLabel(false)
-                    ->getTitleFromRecordUsing(function ($record): string {
-                        return $record->design_completed ? 'Tasarımı Var' : 'Tasarımı Yok';
-                    }),
             ])
             ->defaultGroup('category.name');
 
@@ -536,8 +426,7 @@ class OneriResource extends Resource
     {
         // Remove the SoftDeletingScope so TrashedFilter can work (show/only trashed)
         return parent::getEloquentQuery()
-            ->withoutGlobalScopes([SoftDeletingScope::class])
-            ->withCount('likes');
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
 
     public static function getRelations(): array
@@ -559,7 +448,7 @@ class OneriResource extends Resource
     public static function getHeaderActions(): array
     {
         return [
-            \Filament\Actions\Action::make('create_with_design')
+            \Filament\Actions\Action::make('create_new')
                 ->label('Yeni Öneri Oluştur')
                 ->icon('heroicon-o-plus')
                 ->color('primary')
