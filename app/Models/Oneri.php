@@ -69,6 +69,22 @@ class Oneri extends Model implements HasMedia
         return $this->hasMany(OneriLike::class);
     }
 
+    /**
+     * If this Oneri is a project root, these are its suggestions (child oneri records)
+     */
+    public function suggestions(): HasMany
+    {
+        return $this->hasMany(self::class, 'project_id');
+    }
+
+    /**
+     * If this Oneri is a suggestion, this returns its parent project
+     */
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'project_id');
+    }
+
     public function comments(): HasMany
     {
         return $this->hasMany(OneriComment::class);
