@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './user-panel.css';
 
 /* Custom utility classes */
 @layer utilities {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr" class="h-full bg-gray-50">
+<html lang="tr" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,7 @@
     <!-- Ensure CSS is loaded properly -->
     <style>
         /* Fallback styling in case CSS doesn't load immediately */
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
         .loading { opacity: 0.5; }
         /* Remove loading state when CSS is loaded */
         .loaded .loading { opacity: 1; }
@@ -28,31 +28,31 @@
 </head>
 <body class="h-full">
     <!-- Header -->
-    <header class="bg-white shadow-sm">
-        <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+    <header class="user-header">
+        <nav class="user-container">
+            <div class="user-nav">
                 <div class="flex items-center">
-                    <a href="{{ route('user.index') }}" class="text-xl font-bold text-gray-900">
-                        Proje Paneli
+                    <a href="{{ route('user.index') }}" class="user-logo">
+                        🌱 Proje Paneli
                     </a>
                 </div>
 
-                <div class="flex items-center space-x-8">
+                <div class="user-nav-links">
                     <a href="{{ route('user.index') }}"
-                       class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('user.index') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                       class="user-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
                         Ana Sayfa
                     </a>
                     <a href="{{ route('user.projects') }}"
-                       class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('user.projects') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
+                       class="user-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
                         Projeler
                     </a>
 
                     @auth
                         <div class="flex items-center space-x-3">
-                            <span class="text-sm text-gray-700">Merhaba, {{ Auth::user()->name }}</span>
+                            <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
                         </div>
                     @else
-                        <a href="/admin/login" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                        <a href="/admin/login" class="user-nav-link">
                             Giriş Yap
                         </a>
                     @endauth
@@ -67,9 +67,9 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-white border-t mt-12">
-        <div class="mx-auto max-w-7xl py-6 px-4 sm:px-6 lg:px-8">
-            <div class="text-center text-gray-500 text-sm">
+    <footer class="user-footer">
+        <div class="user-container">
+            <div class="user-footer-content">
                 © 2025 Proje Paneli. Tüm hakları saklıdır.
             </div>
         </div>
