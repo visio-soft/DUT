@@ -108,8 +108,28 @@ php artisan db:seed
 
 6. Geliştirme sunucusu:
 
+**Önemli**: Geliştirme ortamında hem Laravel sunucusu hem de Vite dev server'ının aynı anda çalışması gerekir.
+
+İki ayrı terminal açarak aşağıdaki komutları çalıştırın:
+
+**Terminal 1 - Laravel sunucusu:**
 ```bash
+php artisan serve
+```
+
+**Terminal 2 - Vite dev server (CSS/JS için):**
+```bash
+npm run dev
+```
+
+Alternatif olarak, arka planda çalıştırmak için:
+
+```bash
+# Laravel sunucusu arka planda
 nohup php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-serve.log 2>&1 &
+
+# Vite dev server arka planda
+nohup npm run dev > /tmp/vite-dev.log 2>&1 &
 ```
 
 Not: Bu adımlar yerel geliştirme içindir. Üretim kurulumunda farklı konfigürasyon ve izinler gerekebilir.
