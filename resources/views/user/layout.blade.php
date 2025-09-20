@@ -5,10 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Proje Paneli')</title>
-    
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    
+
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Ensure CSS is loaded properly -->
+    <style>
+        /* Fallback styling in case CSS doesn't load immediately */
+        body { font-family: system-ui, -apple-system, sans-serif; }
+        .loading { opacity: 0.5; }
+        /* Remove loading state when CSS is loaded */
+        .loaded .loading { opacity: 1; }
+    </style>
+
+    <script>
+        // Mark document as loaded when CSS is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            document.documentElement.classList.add('loaded');
+        });
+    </script>
 </head>
 <body class="h-full">
     <!-- Header -->
@@ -20,17 +36,17 @@
                         Proje Paneli
                     </a>
                 </div>
-                
+
                 <div class="flex items-center space-x-8">
-                    <a href="{{ route('user.index') }}" 
+                    <a href="{{ route('user.index') }}"
                        class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('user.index') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
                         Ana Sayfa
                     </a>
-                    <a href="{{ route('user.projects') }}" 
+                    <a href="{{ route('user.projects') }}"
                        class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('user.projects') ? 'text-blue-600 border-b-2 border-blue-600' : '' }}">
                         Projeler
                     </a>
-                    
+
                     @auth
                         <div class="flex items-center space-x-3">
                             <span class="text-sm text-gray-700">Merhaba, {{ Auth::user()->name }}</span>
