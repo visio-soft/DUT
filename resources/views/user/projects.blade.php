@@ -1,20 +1,44 @@
 @extends('user.layout')
 
-@section('title', 'Projeler - Proje Paneli')
+@section('title', 'Projeler - DUT Vote')
 
 @section('content')
-<div style="padding: 2rem 0;">
+<!-- Header Section with Background -->
+<section class="section-padding dynamic-background {{ ($hasBackgroundImages ?? false) ? '' : 'no-background-images' }}" style="padding: 3rem 0;">
+    @if($hasBackgroundImages ?? false)
+        @if(count($carouselImageSets ?? []) > 0)
+            <!-- Carousel Background System -->
+            <div class="carousel-background-container"></div>
+        @elseif(count($backgroundImages ?? []) > 0)
+            @php $headerImage = $backgroundImages[1] ?? $backgroundImages[0] ?? null; @endphp
+            @if($headerImage && isset($headerImage['url']))
+                <div class="background-image-container">
+                    <img src="{{ $headerImage['url'] }}" 
+                         alt="Projeler - {{ $headerImage['title'] ?? 'Öneri' }}" 
+                         class="background-image-main"
+                         loading="eager">
+                </div>
+            @endif
+        @endif
+        <div class="background-image-overlay"></div>
+    @endif
+
     <div class="user-container">
         <!-- Page Header -->
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1rem;">Tüm Projeler</h1>
-            <p style="font-size: 1.125rem; color: var(--gray-600); max-width: 600px; margin: 0 auto;">
+        <div class="text-center content-spacing-xl" style="position: relative; z-index: 3;">
+            <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--gray-900); margin-bottom: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Tüm Projeler</h1>
+            <p style="font-size: 1.125rem; color: var(--gray-700); max-width: 600px; margin: 0 auto; text-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                 Şehrimizi güzelleştirmek için hazırlanan projeler ve yaratıcı öneriler
             </p>
         </div>
+    </div>
+</section>
+
+<div class="section-padding">
+    <div class="user-container">
 
         @if($projects->count() > 0)
-        <div style="display: grid; grid-template-columns: 1fr 3fr; gap: 2rem;">
+        <div class="d-grid" style="grid-template-columns: 1fr 3fr; gap: 2rem;">
             <!-- Sol Taraf: Tree View -->
             <div>
                 <div class="tree-view">
@@ -61,12 +85,12 @@
 
             <!-- Sağ Taraf: Project Cards -->
             <div>
-                <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div class="d-flex" style="flex-direction: column; gap: 2rem;">
                     @foreach($projects as $project)
                     <div id="project-{{ $project->id }}" class="user-card">
                         <!-- Project Header -->
                         <div class="user-card-header">
-                            <div style="display: flex; align-items: start; justify-content: space-between;">
+                            <div class="d-flex align-start justify-between">
                                 <div style="flex: 1;">
                                     <h2 class="user-card-title" style="font-size: 1.5rem; color: var(--green-800);">{{ $project->name }}</h2>
                                     <p class="user-card-description">
@@ -108,7 +132,8 @@
                                     <div style="width: 8rem; height: 6rem; background: var(--gray-200); border-radius: var(--radius-lg); overflow: hidden;">
                                         <img src="{{ $project->getFirstMediaUrl('project_files') }}"
                                              alt="{{ $project->name }}"
-                                             style="width: 100%; height: 100%; object-fit: cover;">
+                                             style="width: 100%; height: 100%; object-fit: cover;"
+                                             onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center;&quot;><svg style=&quot;width: 2rem; height: 2rem; color: var(--green-600);&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg></div>';">
                                     </div>
                                 </div>
                                 @endif
@@ -127,7 +152,8 @@
                                         <div class="suggestion-image">
                                             @if($suggestion->getFirstMediaUrl('images'))
                                                 <img src="{{ $suggestion->getFirstMediaUrl('images') }}"
-                                                     alt="{{ $suggestion->title }}">
+                                                     alt="{{ $suggestion->title }}"
+                                                     onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--gray-200);&quot;><svg style=&quot;width: 1.5rem; height: 1.5rem; color: var(--gray-400);&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg></div>';">
                                             @else
                                                 <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
                                                     <svg style="width: 1.5rem; height: 1.5rem; color: var(--gray-400);" fill="currentColor" viewBox="0 0 20 20">
@@ -186,7 +212,7 @@
         </div>
         @else
         <!-- Empty State -->
-        <div style="text-align: center; padding: 4rem 0;">
+        <div class="text-center section-padding-lg">
             <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
                 <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
@@ -305,4 +331,6 @@ function adjustLayout() {
 window.addEventListener('load', adjustLayout);
 window.addEventListener('resize', adjustLayout);
 </script>
+    </div>
+</div>
 @endsection

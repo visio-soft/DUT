@@ -1,10 +1,26 @@
 @extends('user.layout')
 
-@section('title', 'Ana Sayfa - Proje Paneli')
+@section('title', 'Ana Sayfa - DUT Vote')
 
 @section('content')
 <!-- Hero Section -->
-<section class="user-hero">
+<section class="user-hero dynamic-background {{ ($hasBackgroundImages ?? false) ? '' : 'no-background-images' }}">
+    @if($hasBackgroundImages ?? false)
+        @if(count($carouselImageSets ?? []) > 0)
+            <!-- Carousel Background System -->
+            <div class="carousel-background-container"></div>
+        @elseif($randomBackgroundImage)
+            <!-- Fallback Single Image -->
+            <div class="background-image-container">
+                <img src="{{ $randomBackgroundImage }}" 
+                     alt="Şehri Birlikte Dönüştürelim" 
+                     class="background-image-main"
+                     loading="eager">
+            </div>
+        @endif
+        <div class="background-image-overlay"></div>
+    @endif
+
     <div class="user-container">
         <div class="user-hero-content">
             <h1>Şehri Birlikte <span style="color: var(--green-700);">Dönüştürelim</span></h1>
@@ -31,9 +47,9 @@
 </section>
 
 <!-- Featured Projects Section -->
-<section id="projects" style="padding: 4rem 0;">
+<section id="projects" class="section-padding-lg">
     <div class="user-container">
-        <div style="text-align: center; margin-bottom: 3rem;">
+        <div class="text-center content-spacing-xl">
             <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Öne Çıkan Projeler</h2>
             <p style="font-size: 1.125rem; color: var(--gray-600); max-width: 600px; margin: 0 auto;">
                 Şehrimizi dönüştürecek en popüler projeler ve yaratıcı öneriler
@@ -41,15 +57,16 @@
         </div>
 
         @if($randomProjects->count() > 0)
-            <div class="user-grid user-grid-1 user-grid-2 user-grid-3" style="margin-bottom: 3rem;">
+            <div class="user-grid user-grid-1 user-grid-2 user-grid-3 content-spacing-xl">
                 @foreach($randomProjects as $project)
                     <div class="project-card">
                         <!-- Project Image -->
-                        <div style="height: 200px; overflow: hidden;">
+                        <div style="height: 200px; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
                             @if($project->getFirstMediaUrl('images'))
                                 <img src="{{ $project->getFirstMediaUrl('images') }}"
                                      alt="{{ $project->name }}"
-                                     style="width: 100%; height: 100%; object-fit: cover; transition: var(--transition-normal);">
+                                     style="width: 100%; height: 100%; object-fit: cover; transition: var(--transition-normal);"
+                                     onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center;&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 3rem; height: 3rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 0.875rem;&quot;>Proje Görseli</p></div></div>';">
                             @else
                                 <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center;">
                                     <div style="text-align: center;">
@@ -99,7 +116,7 @@
                 @endforeach
             </div>
         @else
-            <div style="text-align: center; margin: 3rem 0;">
+            <div class="text-center section-padding">
                 <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
                     <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -111,7 +128,7 @@
         @endif
 
         @if($randomProjects->count() > 0)
-        <div style="text-align: center;">
+        <div class="text-center">
             <a href="{{ route('user.projects') }}" class="btn btn-secondary">
                 Tüm Projeleri Görüntüle
                 <svg class="ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20">

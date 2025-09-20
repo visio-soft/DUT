@@ -113,11 +113,13 @@ php artisan db:seed
 İki ayrı terminal açarak aşağıdaki komutları çalıştırın:
 
 **Terminal 1 - Laravel sunucusu:**
+
 ```bash
 php artisan serve
 ```
 
 **Terminal 2 - Vite dev server (CSS/JS için):**
+
 ```bash
 npm run dev
 ```
