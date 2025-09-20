@@ -13,8 +13,8 @@
             @php $detailImage = $backgroundImages[2] ?? $backgroundImages[0] ?? null; @endphp
             @if($detailImage && isset($detailImage['url']))
                 <div class="background-image-container">
-                    <img src="{{ $detailImage['url'] }}" 
-                         alt="Öneri Detayı - {{ $detailImage['title'] ?? 'Öneri' }}" 
+                    <img src="{{ $detailImage['url'] }}"
+                         alt="Öneri Detayı - {{ $detailImage['title'] ?? 'Öneri' }}"
                          class="background-image-main"
                          loading="eager">
                 </div>

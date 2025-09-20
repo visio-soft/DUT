@@ -29,46 +29,46 @@ class DynamicBackgroundManager {
 
     createCarouselContainers() {
         const containers = document.querySelectorAll('.carousel-background-container');
-        
+
         containers.forEach(container => {
             container.innerHTML = ''; // Clear existing content
-            
+
             const wrapper = document.createElement('div');
             wrapper.className = 'carousel-images-wrapper';
-            
+
             // Create image sets
             this.imageSets.forEach((imageSet, setIndex) => {
                 const setElement = document.createElement('div');
                 setElement.className = `carousel-image-set ${setIndex === 0 ? 'active' : ''}`;
-                
+
                 imageSet.forEach((image, imageIndex) => {
                     const imageItem = document.createElement('div');
                     imageItem.className = 'carousel-image-item';
-                    
+
                     const img = document.createElement('img');
                     img.src = image.url;
                     img.alt = image.title || 'Öneri Resmi';
                     img.loading = 'lazy';
-                    
+
                     // Add flowing effect with staggered timing
                     setTimeout(() => {
                         imageItem.classList.add('flowing');
                     }, imageIndex * 2000);
-                    
+
                     imageItem.appendChild(img);
                     setElement.appendChild(imageItem);
                 });
-                
+
                 wrapper.appendChild(setElement);
             });
-            
+
             container.appendChild(wrapper);
         });
     }
 
     startImageRotation() {
         if (this.imageSets.length <= 1) return;
-        
+
         // Start rotation every 20 seconds
         this.rotationInterval = setInterval(() => {
             this.rotateToNextSet();
@@ -78,16 +78,16 @@ class DynamicBackgroundManager {
     rotateToNextSet() {
         const currentSets = document.querySelectorAll('.carousel-image-set');
         if (currentSets.length === 0) return;
-        
+
         // Hide current set
         currentSets[this.currentSetIndex].classList.remove('active');
-        
+
         // Move to next set
         this.currentSetIndex = (this.currentSetIndex + 1) % this.imageSets.length;
-        
+
         // Show next set
         currentSets[this.currentSetIndex].classList.add('active');
-        
+
         // Restart flowing animations for the new set
         const newItems = currentSets[this.currentSetIndex].querySelectorAll('.carousel-image-item');
         newItems.forEach((item, index) => {
@@ -101,7 +101,7 @@ class DynamicBackgroundManager {
     // Legacy background support
     setupLegacyBackground() {
         const backgroundContainers = document.querySelectorAll('.background-image-container');
-        
+
         backgroundContainers.forEach(container => {
             const img = container.querySelector('.background-image-main');
             if (img) {
@@ -119,7 +119,7 @@ class DynamicBackgroundManager {
                 this.checkImageScale(img, container);
                 img.classList.add('loaded');
             });
-            
+
             // Handle error case
             img.addEventListener('error', () => {
                 console.warn('Background image failed to load:', img.src);
@@ -144,33 +144,33 @@ class DynamicBackgroundManager {
 
     enableBlurEffect(img, container) {
         container.classList.add('needs-blur-effect');
-        
+
         // Remove any existing blur elements
         this.removeBlurElements(container);
-        
+
         // Create blur effect wrapper
         const blurWrapper = document.createElement('div');
         blurWrapper.className = 'background-with-blur';
-        
+
         // Create blurred left side
         const blurLeft = document.createElement('div');
         blurLeft.className = 'background-blur-left';
         blurLeft.style.backgroundImage = `url("${img.src}")`;
-        
+
         // Create blurred right side
         const blurRight = document.createElement('div');
         blurRight.className = 'background-blur-right';
         blurRight.style.backgroundImage = `url("${img.src}")`;
-        
+
         // Create center image
         const centerImg = img.cloneNode(true);
         centerImg.className = 'background-center-image loaded';
-        
+
         // Append elements
         blurWrapper.appendChild(blurLeft);
         blurWrapper.appendChild(blurRight);
         blurWrapper.appendChild(centerImg);
-        
+
         // Replace original image
         img.style.display = 'none';
         container.appendChild(blurWrapper);

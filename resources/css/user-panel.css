@@ -283,8 +283,8 @@ h6 { font-size: 1rem; font-weight: 500; }
     right: 0;
     bottom: 0;
     background: linear-gradient(
-        135deg, 
-        rgba(76, 175, 80, 0.1) 0%, 
+        135deg,
+        rgba(76, 175, 80, 0.1) 0%,
         rgba(255, 255, 255, 0.9) 50%,
         rgba(76, 175, 80, 0.1) 100%
     );
@@ -451,7 +451,7 @@ h6 { font-size: 1rem; font-weight: 500; }
     .background-center-image {
         max-width: 90%;
     }
-    
+
     .background-blur-left,
     .background-blur-right {
         filter: blur(15px) brightness(0.8);

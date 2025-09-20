@@ -12,8 +12,8 @@
         @elseif($randomBackgroundImage)
             <!-- Fallback Single Image -->
             <div class="background-image-container">
-                <img src="{{ $randomBackgroundImage }}" 
-                     alt="Şehri Birlikte Dönüştürelim" 
+                <img src="{{ $randomBackgroundImage }}"
+                     alt="Şehri Birlikte Dönüştürelim"
                      class="background-image-main"
                      loading="eager">
             </div>

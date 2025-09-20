@@ -13,8 +13,8 @@
             @php $headerImage = $backgroundImages[1] ?? $backgroundImages[0] ?? null; @endphp
             @if($headerImage && isset($headerImage['url']))
                 <div class="background-image-container">
-                    <img src="{{ $headerImage['url'] }}" 
-                         alt="Projeler - {{ $headerImage['title'] ?? 'Öneri' }}" 
+                    <img src="{{ $headerImage['url'] }}"
+                         alt="Projeler - {{ $headerImage['title'] ?? 'Öneri' }}"
                          class="background-image-main"
                          loading="eager">
                 </div>
