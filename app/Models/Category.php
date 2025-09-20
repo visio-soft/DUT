@@ -40,7 +40,10 @@ class Category extends Model implements HasMedia
      *
      * @var array
      */
-    protected $casts = [];
+    protected $casts = [
+        'start_datetime' => 'datetime',
+        'end_datetime' => 'datetime',
+    ];
 
     /**
      * Default attribute values.
