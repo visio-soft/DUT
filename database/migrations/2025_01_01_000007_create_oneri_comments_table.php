@@ -20,8 +20,9 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
+            // Additional indexes for performance
             $table->index(['oneri_id', 'is_approved']);
-            $table->index('user_id');
+            $table->index('created_at');
         });
     }
 
