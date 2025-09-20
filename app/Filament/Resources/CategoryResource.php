@@ -7,6 +7,7 @@ use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -14,6 +15,7 @@ use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Filters\Filter;
 
 class CategoryResource extends Resource
 {
@@ -29,40 +31,95 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')->label('Proje Adı')
-                    ->required()
-                    ->maxLength(255)
-                    ->placeholder('Proje adını girin'),
+                Forms\Components\Section::make('Temel Bilgiler')
+                    ->icon('heroicon-o-information-circle')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Proje Adı')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('Proje adını girin')
+                            ->columnSpanFull(),
 
-                Forms\Components\Textarea::make('description')
-                    ->label('Proje Açıklaması')
-                    ->rows(4)
-                    ->placeholder('Proje hakkında detaylı açıklama yazın...')
-                    ->helperText('Bu projenin amacı, kapsamı ve hedefleri hakkında bilgi verin'),
+                        Forms\Components\Textarea::make('description')
+                            ->required()
+                            ->label('Proje Açıklaması')
+                            ->rows(3)
+                            ->placeholder('Proje hakkında kısa açıklama...')
+                            ->columnSpanFull(),
 
-                Forms\Components\DateTimePicker::make('start_datetime')->label('Başlangıç Tarihi ve Saati')
-                    ->required()
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->displayFormat('d.m.Y H:i')
-                    ->timezone('Europe/Istanbul')
-                    ->placeholder('01.01.2025 08:00')
-                    ->helperText('Bu projedeki işlerin başlangıç tarihi ve saati (24 saat formatında, örn: 22:00)'),
+                        // Tarihler yan yana
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\DateTimePicker::make('start_datetime')
+                                    ->label('Başlangıç')
+                                    ->required()
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->displayFormat('d.m.Y H:i')
+                                    ->timezone('Europe/Istanbul'),
 
-                Forms\Components\DateTimePicker::make('end_datetime')->label('Bitiş Tarihi ve Saati')
-                    ->required()
-                    ->seconds(false)
-                    ->format('Y-m-d H:i')
-                    ->displayFormat('d.m.Y H:i')
-                    ->timezone('Europe/Istanbul')
-                    ->placeholder('31.12.2025 22:00')
-                    ->helperText('Bu projedeki işlerin bitiş tarihi ve saati (24 saat formatında, örn: 22:00)'),
+                                Forms\Components\DateTimePicker::make('end_datetime')
+                                    ->label('Bitiş')
+                                    ->required()
+                                    ->seconds(false)
+                                    ->format('Y-m-d H:i')
+                                    ->displayFormat('d.m.Y H:i')
+                                    ->timezone('Europe/Istanbul'),
+                            ]),
+                    ])
+                    ->columns(2),
 
-                Forms\Components\SpatieMediaLibraryFileUpload::make('files')->label('Proje Dosyaları')
+                Forms\Components\Section::make('Konum Bilgileri')
+                    ->icon('heroicon-o-map-pin')
+                    ->schema([
+                        // Ülke ve İl yan yana
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('country')
+                                    ->required()
+                                    ->label('Ülke')
+                                    ->default('Türkiye')
+                                    ->placeholder('Ülke'),
+
+                                Forms\Components\TextInput::make('province')
+                                    ->required()
+                                    ->label('İl')
+                                    ->default('İstanbul')
+                                    ->placeholder('İl'),
+                            ]),
+
+                        // İlçe ve Mahalle yan yana
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('district')
+                                    ->label('İlçe')
+                                    ->placeholder('İlçe adı'),
+
+                                Forms\Components\TextInput::make('neighborhood')
+                                    ->label('Mahalle')
+                                    ->required()
+                                    ->placeholder('Mahalle adı'),
+                            ]),
+
+                        Forms\Components\Textarea::make('detailed_address')
+                            ->label('Detaylı Adres')
+                            ->rows(2)
+                            ->placeholder('Sokak, cadde, bina no vb.')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+                SpatieMediaLibraryFileUpload::make('files')
+                    ->label('Proje Alanı Fotoğrafları')
                     ->collection('project_files')
+                    ->multiple()
                     ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'])
-                    ->helperText('Proje ile ilgili dosyaları yükleyin.')
-            ]);
+                    ->panelLayout('compact')
+                    ->required()
+                    ->columnSpanFull(),
+
+            ])
+        ;
     }
 
     public static function table(Table $table): Table
@@ -98,6 +155,38 @@ class CategoryResource extends Resource
                     ->placeholder('-')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('country')
+                    ->label('Ülke')
+                    ->searchable()
+                    ->placeholder('Belirtilmemiş')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('province')
+                    ->label('İl')
+                    ->searchable()
+                    ->placeholder('Belirtilmemiş')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('district')
+                    ->label('İlçe')
+                    ->searchable()
+                    ->placeholder('Belirtilmemiş'),
+
+                Tables\Columns\TextColumn::make('neighborhood')
+                    ->label('Mahalle')
+                    ->searchable()
+                    ->placeholder('Belirtilmemiş'),
+
+                Tables\Columns\TextColumn::make('detailed_address')
+                    ->label('Detaylı Adres')
+                    ->limit(50)
+                    ->searchable()
+                    ->placeholder('Belirtilmemiş')
+                    ->tooltip(function ($record): ?string {
+                        return $record->detailed_address;
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('oneriler_count')
                     ->label('Öneri Sayısı')
                     ->counts('oneriler')
@@ -113,6 +202,37 @@ class CategoryResource extends Resource
             ->defaultSort('name')
             ->filters([
                 TrashedFilter::make(),
+
+                // Konum filtresi: İlçe ve Mahalle dropdownları
+                Filter::make('location')
+                    ->label('Konum')
+                    ->form([
+                        Forms\Components\Select::make('district')
+                            ->label('İlçe')
+                            ->options(function () {
+                                $keys = array_keys(config('istanbul_neighborhoods', []));
+                                return array_combine($keys, $keys);
+                            })
+                            ->searchable(),
+
+                        Forms\Components\Select::make('neighborhood')
+                            ->label('Mahalle')
+                            ->options(function (callable $get) {
+                                $district = $get('district');
+                                $map = config('istanbul_neighborhoods', []);
+                                return $map[$district] ?? [];
+                            })
+                            ->searchable(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['district'])) {
+                            $query->where('district', $data['district']);
+                        }
+
+                        if (!empty($data['neighborhood'])) {
+                            $query->where('neighborhood', $data['neighborhood']);
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\RestoreAction::make()
@@ -120,9 +240,9 @@ class CategoryResource extends Resource
                     ->color('success')
                     ->requiresConfirmation()
                     ->modalHeading('Projeyi Geri Getir')
-                    ->modalDescription('Bu projeyi geri getirmek istediğinizden emin misiniz?')
+                    ->modalDescription('Bu projeyi geri getirmek istediğinizden emin misiniz? Bu kategorideki tüm öneriler de geri getirilecektir.')
                     ->modalSubmitActionLabel('Evet, Geri Getir')
-                    ->successNotificationTitle('Proje başarıyla geri getirildi'),
+                    ->successNotificationTitle('Proje ve ilişkili öneriler başarıyla geri getirildi'),
 
                 Tables\Actions\ForceDeleteAction::make()
                     ->icon('heroicon-o-trash')
@@ -140,25 +260,25 @@ class CategoryResource extends Resource
                     ->visible(fn ($record) => !$record->trashed())
                     ->requiresConfirmation()
                     ->modalHeading('Projeyi Sil')
-                    ->modalDescription('Bu projeyi silmek istediğinizden emin misiniz? Silinen projeler geri getirilebilir.')
+                    ->modalDescription('Bu projeyi silmek istediğinizden emin misiniz? Bu kategorideki tüm öneriler de silinecektir. Silinen projeler geri getirilebilir.')
                     ->modalSubmitActionLabel('Evet, Sil')
-                    ->successNotificationTitle('Proje başarıyla silindi'),
+                    ->successNotificationTitle('Proje ve ilişkili öneriler başarıyla silindi'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->requiresConfirmation()
                         ->modalHeading('Seçili Projeleri Sil')
-                        ->modalDescription('Seçili projeleri silmek istediğinizden emin misiniz? Silinen projeler geri getirilebilir.')
+                        ->modalDescription('Seçili projeleri silmek istediğinizden emin misiniz? Bu kategorilerdeki tüm öneriler de silinecektir. Silinen projeler geri getirilebilir.')
                         ->modalSubmitActionLabel('Evet, Sil')
-                        ->successNotificationTitle('Seçili projeler başarıyla silindi'),
+                        ->successNotificationTitle('Seçili projeler ve ilişkili öneriler başarıyla silindi'),
 
                     Tables\Actions\RestoreBulkAction::make()
                         ->requiresConfirmation()
                         ->modalHeading('Seçili Projeleri Geri Getir')
-                        ->modalDescription('Seçili projeleri geri getirmek istediğinizden emin misiniz?')
+                        ->modalDescription('Seçili projeleri geri getirmek istediğinizden emin misiniz? Bu kategorilerdeki tüm öneriler de geri getirilecektir.')
                         ->modalSubmitActionLabel('Evet, Geri Getir')
-                        ->successNotificationTitle('Seçili projeler başarıyla geri getirildi'),
+                        ->successNotificationTitle('Seçili projeler ve ilişkili öneriler başarıyla geri getirildi'),
 
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->requiresConfirmation()

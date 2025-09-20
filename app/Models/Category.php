@@ -13,7 +13,27 @@ class Category extends Model implements HasMedia
     use SoftDeletes;
     use InteractsWithMedia;
 
-    protected $fillable = ['name', 'start_datetime', 'end_datetime'];
+    protected $fillable = ['name', 'description', 'start_datetime', 'end_datetime', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
+
+    /**
+     * Automatically cascade deletes to related models when soft deleting
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($category) {
+            // When soft deleting a category, also soft delete its related oneriler
+            if (!$category->isForceDeleting()) {
+                $category->oneriler()->delete();
+            }
+        });
+
+        static::restoring(function ($category) {
+            // When restoring a category, also restore its related oneriler
+            $category->oneriler()->withTrashed()->restore();
+        });
+    }
 
     /**
      * Cast attributes to native types.

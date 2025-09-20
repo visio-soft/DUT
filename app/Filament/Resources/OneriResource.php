@@ -36,7 +36,8 @@ class OneriResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make()
+                Forms\Components\Section::make('Temel Bilgiler')
+                    ->icon('heroicon-o-information-circle')
                     ->schema([
                         Forms\Components\Select::make('category_id')
                             ->label('Proje Kategorisi')
@@ -58,156 +59,48 @@ class OneriResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
                             ->label('Açıklama')
-                            ->rows(3),
-                        Forms\Components\TextInput::make('estimated_duration')
-                            ->label('Tahmini İşlem Süresi (Gün)')
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(365)
-                            ->suffix('gün')
-                            ->helperText('Projenin tahmini tamamlanma süresi (1-365 gün arası)'),
-                        Forms\Components\TextInput::make('budget')
-                            ->label('Bütçe')
-                            ->numeric()
-                            ->prefix('₺'),
+                            ->rows(3)
+                            ->columnSpanFull(),
+
+                        Forms\Components\Grid::make(2)
+                            ->schema([
+                                Forms\Components\TextInput::make('budget')
+                                    ->label('Bütçe')
+                                    ->numeric()
+                                    ->prefix('₺')
+                                    ->placeholder('Örn: 50000'),
+
+                                Forms\Components\TextInput::make('estimated_duration')
+                                    ->label('Tahmini Süre')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->maxValue(365)
+                                    ->suffix('gün')
+                                    ->placeholder('Örn: 30'),
+                            ]),
+                    ])
+                    ->columnSpan(1),
+                Forms\Components\Section::make('Konum')
+                    ->icon('heroicon-o-map-pin')
+                    ->schema([
+                        // Sadece detaylı tarif alanı bırakıldı
+                        Forms\Components\Textarea::make('address_details')
+                            ->label('Detaylı Tarif')
+                            ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
+                            ->rows(3)
+                            ->columnSpanFull(),
+
                         // Resim upload - Spatie Media Library ile
                         SpatieMediaLibraryFileUpload::make('images')
-                            ->label('Resim')
-                            // Match the media collection defined in the model (registerMediaCollections)
+                            ->label('Öneri Tasarım Görseli')
                             ->collection('images')
                             ->image()
                             ->imagePreviewHeight('200')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->helperText('Proje görseli. Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP.')
+                            ->helperText('Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP.')
                             ->columnSpanFull(),
-                    ])
-                    ->columnSpan(1),
-                Forms\Components\Section::make('Konum')
-                    ->extraAttributes(['class' => 'mx-auto max-w-2xl p-4 ml-auto'])
-                    ->schema([
-                        //Forms\Components\Toggle::make('use_google_maps')
-                            //->label('Haritadan Seç')
-                            //->default(false)
-                            //->reactive()
-                            //->columnSpanFull(),
-
-                        // Manual Konum Girişi (Google Maps kapalıyken)
-                        Forms\Components\Group::make()->schema([
-                            // Şehir sabit: İstanbul (saklama için Hidden, gösterim için disabled TextInput)
-                            Forms\Components\Hidden::make('city')
-                                ->default('İstanbul'),
-
-                            Forms\Components\TextInput::make('city_display')
-                                ->label('İl')
-                                ->default('İstanbul')
-                                ->disabled()
-                                ->dehydrated(false)
-                                ->columnSpanFull(),
-
-                            Forms\Components\Select::make('district')
-                                ->label('İlçe')
-                                ->options(function () {
-                                    $districts = config('istanbul_neighborhoods', []);
-                                    $districtNames = array_keys($districts);
-                                    return array_combine($districtNames, $districtNames);
-                                })
-                                ->searchable()
-                                ->reactive()
-                                ->columnSpanFull(),
-
-                            Forms\Components\Select::make('neighborhood')
-                                ->label('Mahalle')
-                                ->options(function (callable $get) {
-                                    $district = $get('district');
-                                    if (!$district) {
-                                        return ['__other' => 'Diğer..'];
-                                    }
-
-                                    $map = config('istanbul_neighborhoods', []);
-                                    $options = $map[$district] ?? [];
-                                    // '__other' seçeneği kullanıcı kendi mahalle adını yazabilsin diye
-                                    return array_merge($options, ['__other' => 'Diğer..']);
-                                })
-                                ->reactive()
-                                ->searchable()
-                                ->placeholder(function (callable $get) {
-                                    return $get('district') ? 'Mahalle seçin veya Diğer seçin' : 'Önce ilçe seçin';
-                                })
-                                ->disabled(function (callable $get) {
-                                    return !$get('district');
-                                })
-                                ->columnSpanFull()
-                                ->dehydrateStateUsing(function ($state, callable $get) {
-                                    // Eğer '__other' seçildiyse custom değeri kullan
-                                    if ($state === '__other') {
-                                        return $get('neighborhood_custom') ?: null;
-                                    }
-                                    return $state;
-                                }),
-
-                            // Kullanıcı "Diğer" seçerse kendi mahalle adını yazsın
-                            Forms\Components\TextInput::make('neighborhood_custom')
-                                ->label('Diğer Mahalle')
-                                ->placeholder('Mahallenizi yazın')
-                                ->visible(function (callable $get) {
-                                    return $get('neighborhood') === '__other';
-                                })
-                                ->afterStateHydrated(function ($state, callable $set, callable $get) {
-                                    // Eğer kayıt düzenleniyorsa ve kayıtlı mahalle neighborhood alanında değilse
-                                    // (örneğin önceki kayıt custom girilmişse), neighborhood alanını '__other' yap
-                                    if ($state && $get('neighborhood') !== '__other') {
-                                        $set('neighborhood', '__other');
-                                    }
-                                })
-                                ->dehydrated(false)
-                                ->columnSpanFull(),
-
-                            // Sokak / Cadde alanları yan yana olacak şekilde (Grid ile 2 sütun)
-                            Forms\Components\Grid::make()
-                                ->schema([
-                                    Forms\Components\TextInput::make('street_cadde')
-                                        ->label('Cadde')
-                                        ->placeholder('Cadde adı')
-                                        ->columnSpan(1),
-
-                                    Forms\Components\TextInput::make('street_sokak')
-                                        ->label('Sokak')
-                                        ->placeholder('Sokak adı')
-                                        ->columnSpan(1),
-                                ])
-                                ->columns(2)
-                                ->extraAttributes(['class' => 'grid grid-cols-2 gap-3'])
-                                ->columnSpanFull(),
-
-                            // Detaylı tarif (mahallenin altına)
-                            Forms\Components\Textarea::make('address_details')
-                                ->label('Detaylı Tarif')
-                                ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
-                                ->rows(3)
-                                ->columnSpanFull(),
-                        ])->hidden(function (callable $get) {
-                            return $get('use_google_maps');
-                        }),
-
-                        // Google Maps Konum Seçimi (Google Maps açıkken)
-                        Forms\Components\Group::make()->schema([
-                            Forms\Components\TextInput::make('search_address')
-                                ->label('Adres Ara')
-                                ->placeholder('Bir adres yazın ve haritada bulun...')
-                                ->live()
-                                ->columnSpanFull(),
-
-                            Forms\Components\ViewField::make('google_maps')
-                                ->label('Harita - Tıklayarak Konum Seçin')
-                                ->view('custom.google-maps-picker')
-                                ->columnSpanFull(),
-                        ])->visible(function (callable $get) {
-                            return $get('use_google_maps');
-                        }),
-                        Forms\Components\Hidden::make('latitude'),
-                        Forms\Components\Hidden::make('longitude'),
                     ])
                     ->columnSpan(1),
             ])
