@@ -11,12 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('oneriler', function (Blueprint $table) {
-            // First set a default category for any NULL values
-            // This will be handled in code before the migration
-        });
-
-        // Update any NULL category_id values to a default category
+        // Update any NULL category_id values to a default category before making it required
         $defaultCategory = \App\Models\Category::first();
         if ($defaultCategory) {
             \Illuminate\Support\Facades\DB::table('oneriler')
@@ -25,7 +20,7 @@ return new class extends Migration
         }
 
         Schema::table('oneriler', function (Blueprint $table) {
-            // Make category_id required again
+            // Make category_id required (not nullable)
             $table->foreignId('category_id')->nullable(false)->change();
         });
     }
