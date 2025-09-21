@@ -6,11 +6,8 @@
 <!-- Hero Section -->
 <section class="user-hero dynamic-background {{ ($hasBackgroundImages ?? false) ? '' : 'no-background-images' }}">
     @if($hasBackgroundImages ?? false)
-        @if(count($carouselImageSets ?? []) > 0)
-            <!-- Carousel Background System -->
-            <div class="carousel-background-container"></div>
-        @elseif($randomBackgroundImage)
-            <!-- Fallback Single Image -->
+        @if($randomBackgroundImage)
+            <!-- Single Random Background Image -->
             <div class="background-image-container">
                 <img src="{{ $randomBackgroundImage }}"
                      alt="Şehri Birlikte Dönüştürelim"
@@ -57,13 +54,13 @@
         </div>
 
         @if($randomProjects->count() > 0)
-            <div class="user-grid user-grid-1 user-grid-2 user-grid-3 content-spacing-xl">
+            <div class="featured-projects-grid count-{{ $randomProjects->count() }} content-spacing-xl">
                 @foreach($randomProjects as $project)
                     <div class="project-card">
                         <!-- Project Image -->
                         <div style="height: 200px; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
-                            @if($project->getFirstMediaUrl('images'))
-                                <img src="{{ $project->getFirstMediaUrl('images') }}"
+                            @if($project->getFirstMediaUrl('project_files'))
+                                <img src="{{ $project->getFirstMediaUrl('project_files') }}"
                                      alt="{{ $project->name }}"
                                      style="width: 100%; height: 100%; object-fit: cover; transition: var(--transition-normal);"
                                      onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center;&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 3rem; height: 3rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 0.875rem;&quot;>Proje Görseli</p></div></div>';">

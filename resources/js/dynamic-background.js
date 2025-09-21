@@ -1,19 +1,45 @@
 /**
  * Dynamic Background Image Handler
- * Handles carousel-style background with multiple suggestion images
+ * Handles simple single random background images for user panels
  */
 class DynamicBackgroundManager {
     constructor() {
-        this.currentSetIndex = 0;
-        this.rotationInterval = null;
-        this.imageSets = [];
         this.init();
     }
 
     init() {
-        this.setupCarouselBackground();
-        this.startImageRotation();
+        this.setupBackground();
         window.addEventListener('resize', () => this.handleResize());
+    }
+
+    setupBackground() {
+        // Check if we have simple random background image
+        if (window.backgroundImageData && window.backgroundImageData.hasImages && window.backgroundImageData.randomImage) {
+            this.setupSimpleBackground();
+        } else if (window.backgroundImageData && window.backgroundImageData.carouselSets) {
+            // Fallback to carousel system if it exists
+            this.setupCarouselBackground();
+        } else {
+            // Fallback to legacy single image system
+            this.setupLegacyBackground();
+        }
+    }
+
+    setupSimpleBackground() {
+        const containers = document.querySelectorAll('.background-image-container');
+
+        containers.forEach(container => {
+            container.innerHTML = ''; // Clear existing content
+
+            const img = document.createElement('img');
+            img.src = window.backgroundImageData.randomImage;
+            img.alt = 'Şehri Birlikte Dönüştürelim';
+            img.className = 'background-image-main';
+            img.loading = 'eager';
+
+            container.appendChild(img);
+            this.handleImageLoad(img, container);
+        });
     }
 
     setupCarouselBackground() {
@@ -21,6 +47,7 @@ class DynamicBackgroundManager {
         if (window.backgroundImageData && window.backgroundImageData.carouselSets) {
             this.imageSets = window.backgroundImageData.carouselSets;
             this.createCarouselContainers();
+            this.startImageRotation();
         } else {
             // Fallback to legacy single image system
             this.setupLegacyBackground();
@@ -50,10 +77,10 @@ class DynamicBackgroundManager {
                     img.alt = image.title || 'Öneri Resmi';
                     img.loading = 'lazy';
 
-                    // Add flowing effect with staggered timing
+                    // Start flowing immediately, but keep a small stagger for visual variety
                     setTimeout(() => {
                         imageItem.classList.add('flowing');
-                    }, imageIndex * 2000);
+                    }, imageIndex * 300);
 
                     imageItem.appendChild(img);
                     setElement.appendChild(imageItem);
@@ -67,12 +94,14 @@ class DynamicBackgroundManager {
     }
 
     startImageRotation() {
-        if (this.imageSets.length <= 1) return;
+        if (!this.imageSets || this.imageSets.length <= 1) return;
 
-        // Start rotation every 20 seconds
+        // Keep rotation available but make it very infrequent so images appear to slide continuously
+        // Default to 5 minutes to avoid frequent opacity flips (300000 ms)
+        const rotationMs = 300000; // 5 minutes
         this.rotationInterval = setInterval(() => {
             this.rotateToNextSet();
-        }, 20000);
+        }, rotationMs);
     }
 
     rotateToNextSet() {
@@ -194,7 +223,7 @@ class DynamicBackgroundManager {
         // Debounce resize events
         clearTimeout(this.resizeTimeout);
         this.resizeTimeout = setTimeout(() => {
-            this.setupCarouselBackground();
+            this.setupBackground();
         }, 250);
     }
 

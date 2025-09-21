@@ -32,9 +32,7 @@
         <script>
             window.backgroundImageData = {
                 hasImages: {{ $hasBackgroundImages ? 'true' : 'false' }},
-                randomImage: @json($randomBackgroundImage),
-                images: @json($backgroundImages ?? []),
-                carouselSets: @json($carouselImageSets ?? [])
+                randomImage: @json($randomBackgroundImage)
             };
         </script>
     @endif
@@ -43,7 +41,7 @@
         <nav class="user-container">
             <div class="user-nav">
                 <div class="flex items-center">
-                    <a href="{{ route('user.index') }}" class="user-logo">
+                    <a href="{{ route('user.index') }}" class="user-logo" style="border: 2px solid white; padding: 0.1rem 0.5rem 0.1rem 0.5rem; border-radius: 50px;">
                         DUT Vote
                     </a>
                 </div>
@@ -51,21 +49,52 @@
                 <div class="user-nav-links">
                     <a href="{{ route('user.index') }}"
                        class="user-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                        </svg>
                         Ana Sayfa
                     </a>
                     <a href="{{ route('user.projects') }}"
                        class="user-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+                        </svg>
                         Projeler
                     </a>
 
                     @auth
                         <div class="flex items-center space-x-3">
-                            <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                </svg>
+                                <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
+                            </div>
+                            <form method="POST" action="{{ route('user.logout') }}" style="display: inline;">
+                                @csrf
+                                <button type="submit" class="user-nav-link logout-btn" style="background: none; border: none; cursor: pointer; display: flex; align-items: center;">
+                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                    </svg>
+                                    Çıkış
+                                </button>
+                            </form>
                         </div>
                     @else
-                        <a href="/admin/login" class="user-nav-link">
-                            Giriş Yap
-                        </a>
+                        <div class="auth-buttons-container">
+                            <a href="{{ route('user.login') }}" class="auth-btn auth-btn-login">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                                </svg>
+                                Giriş
+                            </a>
+                            <a href="{{ route('user.register') }}" class="auth-btn auth-btn-register">
+                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                                </svg>
+                                Kayıt
+                            </a>
+                        </div>
                     @endauth
                 </div>
             </div>
@@ -83,7 +112,7 @@
             <div class="user-footer-content">
                 <div class="footer-main">
                     <div class="footer-brand">
-                        <div class="footer-logo">
+                        <div class="footer-logo" style="border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.1rem 0.5rem 0.1rem 0.5rem; border-radius: 0.375rem; display: inline-block;">
                             DUT Vote
                         </div>
                         <p class="footer-description">
@@ -93,16 +122,48 @@
 
                     <div class="footer-links">
                         <div class="footer-section">
-                            <h4>Platform</h4>
+                            <h4>
+                                <svg class="inline w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Platform
+                            </h4>
                             <ul>
-                                <li><a href="{{ route('user.index') }}">Ana Sayfa</a></li>
-                                <li><a href="{{ route('user.projects') }}">Projeler</a></li>
-                                <li><a href="#hakkinda">Hakkında</a></li>
+                                <li>
+                                    <a href="{{ route('user.index') }}">
+                                        <svg class="inline w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/>
+                                        </svg>
+                                        Ana Sayfa
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="{{ route('user.projects') }}">
+                                        <svg class="inline w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
+                                        </svg>
+                                        Projeler
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#hakkinda">
+                                        <svg class="inline w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Hakkında
+                                    </a>
+                                </li>
                             </ul>
                         </div>
 
                         <div class="footer-section">
-                            <h4>İletişim</h4>
+                            <h4>
+                                <svg class="inline w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                </svg>
+                                İletişim
+                            </h4>
                             <ul>
                                 <li>
                                     <a href="mailto:info@visiosoft.com.tr">
@@ -125,7 +186,12 @@
                         </div>
 
                         <div class="footer-section">
-                            <h4>Sosyal Medya</h4>
+                            <h4>
+                                <svg class="inline w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                </svg>
+                                Sosyal Medya
+                            </h4>
                             <div class="social-links">
                                 <a href="#" title="LinkedIn">
                                     <svg class="icon" fill="currentColor" viewBox="0 0 20 20">

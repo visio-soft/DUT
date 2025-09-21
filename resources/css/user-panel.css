@@ -207,6 +207,27 @@ h6 { font-size: 1rem; font-weight: 500; }
     transform: scale(1.02);
 }
 
+/* Logo box hover: border color transition, subtle glow and lift */
+.user-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 180ms ease, transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+    will-change: transform, box-shadow;
+}
+
+.user-logo:hover {
+    color: white; /* keep text readable */
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18), 0 0 8px rgba(255,255,255,0.06) inset;
+    border-color: rgba(255,255,255,0.95);
+}
+
+.user-logo:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+}
+
 .user-nav-links {
     display: flex;
     align-items: center;
@@ -221,6 +242,8 @@ h6 { font-size: 1rem; font-weight: 500; }
     border-radius: var(--radius-md);
     transition: var(--transition-normal);
     position: relative;
+    display: flex;
+    align-items: center;
 }
 
 .user-nav-link:hover {
@@ -282,11 +305,12 @@ h6 { font-size: 1rem; font-weight: 500; }
     left: 0;
     right: 0;
     bottom: 0;
+    /* soften or remove the white wash so images are visible */
     background: linear-gradient(
         135deg,
-        rgba(76, 175, 80, 0.1) 0%,
-        rgba(255, 255, 255, 0.9) 50%,
-        rgba(76, 175, 80, 0.1) 100%
+        rgba(76, 175, 80, 0.06) 0%,
+        rgba(255, 255, 255, 0.12) 50%,
+        rgba(76, 175, 80, 0.06) 100%
     );
     z-index: 2;
     pointer-events: none;
@@ -336,7 +360,7 @@ h6 { font-size: 1rem; font-weight: 500; }
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 20s linear;
+    transition: transform 60s linear;
     transform: translateX(0);
 }
 
@@ -358,17 +382,18 @@ h6 { font-size: 1rem; font-weight: 500; }
 }
 
 /* Flow animation for images */
-@keyframes flowRight {
+/* Slow continuous leftward slide to create subtle parallax */
+@keyframes slideLeftSlow {
     from {
-        transform: translateX(-20px) scale(1.05);
+        transform: translateX(0) scale(1.02);
     }
     to {
-        transform: translateX(20px) scale(1.1);
+        transform: translateX(-12%) scale(1.05);
     }
 }
 
 .carousel-image-item.flowing img {
-    animation: flowRight 20s ease-in-out infinite alternate;
+    animation: slideLeftSlow 90s linear infinite alternate;
 }
 
 /* Legacy single image background */
@@ -400,7 +425,7 @@ h6 { font-size: 1rem; font-weight: 500; }
 .background-with-blur {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: 170%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -414,7 +439,7 @@ h6 { font-size: 1rem; font-weight: 500; }
     width: 50%;
     background-size: cover;
     background-position: center;
-    filter: blur(20px) brightness(0.7) saturate(1.2);
+    filter: blur(5px) brightness(0.7) saturate(1.5);
     transform: scale(1.1);
     opacity: 0.6;
     z-index: 0;
@@ -454,7 +479,7 @@ h6 { font-size: 1rem; font-weight: 500; }
 
     .background-blur-left,
     .background-blur-right {
-        filter: blur(15px) brightness(0.8);
+        filter: blur(6px) brightness(0.8);
         width: 40%;
     }
 }
@@ -691,17 +716,22 @@ h6 { font-size: 1rem; font-weight: 500; }
 .user-grid {
     display: grid;
     gap: 1.5rem;
+    justify-content: center;
 }
 
 /* Mobile: Single column */
 .user-grid-1 {
     grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
 }
 
 /* Tablet: Two columns */
 @media (min-width: 768px) {
     .user-grid-2 {
         grid-template-columns: repeat(2, 1fr);
+        max-width: 800px;
+        margin: 0 auto;
     }
 }
 
@@ -710,6 +740,58 @@ h6 { font-size: 1rem; font-weight: 500; }
     .user-grid-3 {
         grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+}
+
+/* Featured projects specific grid - always centered */
+.featured-projects-grid {
+    display: grid;
+    gap: 1.5rem;
+    justify-content: center;
+    justify-items: center;
+}
+
+/* 1 project - centered */
+.featured-projects-grid.count-1 {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* 2 projects - side by side, centered */
+.featured-projects-grid.count-2 {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 800px;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+/* 3 projects - three columns */
+.featured-projects-grid.count-3 {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 2rem;
+}
+
+/* Mobile responsive for featured projects */
+@media (max-width: 767px) {
+    .featured-projects-grid.count-2,
+    .featured-projects-grid.count-3 {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        gap: 1.5rem;
+    }
+}
+
+/* Tablet responsive for featured projects */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .featured-projects-grid.count-3 {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 800px;
+        gap: 1.5rem;
     }
 }
 
@@ -1381,6 +1463,69 @@ h6 { font-size: 1rem; font-weight: 500; }
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
+    }
+}
+
+/* Auth Buttons - Compact Style */
+.auth-buttons-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.auth-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition-fast);
+    border: 1px solid transparent;
+    line-height: 1;
+}
+
+.auth-btn svg {
+    flex-shrink: 0;
+}
+
+.auth-btn-login {
+    background: transparent;
+    color: white;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.auth-btn-login:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+.auth-btn-register {
+    background: var(--green-500);
+    color: white;
+    border-color: var(--green-500);
+}
+
+.auth-btn-register:hover {
+    background: var(--green-600);
+    border-color: var(--green-600);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments for auth buttons */
+@media (max-width: 768px) {
+    .auth-btn {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+
+    .auth-btn svg {
+        width: 12px;
+        height: 12px;
+        margin-right: 3px;
     }
 }
 

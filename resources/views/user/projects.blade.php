@@ -6,19 +6,14 @@
 <!-- Header Section with Background -->
 <section class="section-padding dynamic-background {{ ($hasBackgroundImages ?? false) ? '' : 'no-background-images' }}" style="padding: 3rem 0;">
     @if($hasBackgroundImages ?? false)
-        @if(count($carouselImageSets ?? []) > 0)
-            <!-- Carousel Background System -->
-            <div class="carousel-background-container"></div>
-        @elseif(count($backgroundImages ?? []) > 0)
-            @php $headerImage = $backgroundImages[1] ?? $backgroundImages[0] ?? null; @endphp
-            @if($headerImage && isset($headerImage['url']))
-                <div class="background-image-container">
-                    <img src="{{ $headerImage['url'] }}"
-                         alt="Projeler - {{ $headerImage['title'] ?? 'Öneri' }}"
-                         class="background-image-main"
-                         loading="eager">
-                </div>
-            @endif
+        @if($randomBackgroundImage)
+            <!-- Single Random Background Image -->
+            <div class="background-image-container">
+                <img src="{{ $randomBackgroundImage }}"
+                     alt="Projeler"
+                     class="background-image-main"
+                     loading="eager">
+            </div>
         @endif
         <div class="background-image-overlay"></div>
     @endif

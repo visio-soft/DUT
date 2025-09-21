@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Oneri;
 use App\Models\OneriLike;
+use App\Helpers\BackgroundImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -21,10 +22,19 @@ class UserController extends Controller
             }])
             ->has('oneriler') // Sadece önerisi olan kategoriler
             ->inRandomOrder()
-            ->limit(6)
+            ->limit(3)
             ->get();
 
-        return view('user.index', compact('randomProjects'));
+        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
+        $randomBackgroundImage = null;
+
+        if ($hasBackgroundImages) {
+            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
+            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
+        }
+
+        return view('user.index', compact('randomProjects', 'hasBackgroundImages', 'randomBackgroundImage'));
     }
 
     /**
@@ -40,7 +50,16 @@ class UserController extends Controller
             ->has('oneriler') // Sadece önerisi olan kategoriler
             ->get();
 
-        return view('user.projects', compact('projects'));
+        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
+        $randomBackgroundImage = null;
+
+        if ($hasBackgroundImages) {
+            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
+            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
+        }
+
+        return view('user.projects', compact('projects', 'hasBackgroundImages', 'randomBackgroundImage'));
     }
 
     /**
@@ -56,7 +75,16 @@ class UserController extends Controller
             ])
             ->findOrFail($id);
 
-        return view('user.suggestion-detail', compact('suggestion'));
+        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
+        $randomBackgroundImage = null;
+
+        if ($hasBackgroundImages) {
+            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
+            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
+        }
+
+        return view('user.suggestion-detail', compact('suggestion', 'hasBackgroundImages', 'randomBackgroundImage'));
     }
 
     /**
