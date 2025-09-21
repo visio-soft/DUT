@@ -264,9 +264,15 @@
                                                         class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
                                                         data-suggestion-id="{{ $suggestion->id }}"
                                                         style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.375rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; transition: all 0.2s; backdrop-filter: blur(4px);">
-                                                    <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                                    </svg>
+                                                    @if(Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0)
+                                                        <svg class="like-icon" style="width: 0.875rem; height: 0.875rem;" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                                        </svg>
+                                                    @else
+                                                        <svg class="like-icon" style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                                        </svg>
+                                                    @endif
                                                     <span class="like-count">{{ $suggestion->likes->count() }}</span>
                                                 </button>
 
@@ -383,7 +389,16 @@ function toggleLike(suggestionId) {
     @endguest
 
     const button = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
+    if (!button) {
+        showMessage('Beğeni butonun bulunamadı.', 'error');
+        return;
+    }
+    
     const likeCount = button.querySelector('.like-count');
+    if (!likeCount) {
+        showMessage('Beğeni sayısı elementi bulunamadı.', 'error');
+        return;
+    }
 
     // Disable button during request
     button.disabled = true;
@@ -396,11 +411,20 @@ function toggleLike(suggestionId) {
             // Update like count
             likeCount.textContent = response.likes_count;
 
-            // Update button appearance
+            // Update button appearance and icon
+            const likeIcon = button.querySelector('.like-icon');
             if (response.liked) {
                 button.classList.add('liked');
+                // Change to filled heart
+                likeIcon.setAttribute('fill', 'currentColor');
+                likeIcon.setAttribute('stroke', 'none');
+                likeIcon.removeAttribute('stroke-width');
             } else {
                 button.classList.remove('liked');
+                // Change to outline heart
+                likeIcon.setAttribute('fill', 'none');
+                likeIcon.setAttribute('stroke', 'currentColor');
+                likeIcon.setAttribute('stroke-width', '1.5');
             }
 
             // Show success message
@@ -412,6 +436,7 @@ function toggleLike(suggestionId) {
                 message = xhr.responseJSON.error;
             }
             showMessage(message, 'error');
+            console.error('Like toggle error:', xhr);
         },
         complete: function() {
             // Re-enable button
