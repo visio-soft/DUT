@@ -54,32 +54,30 @@
         </div>
 
         @if($randomProjects->count() > 0)
-            <div class="featured-projects-grid count-{{ $randomProjects->count() }} content-spacing-xl">
-                @foreach($randomProjects as $project)
+            <div class="featured-projects-grid count-{{ min($randomProjects->count(), 3) }} content-spacing-xl">
+                @foreach($randomProjects->take(3) as $project)
                     <div class="project-card">
                         <!-- Project Image -->
-                        <div style="height: 200px; overflow: hidden; border-radius: var(--radius-lg) var(--radius-lg) 0 0;">
+                        <div class="project-image-container">
                             @if($project->getFirstMediaUrl('project_files'))
                                 <img src="{{ $project->getFirstMediaUrl('project_files') }}"
                                      alt="{{ $project->name }}"
-                                     style="width: 100%; height: 100%; object-fit: cover; transition: var(--transition-normal);"
-                                     onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center;&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 3rem; height: 3rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 0.875rem;&quot;>Proje Görseli</p></div></div>';">
+                                     class="project-image"
+                                     onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;image-placeholder&quot;><svg class=&quot;placeholder-icon&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p>Proje Görseli</p></div>';">
                             @else
-                                <div style="width: 100%; height: 100%; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center;">
-                                    <div style="text-align: center;">
-                                        <svg style="width: 3rem; height: 3rem; color: var(--green-600); margin-bottom: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
-                                        </svg>
-                                        <p style="color: var(--green-700); font-size: 0.875rem;">Proje Görseli</p>
-                                    </div>
+                                <div class="image-placeholder">
+                                    <svg class="placeholder-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+                                    </svg>
+                                    <p>Proje Görseli</p>
                                 </div>
                             @endif
                         </div>
 
                         <!-- Project Content -->
-                        <div class="project-header">
+                        <div class="project-content">
                             <h3 class="project-title">{{ $project->name }}</h3>
-                            <p class="project-description">{{ Str::limit($project->description, 150) }}</p>
+                            <p class="project-description">{{ Str::limit($project->description, 120) }}</p>
 
                             <!-- Project Stats -->
                             <div class="project-stats">
@@ -101,8 +99,8 @@
                         </div>
 
                         <!-- Project Actions -->
-                        <div style="padding: 1.5rem; border-top: 1px solid var(--green-100);">
-                            <a href="{{ route('user.projects') }}#project-{{ $project->id }}" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                        <div class="project-actions">
+                            <a href="{{ route('user.projects') }}#project-{{ $project->id }}" class="btn btn-primary">
                                 Projeyi İncele
                                 <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>

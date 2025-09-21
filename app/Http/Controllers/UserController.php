@@ -16,13 +16,13 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Rastgele kategoriler (projeler) al
+        // Rastgele kategoriler (projeler) al - maksimum 3 adet
         $randomProjects = Category::with(['oneriler' => function($query) {
                 $query->limit(3); // Her kategoriden max 3 öneri
             }])
             ->has('oneriler') // Sadece önerisi olan kategoriler
             ->inRandomOrder()
-            ->limit(3)
+            ->limit(3) // Ana sayfada maksimum 3 proje göster
             ->get();
 
         // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
