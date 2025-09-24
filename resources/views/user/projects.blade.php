@@ -87,6 +87,24 @@
                         </svg>
                         <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Proje Listesi</h3>
                     </div>
+
+                    <!-- Info about voting system -->
+                    <div style="background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: start; gap: 0.5rem;">
+                            <svg style="width: 1rem; height: 1rem; color: var(--green-600); margin-top: 0.125rem; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                            </svg>
+                            <div>
+                                <p style="font-size: 0.75rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
+                                    <strong>Oylama Sistemi:</strong> Her proje kategorisinde sadece bir öneri için oy kullanabilirsiniz.
+                                </p>
+                                <p style="font-size: 0.7rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
+                                    Seçiminizi değiştirmek için başka bir öneriye tıklayın. ○ işareti mevcut seçiminizi gösterir.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div style="space-y: 0.5rem;">
                         @foreach($projects as $project)
                         <div style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
@@ -263,8 +281,11 @@
                                                 <button onclick="toggleLike({{ $suggestion->id }})"
                                                         class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
                                                         data-suggestion-id="{{ $suggestion->id }}"
-                                                        style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.375rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; transition: all 0.2s; backdrop-filter: blur(4px);">
-                                                    <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                        data-project-id="{{ $project->id }}"
+                                                        title="Bu proje kategorisinde sadece bir öneri beğenilebilir"
+                                                        style="background: {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? '#ef4444' : 'rgba(255,255,255,0.15)' }}; border: 1px solid {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? '#dc2626' : 'rgba(255,255,255,0.3)' }}; color: white; padding: 0.375rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; transition: all 0.2s; backdrop-filter: blur(4px); cursor: pointer;">
+
+                                                    <svg style="width: 0.875rem; height: 0.875rem;" fill="{{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                                     </svg>
                                                     <span class="like-count">{{ $suggestion->likes->count() }}</span>
@@ -372,39 +393,97 @@ function scrollToSuggestion(suggestionId) {
     }
 }
 
-// Toggle like with AJAX
+// Toggle like with AJAX (Radio button logic: one per project category)
 function toggleLike(suggestionId) {
     @guest
         showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
         setTimeout(() => {
-            window.location.href = '/admin/login';
+            window.location.href = '{{ route('user.login') }}';
         }, 2000);
         return;
     @endguest
 
-    const button = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
-    const likeCount = button.querySelector('.like-count');
+    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
+    const likeCount = clickedButton.querySelector('.like-count');
 
-    // Disable button during request
-    button.disabled = true;
-    button.classList.add('loading');
+    // Find the project container to get category context
+    const projectContainer = clickedButton.closest('[id^="project-"]');
+    const projectId = projectContainer ? projectContainer.id.replace('project-', '') : null;
+
+    // Disable all buttons in this project during request
+    const allButtonsInProject = projectContainer ? projectContainer.querySelectorAll('.btn-like') : [clickedButton];
+    allButtonsInProject.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('loading');
+    });
 
     $.ajax({
         url: `/suggestions/${suggestionId}/toggle-like`,
         method: 'POST',
         success: function(response) {
-            // Update like count
-            likeCount.textContent = response.likes_count;
+            // Update like counts for all suggestions in this project
+            if (projectContainer) {
+                // Reset all like buttons in this project
+                allButtonsInProject.forEach(btn => {
+                    btn.classList.remove('liked');
+                    const btnSuggestionId = btn.getAttribute('data-suggestion-id');
 
-            // Update button appearance
-            if (response.liked) {
-                button.classList.add('liked');
-            } else {
-                button.classList.remove('liked');
+                    // Reset button appearance to default (not liked)
+                    btn.style.background = 'rgba(255,255,255,0.15)';
+                    btn.style.borderColor = 'rgba(255,255,255,0.3)';
+
+                    // Reset heart icon to outline
+                    const heartIcon = btn.querySelector('svg');
+                    if (heartIcon) {
+                        heartIcon.style.fill = 'none';
+                    }
+
+                    // Update like count from server response if available
+                    if (response.all_likes && response.all_likes[btnSuggestionId] !== undefined) {
+                        const btnLikeCount = btn.querySelector('.like-count');
+                        if (btnLikeCount) {
+                            btnLikeCount.textContent = response.all_likes[btnSuggestionId];
+                        }
+                    }
+                });
             }
 
-            // Show success message
-            showMessage(response.message, 'success');
+            // Update clicked button's like count
+            likeCount.textContent = response.likes_count;
+
+            // Update clicked button appearance
+            if (response.liked) {
+                clickedButton.classList.add('liked');
+
+                // Update button to red (liked state)
+                clickedButton.style.background = '#ef4444';
+                clickedButton.style.borderColor = '#dc2626';
+
+                // Fill heart icon
+                const heartIcon = clickedButton.querySelector('svg');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'currentColor';
+                }
+
+                showMessage('✓ Bu proje kategorisindeki seçiminiz güncellendi!', 'success');
+            } else {
+                clickedButton.classList.remove('liked');
+
+                // Reset button to default (not liked state)
+                clickedButton.style.background = 'rgba(255,255,255,0.15)';
+                clickedButton.style.borderColor = 'rgba(255,255,255,0.3)';
+
+                // Reset heart icon to outline
+                const heartIcon = clickedButton.querySelector('svg');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'none';
+                }
+
+                showMessage('Beğeni kaldırıldı.', 'info');
+            }            // Add visual feedback for radio button behavior
+            if (response.liked && response.switched_from) {
+                showMessage(`Seçiminiz "${response.switched_from}" önerisinden bu öneriye değiştirildi.`, 'info');
+            }
         },
         error: function(xhr) {
             let message = 'Bir hata oluştu.';
@@ -414,24 +493,133 @@ function toggleLike(suggestionId) {
             showMessage(message, 'error');
         },
         complete: function() {
-            // Re-enable button
-            button.disabled = false;
-            button.classList.remove('loading');
+            // Re-enable all buttons
+            allButtonsInProject.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+            });
         }
     });
 }
 
-// Show message function
-function showMessage(message, type) {
+// Show message function with enhanced styling for like system
+function showMessage(message, type = 'info') {
+    // Remove any existing messages first
+    const existingMessages = document.querySelectorAll('.message');
+    existingMessages.forEach(msg => msg.remove());
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
-    messageDiv.textContent = message;
+
+    // Add appropriate icon based on message type
+    const icons = {
+        success: '✓',
+        error: '✗',
+        info: 'ℹ'
+    };
+
+    const icon = icons[type] || 'ℹ';
+    messageDiv.innerHTML = `<span style="margin-right: 0.5rem; font-weight: bold;">${icon}</span>${message}`;
+
+    // Position it better for mobile
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-lg);
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+    `;
+
+    // Apply type-specific styling
+    switch(type) {
+        case 'success':
+            messageDiv.style.background = 'linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 100%)';
+            break;
+        case 'error':
+            messageDiv.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+            break;
+        case 'info':
+            messageDiv.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+            break;
+    }
 
     document.body.appendChild(messageDiv);
 
+    // Auto remove after delay based on message length
+    const delay = Math.max(3000, message.length * 50);
     setTimeout(() => {
-        messageDiv.remove();
-    }, 3000);
+        messageDiv.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => messageDiv.remove(), 300);
+    }, delay);
+}
+
+// Add CSS for message animations
+if (!document.getElementById('message-styles')) {
+    const style = document.createElement('style');
+    style.id = 'message-styles';
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%) translateX(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%) translateX(-50%);
+                opacity: 0;
+            }
+        }
+        .message {
+            transform: translateX(-50%);
+        }
+        @media (min-width: 640px) {
+            .message {
+                right: 1rem !important;
+                left: auto !important;
+                max-width: 400px !important;
+                transform: none !important;
+            }
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Responsive grid adjustment for mobile
@@ -490,6 +678,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!this.classList.contains('liked')) {
                 this.style.background = 'rgba(255,255,255,0.25)';
                 this.style.borderColor = 'rgba(255,255,255,0.5)';
+            } else {
+                this.style.background = '#dc2626';
+                this.style.borderColor = '#b91c1c';
             }
         });
 
@@ -497,6 +688,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!this.classList.contains('liked')) {
                 this.style.background = 'rgba(255,255,255,0.15)';
                 this.style.borderColor = 'rgba(255,255,255,0.3)';
+            } else {
+                this.style.background = '#ef4444';
+                this.style.borderColor = '#dc2626';
             }
         });
     });

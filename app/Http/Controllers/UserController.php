@@ -105,7 +105,11 @@ class UserController extends Controller
                 $query->where('category_id', $categoryId);
             })
             ->where('user_id', $user->id)
+            ->with('oneri')
             ->first();
+
+        $switchedFrom = null;
+        $liked = false;
 
         if ($existingLike) {
             // Eğer bu öneriye beğeni varsa kaldır, başka öneriye ise değiştir
@@ -113,6 +117,9 @@ class UserController extends Controller
                 $existingLike->delete();
                 $liked = false;
             } else {
+                // Eski beğeniyi kaydet (hangi öneriden değiştirildiğini bilmek için)
+                $switchedFrom = $existingLike->oneri->title;
+
                 // Eski beğeniyi sil, yeni beğeni ekle
                 $existingLike->delete();
                 OneriLike::create([
@@ -133,10 +140,21 @@ class UserController extends Controller
         // Güncel beğeni sayısını hesapla
         $likesCount = $suggestion->fresh()->likes()->count();
 
+        // Bu kategorideki tüm önerilerin güncel beğeni sayılarını al
+        $allSuggestionsInCategory = Oneri::where('category_id', $categoryId)
+            ->withCount('likes')
+            ->get()
+            ->pluck('likes_count', 'id')
+            ->toArray();
+
         return response()->json([
             'liked' => $liked,
             'likes_count' => $likesCount,
-            'message' => $liked ? 'Öneri beğenildi!' : 'Beğeni kaldırıldı!'
+            'all_likes' => $allSuggestionsInCategory,
+            'switched_from' => $switchedFrom,
+            'message' => $liked
+                ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi!')
+                : 'Beğeni kaldırıldı!'
         ]);
     }
 }

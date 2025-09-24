@@ -91,18 +91,64 @@
                         </div>
                     </div>
 
-                    <!-- Like Button (Large) -->
+                    <!-- Like Button (Large) - Radio Button Logic -->
                     <div style="flex-shrink: 0; margin-left: 1.5rem;">
                         <button onclick="toggleLike({{ $suggestion->id }})"
                                 class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
-                                style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 500;"
-                                data-suggestion-id="{{ $suggestion->id }}">
+                                style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 500; position: relative;"
+                                data-suggestion-id="{{ $suggestion->id }}"
+                                title="Bu proje kategorisinde sadece bir öneri beğenilebilir">
+
+                            @php
+                                $userHasLikedInProject = false;
+                                $userLikedSuggestionInProject = null;
+                                if (Auth::check()) {
+                                    $projectSuggestions = \App\Models\Oneri::where('category_id', $suggestion->category_id)->get();
+                                    foreach($projectSuggestions as $projectSuggestion) {
+                                        if ($projectSuggestion->likes->where('user_id', Auth::id())->count() > 0) {
+                                            $userHasLikedInProject = true;
+                                            $userLikedSuggestionInProject = $projectSuggestion->id;
+                                            break;
+                                        }
+                                    }
+                                }
+                            @endphp
+
+                            <!-- Radio button indicator -->
+                            <div style="width: 1rem; height: 1rem; border: 2px solid currentColor; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 0.25rem; opacity: 0.7;">
+                                @if($userLikedSuggestionInProject == $suggestion->id)
+                                <div style="width: 0.5rem; height: 0.5rem; background: currentColor; border-radius: 50%;"></div>
+                                @endif
+                            </div>
+
                             <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                             </svg>
                             <span class="like-count">{{ $suggestion->likes->count() }}</span>
                             <span>Beğeni</span>
+
+                            <!-- Show selection indicator if user has liked this suggestion -->
+                            @if($userHasLikedInProject && $userLikedSuggestionInProject == $suggestion->id)
+                            <span style="margin-left: 0.5rem; font-size: 0.875rem; opacity: 0.8;">✓ Seçili</span>
+                            @endif
                         </button>
+
+                        <!-- Radio button explanation -->
+                        @if($userHasLikedInProject)
+                        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--gray-600); text-align: center; line-height: 1.3;">
+                            <svg style="width: 0.75rem; height: 0.75rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                            </svg>
+                            Bu projede bir seçiminiz var
+                        </div>
+                        @else
+                        <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--gray-600); text-align: center; line-height: 1.3;">
+                            <svg style="width: 0.75rem; height: 0.75rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                            </svg>
+                            Proje başına bir öneri beğenilebilir
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -247,12 +293,12 @@
 </div>
 
 <script>
-// Toggle like with AJAX (same as projects page)
+// Toggle like with AJAX (Radio button logic: one per project category)
 function toggleLike(suggestionId) {
     @guest
         showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
         setTimeout(() => {
-            window.location.href = '/admin/login';
+            window.location.href = '{{ route('user.login') }}';
         }, 2000);
         return;
     @endguest
@@ -271,11 +317,15 @@ function toggleLike(suggestionId) {
 
             if (response.liked) {
                 button.classList.add('liked');
+                if (response.switched_from) {
+                    showMessage(`✓ Bu proje kategorisindeki seçiminiz "${response.switched_from}" önerisinden bu öneriye değiştirildi.`, 'success');
+                } else {
+                    showMessage('✓ Bu proje kategorisindeki seçiminiz güncellendi!', 'success');
+                }
             } else {
                 button.classList.remove('liked');
+                showMessage('Beğeni kaldırıldı.', 'info');
             }
-
-            showMessage(response.message, 'success');
         },
         error: function(xhr) {
             let message = 'Bir hata oluştu.';
@@ -291,16 +341,123 @@ function toggleLike(suggestionId) {
     });
 }
 
-function showMessage(message, type) {
+function showMessage(message, type = 'info') {
+    // Remove any existing messages first
+    const existingMessages = document.querySelectorAll('.message');
+    existingMessages.forEach(msg => msg.remove());
+
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
-    messageDiv.textContent = message;
+
+    // Add appropriate icon based on message type
+    const icons = {
+        success: '✓',
+        error: '✗',
+        info: 'ℹ'
+    };
+
+    const icon = icons[type] || 'ℹ';
+    messageDiv.innerHTML = `<span style="margin-right: 0.5rem; font-weight: bold;">${icon}</span>${message}`;
+
+    // Position it better for mobile
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius-lg);
+        color: white;
+        font-weight: 500;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        backdrop-filter: blur(8px);
+    `;
+
+    // Apply type-specific styling
+    switch(type) {
+        case 'success':
+            messageDiv.style.background = 'linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 100%)';
+            break;
+        case 'error':
+            messageDiv.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+            break;
+        case 'info':
+            messageDiv.style.background = 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)';
+            break;
+    }
 
     document.body.appendChild(messageDiv);
 
+    // Auto remove after delay based on message length
+    const delay = Math.max(3000, message.length * 50);
     setTimeout(() => {
-        messageDiv.remove();
-    }, 3000);
+        messageDiv.style.animation = 'slideOut 0.3s ease forwards';
+        setTimeout(() => messageDiv.remove(), 300);
+    }, delay);
+}
+
+// Add CSS for message animations
+if (!document.getElementById('message-styles')) {
+    const style = document.createElement('style');
+    style.id = 'message-styles';
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                transform: translateY(-100%) translateX(-50%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateY(0) translateX(-50%);
+                opacity: 1;
+            }
+            to {
+                transform: translateY(-100%) translateX(-50%);
+                opacity: 0;
+            }
+        }
+        .message {
+            transform: translateX(-50%);
+        }
+        @media (min-width: 640px) {
+            .message {
+                right: 1rem !important;
+                left: auto !important;
+                max-width: 400px !important;
+                transform: none !important;
+            }
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        }
+    `;
+    document.head.appendChild(style);
 }
 
 // Responsive layout adjustment

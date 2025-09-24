@@ -644,6 +644,122 @@ h6 { font-size: 1rem; font-weight: 500; }
     transform: scale(1.05);
 }
 
+/* Radio Button Like System - Enhanced Styling */
+.btn-like[data-project-id] {
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.2s ease, box-shadow 0.3s ease;
+}
+
+.btn-like[data-project-id]:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-1px) scale(1.02);
+}
+
+.btn-like[data-project-id].liked {
+    background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
+    color: white;
+    border-color: var(--green-400);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.3);
+}
+
+.btn-like[data-project-id].liked:hover {
+    background: linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 100%);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* Radio button indicator styling */
+.btn-like .radio-indicator {
+    width: 0.75rem;
+    height: 0.75rem;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.25rem;
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.btn-like:hover .radio-indicator {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.btn-like.liked .radio-indicator {
+    opacity: 1;
+    border-color: white;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.3);
+}
+
+.btn-like .radio-indicator .radio-dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    background: currentColor;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+}
+
+.btn-like.liked .radio-indicator .radio-dot {
+    transform: scale(1);
+    background: white;
+}
+
+/* Selection indicator for liked suggestions */
+.btn-like .selection-indicator {
+    margin-left: 0.25rem;
+    font-size: 0.625rem;
+    opacity: 0.8;
+    transition: all 0.2s ease;
+}
+
+.btn-like:hover .selection-indicator {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Info text styling for radio button behavior */
+.radio-info-text {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    text-align: center;
+    line-height: 1.3;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.radio-info-text:hover {
+    opacity: 1;
+}
+
+.radio-info-text svg {
+    width: 0.75rem;
+    height: 0.75rem;
+    display: inline;
+    margin-right: 0.25rem;
+    color: var(--green-600);
+}
+
+/* Project context visual grouping */
+[id^="project-"] {
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+}
+
+[id^="project-"]:hover {
+    border-color: rgba(76, 175, 80, 0.2);
+}
+
+/* Enhanced message styling for like system feedback */
+.message.info {
+    background: linear-gradient(135deg, var(--blue-500) 0%, var(--blue-600) 100%);
+    color: white;
+}
+
 .btn-details {
     background: linear-gradient(135deg, var(--gray-100) 0%, var(--gray-200) 100%);
     color: var(--gray-700);
