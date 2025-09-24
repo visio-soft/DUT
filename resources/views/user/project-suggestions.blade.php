@@ -117,10 +117,10 @@
                         <div style="text-align: center;">❤️ Beğeni</div>
                         <div style="text-align: center;">💬 Yorum</div>
                     </div>
-                    
+
                     <div id="suggestionsList" style="max-height: 60vh; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: var(--radius-md);">
                         @foreach($project->oneriler->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
-                        <div class="suggestion-item" 
+                        <div class="suggestion-item"
                              data-id="{{ $suggestion->id }}"
                              data-likes="{{ $suggestion->likes->count() }}"
                              data-comments="{{ $suggestion->comments->count() }}"
@@ -129,7 +129,7 @@
                              onclick="scrollToSuggestion({{ $suggestion->id }})"
                              onmouseenter="this.style.background='var(--blue-50)'"
                              onmouseleave="this.style.background='white'">
-                            
+
                             <!-- Öneri Adı -->
                             <div style="min-width: 0;">
                                 <div style="font-size: 0.875rem; font-weight: 600; color: var(--gray-900); margin-bottom: 0.25rem; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -164,8 +164,8 @@
                 <div style="display: flex; flex-direction: column; gap: 2rem;">
                     @foreach($project->oneriler->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $index => $suggestion)
                     <div id="suggestion-{{ $suggestion->id }}" class="user-card" style="
-                        overflow: hidden; 
-                        position: relative; 
+                        overflow: hidden;
+                        position: relative;
                         min-height: 400px;
                         border-radius: var(--radius-lg);
                         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -176,26 +176,26 @@
                             $suggestionImage = null;
                             $imageSource = 'none';
                             $debugInfo = [];
-                            
+
                             // Debug: Suggestion model bilgileri
                             $debugInfo[] = "Suggestion ID: " . $suggestion->id;
                             $debugInfo[] = "Suggestion Title: " . $suggestion->title;
-                            
+
                             // 1. Önce media library'den dene
                             $mediaUrl = $suggestion->getFirstMediaUrl('images');
                             $debugInfo[] = "Media Library URL: " . ($mediaUrl ?: 'empty');
-                            
+
                             if($mediaUrl) {
                                 $suggestionImage = $mediaUrl;
                                 $imageSource = 'media_library';
                                 $debugInfo[] = "✓ Using Media Library image";
                             }
-                            
+
                             // 2. Media library'den tüm resimleri kontrol et
                             if(!$suggestionImage) {
                                 $allMedia = $suggestion->getMedia('images');
                                 $debugInfo[] = "All media count: " . $allMedia->count();
-                                
+
                                 if($allMedia->count() > 0) {
                                     $firstMedia = $allMedia->first();
                                     $suggestionImage = $firstMedia->getUrl();
@@ -204,18 +204,18 @@
                                     $debugInfo[] = "Media exists on disk: " . (file_exists($firstMedia->getPath()) ? 'YES' : 'NO');
                                 }
                             }
-                            
+
                             // 3. Proje resmini kullan
                             if(!$suggestionImage && $project->image) {
                                 $suggestionImage = asset('storage/' . $project->image);
                                 $imageSource = 'project_image';
                                 $debugInfo[] = "✓ Using Project image: " . $project->image;
-                                
+
                                 // Proje dosyası var mı kontrol et
                                 $projectFilePath = storage_path('app/public/' . $project->image);
                                 $debugInfo[] = "Project file exists: " . (file_exists($projectFilePath) ? 'YES' : 'NO');
                             }
-                            
+
                             // 4. Son çare: default resim
                             if(!$suggestionImage) {
                                 $defaultImages = [
@@ -223,7 +223,7 @@
                                     'images/default-project.jpg',
                                     'images/placeholder.jpg'
                                 ];
-                                
+
                                 foreach($defaultImages as $defaultImg) {
                                     $defaultPath = public_path($defaultImg);
                                     if(file_exists($defaultPath)) {
@@ -234,10 +234,10 @@
                                     }
                                 }
                             }
-                            
+
                             $debugInfo[] = "Final image source: " . $imageSource;
                             $debugInfo[] = "Final image URL: " . ($suggestionImage ?: 'null');
-                            
+
                             // Log to Laravel log
                             \Log::info('Suggestion Image Debug', [
                                 'suggestion_id' => $suggestion->id,
@@ -246,7 +246,7 @@
                                 'debug_info' => $debugInfo
                             ]);
                         @endphp
-                        
+
                         <!-- Debug info (sadece development'ta göster) -->
                         @if(config('app.debug'))
                         <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.8); color: white; padding: 0.5rem; border-radius: 4px; font-size: 10px; z-index: 10; max-width: 200px;">
@@ -256,16 +256,16 @@
                             @endforeach
                         </div>
                         @endif
-                        
+
                         <!-- Background Layer -->
                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
                             @if($suggestionImage)
                                 <img src="{{ $suggestionImage }}"
                                      alt="{{ $suggestion->title }}"
                                      style="
-                                        width: 100%; 
-                                        height: 100%; 
-                                        object-fit: cover; 
+                                        width: 100%;
+                                        height: 100%;
+                                        object-fit: cover;
                                         object-position: center;
                                         filter: brightness(0.4) saturate(1.2);
                                         transition: filter 0.3s ease;
@@ -275,8 +275,8 @@
                             @else
                                 <!-- Gradient Background when no image -->
                                 <div style="
-                                    width: 100%; 
-                                    height: 100%; 
+                                    width: 100%;
+                                    height: 100%;
                                     background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
                                     position: relative;
                                 ">
@@ -297,11 +297,11 @@
 
                         <!-- Gradient Overlay for better text readability -->
                         <div style="
-                            position: absolute; 
-                            top: 0; 
-                            left: 0; 
-                            right: 0; 
-                            bottom: 0; 
+                            position: absolute;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            bottom: 0;
                             background: linear-gradient(
                                 135deg,
                                 rgba(0,0,0,0.3) 0%,
@@ -312,19 +312,19 @@
                         "></div>
 
                         <!-- Suggestion Content -->
-                        <div class="suggestion-card" 
+                        <div class="suggestion-card"
                              data-id="{{ $suggestion->id }}"
                              data-likes="{{ $suggestion->likes->count() }}"
                              data-comments="{{ $suggestion->comments->count() }}"
                              data-created="{{ $suggestion->created_at->timestamp }}"
                              style="
-                                position: absolute; 
-                                top: 0; 
-                                left: 0; 
-                                right: 0; 
-                                bottom: 0; 
-                                z-index: 3; 
-                                padding: 2rem; 
+                                position: absolute;
+                                top: 0;
+                                left: 0;
+                                right: 0;
+                                bottom: 0;
+                                z-index: 3;
+                                padding: 2rem;
                                 color: white;
                                 display: flex;
                                 flex-direction: column;
@@ -351,10 +351,10 @@
 
                                 @if($suggestion->description)
                                 <div style="
-                                    background: rgba(255,255,255,0.1); 
+                                    background: rgba(255,255,255,0.1);
                                     backdrop-filter: blur(10px);
-                                    border-radius: 0.75rem; 
-                                    padding: 1.25rem; 
+                                    border-radius: 0.75rem;
+                                    padding: 1.25rem;
                                     margin-bottom: 1.5rem;
                                     border: 1px solid rgba(255,255,255,0.2);
                                 ">
@@ -367,9 +367,9 @@
 
                             <!-- Bottom Content - Stats & Actions -->
                             <div style="
-                                background: rgba(0,0,0,0.3); 
+                                background: rgba(0,0,0,0.3);
                                 backdrop-filter: blur(15px);
-                                border-radius: 0.75rem; 
+                                border-radius: 0.75rem;
                                 padding: 1.25rem;
                                 border: 1px solid rgba(255,255,255,0.1);
                             ">
@@ -406,18 +406,18 @@
                                             data-project-id="{{ $project->id }}"
                                             title="Bu proje kategorisinde sadece bir öneri beğenilebilir"
                                             style="
-                                                background: {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'rgba(255,255,255,0.15)' }}; 
-                                                border: 1px solid {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? '#dc2626' : 'rgba(255,255,255,0.3)' }}; 
-                                                color: white; 
-                                                padding: 0.75rem 1.25rem; 
-                                                border-radius: 0.5rem; 
-                                                font-size: 0.875rem; 
+                                                background: {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'rgba(255,255,255,0.15)' }};
+                                                border: 1px solid {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? '#dc2626' : 'rgba(255,255,255,0.3)' }};
+                                                color: white;
+                                                padding: 0.75rem 1.25rem;
+                                                border-radius: 0.5rem;
+                                                font-size: 0.875rem;
                                                 font-weight: 500;
-                                                display: flex; 
-                                                align-items: center; 
-                                                gap: 0.5rem; 
-                                                transition: all 0.3s ease; 
-                                                backdrop-filter: blur(10px); 
+                                                display: flex;
+                                                align-items: center;
+                                                gap: 0.5rem;
+                                                transition: all 0.3s ease;
+                                                backdrop-filter: blur(10px);
                                                 cursor: pointer;
                                                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                                             "
@@ -433,18 +433,18 @@
                                     <!-- Details Button -->
                                     <a href="{{ route('user.suggestion.detail', $suggestion->id) }}"
                                        style="
-                                           background: rgba(255,255,255,0.95); 
-                                           color: #1e40af; 
-                                           padding: 0.75rem 1.25rem; 
-                                           border-radius: 0.5rem; 
-                                           font-size: 0.875rem; 
-                                           font-weight: 600; 
-                                           text-decoration: none; 
-                                           transition: all 0.3s ease; 
-                                           backdrop-filter: blur(10px); 
-                                           border: 1px solid rgba(255,255,255,0.5); 
-                                           display: flex; 
-                                           align-items: center; 
+                                           background: rgba(255,255,255,0.95);
+                                           color: #1e40af;
+                                           padding: 0.75rem 1.25rem;
+                                           border-radius: 0.5rem;
+                                           font-size: 0.875rem;
+                                           font-weight: 600;
+                                           text-decoration: none;
+                                           transition: all 0.3s ease;
+                                           backdrop-filter: blur(10px);
+                                           border: 1px solid rgba(255,255,255,0.5);
+                                           display: flex;
+                                           align-items: center;
                                            gap: 0.5rem;
                                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                                        "
