@@ -63,6 +63,31 @@ class UserController extends Controller
     }
 
     /**
+     * Proje önerileri sayfası - Belirli bir projenin tüm önerileri
+     */
+    public function projectSuggestions($id)
+    {
+        // Projeyi (kategoriyi) önerileriyle birlikte getir
+        $project = Category::with([
+                'oneriler.likes',
+                'oneriler.comments',
+                'oneriler.createdBy'
+            ])
+            ->findOrFail($id);
+
+        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
+        $randomBackgroundImage = null;
+
+        if ($hasBackgroundImages) {
+            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
+            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
+        }
+
+        return view('user.project-suggestions', compact('project', 'hasBackgroundImages', 'randomBackgroundImage'));
+    }
+
+    /**
      * Öneri detay sayfası
      */
     public function suggestionDetail($id)

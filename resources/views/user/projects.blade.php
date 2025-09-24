@@ -315,14 +315,14 @@
 
                                 @if($project->oneriler->count() > 2)
                                 <div style="grid-column: 1 / -1; text-align: center; margin-top: 0.5rem;">
-                                    <div style="display: flex; align-items: center; justify-content: center;">
-                                        <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.7);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <a href="{{ route('user.project.suggestions', $project->id) }}"
+                                       class="btn-show-more"
+                                       style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 0 auto; text-shadow: 0 1px 2px rgba(0,0,0,0.5); text-decoration: none;">
+                                        <svg style="width: 1rem; height: 1rem; color: rgba(255,255,255,0.9);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                         </svg>
-                                        <span style="color: rgba(255,255,255,0.8); font-size: 0.875rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                            ve {{ $project->oneriler->count() - 2 }} öneri daha...
-                                        </span>
-                                    </div>
+                                        <span>ve {{ $project->oneriler->count() - 2 }} öneri daha...</span>
+                                    </a>
                                 </div>
                                 @endif
                             </div>
@@ -365,8 +365,16 @@
     </div>
 </div>
 
+
+
 <!-- JavaScript for interactions -->
 <script>
+// Set up CSRF token for AJAX requests
+$.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
 // Scroll to project
 function scrollToProject(projectId) {
     const element = document.getElementById('project-' + projectId);
@@ -590,6 +598,8 @@ if (!document.getElementById('message-styles')) {
         .message {
             transform: translateX(-50%);
         }
+
+
         @media (min-width: 640px) {
             .message {
                 right: 1rem !important;
@@ -706,6 +716,51 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('mouseleave', function() {
             this.style.background = 'var(--red-600)';
             this.style.transform = 'translateY(0)';
+        });
+    });
+});
+
+
+
+// Add hover effects for buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Add hover effect for "show more" buttons
+    const showMoreButtons = document.querySelectorAll('.btn-show-more');
+    showMoreButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.background = 'rgba(255,255,255,0.3)';
+            this.style.borderColor = 'rgba(255,255,255,0.6)';
+            this.style.transform = 'translateY(-2px)';
+        });
+
+        button.addEventListener('mouseleave', function() {
+            this.style.background = 'rgba(255,255,255,0.2)';
+            this.style.borderColor = 'rgba(255,255,255,0.4)';
+            this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Existing hover effects code...
+    const likeButtons = document.querySelectorAll('.btn-like');
+    likeButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            if (!this.classList.contains('liked')) {
+                this.style.background = 'rgba(255,255,255,0.25)';
+                this.style.borderColor = 'rgba(255,255,255,0.5)';
+            } else {
+                this.style.background = '#dc2626';
+                this.style.borderColor = '#b91c1c';
+            }
+        });
+
+        button.addEventListener('mouseleave', function() {
+            if (!this.classList.contains('liked')) {
+                this.style.background = 'rgba(255,255,255,0.15)';
+                this.style.borderColor = 'rgba(255,255,255,0.3)';
+            } else {
+                this.style.background = '#ef4444';
+                this.style.borderColor = '#dc2626';
+            }
         });
     });
 });

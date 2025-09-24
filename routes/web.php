@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\UserAuthController;
 // User Panel Routes
 Route::get('/', [UserController::class, 'index'])->name('user.index');
 Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
+Route::get('/projects/{id}/suggestions', [UserController::class, 'projectSuggestions'])->name('user.project.suggestions');
 Route::get('/suggestions/{id}', [UserController::class, 'suggestionDetail'])->name('user.suggestion.detail');
 
 // User Authentication Routes
