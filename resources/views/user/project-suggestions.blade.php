@@ -725,6 +725,20 @@
         fill: currentColor !important;
     }
 
+    .btn-like.expired {
+        background: rgba(107, 114, 128, 0.5) !important;
+        border-color: rgba(107, 114, 128, 0.3) !important;
+        color: rgba(255, 255, 255, 0.5) !important;
+        cursor: not-allowed !important;
+        opacity: 0.6 !important;
+    }
+
+    .btn-like.expired:hover {
+        background: rgba(107, 114, 128, 0.5) !important;
+        border-color: rgba(107, 114, 128, 0.3) !important;
+        transform: none !important;
+    }
+
     /* Detail button matches projects Detay appearance */
     .detail-button {
         color: rgba(255,255,255,0.9);
@@ -1158,13 +1172,42 @@
                     <p class="stat-label">Toplam Yorum</p>
                 </div>
                 </div>
-            </div>
+                </div>
+            @endif
+
+            <!-- Project Timing Info -->
+            @if($project->end_datetime)
+                @php
+                    $remainingTime = $project->getRemainingTime();
+                    $isExpired = $project->isExpired();
+                @endphp
+                <div class="stats-section" style="padding: 1.5rem 0; margin-bottom: 1rem;">
+                    <div style="max-width: 600px; margin: 0 auto; text-center;">
+                        <div style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 1rem 2rem; border-radius: var(--radius-xl); background: {{ $isExpired ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }}; border: 2px solid {{ $isExpired ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)' }};">
+                            <svg style="width: 1.5rem; height: 1.5rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }};" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                            <div style="text-align: left;">
+                                <div style="font-size: 0.875rem; color: {{ $isExpired ? 'var(--red-700)' : 'var(--green-700)' }}; font-weight: 500;">
+                                    Proje Bitiş: {{ $project->end_datetime->format('d.m.Y H:i') }}
+                                </div>
+                                <div style="font-size: 1rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }}; font-weight: 700;">
+                                    @if($isExpired)
+                                        Süre Dolmuş - Beğeni Devre Dışı
+                                    @elseif($remainingTime)
+                                        {{ $remainingTime['formatted'] }} kaldı
+                                    @else
+                                        Süresiz
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             @endif
         </div>
     </div>
-</section>
-
-<!-- Main Content Section -->
+</section><!-- Main Content Section -->
 <div class="section-padding">
     <div class="user-container">
         @if($project->oneriler->count() > 0)
@@ -1313,12 +1356,17 @@
                             <!-- Action Buttons (aligned with projects page) -->
                             <div style="display: flex; gap: 1rem; align-items: center;">
                                 <!-- Like Button -->
-                                <button onclick="toggleLike({{ $suggestion->id }})"
-                                        class="btn-like btn-like-large {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
+                                @php
+                                    $isProjectExpired = $project->isExpired();
+                                @endphp
+                                <button onclick="{{ $isProjectExpired ? 'showExpiredMessage()' : 'toggleLike(' . $suggestion->id . ')' }}"
+                                        class="btn-like btn-like-large {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }} {{ $isProjectExpired ? 'expired' : '' }}"
                                         data-suggestion-id="{{ $suggestion->id }}"
                                         data-project-id="{{ $project->id }}"
                                         data-category="{{ $suggestion->category_id ?? 'default' }}"
-                                        title="Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)">
+                                        data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
+                                        title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)' }}"
+                                        {{ $isProjectExpired ? 'disabled' : '' }}
                                     <svg class="like-icon like-icon-large" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                     </svg>
@@ -1412,8 +1460,20 @@ function updateSidebarActiveState(suggestionId) {
 
 
 
+// Show expired message for expired projects
+function showExpiredMessage() {
+    showMessage('Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.', 'error');
+}
+
 // Toggle like with AJAX (Radio button logic: one per project category)
 function toggleLike(suggestionId) {
+    // Check if button is expired first
+    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
+    if (clickedButton && clickedButton.getAttribute('data-expired') === 'true') {
+        showExpiredMessage();
+        return;
+    }
+
     @guest
         showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
         setTimeout(() => {
@@ -1422,7 +1482,6 @@ function toggleLike(suggestionId) {
         return;
     @endguest
 
-    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
     const likeCount = clickedButton.querySelector('.like-count');
     const projectId = {{ $project->id }};
 
@@ -1432,11 +1491,14 @@ function toggleLike(suggestionId) {
     // Find all buttons in the same category (radio button behavior)
     const allButtonsInCategory = document.querySelectorAll(`[data-category="${suggestionCategory}"]`);
 
-    // Disable all buttons in this category during request
+    // Disable all non-expired buttons in this category during request
     allButtonsInCategory.forEach(btn => {
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
-        btn.style.pointerEvents = 'none';
+        // Don't disable expired buttons - just leave them as is
+        if (btn.getAttribute('data-expired') !== 'true') {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+        }
     });
 
     $.ajax({
@@ -1504,14 +1566,26 @@ function toggleLike(suggestionId) {
             if (xhr.responseJSON && xhr.responseJSON.error) {
                 message = xhr.responseJSON.error;
             }
+
+            // Handle expired project error specifically
+            if (xhr.responseJSON && xhr.responseJSON.expired) {
+                // Mark button as expired and update its appearance
+                clickedButton.setAttribute('data-expired', 'true');
+                clickedButton.classList.add('expired');
+                clickedButton.disabled = true;
+                clickedButton.onclick = function() { showExpiredMessage(); };
+            }
+
             showMessage(message, 'error');
         },
         complete: function() {
-            // Re-enable all buttons in the category
+            // Re-enable all non-expired buttons in the category
             allButtonsInCategory.forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
+                if (btn.getAttribute('data-expired') !== 'true') {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
             });
         }
     });

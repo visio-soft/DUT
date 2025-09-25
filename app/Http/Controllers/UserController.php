@@ -137,9 +137,17 @@ class UserController extends Controller
             return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
         }
 
-        $suggestion = Oneri::findOrFail($suggestionId);
+        $suggestion = Oneri::with('category')->findOrFail($suggestionId);
         $user = Auth::user();
         $categoryId = $suggestion->category_id;
+
+        // Proje süresi kontrol et
+        if ($suggestion->category && $suggestion->category->isExpired()) {
+            return response()->json([
+                'error' => 'Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.',
+                'expired' => true
+            ], 403);
+        }
 
         // Aynı kategorideki (projedeki) diğer beğenileri kontrol et
         $existingLike = OneriLike::whereHas('oneri', function($query) use ($categoryId) {

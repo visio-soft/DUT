@@ -64,6 +64,70 @@ class Category extends Model implements HasMedia
     }
 
     /**
+     * Check if the project is expired (past end_datetime)
+     */
+    public function isExpired(): bool
+    {
+        if (!$this->end_datetime) {
+            return false;
+        }
+
+        return now()->greaterThan($this->end_datetime);
+    }
+
+    /**
+     * Get remaining time until project ends
+     */
+    public function getRemainingTime(): ?array
+    {
+        if (!$this->end_datetime || $this->isExpired()) {
+            return null;
+        }
+
+        $now = now();
+        $endTime = $this->end_datetime;
+        $diff = $now->diff($endTime);
+
+        return [
+            'days' => $diff->days,
+            'hours' => $diff->h,
+            'minutes' => $diff->i,
+            'seconds' => $diff->s,
+            'total_hours' => ($diff->days * 24) + $diff->h,
+            'total_minutes' => (($diff->days * 24) + $diff->h) * 60 + $diff->i,
+            'formatted' => $this->formatRemainingTime($diff)
+        ];
+    }
+
+    /**
+     * Format remaining time for display
+     */
+    private function formatRemainingTime($diff): string
+    {
+        if ($diff->days > 0) {
+            return "{$diff->days} gün {$diff->h} saat";
+        } elseif ($diff->h > 0) {
+            return "{$diff->h} saat {$diff->i} dakika";
+        } elseif ($diff->i > 0) {
+            return "{$diff->i} dakika";
+        } else {
+            return "{$diff->s} saniye";
+        }
+    }
+
+    /**
+     * Get formatted end datetime for display
+     */
+    public function getFormattedEndDatetime(): ?string
+    {
+        if (!$this->end_datetime) {
+            return null;
+        }
+
+        return $this->end_datetime->format('d.m.Y H:i');
+    }
+
+    /**
      * Register media collections used by Category.
      */
     public function registerMediaCollections(): void

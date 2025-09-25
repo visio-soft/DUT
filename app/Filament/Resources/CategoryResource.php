@@ -52,20 +52,24 @@ class CategoryResource extends Resource
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\DateTimePicker::make('start_datetime')
-                                    ->label('Başlangıç')
+                                    ->label('Başlangıç Tarihi ve Saati')
                                     ->required()
                                     ->seconds(false)
                                     ->format('Y-m-d H:i')
                                     ->displayFormat('d.m.Y H:i')
-                                    ->timezone('Europe/Istanbul'),
+                                    ->timezone('Europe/Istanbul')
+                                    ->native(false),
 
                                 Forms\Components\DateTimePicker::make('end_datetime')
-                                    ->label('Bitiş')
+                                    ->label('Bitiş Tarihi ve Saati')
                                     ->required()
                                     ->seconds(false)
                                     ->format('Y-m-d H:i')
                                     ->displayFormat('d.m.Y H:i')
-                                    ->timezone('Europe/Istanbul'),
+                                    ->timezone('Europe/Istanbul')
+                                    ->native(false)
+                                    ->after('start_datetime')
+                                    ->helperText('Proje bitiş tarihi geçtikten sonra beğeni yapılamaz.'),
                             ]),
                     ])
                     ->columns(2),
@@ -154,6 +158,24 @@ class CategoryResource extends Resource
                     ->dateTime('d.m.Y H:i')
                     ->placeholder('-')
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('remaining_time')
+                    ->label('Kalan Süre')
+                    ->getStateUsing(function ($record) {
+                        if (!$record->end_datetime) {
+                            return 'Belirsiz';
+                        }
+
+                        if ($record->isExpired()) {
+                            return 'Süre Dolmuş';
+                        }
+
+                        $remaining = $record->getRemainingTime();
+                        return $remaining ? $remaining['formatted'] : 'Süre Dolmuş';
+                    })
+                    ->badge()
+                    ->color(fn ($record) => $record && $record->end_datetime && $record->isExpired() ? 'danger' : 'success')
+                    ->sortable(false),
 
                 Tables\Columns\TextColumn::make('country')
                     ->label('Ülke')

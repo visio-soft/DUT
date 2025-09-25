@@ -211,6 +211,31 @@
         color: var(--gray-800);
     }
 
+    /* Desktop Optimizations */
+    @media (min-width: 1024px) {
+        .main-content-grid {
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .tree-view {
+            position: sticky;
+            top: 2rem;
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+        }
+    }
+
+    /* Tablet Responsive */
+    @media (max-width: 1023px) and (min-width: 769px) {
+        .main-content-grid {
+            grid-template-columns: 250px 1fr;
+            gap: 1.5rem;
+        }
+    }
+
     /* Mobile Responsive */
     @media (max-width: 768px) {
         .header-title-wrapper {
@@ -235,6 +260,34 @@
         .stat-label {
             font-size: 0.875rem;
         }
+        
+        .main-content-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+    }
+
+    /* Project Cards Full Width */
+    .project-cards-container {
+        width: 100%;
+        min-width: 0; /* Allow shrinking */
+    }
+    
+    .project-card-wrapper {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .main-content-grid .user-card {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+    
+    /* Ensure grid takes full available space */
+    .main-content-grid {
+        width: 100%;
+        display: grid;
     }
 
     @media (max-width: 640px) {
@@ -347,10 +400,10 @@
 </section>
 
 <div class="section-padding">
-    <div class="user-container">
+    <div class="projects-wide-container">
 
         @if($projects->count() > 0)
-        <div class="d-grid" style="grid-template-columns: 1fr 3fr; gap: 2rem;">
+        <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
             <!-- Sol Taraf: Tree View -->
             <div>
                 <div class="tree-view">
@@ -419,8 +472,8 @@
             </div>
 
             <!-- Sağ Taraf: Project Cards -->
-            <div>
-                <div class="d-flex" style="flex-direction: column; gap: 2rem;">
+            <div class="project-cards-container">
+                <div class="d-flex" style="flex-direction: column; gap: 2rem; width: 100%;"">
                     @foreach($projects as $project)
                     <div id="project-{{ $project->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
                         <!-- Project Background Image -->
@@ -476,10 +529,29 @@
                                 @if($project->end_datetime)
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                     </svg>
-                                    Bitiş: {{ $project->end_datetime->format('d.m.Y') }}
+                                    Bitiş: {{ $project->end_datetime->format('d.m.Y H:i') }}
                                 </div>
+                                @endif
+
+                                @if($project->end_datetime)
+                                    @php
+                                        $remainingTime = $project->getRemainingTime();
+                                        $isExpired = $project->isExpired();
+                                    @endphp
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: {{ $isExpired ? 'rgba(239, 68, 68, 0.9)' : 'rgba(34, 197, 94, 0.9)' }}; font-size: 0.875rem; font-weight: 600;">
+                                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                        @if($isExpired)
+                                            <span>Süre Dolmuş - Beğeni Devre Dışı</span>
+                                        @elseif($remainingTime)
+                                            <span>Kalan: {{ $remainingTime['formatted'] }}</span>
+                                        @else
+                                            <span>Süresiz</span>
+                                        @endif
+                                    </div>
                                 @endif
 
                                 @if($project->district)
@@ -560,12 +632,17 @@
                                         <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
                                             <div style="display: flex; align-items: center; gap: 1rem;">
                                                 <!-- Like Button -->
-                                                <button onclick="toggleLike({{ $suggestion->id }})"
-                                                        class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
+                                                @php
+                                                    $isProjectExpired = $project->isExpired();
+                                                @endphp
+                                                <button onclick="{{ $isProjectExpired ? 'showExpiredMessage()' : 'toggleLike(' . $suggestion->id . ')' }}"
+                                                        class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }} {{ $isProjectExpired ? 'expired' : '' }}"
                                                         data-suggestion-id="{{ $suggestion->id }}"
                                                         data-project-id="{{ $project->id }}"
                                                         data-category="{{ $suggestion->category_id ?? 'default' }}"
-                                                        title="Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)">
+                                                        data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
+                                                        title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)' }}"
+                                                        {{ $isProjectExpired ? 'disabled' : '' }}>
 
                                                     <svg class="like-icon" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
@@ -678,106 +755,7 @@ function scrollToSuggestion(suggestionId) {
     }
 }
 
-// Toggle like with AJAX (Radio button logic: one per category)
-function toggleLike(suggestionId) {
-    @guest
-        showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
-        setTimeout(() => {
-            window.location.href = '{{ route('user.login') }}';
-        }, 2000);
-        return;
-    @endguest
 
-    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
-    const likeCount = clickedButton.querySelector('.like-count');
-
-    // Get current suggestion's category from the data attributes
-    const suggestionCategory = clickedButton.getAttribute('data-category') || 'default';
-
-    // Find all buttons in the same category (radio button behavior - across all projects)
-    const allButtonsInCategory = document.querySelectorAll(`[data-category="${suggestionCategory}"]`);
-
-    // Disable all buttons in this category during request
-    allButtonsInCategory.forEach(btn => {
-        btn.disabled = true;
-        btn.style.opacity = '0.7';
-        btn.style.pointerEvents = 'none';
-    });
-
-    $.ajax({
-        url: `/suggestions/${suggestionId}/toggle-like`,
-        method: 'POST',
-        data: {
-            category: suggestionCategory
-        },
-        success: function(response) {
-            // Reset all buttons in the same category to default state (radio button logic)
-            allButtonsInCategory.forEach(btn => {
-                btn.classList.remove('liked');
-                const btnSuggestionId = btn.getAttribute('data-suggestion-id');
-
-                // Reset heart icon to outline for all buttons in category
-                const heartIcon = btn.querySelector('.like-icon');
-                if (heartIcon) {
-                    heartIcon.style.fill = 'none';
-                }
-
-                // Update like counts from server response if available
-                if (response.all_likes && response.all_likes[btnSuggestionId] !== undefined) {
-                    const btnLikeCount = btn.querySelector('.like-count');
-                    if (btnLikeCount) {
-                        btnLikeCount.textContent = response.all_likes[btnSuggestionId];
-                    }
-                }
-            });
-
-            // Update clicked button's like count
-            likeCount.textContent = response.likes_count;
-
-            // Update clicked button appearance if it's now liked
-            if (response.liked) {
-                clickedButton.classList.add('liked');
-
-                // Fill heart icon for the selected button
-                const heartIcon = clickedButton.querySelector('.like-icon');
-                if (heartIcon) {
-                    heartIcon.style.fill = 'currentColor';
-                }
-
-                if (response.switched_from) {
-                    showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
-                } else {
-                    showMessage('✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.', 'success');
-                }
-            } else {
-                clickedButton.classList.remove('liked');
-
-                // Reset heart icon to outline
-                const heartIcon = clickedButton.querySelector('.like-icon');
-                if (heartIcon) {
-                    heartIcon.style.fill = 'none';
-                }
-
-                showMessage('Beğeni kaldırıldı.', 'info');
-            }
-        },
-        error: function(xhr) {
-            let message = 'Bir hata oluştu.';
-            if (xhr.responseJSON && xhr.responseJSON.error) {
-                message = xhr.responseJSON.error;
-            }
-            showMessage(message, 'error');
-        },
-        complete: function() {
-            // Re-enable all buttons in the category
-            allButtonsInCategory.forEach(btn => {
-                btn.disabled = false;
-                btn.style.opacity = '1';
-                btn.style.pointerEvents = 'auto';
-            });
-        }
-    });
-}
 
 // Show message function with enhanced styling for like system
 function showMessage(message, type = 'info') {
@@ -884,6 +862,20 @@ if (!document.getElementById('message-styles')) {
             border-color: #b91c1c !important;
         }
 
+        .btn-like.expired {
+            background: rgba(107, 114, 128, 0.5) !important;
+            border-color: rgba(107, 114, 128, 0.3) !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            cursor: not-allowed !important;
+            opacity: 0.6 !important;
+        }
+
+        .btn-like.expired:hover {
+            background: rgba(107, 114, 128, 0.5) !important;
+            border-color: rgba(107, 114, 128, 0.3) !important;
+            transform: none !important;
+        }
+
         .btn-like .like-icon {
             width: 0.875rem !important;
             height: 0.875rem !important;
@@ -959,12 +951,15 @@ if (!document.getElementById('message-styles')) {
 
 // Responsive grid adjustment for mobile
 function adjustLayout() {
-    const container = document.querySelector('[style*="grid-template-columns: 1fr 3fr"]');
-    if (container && window.innerWidth < 1024) {
+    const container = document.querySelector('.main-content-grid');
+    if (container && window.innerWidth < 768) {
         container.style.gridTemplateColumns = '1fr';
         container.style.gap = '1rem';
+    } else if (container && window.innerWidth < 1024) {
+        container.style.gridTemplateColumns = '250px 1fr';
+        container.style.gap = '1.5rem';
     } else if (container) {
-        container.style.gridTemplateColumns = '1fr 3fr';
+        container.style.gridTemplateColumns = '300px 1fr';
         container.style.gap = '2rem';
     }
 
@@ -1040,6 +1035,138 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Show expired message for expired projects
+function showExpiredMessage() {
+    showMessage('Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.', 'error');
+}
+
+// Update the toggleLike function to handle expired projects
+function toggleLike(suggestionId) {
+    // Check if button is expired first
+    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
+    if (clickedButton && clickedButton.getAttribute('data-expired') === 'true') {
+        showExpiredMessage();
+        return;
+    }
+
+    @guest
+        showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
+        setTimeout(() => {
+            window.location.href = '{{ route('user.login') }}';
+        }, 2000);
+        return;
+    @endguest
+
+    const likeCount = clickedButton.querySelector('.like-count');
+
+    // Get current suggestion's category from the data attributes
+    const suggestionCategory = clickedButton.getAttribute('data-category') || 'default';
+
+    // Find all buttons in the same category (radio button behavior - across all projects)
+    const allButtonsInCategory = document.querySelectorAll(`[data-category="${suggestionCategory}"]`);
+
+    // Disable all buttons in this category during request
+    allButtonsInCategory.forEach(btn => {
+        // Don't disable expired buttons - just leave them as is
+        if (btn.getAttribute('data-expired') !== 'true') {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
+            btn.style.pointerEvents = 'none';
+        }
+    });
+
+    $.ajax({
+        url: `/suggestions/${suggestionId}/toggle-like`,
+        method: 'POST',
+        data: {
+            category: suggestionCategory
+        },
+        success: function(response) {
+            // Reset all buttons in the same category to default state (radio button logic)
+            allButtonsInCategory.forEach(btn => {
+                // Skip expired buttons
+                if (btn.getAttribute('data-expired') === 'true') {
+                    return;
+                }
+
+                btn.classList.remove('liked');
+                const btnSuggestionId = btn.getAttribute('data-suggestion-id');
+
+                // Reset heart icon to outline for all buttons in category
+                const heartIcon = btn.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'none';
+                }
+
+                // Update like counts from server response if available
+                if (response.all_likes && response.all_likes[btnSuggestionId] !== undefined) {
+                    const btnLikeCount = btn.querySelector('.like-count');
+                    if (btnLikeCount) {
+                        btnLikeCount.textContent = response.all_likes[btnSuggestionId];
+                    }
+                }
+            });
+
+            // Update clicked button's like count
+            likeCount.textContent = response.likes_count;
+
+            // Update clicked button appearance if it's now liked
+            if (response.liked) {
+                clickedButton.classList.add('liked');
+
+                // Fill heart icon for the selected button
+                const heartIcon = clickedButton.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'currentColor';
+                }
+
+                if (response.switched_from) {
+                    showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
+                } else {
+                    showMessage('✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.', 'success');
+                }
+            } else {
+                clickedButton.classList.remove('liked');
+
+                // Reset heart icon to outline
+                const heartIcon = clickedButton.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'none';
+                }
+
+                showMessage('Beğeni kaldırıldı.', 'info');
+            }
+        },
+        error: function(xhr) {
+            let message = 'Bir hata oluştu.';
+            if (xhr.responseJSON && xhr.responseJSON.error) {
+                message = xhr.responseJSON.error;
+            }
+
+            // Handle expired project error specifically
+            if (xhr.responseJSON && xhr.responseJSON.expired) {
+                // Mark button as expired and update its appearance
+                clickedButton.setAttribute('data-expired', 'true');
+                clickedButton.classList.add('expired');
+                clickedButton.disabled = true;
+                clickedButton.onclick = function() { showExpiredMessage(); };
+            }
+
+            showMessage(message, 'error');
+        },
+        complete: function() {
+            // Re-enable all non-expired buttons in the category
+            allButtonsInCategory.forEach(btn => {
+                if (btn.getAttribute('data-expired') !== 'true') {
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    btn.style.pointerEvents = 'auto';
+                }
+            });
+        }
+    });
+}
 
 // Call on load and resize
 window.addEventListener('load', adjustLayout);

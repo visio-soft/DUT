@@ -88,6 +88,27 @@
                                 </svg>
                                 {{ $suggestion->created_at->format('d.m.Y') }}
                             </div>
+
+                            @if($suggestion->category && $suggestion->category->end_datetime)
+                                @php
+                                    $remainingTime = $suggestion->category->getRemainingTime();
+                                    $isExpired = $suggestion->category->isExpired();
+                                @endphp
+                                <div style="display: flex; align-items: center;">
+                                    <svg style="width: 1rem; height: 1rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                    </svg>
+                                    <span style="color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }}; font-weight: 600;">
+                                        @if($isExpired)
+                                            Süre Dolmuş
+                                        @elseif($remainingTime)
+                                            {{ $remainingTime['formatted'] }} kaldı
+                                        @else
+                                            Süresiz
+                                        @endif
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                     </div>
 
@@ -163,14 +184,19 @@
                                 }
                             @endphp
 
-                            <button onclick="toggleLike({{ $suggestion->id }})"
-                                    class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
-                                    style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; background: rgba(239, 68, 68, 0.95); border: 2px solid #dc2626; border-radius: var(--radius-lg); color: white; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3); backdrop-filter: blur(8px);"
+                            @php
+                                $isProjectExpired = $suggestion->category && $suggestion->category->isExpired();
+                            @endphp
+                            <button onclick="{{ $isProjectExpired ? 'showExpiredMessage()' : 'toggleLike(' . $suggestion->id . ')' }}"
+                                    class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }} {{ $isProjectExpired ? 'expired' : '' }}"
+                                    style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; background: {{ $isProjectExpired ? 'rgba(107, 114, 128, 0.5)' : 'rgba(239, 68, 68, 0.95)' }}; border: 2px solid {{ $isProjectExpired ? 'rgba(107, 114, 128, 0.3)' : '#dc2626' }}; border-radius: var(--radius-lg); color: {{ $isProjectExpired ? 'rgba(255, 255, 255, 0.5)' : 'white' }}; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3); backdrop-filter: blur(8px); {{ $isProjectExpired ? 'cursor: not-allowed; opacity: 0.6;' : '' }}"
                                     data-suggestion-id="{{ $suggestion->id }}"
                                     data-category="{{ $suggestion->category_id ?? 'default' }}"
-                                    title="Bu kategoride sadece bir öneri beğenilebilir"
-                                    onmouseover="this.style.background='rgba(220, 38, 38, 0.95)'; this.style.transform='translateY(-2px) scale(1.05)'"
-                                    onmouseout="this.style.background='rgba(239, 68, 68, 0.95)'; this.style.transform='translateY(0) scale(1)'">
+                                    data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
+                                    title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir' }}"
+                                    {{ $isProjectExpired ? 'disabled' : '' }}
+                                    onmouseover="{{ $isProjectExpired ? '' : 'this.style.background=\'rgba(220, 38, 38, 0.95)\'; this.style.transform=\'translateY(-2px) scale(1.05)\'' }}"
+                                    onmouseout="{{ $isProjectExpired ? '' : 'this.style.background=\'rgba(239, 68, 68, 0.95)\'; this.style.transform=\'translateY(0) scale(1)\'' }}">
 
                                 <!-- Heart Icon -->
                                 <svg class="like-icon" style="width: 1rem; height: 1rem; {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'fill: currentColor;' : 'fill: none;' }}" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -607,8 +633,20 @@
 </div>
 
 <script>
+// Show expired message for expired projects
+function showExpiredMessage() {
+    showMessage('Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.', 'error');
+}
+
 // Toggle like with AJAX (Radio button logic: one per category)
 function toggleLike(suggestionId) {
+    // Check if button is expired first
+    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
+    if (clickedButton && clickedButton.getAttribute('data-expired') === 'true') {
+        showExpiredMessage();
+        return;
+    }
+
     @guest
         showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
         setTimeout(() => {
@@ -617,7 +655,6 @@ function toggleLike(suggestionId) {
         return;
     @endguest
 
-    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
     const likeCount = clickedButton.querySelector('.like-count');
 
     // Get current suggestion's category from the data attributes
@@ -694,6 +731,23 @@ function toggleLike(suggestionId) {
             if (xhr.responseJSON && xhr.responseJSON.error) {
                 message = xhr.responseJSON.error;
             }
+
+            // Handle expired project error specifically
+            if (xhr.responseJSON && xhr.responseJSON.expired) {
+                // Mark button as expired and update its appearance
+                clickedButton.setAttribute('data-expired', 'true');
+                clickedButton.classList.add('expired');
+                clickedButton.disabled = true;
+                clickedButton.onclick = function() { showExpiredMessage(); };
+
+                // Update button styling for expired state
+                clickedButton.style.background = 'rgba(107, 114, 128, 0.5)';
+                clickedButton.style.borderColor = 'rgba(107, 114, 128, 0.3)';
+                clickedButton.style.color = 'rgba(255, 255, 255, 0.5)';
+                clickedButton.style.cursor = 'not-allowed';
+                clickedButton.style.opacity = '0.6';
+            }
+
             showMessage(message, 'error');
         },
         complete: function() {
@@ -1217,7 +1271,7 @@ function resetCommentForm() {
     const form = document.getElementById('comment-submit-form');
     const commentText = document.getElementById('comment-text');
     const charCount = document.getElementById('char-count');
-    
+
     if (form) {
         form.reset();
     }
