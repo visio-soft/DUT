@@ -218,38 +218,62 @@ h6 { font-size: 1rem; font-weight: 500; }
     padding: 0 1rem;
 }
 
-.user-logo {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-    text-decoration: none;
-    transition: var(--transition-normal);
-}
-
-.user-logo:hover {
-    color: var(--green-100);
-    transform: scale(1.02);
-}
-
-/* Logo box hover: border color transition, subtle glow and lift */
-.user-logo {
+/* Header SVG Logo Styles */
+.user-logo-svg {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: color 180ms ease, transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
-    will-change: transform, box-shadow;
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
 
-.user-logo:hover {
-    color: white; /* keep text readable */
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 6px 18px rgba(0,0,0,0.18), 0 0 8px rgba(255,255,255,0.06) inset;
-    border-color: rgba(255,255,255,0.95);
+.user-logo-svg:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-.user-logo:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(255,255,255,0.08);
+.user-logo-svg .logo {
+    height: 2rem;
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+.user-logo-svg:hover .logo {
+    transform: scale(1.05);
+}
+
+/* Footer SVG Logo Styles */
+.footer-logo-svg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 0.375rem;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.footer-logo-svg:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-logo-svg .footer-logo {
+    height: 1.5rem;
+    width: auto;
+    transition: all 0.3s ease;
+}
+
+.footer-logo-svg:hover .footer-logo {
+    transform: scale(1.05);
 }
 
 /* Desktop Navigation - Hidden on mobile */
@@ -478,8 +502,33 @@ h6 { font-size: 1rem; font-weight: 500; }
         padding: 0 0.75rem;
     }
 
-    .user-logo {
-        font-size: 1.25rem;
+    /* Mobile Header Logo */
+    .user-logo-svg {
+        padding: 0.375rem 0.75rem;
+    }
+    
+    .user-logo-svg .logo {
+        height: 1.75rem;
+    }
+    
+    /* Mobile Footer Logo */
+    .footer-logo-svg {
+        padding: 0.375rem 0.625rem;
+    }
+    
+    .footer-logo-svg .footer-logo {
+        height: 1.25rem;
+    }
+}
+
+/* Very small screens - make logo even smaller */
+@media (max-width: 480px) {
+    .user-logo-svg .logo {
+        height: 1.5rem;
+    }
+    
+    .footer-logo-svg .footer-logo {
+        height: 1rem;
     }
 }
 
