@@ -5,6 +5,8 @@
 @section('content')
 <!-- Header Section -->
 <section class="section-padding" style="padding: 3rem 0; background: #f8fafc;">
+    {{-- shared colors/vars --}}
+    @include('user._shared-colors')
     <div class="user-container">
         <!-- Page Header -->
         <div class="text-center" style="margin-bottom: 3rem;">

@@ -4,49 +4,8 @@
 
 @section('content')
 <!-- CSS Styles -->
+@include('user._shared-colors')
 <style>
-    /* Root Variables */
-    :root {
-        --green-50: #f0fdf4;
-        --green-100: #dcfce7;
-        --green-200: #bbf7d0;
-        --green-300: #86efac;
-        --green-400: #4ade80;
-        --green-500: #22c55e;
-        --green-600: #16a34a;
-        --green-700: #15803d;
-        --green-800: #166534;
-        --blue-50: #eff6ff;
-        --blue-100: #dbeafe;
-        --blue-400: #60a5fa;
-        --blue-500: #3b82f6;
-        --blue-600: #2563eb;
-        --blue-700: #1d4ed8;
-        --red-400: #f87171;
-        --red-500: #ef4444;
-        --red-600: #dc2626;
-        --yellow-100: #fef3c7;
-        --yellow-600: #d97706;
-        --gray-50: #f9fafb;
-        --gray-100: #f3f4f6;
-        --gray-200: #e5e7eb;
-        --gray-300: #d1d5db;
-        --gray-400: #9ca3af;
-        --gray-500: #6b7280;
-        --gray-600: #4b5563;
-        --gray-700: #374151;
-        --gray-800: #1f2937;
-        --gray-900: #111827;
-        --radius-sm: 0.375rem;
-        --radius-md: 0.5rem;
-        --radius-lg: 0.75rem;
-        --radius-xl: 1rem;
-        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-        --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-    }
-
     /* Header Styles */
     .page-header {
         padding: 3rem 0;
@@ -111,61 +70,148 @@
     }
 
     /* Statistics Cards */
-    .stats-container {
+    .stats-section {
+        position: relative;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .stats-header {
         display: flex;
-        justify-content: center;
-        gap: 2rem;
-        max-width: 800px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 1rem;
+    }
+
+    .stats-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stats-back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.25rem;
+        background: linear-gradient(135deg, var(--blue-500), var(--blue-600));
+        color: white;
+        text-decoration: none;
+        border-radius: var(--radius-lg);
+        font-weight: 500;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+    }
+
+    .stats-back-btn:hover {
+        background: linear-gradient(135deg, var(--blue-600), var(--blue-700));
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(59, 130, 246, 0.25);
+        color: white;
+    }
+
+    .stats-back-btn svg {
+        width: 1.125rem;
+        height: 1.125rem;
+        transition: transform 0.2s ease;
+    }
+
+    .stats-back-btn:hover svg {
+        transform: translateX(-2px);
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        max-width: 900px;
         margin: 0 auto;
+        padding: 0 1rem;
     }
 
     .stat-card {
-        background: white;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         border-radius: var(--radius-xl);
-        padding: 2rem;
+        padding: 2rem 1.5rem;
         text-align: center;
         border: 1px solid var(--gray-200);
-        box-shadow: var(--shadow-md);
-        flex: 1;
-        min-width: 200px;
-        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--blue-500), var(--green-500), var(--yellow-500));
+        opacity: 0;
+        transition: opacity 0.3s ease;
     }
 
     .stat-card:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+        border-color: var(--gray-300);
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
     }
 
     .stat-icon-wrapper {
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-bottom: 1rem;
+        margin-bottom: 1.25rem;
     }
 
     .stat-icon {
         border-radius: 50%;
-        padding: 0.75rem;
+        padding: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
     }
 
     .stat-icon.blue {
-        background: var(--blue-100);
+        background: linear-gradient(135deg, var(--blue-100), var(--blue-200));
+        border: 2px solid var(--blue-300);
     }
 
     .stat-icon.red {
-        background: #fef2f2;
+        background: linear-gradient(135deg, #fef2f2, #fce7e7);
+        border: 2px solid var(--red-300);
     }
 
     .stat-icon.yellow {
-        background: var(--yellow-100);
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        border: 2px solid #fcd34d;
     }
 
     .stat-icon svg {
-        width: 2rem;
-        height: 2rem;
+        width: 2.25rem;
+        height: 2.25rem;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover .stat-icon svg {
+        transform: scale(1.1);
     }
 
     .stat-icon.blue svg {
@@ -177,32 +223,59 @@
     }
 
     .stat-icon.yellow svg {
-        color: var(--yellow-600);
+        color: #d97706;
     }
 
     .stat-number {
-        font-size: 2.5rem;
-        font-weight: 700;
+        font-size: 2.75rem;
+        font-weight: 800;
         margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, var(--gray-800), var(--gray-600));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: all 0.3s ease;
     }
 
     .stat-number.blue {
-        color: var(--blue-700);
+        background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .stat-number.red {
-        color: var(--red-600);
+        background: linear-gradient(135deg, var(--red-600), var(--red-400));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
 
     .stat-number.yellow {
-        color: var(--yellow-600);
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support background-clip */
+        color: #d97706;
+    }
+
+    .stat-card:hover .stat-number {
+        transform: scale(1.05);
     }
 
     .stat-label {
-        font-size: 1rem;
-        color: var(--gray-600);
+        font-size: 0.95rem;
+        color: var(--gray-700);
         margin: 0;
-        font-weight: 500;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+    }
+
+    .stat-card:hover .stat-label {
+        color: var(--gray-800);
     }
 
     /* Main Content Layout */
@@ -613,70 +686,82 @@
         border-top: 1px solid rgba(255,255,255,0.1);
     }
 
-    .like-button {
-        background: rgba(255,255,255,0.15);
-        border: 1px solid rgba(255,255,255,0.3);
-        color: white;
-        padding: 0.75rem 1.25rem;
-        border-radius: var(--radius-md);
-        font-size: 0.875rem;
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        cursor: pointer;
-        box-shadow: var(--shadow-md);
-        text-decoration: none;
+    /* Use same like button styles as projects page for visual consistency */
+    .btn-like {
+        background: rgba(255,255,255,0.15) !important;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+        color: white !important;
+        padding: 0.375rem 0.75rem !important;
+        border-radius: var(--radius-md) !important;
+        font-size: 0.75rem !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 0.25rem !important;
+        transition: all 0.2s !important;
+        backdrop-filter: blur(4px) !important;
+        cursor: pointer !important;
+        font-weight: 600 !important;
+        text-decoration: none !important;
     }
 
-    .like-button:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
+    .btn-like-large {
+        padding: 0.75rem 1.25rem !important;
+        font-size: 0.875rem !important;
+        gap: 0.5rem !important;
+        backdrop-filter: blur(10px) !important;
+        box-shadow: var(--shadow-md) !important;
     }
 
-    .like-button.liked {
-        background: linear-gradient(135deg, #ef4444, #dc2626);
-        border-color: #dc2626;
+    .btn-like.liked {
+        background: #ef4444 !important;
+        border-color: #dc2626 !important;
     }
 
-    .like-button.liked:hover {
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
-        border-color: #b91c1c;
+    .btn-like:hover:not(.liked) {
+        background: rgba(255,255,255,0.25) !important;
+        border-color: rgba(255,255,255,0.5) !important;
     }
 
-    .like-button-icon {
-        width: 1rem;
-        height: 1rem;
+    .btn-like.liked:hover {
+        background: #dc2626 !important;
+        border-color: #b91c1c !important;
     }
 
-    .like-button.liked .like-button-icon {
-        fill: currentColor;
+    .btn-like .like-icon {
+        width: 0.875rem !important;
+        height: 0.875rem !important;
+        fill: none !important;
     }
 
+    .btn-like .like-icon-large {
+        width: 1rem !important;
+        height: 1rem !important;
+    }
+
+    .btn-like.liked .like-icon {
+        fill: currentColor !important;
+    }
+
+    /* Detail button matches projects Detay appearance */
     .detail-button {
-        background: rgba(255,255,255,0.95);
-        color: var(--green-700); /* match projects Detay button */
-        padding: 0.75rem 1.25rem;
+        color: rgba(255,255,255,0.9);
+        background: var(--green-700);
+        padding: 0.375rem 0.75rem;
         border-radius: var(--radius-md);
-        font-size: 0.875rem;
-        font-weight: 600;
+        font-size: 0.75rem;
+        font-weight: 500;
         text-decoration: none;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.5);
-        display: flex;
+        transition: all 0.2s;
+        display: inline-flex;
         align-items: center;
-        gap: 0.5rem;
-        box-shadow: var(--shadow-md);
+        gap: 0.25rem;
+        border: 1px solid rgba(255,255,255,0.5);
+        backdrop-filter: blur(4px);
     }
 
     .detail-button:hover {
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-lg);
-        background: white;
-        color: var(--green-800);
+        transform: translateY(-1px);
+        background: var(--green-800);
     }
 
     .detail-button-icon {
@@ -781,10 +866,38 @@
             text-align: center;
         }
 
-        .stats-container {
+        .stats-header {
             flex-direction: column;
             gap: 1rem;
+            text-align: center;
+        }
+
+        .stats-title {
+            font-size: 1.25rem;
+        }
+
+        .stats-back-btn {
+            align-self: center;
+            padding: 0.625rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
             max-width: 400px;
+        }
+
+        .stat-card {
+            padding: 1.5rem 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
         }
 
         .content-grid {
@@ -835,6 +948,7 @@
             gap: 0.75rem;
         }
 
+        .btn-like,
         .like-button,
         .detail-button {
             width: 100%;
@@ -845,6 +959,54 @@
     @media (max-width: 640px) {
         .user-container {
             padding: 0 1rem !important;
+        }
+
+        .stats-section {
+            padding: 1rem 0;
+        }
+
+        .stats-header {
+            padding: 0 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-title {
+            font-size: 1.125rem;
+        }
+
+        .stats-back-btn {
+            padding: 0.5rem 0.875rem;
+            font-size: 0.75rem;
+        }
+
+        .stats-back-btn svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .stats-container {
+            padding: 0 0.5rem;
+        }
+
+        .stat-card {
+            padding: 1.25rem 1rem;
+        }
+
+        .stat-icon {
+            padding: 0.875rem;
+        }
+
+        .stat-icon svg {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
         }
 
         .content-grid {
@@ -936,11 +1098,6 @@
         <!-- Page Header -->
         <div class="header-content">
             <div class="header-title-wrapper">
-                <a href="{{ route('user.projects') }}" class="back-button">
-                    <svg class="back-button-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                </a>
                 <svg class="project-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                 </svg>
@@ -961,9 +1118,25 @@
             @endphp
 
             @if($totalSuggestions > 0)
-            <!-- Statistics Cards -->
-            <div class="stats-container">
-                <!-- Total Suggestions Card -->
+            <!-- Statistics Section -->
+            <div class="stats-section">
+                <div class="stats-header">
+                    <h2 class="stats-title">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+                        </svg>
+                        İstatistikler
+                    </h2>
+                    <a href="{{ route('user.projects') }}" class="stats-back-btn">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        Projelere Dön
+                    </a>
+                </div>
+
+                <div class="stats-container">
+                    <!-- Total Suggestions Card -->
                 <div class="stat-card">
                     <div class="stat-icon-wrapper">
                         <div class="stat-icon blue">
@@ -1000,6 +1173,7 @@
                     </div>
                     <h3 class="stat-number yellow">{{ $totalComments }}</h3>
                     <p class="stat-label">Toplam Yorum</p>
+                </div>
                 </div>
             </div>
             @endif
@@ -1059,11 +1233,11 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                     </svg>
                                     <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($suggestion->title, 20) }}</span>
-                                    <span style="margin-left: auto; display: flex; align-items: center;">
-                                        <svg style="width: 0.75rem; height: 0.75rem; color: var(--red-500); margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <span style="margin-left: auto; display: flex; align-items: center; gap: 0.25rem;">
+                                        <svg style="width: 0.75rem; height: 0.75rem; color: var(--red-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                         </svg>
-                                        {{ $suggestion->likes->count() }}
+                                        <span class="sidebar-like-count">{{ $suggestion->likes->count() }}</span>
                                     </span>
                                 </div>
                                 @endforeach
@@ -1111,6 +1285,7 @@
                             </div>
 
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                <!-- profile/user icon (matching projects) -->
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
@@ -1121,8 +1296,10 @@
 
                             @if($suggestion->description)
                             <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.5;">
-                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                                <!-- info-circle icon used in projects for descriptions -->
+                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25h.008v.008H12V8.25zm0 2.25v4.5" />
                                 </svg>
                                 {{ $suggestion->description }}
                             </p>
@@ -1150,7 +1327,7 @@
                                 </div>
                             </div>
 
-                            <!-- Action Buttons -->
+                            <!-- Action Buttons (aligned with projects page) -->
                             <div style="display: flex; gap: 1rem; align-items: center;">
                                 <!-- Like Button -->
                                 <button onclick="toggleLike({{ $suggestion->id }})"
@@ -1166,11 +1343,11 @@
                                 </button>
 
                                 <!-- Detail Button -->
-                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" style="background: rgba(255,255,255,0.95); color: var(--green-700); padding: 0.75rem 1.25rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-md);">
-                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" class="detail-button">
+                                    <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                     </svg>
-                                    Detay
+                                    <span style="font-weight:600;">Detay</span>
                                 </a>
                             </div>
                         </div>
@@ -1292,7 +1469,7 @@ function toggleLike(suggestionId) {
                 const btnSuggestionId = btn.getAttribute('data-suggestion-id');
 
                 // Reset heart icon to outline for all buttons in category
-                const heartIcon = btn.querySelector('.like-button-icon') || btn.querySelector('.like-icon');
+                const heartIcon = btn.querySelector('.like-button-icon') || btn.querySelector('.like-icon') || btn.querySelector('.like-icon-large');
                 if (heartIcon) {
                     heartIcon.style.fill = 'none';
                 }
@@ -1314,7 +1491,7 @@ function toggleLike(suggestionId) {
                 clickedButton.classList.add('liked');
 
                 // Fill heart icon for the selected button
-                const heartIcon = clickedButton.querySelector('.like-button-icon') || clickedButton.querySelector('.like-icon');
+                const heartIcon = clickedButton.querySelector('.like-button-icon') || clickedButton.querySelector('.like-icon') || clickedButton.querySelector('.like-icon-large');
                 if (heartIcon) {
                     heartIcon.style.fill = 'currentColor';
                 }
@@ -1328,7 +1505,7 @@ function toggleLike(suggestionId) {
                 clickedButton.classList.remove('liked');
 
                 // Reset heart icon to outline
-                const heartIcon = clickedButton.querySelector('.like-button-icon') || clickedButton.querySelector('.like-icon');
+                const heartIcon = clickedButton.querySelector('.like-button-icon') || clickedButton.querySelector('.like-icon') || clickedButton.querySelector('.like-icon-large');
                 if (heartIcon) {
                     heartIcon.style.fill = 'none';
                 }
@@ -1654,7 +1831,7 @@ window.addEventListener('load', adjustLayout);
 window.addEventListener('resize', adjustLayout);
 
     // Initialize tooltips for like buttons
-    const likeButtons = document.querySelectorAll('.like-button');
+    const likeButtons = document.querySelectorAll('.like-button, .btn-like');
     likeButtons.forEach(button => {
         button.addEventListener('mouseenter', function() {
             // Add subtle pulse effect for better user feedback
