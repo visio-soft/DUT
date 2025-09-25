@@ -76,7 +76,7 @@ class Oneri extends Model implements HasMedia
 
     public function approvedComments(): HasMany
     {
-        return $this->hasMany(OneriComment::class)->where('is_approved', true);
+        return $this->hasMany(OneriComment::class)->where('is_approved', true)->whereNull('parent_id');
     }
 
     public function getLikesCountAttribute(): int

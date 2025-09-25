@@ -26,3 +26,15 @@ Route::middleware('auth')->group(function () {
 Route::post('/suggestions/{id}/toggle-like', [UserController::class, 'toggleLike'])
     ->middleware('auth')
     ->name('user.suggestion.toggle-like');
+
+Route::post('/suggestions/{id}/comments', [UserController::class, 'storeComment'])
+    ->middleware('auth')
+    ->name('user.suggestion.store-comment');
+
+Route::post('/comments/{id}/reply', [UserController::class, 'storeReply'])
+    ->middleware('auth')
+    ->name('user.comment.store-reply');
+
+Route::post('/comments/{id}/toggle-like', [UserController::class, 'toggleCommentLike'])
+    ->middleware('auth')
+    ->name('user.comment.toggle-like');

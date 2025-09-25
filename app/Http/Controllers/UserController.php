@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Oneri;
 use App\Models\OneriLike;
+use App\Models\OneriComment;
+use App\Models\OneriCommentLike;
 use App\Helpers\BackgroundImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -96,9 +98,23 @@ class UserController extends Controller
                 'category',
                 'likes.user',
                 'approvedComments.user',
+                'approvedComments.likes.user',
+                'approvedComments.approvedReplies.user',
+                'approvedComments.approvedReplies.likes.user',
                 'createdBy'
             ])
             ->findOrFail($id);
+
+        // Kullanıcının bu öneriye yazdığı onaylanmamış yorumları da getir (hem ana yorumlar hem cevaplar)
+        $userPendingComments = collect();
+        if (Auth::check()) {
+            $userPendingComments = OneriComment::with(['user', 'parent.user'])
+                ->where('oneri_id', $id)
+                ->where('user_id', Auth::id())
+                ->where('is_approved', false)
+                ->orderBy('created_at', 'desc')
+                ->get();
+        }
 
         // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
         $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
@@ -109,7 +125,7 @@ class UserController extends Controller
             $randomBackgroundImage = $imageData ? $imageData['url'] : null;
         }
 
-        return view('user.suggestion-detail', compact('suggestion', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.suggestion-detail', compact('suggestion', 'hasBackgroundImages', 'randomBackgroundImage', 'userPendingComments'));
     }
 
     /**
@@ -183,5 +199,141 @@ class UserController extends Controller
                 ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi! (Kategori başına sadece bir beğeni)')
                 : 'Beğeni kaldırıldı!'
         ]);
+    }
+
+    /**
+     * AJAX ile yorum ekleme işlemi
+     */
+    public function storeComment(Request $request, $suggestionId)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:1000|min:3'
+        ], [
+            'comment.required' => 'Yorum içeriği gereklidir.',
+            'comment.max' => 'Yorum en fazla 1000 karakter olabilir.',
+            'comment.min' => 'Yorum en az 3 karakter olmalıdır.'
+        ]);
+
+        $suggestion = Oneri::findOrFail($suggestionId);
+        $user = Auth::user();
+
+        try {
+            // Yorum ekleme (varsayılan olarak onaysız)
+            $comment = OneriComment::create([
+                'oneri_id' => $suggestion->id,
+                'user_id' => $user->id,
+                'comment' => trim($request->comment),
+                'is_approved' => false // Admin onayı gerekiyor
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Yorumunuz başarıyla gönderildi. Onaylandıktan sonra görüntülenecektir.',
+                'comment_id' => $comment->id
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Yorum eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
+            ], 500);
+        }
+    }
+
+    /**
+     * AJAX ile yorum cevaplama işlemi
+     */
+    public function storeReply(Request $request, $commentId)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
+        }
+
+        $request->validate([
+            'comment' => 'required|string|max:1000|min:3'
+        ], [
+            'comment.required' => 'Cevap içeriği gereklidir.',
+            'comment.max' => 'Cevap en fazla 1000 karakter olabilir.',
+            'comment.min' => 'Cevap en az 3 karakter olmalıdır.'
+        ]);
+
+        $parentComment = OneriComment::findOrFail($commentId);
+        $user = Auth::user();
+
+        try {
+            // Cevap ekleme (varsayılan olarak onaysız)
+            $reply = OneriComment::create([
+                'oneri_id' => $parentComment->oneri_id,
+                'user_id' => $user->id,
+                'parent_id' => $parentComment->id,
+                'comment' => trim($request->comment),
+                'is_approved' => false // Admin onayı gerekiyor
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cevabınız başarıyla gönderildi. Onaylandıktan sonra görüntülenecektir.',
+                'reply_id' => $reply->id
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cevap eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
+            ], 500);
+        }
+    }
+
+    /**
+     * AJAX ile yorum beğenme işlemi
+     */
+    public function toggleCommentLike(Request $request, $commentId)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
+        }
+
+        $comment = OneriComment::findOrFail($commentId);
+        $user = Auth::user();
+
+        try {
+            // Kullanıcının bu yoruma beğenisi var mı kontrol et
+            $existingLike = OneriCommentLike::where('oneri_comment_id', $commentId)
+                ->where('user_id', $user->id)
+                ->first();
+
+            if ($existingLike) {
+                // Beğeniyi kaldır
+                $existingLike->delete();
+                $liked = false;
+            } else {
+                // Beğeni ekle
+                OneriCommentLike::create([
+                    'oneri_comment_id' => $commentId,
+                    'user_id' => $user->id
+                ]);
+                $liked = true;
+            }
+
+            // Güncel beğeni sayısını hesapla
+            $likesCount = OneriCommentLike::where('oneri_comment_id', $commentId)->count();
+
+            return response()->json([
+                'success' => true,
+                'liked' => $liked,
+                'likes_count' => $likesCount,
+                'message' => $liked ? 'Yorum beğenildi!' : 'Beğeni kaldırıldı!'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Beğeni işlemi sırasında bir hata oluştu.'
+            ], 500);
+        }
     }
 }

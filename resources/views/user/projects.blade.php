@@ -7,14 +7,274 @@
 <section class="section-padding" style="padding: 3rem 0; background: #f8fafc;">
     {{-- shared colors/vars --}}
     @include('user._shared-colors')
+
+<style>
+    /* Header Styles */
+    .page-header {
+        padding: 3rem 0;
+        background: #f8fafc;
+    }
+
+    .header-content {
+        margin-bottom: 3rem;
+        text-align: center;
+    }
+
+    .header-title-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1rem;
+        gap: 1rem;
+    }
+
+    .project-icon {
+        width: 3rem;
+        height: 3rem;
+        color: var(--green-600);
+    }
+
+    .project-title-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    /* Statistics Section */
+    .stats-section {
+        position: relative;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+
+    .stats-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0 1rem;
+    }
+
+    .stats-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: var(--radius-xl);
+        padding: 2rem 1.5rem;
+        text-align: center;
+        border: 1px solid var(--gray-200);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+        border-color: var(--gray-300);
+    }
+
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+
+    .stat-icon-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.25rem;
+    }
+
+    .stat-icon {
+        border-radius: 50%;
+        padding: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        transition: all 0.3s ease;
+    }
+
+    .stat-icon.green {
+        background: linear-gradient(135deg, var(--green-100), var(--green-200));
+        border: 2px solid var(--green-300);
+    }
+
+    .stat-icon.blue {
+        background: linear-gradient(135deg, var(--blue-100), #bfdbfe);
+        border: 2px solid #93c5fd;
+    }
+
+    .stat-icon.red {
+        background: linear-gradient(135deg, #fef2f2, #fce7e7);
+        border: 2px solid var(--red-300);
+    }
+
+    .stat-icon svg {
+        width: 2.25rem;
+        height: 2.25rem;
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover .stat-icon svg {
+        transform: scale(1.1);
+    }
+
+    .stat-icon.green svg {
+        color: var(--green-600);
+    }
+
+    .stat-icon.blue svg {
+        color: var(--blue-600);
+    }
+
+    .stat-icon.red svg {
+        color: var(--red-600);
+    }
+
+    .stat-number {
+        font-size: 2.75rem;
+        font-weight: 800;
+        margin: 0 0 0.5rem 0;
+        background: linear-gradient(135deg, var(--gray-800), var(--gray-600));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        transition: all 0.3s ease;
+    }
+
+    .stat-number.green {
+        background: linear-gradient(135deg, var(--green-700), var(--green-500));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support background-clip */
+        color: var(--green-700);
+    }
+
+    .stat-number.blue {
+        background: linear-gradient(135deg, var(--blue-700), var(--blue-500));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support background-clip */
+        color: var(--blue-700);
+    }
+
+    .stat-number.red {
+        background: linear-gradient(135deg, var(--red-600), var(--red-400));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        /* Fallback for browsers that don't support background-clip */
+        color: var(--red-600);
+    }
+
+    .stat-card:hover .stat-number {
+        transform: scale(1.05);
+    }
+
+    .stat-label {
+        font-size: 0.95rem;
+        color: var(--gray-700);
+        margin: 0;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: color 0.3s ease;
+    }
+
+    .stat-card:hover .stat-label {
+        color: var(--gray-800);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .header-title-wrapper {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .stats-container {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-width: 400px;
+        }
+
+        .stat-card {
+            padding: 1.5rem 1rem;
+        }
+
+        .stat-number {
+            font-size: 2.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .stats-container {
+            padding: 0 0.5rem;
+        }
+
+        .stat-card {
+            padding: 1.25rem 1rem;
+        }
+
+        .stat-icon {
+            padding: 0.875rem;
+        }
+
+        .stat-icon svg {
+            width: 2rem;
+            height: 2rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+        }
+    }
+</style>
+
     <div class="user-container">
         <!-- Page Header -->
-        <div class="text-center" style="margin-bottom: 3rem;">
-            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 2rem;">
-                <svg style="width: 3rem; height: 3rem; margin-right: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+        <div class="header-content">
+            <div class="header-title-wrapper">
+                <svg class="project-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                 </svg>
-                <h1 style="font-size: 2.5rem; font-weight: 700; color: var(--gray-900); margin: 0;">Tüm Projeler</h1>
+                <div class="project-title-section">
+                    <h1>Tüm Projeler</h1>
+                </div>
             </div>
 
             @php
@@ -29,45 +289,56 @@
             @endphp
 
             @if($totalProjects > 0)
-            <!-- Statistics Cards -->
-            <div style="display: flex; justify-content: center; gap: 2rem; max-width: 800px; margin: 0 auto;">
-                <!-- Total Projects Card -->
-                <div style="background: white; border-radius: 1rem; padding: 2rem; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; min-width: 200px;">
-                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                        <div style="background: var(--green-100); border-radius: 50%; padding: 0.75rem; display: flex; align-items: center; justify-content: center;">
-                            <svg style="width: 2rem; height: 2rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
-                            </svg>
-                        </div>
-                    </div>
-                    <h3 style="font-size: 2.5rem; font-weight: 700; color: var(--green-700); margin: 0 0 0.5rem 0;">{{ $totalProjects }}</h3>
-                    <p style="font-size: 1rem; color: var(--gray-600); margin: 0; font-weight: 500;">Toplam Proje</p>
+            <!-- Statistics Section -->
+            <div class="stats-section">
+                <div class="stats-header">
+                    <h2 class="stats-title">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem;">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
+                        </svg>
+                        Genel İstatistikler
+                    </h2>
                 </div>
 
-                <!-- Total Suggestions Card -->
-                <div style="background: white; border-radius: 1rem; padding: 2rem; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; min-width: 200px;">
-                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                        <div style="background: var(--blue-100); border-radius: 50%; padding: 0.75rem; display: flex; align-items: center; justify-content: center;">
-                            <svg style="width: 2rem; height: 2rem; color: var(--blue-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                            </svg>
+                <div class="stats-container">
+                    <!-- Total Projects Card -->
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper">
+                            <div class="stat-icon green">
+                                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                                </svg>
+                            </div>
                         </div>
+                        <h3 class="stat-number green">{{ $totalProjects }}</h3>
+                        <p class="stat-label">Toplam Proje</p>
                     </div>
-                    <h3 style="font-size: 2.5rem; font-weight: 700; color: var(--blue-700); margin: 0 0 0.5rem 0;">{{ $totalSuggestions }}</h3>
-                    <p style="font-size: 1rem; color: var(--gray-600); margin: 0; font-weight: 500;">Toplam Öneri</p>
-                </div>
 
-                <!-- Total Likes Card -->
-                <div style="background: white; border-radius: 1rem; padding: 2rem; text-align: center; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px rgba(0,0,0,0.05); flex: 1; min-width: 200px;">
-                    <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                        <div style="background: var(--red-100); border-radius: 50%; padding: 0.75rem; display: flex; align-items: center; justify-content: center;">
-                            <svg style="width: 2rem; height: 2rem; color: var(--red-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                            </svg>
+                    <!-- Total Suggestions Card -->
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper">
+                            <div class="stat-icon blue">
+                                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                                </svg>
+                            </div>
                         </div>
+                        <h3 class="stat-number blue">{{ $totalSuggestions }}</h3>
+                        <p class="stat-label">Toplam Öneri</p>
                     </div>
-                    <h3 style="font-size: 2.5rem; font-weight: 700; color: var(--red-600); margin: 0 0 0.5rem 0;">{{ $totalLikes }}</h3>
-                    <p style="font-size: 1rem; color: var(--gray-600); margin: 0; font-weight: 500;">Toplam Beğeni</p>
+
+                    <!-- Total Likes Card -->
+                    <div class="stat-card">
+                        <div class="stat-icon-wrapper">
+                            <div class="stat-icon red">
+                                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="stat-number red">{{ $totalLikes }}</h3>
+                        <p class="stat-label">Toplam Beğeni</p>
+                    </div>
                 </div>
             </div>
             @endif
