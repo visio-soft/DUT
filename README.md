@@ -1,79 +1,79 @@
-## Kısa kullanım notu
+## Quick Usage Note
 
-Veritabanındaki gereksiz tabloları temizleyip (istenmeyenleri truncate/delete) seed çalıştırmak için küçük bir yardımcı eklendi.
+A small helper has been added to clean unnecessary tables in the database (truncate/delete unwanted ones) and run seeders.
 
-## Seeder nasıl çalıştırılır
+## How to Run Seeders
 
-Aşağıdaki komutlar, Laravel projesinde tek bir seeder dosyasını çalıştırmak için kullanılabilir.
+The following commands can be used to run a single seeder file in a Laravel project.
 
--   Basit kullanım (seeder sınıf adı ile):
+-   Simple usage (with seeder class name):
 
 ```bash
 php artisan db:seed --class=CategorySeeder
 ```
 
--   Tam namespace gerekiyorsa (özellikle Laravel 8+ veya farklı namespace kullanıyorsanız):
+-   If full namespace is required (especially for Laravel 8+ or if using different namespace):
 
 ```bash
 php artisan db:seed --class="Database\\Seeders\\CategorySeeder"
 ```
 
--   Eğer `DatabaseSeeder` içinde bir seeder çağrısı varsa, tüm `DatabaseSeeder`'ı çalıştırmak için:
+-   If there's a seeder call inside `DatabaseSeeder`, to run all `DatabaseSeeder`:
 
 ```bash
 php artisan db:seed
 ```
 
-Notlar:
+Notes:
 
--   Komutları çalıştırmadan önce `.env` dosyanızda veritabanı bağlantınızın doğru ayarlı olduğundan emin olun.
--   Genelde önce migration'ları çalıştırmak isterseniz:
+-   Make sure your database connection is properly configured in the `.env` file before running commands.
+-   If you want to run migrations first:
 
 ```bash
 php artisan migrate
 ```
 
--   Local geliştirme ortamında SQLite kullanıyorsanız, `DB_CONNECTION=sqlite` ve `DB_DATABASE` ayarlarının doğru olduğuna dikkat edin.
+-   If you're using SQLite in local development environment, make sure `DB_CONNECTION=sqlite` and `DB_DATABASE` settings are correct.
 
 ---
 
-## Veritabanını temizleyip seed çalıştırma (seed_clean)
+## Clean Database and Run Seeders (seed_clean)
 
-Projeye eklenmiş `scripts/seed_clean.php` yardımcı scripti, belirttiğiniz tabloları koruyarak geri kalan tabloları temizler ve sonrasında seedleri çalıştırır.
+The `scripts/seed_clean.php` helper script added to the project cleans remaining tables while preserving the specified tables and then runs seeders.
 
-Varsayılan davranış:
+Default behavior:
 
--   Korunan tablolar: `migrations`, `categories`
--   Çalıştırılan seeder: `Database\\Seeders\\DatabaseSeeder`
+-   Protected tables: `migrations`, `categories`
+-   Seeder to run: `Database\\Seeders\\DatabaseSeeder`
 
-Kullanım örnekleri:
+Usage examples:
 
 ```bash
 php scripts/seed_clean.php
 ```
 
-veya composer üzerinden:
+or via composer:
 
 ```bash
 composer seed:clean
 ```
 
-Özelleştirme (saklanacak tablolar ve seed sınıfları):
+Customization (tables to keep and seed classes):
 
 ```bash
 php scripts/seed_clean.php --keep=categories,users --seeders=Database\\\\Seeders\\\\CategorySeeder,Database\\\\Seeders\\\\UserSeeder
 ```
 
-Notlar:
+Notes:
 
--   Bu script tabloları truncate/delete yaparak veri siler; yalnızca geliştirme ortamında veya yedek alındığında kullanın.
--   PgSQL, MySQL ve SQLite ile uyumludur.
+-   This script deletes data by truncating/deleting tables; use only in development environment or when backup is taken.
+-   Compatible with PgSQL, MySQL and SQLite.
 
 ---
 
-## Hızlı kurulum (kısa ve net)
+## Quick Setup (short and clear)
 
-1. Depoyu hazırlayın ve bağımlılıkları yükleyin:
+1. Prepare the repository and install dependencies:
 
 ```bash
 composer install
@@ -81,57 +81,57 @@ cp .env.example .env
 php artisan key:generate
 ```
 
-2. SQLite kullanıyorsanız boş dosyayı oluşturun ve migration çalıştırın:
+2. If using SQLite, create empty file and run migration:
 
 ```bash
 php -r "file_exists('database/database.sqlite') || touch('database/database.sqlite');"
 php artisan migrate --force
 ```
 
-3. Storage bağlantısını oluşturun (public/storage -> storage/app/public):
+3. Create storage link (public/storage -> storage/app/public):
 
 ```bash
 php artisan storage:link --force
 ```
 
-4. Seeder'ları çalıştırın (örnek):
+4. Run seeders (example):
 
 ```bash
 php artisan db:seed
 ```
 
-5. Oluşturulan örnek admin hesapları (seed tarafından eklenmiştir):
+5. Created sample admin accounts (added by seeder):
 
 -   Email: admin@admin.com / Password: password (super_admin)
 -   Email: omega@admin.com / Password: omega456 (normal admin)
 -   Email: normaladmin@dut.com / Password: main123 (normal admin)
 
-6. Geliştirme sunucusu:
+6. Development server:
 
-**Önemli**: Geliştirme ortamında hem Laravel sunucusu hem de Vite dev server'ının aynı anda çalışması gerekir.
+**Important**: In development environment, both Laravel server and Vite dev server need to run simultaneously.
 
-İki ayrı terminal açarak aşağıdaki komutları çalıştırın:
+Open two separate terminals and run the following commands:
 
-**Terminal 1 - Laravel sunucusu:**
+**Terminal 1 - Laravel server:**
 
 ```bash
 php artisan serve
 ```
 
-**Terminal 2 - Vite dev server (CSS/JS için):**
+**Terminal 2 - Vite dev server (for CSS/JS):**
 
 ```bash
 npm run dev
 ```
 
-Alternatif olarak, arka planda çalıştırmak için:
+Alternatively, to run in background:
 
 ```bash
-# Laravel sunucusu arka planda
+# Laravel server in background
 nohup php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-serve.log 2>&1 &
 
-# Vite dev server arka planda
+# Vite dev server in background
 nohup npm run dev > /tmp/vite-dev.log 2>&1 &
 ```
 
-Not: Bu adımlar yerel geliştirme içindir. Üretim kurulumunda farklı konfigürasyon ve izinler gerekebilir.
+Note: These steps are for local development. Production setup may require different configuration and permissions.
