@@ -434,7 +434,7 @@
                                 </p>
                                 @auth
                                     <button
-                                        onclick="toggleCommentForm()"
+                                        onclick="document.getElementById('comment-text').focus(); document.getElementById('comment-text').scrollIntoView({behavior: 'smooth'});"
                                         class="btn btn-primary"
                                         style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem;">
                                         <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -460,23 +460,8 @@
 
                         <!-- Comment Form Section -->
                         @auth
-                            @if($suggestion->approvedComments->count() > 0)
-                                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--gray-200);">
-                                    <button
-                                        onclick="toggleCommentForm()"
-                                        class="btn btn-outline-primary"
-                                        id="add-comment-btn"
-                                        style="display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-                                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                        </svg>
-                                        Yorum Ekle
-                                    </button>
-                                </div>
-                            @endif
-
-                            <!-- Comment Form (Initially Hidden) -->
-                            <div id="comment-form" style="display: none; margin-top: 1.5rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--radius-lg); border: 1px solid var(--gray-200);">
+                            <!-- Comment Form (Always Visible) -->
+                            <div id="comment-form" style="margin-top: 2rem; padding: 1.5rem; background: var(--gray-50); border-radius: var(--radius-lg); border: 1px solid var(--gray-200);
                                 <h4 style="font-size: 1rem; font-weight: 600; color: var(--gray-900); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                                     <svg style="width: 1.25rem; height: 1.25rem; color: var(--blue-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
@@ -516,14 +501,14 @@
                                             Yorumu Gönder
                                         </button>
                                         <button
-                                            type="button"
-                                            onclick="cancelComment()"
+                                            type="reset"
+                                            onclick="resetCommentForm()"
                                             class="btn btn-secondary"
                                             style="display: inline-flex; align-items: center; gap: 0.5rem;">
                                             <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/>
                                             </svg>
-                                            İptal
+                                            Temizle
                                         </button>
                                     </div>
                                 </form>
@@ -1220,30 +1205,29 @@ document.addEventListener('keydown', function(e) {
 
 // Comment Form Functions
 function toggleCommentForm() {
-    const form = document.getElementById('comment-form');
-    const btn = document.getElementById('add-comment-btn');
-
-    if (form.style.display === 'none' || form.style.display === '') {
-        form.style.display = 'block';
-        if (btn) {
-            btn.style.display = 'none';
-        }
-        // Focus on textarea
-        setTimeout(() => {
-            document.getElementById('comment-text').focus();
-        }, 100);
-    } else {
-        form.style.display = 'none';
-        if (btn) {
-            btn.style.display = 'inline-flex';
-        }
+    // Since form is always visible now, just focus on textarea
+    const textarea = document.getElementById('comment-text');
+    if (textarea) {
+        textarea.focus();
+        textarea.scrollIntoView({ behavior: 'smooth' });
     }
 }
 
-function cancelComment() {
-    document.getElementById('comment-text').value = '';
-    document.getElementById('char-count').textContent = '0';
-    toggleCommentForm();
+function resetCommentForm() {
+    const form = document.getElementById('comment-submit-form');
+    const commentText = document.getElementById('comment-text');
+    const charCount = document.getElementById('char-count');
+    
+    if (form) {
+        form.reset();
+    }
+    if (commentText) {
+        commentText.value = '';
+    }
+    if (charCount) {
+        charCount.textContent = '0';
+        charCount.style.color = 'var(--gray-500)';
+    }
 }
 
 function submitComment(event) {
@@ -1279,7 +1263,7 @@ function submitComment(event) {
     .then(data => {
         if (data.success) {
             showMessage('Yorumunuz başarıyla gönderildi. Onaylandıktan sonra görüntülenecektir.', 'success');
-            cancelComment();
+            resetCommentForm();
 
             // Reload page to show the pending comment
             setTimeout(() => {

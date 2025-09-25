@@ -1091,42 +1091,47 @@ h6 { font-size: 1rem; font-weight: 500; }
 
 /* 1 project - centered */
 .featured-projects-grid.count-1 {
-    grid-template-columns: 1fr;
-    max-width: 400px;
+    grid-template-columns: 400px;
     margin: 0 auto;
 }
 
 /* 2 projects - side by side, centered */
 .featured-projects-grid.count-2 {
-    grid-template-columns: repeat(2, 1fr);
-    max-width: 800px;
+    grid-template-columns: repeat(2, 400px);
     margin: 0 auto;
     gap: 2rem;
 }
 
 /* 3 projects - three columns */
 .featured-projects-grid.count-3 {
-    grid-template-columns: repeat(3, 1fr);
-    max-width: 1200px;
+    grid-template-columns: repeat(3, 400px);
     margin: 0 auto;
     gap: 2rem;
 }
 
 /* Mobile responsive for featured projects */
 @media (max-width: 767px) {
+    .featured-projects-grid.count-1 {
+        grid-template-columns: 1fr;
+        max-width: 350px;
+    }
+
     .featured-projects-grid.count-2,
     .featured-projects-grid.count-3 {
         grid-template-columns: 1fr;
-        max-width: 400px;
+        max-width: 350px;
         gap: 1.5rem;
+    }
+
+    .project-card {
+        max-width: 100%;
     }
 }
 
 /* Tablet responsive for featured projects */
 @media (min-width: 768px) and (max-width: 1023px) {
     .featured-projects-grid.count-3 {
-        grid-template-columns: repeat(2, 1fr);
-        max-width: 800px;
+        grid-template-columns: repeat(2, 380px);
         gap: 1.5rem;
     }
 }
@@ -1139,6 +1144,11 @@ h6 { font-size: 1rem; font-weight: 500; }
     overflow: hidden;
     transition: var(--transition-normal);
     border: 1px solid var(--green-100);
+    width: 100%;
+    max-width: 400px;
+    height: 550px;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-card:hover {
@@ -1147,10 +1157,98 @@ h6 { font-size: 1rem; font-weight: 500; }
     border-color: var(--green-300);
 }
 
+/* Project Image Container */
+.project-image-container {
+    height: 200px;
+    overflow: hidden;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    position: relative;
+}
+
+/* Project Blur Background Effects */
+.project-background-with-blur {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--green-50);
+}
+
+.project-background-blur-left,
+.project-background-blur-right {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background-size: cover;
+    background-position: center;
+    filter: blur(8px) brightness(0.7) saturate(1.3);
+    transform: scale(1.2);
+    opacity: 0.7;
+    z-index: 0;
+}
+
+.project-background-blur-left {
+    left: 0;
+    background-position: left center;
+}
+
+.project-background-blur-right {
+    right: 0;
+    background-position: right center;
+}
+
+.project-center-image {
+    position: relative;
+    z-index: 1;
+    max-width: 80%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    transition: var(--transition-normal);
+}
+
+.project-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive adjustments for project cards */
+@media (max-width: 768px) {
+    .project-center-image {
+        max-width: 90%;
+    }
+
+    .project-background-blur-left,
+    .project-background-blur-right {
+        filter: blur(6px) brightness(0.8);
+        width: 45%;
+    }
+
+    .project-card {
+        height: 500px;
+    }
+
+    .project-description {
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+    }
+}
+
 .project-header {
     padding: 1.5rem;
     background: linear-gradient(135deg, var(--green-50) 0%, white 100%);
     border-bottom: 1px solid var(--green-100);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .project-title {
@@ -1164,6 +1262,13 @@ h6 { font-size: 1rem; font-weight: 500; }
     color: var(--gray-600);
     line-height: 1.6;
     margin-bottom: 1rem;
+    flex: 1;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .project-stats {
@@ -1184,6 +1289,23 @@ h6 { font-size: 1rem; font-weight: 500; }
     width: 1rem;
     height: 1rem;
     color: var(--green-600);
+}
+
+.project-actions {
+    padding: 1.5rem;
+    border-top: 1px solid var(--green-100);
+    margin-top: auto;
+}
+
+.project-action-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* View All Projects Button Section */
+.view-all-projects-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
 }
 
 /* Suggestion Cards */
