@@ -177,8 +177,10 @@ class UserController extends Controller
             'likes_count' => $likesCount,
             'all_likes' => $allSuggestionsInCategory,
             'switched_from' => $switchedFrom,
+            'current_title' => $suggestion->title,
+            'category_id' => $categoryId,
             'message' => $liked
-                ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi!')
+                ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi! (Kategori başına sadece bir beğeni)')
                 : 'Beğeni kaldırıldı!'
         ]);
     }

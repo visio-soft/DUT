@@ -97,7 +97,8 @@
                                 class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
                                 style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 500; position: relative;"
                                 data-suggestion-id="{{ $suggestion->id }}"
-                                title="Bu proje kategorisinde sadece bir öneri beğenilebilir">
+                                data-category="{{ $suggestion->category_id ?? 'default' }}"
+                                title="Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)">
 
                             @php
                                 $userHasLikedInProject = false;
@@ -293,7 +294,7 @@
 </div>
 
 <script>
-// Toggle like with AJAX (Radio button logic: one per project category)
+// Toggle like with AJAX (Radio button logic: one per category)
 function toggleLike(suggestionId) {
     @guest
         showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
@@ -303,27 +304,75 @@ function toggleLike(suggestionId) {
         return;
     @endguest
 
-    const button = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
-    const likeCount = button.querySelector('.like-count');
+    const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
+    const likeCount = clickedButton.querySelector('.like-count');
 
-    button.disabled = true;
-    button.classList.add('loading');
+    // Get current suggestion's category from the data attributes
+    const suggestionCategory = clickedButton.getAttribute('data-category') || 'default';
+
+    // Find all buttons in the same category (radio button behavior)
+    const allButtonsInCategory = document.querySelectorAll(`[data-category="${suggestionCategory}"]`);
+
+    // Disable all buttons in this category during request
+    allButtonsInCategory.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+    });
 
     $.ajax({
         url: `/suggestions/${suggestionId}/toggle-like`,
         method: 'POST',
+        data: {
+            category: suggestionCategory
+        },
         success: function(response) {
+            // Reset all buttons in the same category to default state (radio button logic)
+            allButtonsInCategory.forEach(btn => {
+                btn.classList.remove('liked');
+
+                // Reset heart icon if exists
+                const heartIcon = btn.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'none';
+                }
+
+                // Update like counts if response contains data for other buttons in category
+                const btnSuggestionId = btn.getAttribute('data-suggestion-id');
+                if (response.all_likes && response.all_likes[btnSuggestionId] !== undefined) {
+                    const btnLikeCount = btn.querySelector('.like-count');
+                    if (btnLikeCount) {
+                        btnLikeCount.textContent = response.all_likes[btnSuggestionId];
+                    }
+                }
+            });
+
+            // Update clicked button's like count
             likeCount.textContent = response.likes_count;
 
             if (response.liked) {
-                button.classList.add('liked');
+                clickedButton.classList.add('liked');
+
+                // Fill heart icon for the selected button
+                const heartIcon = clickedButton.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'currentColor';
+                }
+
                 if (response.switched_from) {
-                    showMessage(`✓ Bu proje kategorisindeki seçiminiz "${response.switched_from}" önerisinden bu öneriye değiştirildi.`, 'success');
+                    showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
                 } else {
-                    showMessage('✓ Bu proje kategorisindeki seçiminiz güncellendi!', 'success');
+                    showMessage('✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.', 'success');
                 }
             } else {
-                button.classList.remove('liked');
+                clickedButton.classList.remove('liked');
+
+                // Reset heart icon to outline
+                const heartIcon = clickedButton.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'none';
+                }
+
                 showMessage('Beğeni kaldırıldı.', 'info');
             }
         },
@@ -335,8 +384,12 @@ function toggleLike(suggestionId) {
             showMessage(message, 'error');
         },
         complete: function() {
-            button.disabled = false;
-            button.classList.remove('loading');
+            // Re-enable all buttons in the category
+            allButtonsInCategory.forEach(btn => {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+            });
         }
     });
 }

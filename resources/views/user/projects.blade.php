@@ -282,10 +282,10 @@
                                                         class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }}"
                                                         data-suggestion-id="{{ $suggestion->id }}"
                                                         data-project-id="{{ $project->id }}"
-                                                        title="Bu proje kategorisinde sadece bir öneri beğenilebilir"
-                                                        style="background: {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? '#ef4444' : 'rgba(255,255,255,0.15)' }}; border: 1px solid {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? '#dc2626' : 'rgba(255,255,255,0.3)' }}; color: white; padding: 0.375rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; transition: all 0.2s; backdrop-filter: blur(4px); cursor: pointer;">
+                                                        data-category="{{ $suggestion->category_id ?? 'default' }}"
+                                                        title="Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)">
 
-                                                    <svg style="width: 0.875rem; height: 0.875rem;" fill="{{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <svg class="like-icon" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                                     </svg>
                                                     <span class="like-count">{{ $suggestion->likes->count() }}</span>
@@ -401,7 +401,7 @@ function scrollToSuggestion(suggestionId) {
     }
 }
 
-// Toggle like with AJAX (Radio button logic: one per project category)
+// Toggle like with AJAX (Radio button logic: one per category)
 function toggleLike(suggestionId) {
     @guest
         showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
@@ -414,83 +414,74 @@ function toggleLike(suggestionId) {
     const clickedButton = document.querySelector(`[data-suggestion-id="${suggestionId}"]`);
     const likeCount = clickedButton.querySelector('.like-count');
 
-    // Find the project container to get category context
-    const projectContainer = clickedButton.closest('[id^="project-"]');
-    const projectId = projectContainer ? projectContainer.id.replace('project-', '') : null;
+    // Get current suggestion's category from the data attributes
+    const suggestionCategory = clickedButton.getAttribute('data-category') || 'default';
 
-    // Disable all buttons in this project during request
-    const allButtonsInProject = projectContainer ? projectContainer.querySelectorAll('.btn-like') : [clickedButton];
-    allButtonsInProject.forEach(btn => {
+    // Find all buttons in the same category (radio button behavior - across all projects)
+    const allButtonsInCategory = document.querySelectorAll(`[data-category="${suggestionCategory}"]`);
+
+    // Disable all buttons in this category during request
+    allButtonsInCategory.forEach(btn => {
         btn.disabled = true;
-        btn.classList.add('loading');
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
     });
 
     $.ajax({
         url: `/suggestions/${suggestionId}/toggle-like`,
         method: 'POST',
+        data: {
+            category: suggestionCategory
+        },
         success: function(response) {
-            // Update like counts for all suggestions in this project
-            if (projectContainer) {
-                // Reset all like buttons in this project
-                allButtonsInProject.forEach(btn => {
-                    btn.classList.remove('liked');
-                    const btnSuggestionId = btn.getAttribute('data-suggestion-id');
+            // Reset all buttons in the same category to default state (radio button logic)
+            allButtonsInCategory.forEach(btn => {
+                btn.classList.remove('liked');
+                const btnSuggestionId = btn.getAttribute('data-suggestion-id');
 
-                    // Reset button appearance to default (not liked)
-                    btn.style.background = 'rgba(255,255,255,0.15)';
-                    btn.style.borderColor = 'rgba(255,255,255,0.3)';
+                // Reset heart icon to outline for all buttons in category
+                const heartIcon = btn.querySelector('.like-icon');
+                if (heartIcon) {
+                    heartIcon.style.fill = 'none';
+                }
 
-                    // Reset heart icon to outline
-                    const heartIcon = btn.querySelector('svg');
-                    if (heartIcon) {
-                        heartIcon.style.fill = 'none';
+                // Update like counts from server response if available
+                if (response.all_likes && response.all_likes[btnSuggestionId] !== undefined) {
+                    const btnLikeCount = btn.querySelector('.like-count');
+                    if (btnLikeCount) {
+                        btnLikeCount.textContent = response.all_likes[btnSuggestionId];
                     }
-
-                    // Update like count from server response if available
-                    if (response.all_likes && response.all_likes[btnSuggestionId] !== undefined) {
-                        const btnLikeCount = btn.querySelector('.like-count');
-                        if (btnLikeCount) {
-                            btnLikeCount.textContent = response.all_likes[btnSuggestionId];
-                        }
-                    }
-                });
-            }
+                }
+            });
 
             // Update clicked button's like count
             likeCount.textContent = response.likes_count;
 
-            // Update clicked button appearance
+            // Update clicked button appearance if it's now liked
             if (response.liked) {
                 clickedButton.classList.add('liked');
 
-                // Update button to red (liked state)
-                clickedButton.style.background = '#ef4444';
-                clickedButton.style.borderColor = '#dc2626';
-
-                // Fill heart icon
-                const heartIcon = clickedButton.querySelector('svg');
+                // Fill heart icon for the selected button
+                const heartIcon = clickedButton.querySelector('.like-icon');
                 if (heartIcon) {
                     heartIcon.style.fill = 'currentColor';
                 }
 
-                showMessage('✓ Bu proje kategorisindeki seçiminiz güncellendi!', 'success');
+                if (response.switched_from) {
+                    showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
+                } else {
+                    showMessage('✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.', 'success');
+                }
             } else {
                 clickedButton.classList.remove('liked');
 
-                // Reset button to default (not liked state)
-                clickedButton.style.background = 'rgba(255,255,255,0.15)';
-                clickedButton.style.borderColor = 'rgba(255,255,255,0.3)';
-
                 // Reset heart icon to outline
-                const heartIcon = clickedButton.querySelector('svg');
+                const heartIcon = clickedButton.querySelector('.like-icon');
                 if (heartIcon) {
                     heartIcon.style.fill = 'none';
                 }
 
                 showMessage('Beğeni kaldırıldı.', 'info');
-            }            // Add visual feedback for radio button behavior
-            if (response.liked && response.switched_from) {
-                showMessage(`Seçiminiz "${response.switched_from}" önerisinden bu öneriye değiştirildi.`, 'info');
             }
         },
         error: function(xhr) {
@@ -501,10 +492,11 @@ function toggleLike(suggestionId) {
             showMessage(message, 'error');
         },
         complete: function() {
-            // Re-enable all buttons
-            allButtonsInProject.forEach(btn => {
+            // Re-enable all buttons in the category
+            allButtonsInCategory.forEach(btn => {
                 btn.disabled = false;
-                btn.classList.remove('loading');
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
             });
         }
     });
@@ -570,11 +562,67 @@ function showMessage(message, type = 'info') {
     }, delay);
 }
 
-// Add CSS for message animations
+// Add CSS for message animations and like buttons
 if (!document.getElementById('message-styles')) {
     const style = document.createElement('style');
     style.id = 'message-styles';
     style.textContent = `
+        /* Like Button Styles */
+        .btn-like {
+            background: rgba(255,255,255,0.15) !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+            color: white !important;
+            padding: 0.375rem 0.75rem !important;
+            border-radius: var(--radius-md) !important;
+            font-size: 0.75rem !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 0.25rem !important;
+            transition: all 0.2s !important;
+            backdrop-filter: blur(4px) !important;
+            cursor: pointer !important;
+            font-weight: 600 !important;
+        }
+
+        .btn-like-large {
+            padding: 0.75rem 1.25rem !important;
+            font-size: 0.875rem !important;
+            gap: 0.5rem !important;
+            backdrop-filter: blur(10px) !important;
+            box-shadow: var(--shadow-md) !important;
+        }
+
+        .btn-like.liked {
+            background: #ef4444 !important;
+            border-color: #dc2626 !important;
+        }
+
+        .btn-like:hover:not(.liked) {
+            background: rgba(255,255,255,0.25) !important;
+            border-color: rgba(255,255,255,0.5) !important;
+        }
+
+        .btn-like.liked:hover {
+            background: #dc2626 !important;
+            border-color: #b91c1c !important;
+        }
+
+        .btn-like .like-icon {
+            width: 0.875rem !important;
+            height: 0.875rem !important;
+            fill: none !important;
+        }
+
+        .btn-like .like-icon-large {
+            width: 1rem !important;
+            height: 1rem !important;
+        }
+
+        .btn-like.liked .like-icon {
+            fill: currentColor !important;
+        }
+
+        /* Message Animations */
         @keyframes slideIn {
             from {
                 transform: translateY(-100%) translateX(-50%);
@@ -680,32 +728,8 @@ function adjustLayout() {
     });
 }
 
-// Add hover effects for like buttons and action buttons
+// Add hover effects for action buttons
 document.addEventListener('DOMContentLoaded', function() {
-    const likeButtons = document.querySelectorAll('.btn-like');
-    likeButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            if (!this.classList.contains('liked')) {
-                this.style.background = 'rgba(255,255,255,0.25)';
-                this.style.borderColor = 'rgba(255,255,255,0.5)';
-            } else {
-                this.style.background = '#dc2626';
-                this.style.borderColor = '#b91c1c';
-            }
-        });
-
-        button.addEventListener('mouseleave', function() {
-            if (!this.classList.contains('liked')) {
-                this.style.background = 'rgba(255,255,255,0.15)';
-                this.style.borderColor = 'rgba(255,255,255,0.3)';
-            } else {
-                this.style.background = '#ef4444';
-                this.style.borderColor = '#dc2626';
-            }
-        });
-    });
-
-    // Add hover effects for action buttons
     const actionButtons = document.querySelectorAll('a[style*="background: var(--red-600)"]');
     actionButtons.forEach(button => {
         button.addEventListener('mouseenter', function() {
@@ -722,9 +746,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// Add hover effects for buttons
+// Add hover effects for "show more" buttons
 document.addEventListener('DOMContentLoaded', function() {
-    // Add hover effect for "show more" buttons
     const showMoreButtons = document.querySelectorAll('.btn-show-more');
     showMoreButtons.forEach(button => {
         button.addEventListener('mouseenter', function() {
@@ -737,30 +760,6 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.background = 'rgba(255,255,255,0.2)';
             this.style.borderColor = 'rgba(255,255,255,0.4)';
             this.style.transform = 'translateY(0)';
-        });
-    });
-
-    // Existing hover effects code...
-    const likeButtons = document.querySelectorAll('.btn-like');
-    likeButtons.forEach(button => {
-        button.addEventListener('mouseenter', function() {
-            if (!this.classList.contains('liked')) {
-                this.style.background = 'rgba(255,255,255,0.25)';
-                this.style.borderColor = 'rgba(255,255,255,0.5)';
-            } else {
-                this.style.background = '#dc2626';
-                this.style.borderColor = '#b91c1c';
-            }
-        });
-
-        button.addEventListener('mouseleave', function() {
-            if (!this.classList.contains('liked')) {
-                this.style.background = 'rgba(255,255,255,0.15)';
-                this.style.borderColor = 'rgba(255,255,255,0.3)';
-            } else {
-                this.style.background = '#ef4444';
-                this.style.borderColor = '#dc2626';
-            }
         });
     });
 });
