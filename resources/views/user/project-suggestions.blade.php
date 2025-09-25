@@ -520,7 +520,7 @@
     .card-author-section {
         display: flex;
         align-items: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem; /* match projects spacing */
         gap: 0.5rem;
     }
 
@@ -589,7 +589,7 @@
     }
 
     .card-stat.comments .card-stat-icon {
-        color: #3b82f6;
+        color: var(--blue-600);
     }
 
     .card-stat.date {
@@ -657,7 +657,7 @@
 
     .detail-button {
         background: rgba(255,255,255,0.95);
-        color: #1e40af;
+        color: var(--green-700); /* match projects Detay button */
         padding: 0.75rem 1.25rem;
         border-radius: var(--radius-md);
         font-size: 0.875rem;
@@ -676,12 +676,13 @@
         transform: translateY(-2px);
         box-shadow: var(--shadow-lg);
         background: white;
-        color: #1e40af;
+        color: var(--green-800);
     }
 
     .detail-button-icon {
         width: 1rem;
         height: 1rem;
+        color: currentColor;
     }
 
     /* Empty State */
@@ -1165,7 +1166,7 @@
                                 </button>
 
                                 <!-- Detail Button -->
-                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" style="background: rgba(255,255,255,0.95); color: #1e40af; padding: 0.75rem 1.25rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-md);">
+                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" style="background: rgba(255,255,255,0.95); color: var(--green-700); padding: 0.75rem 1.25rem; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; text-decoration: none; transition: all 0.3s ease; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-md);">
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                     </svg>
@@ -1184,7 +1185,7 @@
         <div class="text-center section-padding-lg">
             <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
                 <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 003 5.25v13.5A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                 </svg>
                 <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
                     <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -1530,8 +1531,8 @@ if (!document.getElementById('message-styles')) {
         /* Mobile responsiveness */
         @media (max-width: 1024px) {
             .d-grid[style*="grid-template-columns: 1fr 3fr"] {
-                grid-template-columns: 1fr !important;
-                gap: 1rem !important;
+                grid-template-columns: 1fr;
+                gap: 1rem;
             }
         }
 
