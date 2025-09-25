@@ -91,7 +91,7 @@
                 </div>
 
                 <!-- Desktop navigation -->
-                <div class="user-nav-links hidden md:flex">
+                <div class="hidden user-nav-links md:flex">
                     <a href="{{ route('user.index') }}"
                        class="user-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -110,10 +110,10 @@
                     @auth
                         <div class="flex items-center space-x-3">
                             <div class="flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <svg class="w-5 h-5 mr-2" style="color: #1ABF6B;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
-                                <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
+                                <span class="text-sm" style="color: #053640;">Merhaba, {{ Auth::user()->name }}</span>
                             </div>
                             <form method="POST" action="{{ route('user.logout') }}" style="display: inline;">
                                 @csrf
@@ -171,7 +171,7 @@
                                 </div>
                                 <form method="POST" action="{{ route('user.logout') }}" class="w-full">
                                     @csrf
-                                    <button type="submit" class="mobile-nav-link logout-btn w-full text-left">
+                                    <button type="submit" class="w-full text-left mobile-nav-link logout-btn">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"/>
                                         </svg>
@@ -212,8 +212,8 @@
             <div class="user-footer-content">
                 <div class="footer-main">
                     <div class="footer-brand">
-                        <div class="footer-logo-svg">
-                            <svg class="footer-logo" viewBox="0 0 191 44" xmlns="http://www.w3.org/2000/svg">
+                        <div class="footer-logo-container">
+                            <svg class="footer-logo" viewBox="0 0 99 44" xmlns="http://www.w3.org/2000/svg">
                                 <g clip-path="url(#DutLogo_footer_clip0_1357_1541)">
                                     <path d="M77.4253 44H21.538C9.64333 44 0 34.1513 0 22C0 9.84867 9.64333 0 21.538 0H77.4253C89.32 0 98.9633 9.84867 98.9633 22C98.9633 34.1513 89.32 44 77.4253 44Z" fill="#1ABF6B"></path>
                                     <path d="M30.7191 12.188C31.9878 12.7527 33.0951 13.508 34.0338 14.4687C34.9725 15.4294 35.7132 16.5587 36.2631 17.8567C36.8131 19.1547 37.0845 20.5334 37.0845 21.9927C37.0845 23.452 36.8131 24.8527 36.2631 26.136C35.7132 27.4267 34.9725 28.5487 34.0338 29.5094C33.0951 30.47 31.9878 31.2254 30.7191 31.79C29.4505 32.3474 28.1011 32.6334 26.6711 32.6334H18.3185V26.6347H26.1725C26.7958 26.6347 27.3898 26.5174 27.9325 26.2754C28.4825 26.0334 28.9665 25.7034 29.3845 25.278C29.8025 24.8527 30.1325 24.354 30.3598 23.782C30.5945 23.21 30.7118 22.6087 30.7118 21.9707C30.7118 21.3327 30.5945 20.7314 30.3598 20.1594C30.1251 19.5874 29.8025 19.096 29.3845 18.678C28.9665 18.26 28.4825 17.93 27.9325 17.6807C27.3825 17.4314 26.7958 17.3067 26.1725 17.3067H18.3185V11.3594H26.6711C28.0938 11.3594 29.4431 11.638 30.7191 12.1954" fill="#053640"></path>
@@ -249,6 +249,10 @@
                                     </clipPath>
                                 </defs>
                             </svg>
+                            <div class="footer-logo-text">
+                                <span class="footer-logo-title">Driving Urban</span>
+                                <span class="footer-logo-subtitle">Transformation</span>
+                            </div>
                         </div>
                         <p class="footer-description">
                             Şehrimizi birlikte dönüştürmek için oluşturulmuş katılımcı demokrasi platformu
@@ -281,7 +285,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#hakkinda">
+                                    <a href="https://dutpartnership.eu/about">
                                         <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
                                         </svg>
@@ -300,49 +304,25 @@
                             </h4>
                             <ul>
                                 <li>
-                                    <a href="mailto:info@visiosoft.com.tr">
+                                    <a href="mailto:info@dutpartnership.eu">
                                         <svg class="icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
                                         </svg>
-                                        info@visiosoft.com.tr
+                                        info@dutpartnership.eu
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://visiosoft.com.tr" target="_blank">
+                                    <a href="https://dutpartnership.eu" target="_blank">
                                         <svg class="icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/>
                                         </svg>
-                                        visiosoft.com.tr
+                                        dutpartnership.eu
                                     </a>
                                 </li>
                             </ul>
                         </div>
 
-                        <div class="footer-section">
-                            <h4>
-                                <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"/>
-                                </svg>
-                                Sosyal Medya
-                            </h4>
-                            <div class="social-links">
-                                <a href="#" title="LinkedIn">
-                                    <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                                    </svg>
-                                </a>
-                                <a href="#" title="Twitter">
-                                    <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                                    </svg>
-                                </a>
-                                <a href="#" title="Instagram">
-                                    <svg class="icon" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M12.017 0C8.396 0 7.929.01 7.075.048 6.223.085 5.65.204 5.14.388a6.578 6.578 0 0 0-2.37 1.543A6.578 6.578 0 0 0 .227 4.301C.043 4.812-.076 5.385-.113 6.237-.151 7.091-.161 7.558-.161 11.179c0 3.621.01 4.088.048 4.942.037.852.156 1.425.34 1.935a6.578 6.578 0 0 0 1.543 2.37 6.578 6.578 0 0 0 2.37 1.543c.51.184 1.083.303 1.935.34.854.038 1.321.048 4.942.048 3.621 0 4.088-.01 4.942-.048.852-.037 1.425-.156 1.935-.34a6.578 6.578 0 0 0 2.37-1.543 6.578 6.578 0 0 0 1.543-2.37c.184-.51.303-1.083.34-1.935.038-.854.048-1.321.048-4.942 0-3.621-.01-4.088-.048-4.942-.037-.852-.156-1.425-.34-1.935A6.578 6.578 0 0 0 19.69 1.931 6.578 6.578 0 0 0 17.32.388C16.81.204 16.237.085 15.385.048 14.531.01 14.064 0 10.443 0h1.574zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12.017 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm7.846-10.405a1.441 1.441 0 0 1-2.88 0 1.441 1.441 0 0 1 2.88 0z"/>
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
 

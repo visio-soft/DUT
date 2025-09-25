@@ -203,8 +203,9 @@ h6 { font-size: 1rem; font-weight: 500; }
 
 /* Header Styles */
 .user-header {
-    background: linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 100%);
-    box-shadow: var(--shadow-md);
+    background: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
     position: sticky;
     top: 0;
     z-index: 50;
@@ -223,57 +224,95 @@ h6 { font-size: 1rem; font-weight: 500; }
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50px;
     text-decoration: none;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
 }
 
 .user-logo-svg:hover {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px) scale(1.05);
 }
 
 .user-logo-svg .logo {
-    height: 2rem;
+    height: 2.5rem;
     width: auto;
     transition: all 0.3s ease;
 }
 
 .user-logo-svg:hover .logo {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
-/* Footer SVG Logo Styles */
-.footer-logo-svg {
-    display: inline-flex;
+/* Footer Logo Container Styles */
+.footer-logo-container {
+    display: flex;
     align-items: center;
-    justify-content: center;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 0.375rem;
-    background: rgba(255, 255, 255, 0.05);
-    transition: all 0.3s ease;
+    gap: 8px;
 }
 
-.footer-logo-svg:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
-}
-
-.footer-logo-svg .footer-logo {
-    height: 1.5rem;
+.footer-logo {
+    height: 44px;
     width: auto;
+    max-width: 120px;
     transition: all 0.3s ease;
+    flex-shrink: 0;
 }
 
-.footer-logo-svg:hover .footer-logo {
+.footer-logo:hover {
     transform: scale(1.05);
+}
+
+.footer-logo-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.footer-logo-title {
+    color: #1ABF6B;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+}
+
+.footer-logo-subtitle {
+    color: #1ABF6B;
+    font-size: 1.25rem;
+    font-weight: 500;
+    line-height: 1.2;
+    transition: color 0.3s ease;
+}
+
+.footer-logo-text:hover .footer-logo-title,
+.footer-logo-text:hover .footer-logo-subtitle {
+    color: #16a559;
+}
+
+/* Mobile responsive footer logo */
+@media (max-width: 768px) {
+    .footer-logo-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .footer-logo {
+        height: 36px;
+    }
+
+    .footer-logo-text {
+        align-items: center;
+        text-align: center;
+    }
+
+    .footer-logo-title {
+        font-size: 1.25rem;
+    }
+
+    .footer-logo-subtitle {
+        font-size: 1rem;
+    }
 }
 
 /* Desktop Navigation - Hidden on mobile */
@@ -290,7 +329,7 @@ h6 { font-size: 1rem; font-weight: 500; }
 }
 
 .user-nav-link {
-    color: rgba(255, 255, 255, 0.9);
+    color: #053640;
     text-decoration: none;
     font-weight: 500;
     padding: 0.5rem 1rem;
@@ -302,14 +341,15 @@ h6 { font-size: 1rem; font-weight: 500; }
 }
 
 .user-nav-link:hover {
-    color: white;
-    background-color: rgba(255, 255, 255, 0.1);
+    color: #1ABF6B;
+    background-color: rgba(26, 191, 107, 0.1);
     transform: translateY(-1px);
 }
 
 .user-nav-link.active {
-    color: white;
-    background-color: var(--green-800);
+    color: #1ABF6B;
+    background-color: rgba(26, 191, 107, 0.1);
+    font-weight: 600;
 }
 
 .user-nav-link.active::after {
@@ -320,7 +360,7 @@ h6 { font-size: 1rem; font-weight: 500; }
     transform: translateX(-50%);
     width: 20px;
     height: 3px;
-    background-color: var(--green-200);
+    background-color: #1ABF6B;
     border-radius: 2px;
 }
 
@@ -349,7 +389,7 @@ h6 { font-size: 1rem; font-weight: 500; }
     display: block;
     width: 100%;
     height: 2px;
-    background-color: white;
+    background-color: #053640;
     border-radius: 1px;
     transition: var(--transition-normal);
     transform-origin: center;
@@ -503,19 +543,13 @@ h6 { font-size: 1rem; font-weight: 500; }
     }
 
     /* Mobile Header Logo */
-    .user-logo-svg {
-        padding: 0.375rem 0.75rem;
-    }
-    
     .user-logo-svg .logo {
-        height: 1.75rem;
-    }
-    
-    /* Mobile Footer Logo */
+        height: 2rem;
+    }    /* Mobile Footer Logo */
     .footer-logo-svg {
         padding: 0.375rem 0.625rem;
     }
-    
+
     .footer-logo-svg .footer-logo {
         height: 1.25rem;
     }
@@ -524,15 +558,13 @@ h6 { font-size: 1rem; font-weight: 500; }
 /* Very small screens - make logo even smaller */
 @media (max-width: 480px) {
     .user-logo-svg .logo {
-        height: 1.5rem;
+        height: 1.75rem;
     }
-    
+
     .footer-logo-svg .footer-logo {
         height: 1rem;
     }
-}
-
-@media (min-width: 768px) {
+}@media (min-width: 768px) {
     .mobile-menu {
         display: none !important;
     }
@@ -1650,8 +1682,8 @@ h6 { font-size: 1rem; font-weight: 500; }
 
 /* Footer */
 .user-footer {
-    background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
-    border-top: 1px solid var(--green-100);
+    background: #053640;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     margin-top: 4rem;
     padding: 3rem 0 1rem;
     color: var(--gray-300);
@@ -1999,25 +2031,25 @@ h6 { font-size: 1rem; font-weight: 500; }
 
 .auth-btn-login {
     background: transparent;
-    color: white;
-    border-color: rgba(255, 255, 255, 0.3);
+    color: #053640;
+    border-color: rgba(5, 54, 64, 0.3);
 }
 
 .auth-btn-login:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.5);
-    color: white;
+    background: rgba(5, 54, 64, 0.1);
+    border-color: rgba(5, 54, 64, 0.5);
+    color: #053640;
 }
 
 .auth-btn-register {
-    background: var(--green-500);
+    background: #1ABF6B;
     color: white;
-    border-color: var(--green-500);
+    border-color: #1ABF6B;
 }
 
 .auth-btn-register:hover {
-    background: var(--green-600);
-    border-color: var(--green-600);
+    background: #16a559;
+    border-color: #16a559;
     color: white;
     transform: translateY(-1px);
 }
