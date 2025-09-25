@@ -150,17 +150,6 @@
         overflow: hidden;
     }
 
-    .stat-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--blue-500), var(--green-500), var(--yellow-500));
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
 
     .stat-card:hover {
         transform: translateY(-4px);
@@ -521,12 +510,6 @@
         transition: filter 0.3s ease;
     }
 
-    .card-gradient {
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 50%, #EC4899 100%);
-        position: relative;
-    }
 
     .card-pattern {
         position: absolute;

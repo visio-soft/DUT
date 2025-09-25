@@ -46,7 +46,17 @@
                     </a>
                 </div>
 
-                <div class="user-nav-links">
+                <!-- Mobile menu button -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="mobile-menu-button">
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                        <span class="hamburger-line"></span>
+                    </button>
+                </div>
+
+                <!-- Desktop navigation -->
+                <div class="user-nav-links hidden md:flex">
                     <a href="{{ route('user.index') }}"
                        class="user-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -96,6 +106,61 @@
                             </a>
                         </div>
                     @endauth
+                </div>
+
+                <!-- Mobile navigation menu -->
+                <div id="mobile-menu" class="mobile-menu">
+                    <div class="mobile-menu-content">
+                        <a href="{{ route('user.index') }}"
+                           class="mobile-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                            </svg>
+                            Ana Sayfa
+                        </a>
+                        <a href="{{ route('user.projects') }}"
+                           class="mobile-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                            </svg>
+                            Projeler
+                        </a>
+
+                        @auth
+                            <div class="mobile-auth-section">
+                                <div class="mobile-user-info">
+                                    <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 1-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                    </svg>
+                                    <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
+                                </div>
+                                <form method="POST" action="{{ route('user.logout') }}" class="w-full">
+                                    @csrf
+                                    <button type="submit" class="mobile-nav-link logout-btn w-full text-left">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"/>
+                                        </svg>
+                                        Çıkış
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <div class="mobile-auth-buttons">
+                                <a href="{{ route('user.login') }}" class="mobile-auth-btn mobile-auth-btn-login">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
+                                    </svg>
+                                    Giriş
+                                </a>
+                                <a href="{{ route('user.register') }}" class="mobile-auth-btn mobile-auth-btn-register">
+                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
+                                    </svg>
+                                    Kayıt
+                                </a>
+                            </div>
+                        @endauth
+                    </div>
                 </div>
             </div>
         </nav>
@@ -232,6 +297,76 @@
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
+        });
+
+        // Mobile Menu Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            let isMenuOpen = false;
+
+            function toggleMenu() {
+                isMenuOpen = !isMenuOpen;
+
+                if (isMenuOpen) {
+                    mobileMenuButton.classList.add('active');
+                    mobileMenu.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    mobileMenuButton.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            function closeMenu() {
+                if (isMenuOpen) {
+                    isMenuOpen = false;
+                    mobileMenuButton.classList.remove('active');
+                    mobileMenu.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
+            }
+
+            // Toggle menu on button click
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', toggleMenu);
+            }
+
+            // Close menu when clicking on mobile nav links
+            const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    // Only close for navigation links, not the logout button
+                    if (this.tagName === 'A') {
+                        closeMenu();
+                    }
+                });
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+                const isClickInsideMenu = mobileMenu && mobileMenu.contains(event.target);
+                const isClickOnButton = mobileMenuButton && mobileMenuButton.contains(event.target);
+
+                if (!isClickInsideMenu && !isClickOnButton && isMenuOpen) {
+                    closeMenu();
+                }
+            });
+
+            // Close menu on window resize to desktop size
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 768 && isMenuOpen) {
+                    closeMenu();
+                }
+            });
+
+            // Handle escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && isMenuOpen) {
+                    closeMenu();
+                }
+            });
         });
     </script>
 </body>
