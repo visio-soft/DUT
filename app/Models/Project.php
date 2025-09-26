@@ -77,7 +77,9 @@ class Project extends Model implements HasMedia
                 'image/bmp',
                 'image/svg+xml'
             ])
-            ->singleFile();
+            ->singleFile()
+            ->useFallbackUrl('/images/placeholder-project.jpg')
+            ->useFallbackPath(public_path('/images/placeholder-project.jpg'));
     }
 
     public function registerMediaConversions(?Media $media = null): void
