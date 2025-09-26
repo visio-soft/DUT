@@ -78,7 +78,9 @@ class ChunkedUploader {
             Object.keys(additionalData).forEach(key => {
                 formData.append(key, additionalData[key]);
             });
-        }        const response = await fetch(this.baseUrl, {
+        }
+
+        const response = await fetch(this.uploadUrl, {
             method: 'POST',
             body: formData,
             headers: {
@@ -110,7 +112,7 @@ class ChunkedUploader {
         let retries = 0;
         while (retries < this.maxRetries) {
             try {
-                const response = await fetch(this.baseUrl, {
+                const response = await fetch(this.uploadUrl, {
                     method: 'POST',
                     body: formData,
                     headers: {
@@ -148,7 +150,7 @@ class ChunkedUploader {
             formData.append('_token', this.csrfToken);
         }
 
-        const response = await fetch(this.baseUrl, {
+        const response = await fetch(this.uploadUrl, {
             method: 'POST',
             body: formData,
             headers: {
