@@ -96,6 +96,9 @@ class UserAuthController extends Controller
             'email_verified_at' => now(), // Auto-verify for user panel
         ]);
 
+        // Assign 'user' role to new registrations
+        $user->assignRole('user');
+
         Auth::login($user);
 
         return redirect()->route('user.index')
