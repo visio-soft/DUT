@@ -38,8 +38,6 @@ class Project extends Model implements HasMedia
         'neighborhood',
         'street_cadde',
         'street_sokak',
-        'design_completed',
-        'design_landscape',
     ];
 
     protected $casts = [
@@ -48,8 +46,6 @@ class Project extends Model implements HasMedia
         'budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
-        'design_completed' => 'boolean',
-        'design_landscape' => 'array',
     ];
 
     public function category(): BelongsTo
@@ -67,10 +63,7 @@ class Project extends Model implements HasMedia
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    public function design(): HasOne
-    {
-    return $this->hasOne(ProjectDesign::class, 'project_id');
-    }
+    // Design relationship removed - no longer needed
 
     public function registerMediaCollections(): void
     {

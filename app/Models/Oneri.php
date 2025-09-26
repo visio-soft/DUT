@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -36,7 +37,6 @@ class Oneri extends Model implements HasMedia
         'neighborhood',
         'street_cadde',
         'street_sokak',
-        'design_completed',
     ];
 
     protected $casts = [
@@ -44,14 +44,10 @@ class Oneri extends Model implements HasMedia
         'budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
-        'design_completed' => 'boolean',
     ];
 
-    // Append a human-friendly design status attribute so it can be used in
-    // Filament grouping and table displays.
-    protected $appends = [
-        'design_status',
-    ];
+    // Remove design-related appends since design functionality is removed
+    protected $appends = [];
 
     public function category(): BelongsTo
     {
@@ -68,28 +64,37 @@ class Oneri extends Model implements HasMedia
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    public function design(): HasOne
+    public function likes(): HasMany
     {
-    // Explicit foreign key: project_designs.project_id (table uses project_id constrained to oneriler)
-    return $this->hasOne(ProjectDesign::class, 'project_id');
+        return $this->hasMany(OneriLike::class);
     }
 
-    public function likes()
+    public function comments(): HasMany
     {
-        return $this->hasManyThrough(
-            ProjectDesignLike::class,
-            ProjectDesign::class,
-            'project_id', // Foreign key on project_designs table
-            'project_design_id', // Foreign key on project_design_likes table
-            'id', // Local key on oneriler table
-            'id' // Local key on project_designs table
-        );
+        return $this->hasMany(OneriComment::class);
+    }
+
+    public function approvedComments(): HasMany
+    {
+        return $this->hasMany(OneriComment::class)->where('is_approved', true)->whereNull('parent_id');
     }
 
     public function getLikesCountAttribute(): int
     {
         return $this->likes()->count();
     }
+
+    public function getCommentsCountAttribute(): int
+    {
+        return $this->comments()->count();
+    }
+
+    public function getApprovedCommentsCountAttribute(): int
+    {
+        return $this->approvedComments()->count();
+    }
+
+    // Design relationships removed - no longer needed
 
     public function registerMediaCollections(): void
     {
@@ -109,9 +114,5 @@ class Oneri extends Model implements HasMedia
         return $this->title;
     }
 
-    // Human-friendly design status used for grouping in Filament tables.
-    public function getDesignStatusAttribute(): string
-    {
-        return $this->design_completed ? 'Tasarımı Var' : 'Tasarımı Yok';
-    }
+    // Design status functionality removed
 }

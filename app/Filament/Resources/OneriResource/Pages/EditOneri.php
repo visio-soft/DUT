@@ -61,18 +61,7 @@ class EditOneri extends EditRecord
 
     protected function getHeaderActions(): array
     {
-        $actions = [Actions\DeleteAction::make()];
-
-        // Eğer öneri tasarımı tamamlandıysa tasarımı görüntüle butonu ekle
-        if ($this->record && $this->record->design_completed && $this->record->design) {
-            $actions[] = Actions\Action::make('viewDesign')
-                ->label('Tasarımı Görüntüle')
-                ->icon('heroicon-o-eye')
-                ->color('success')
-                ->url("/admin/project-designs/{$this->record->design->id}");
-        }
-
-        return $actions;
+        return [Actions\DeleteAction::make()];
     }
 
     protected function getRedirectUrl(): string

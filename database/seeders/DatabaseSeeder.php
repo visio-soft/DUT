@@ -12,16 +12,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Create roles first
+        $this->call([
+            RoleSeeder::class,
+        ]);
+        
         // Admin kullanıcıları ekle
         $this->call([
             AdminUserSeeder::class,
             NormalAdminUserSeeder::class,
-            DoğaObjelerSeeder::class,
-            UlaşımObjelerSeeder::class,
-            MimarlıkObjelerSeeder::class,
-            SanatObjelerSeeder::class,
-            DokuObjelerSeeder::class,
-            YaşamObjelerSeeder::class,
         ]);
     }
 }

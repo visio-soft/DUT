@@ -57,11 +57,18 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-       return true;
+        // Only allow users with admin or super_admin roles to access the admin panel
+        if ($panel->getId() === 'admin') {
+            return $this->hasAnyRole(['admin', 'super_admin']);
+        }
+        
+        return true;
     }
 
-    public function projectDesignLikes(): HasMany
+    public function oneriComments(): HasMany
     {
-        return $this->hasMany(ProjectDesignLike::class);
+        return $this->hasMany(OneriComment::class);
     }
+
+    // Design functionality removed - projectDesignLikes relationship no longer needed
 }
