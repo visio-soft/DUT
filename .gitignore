@@ -20,7 +20,32 @@
 /storage/pail
 /storage/media-library/temp/
 /storage/app/media-temp/
+/storage/app/public/
+/public/storage/
 /vendor
+
+# Media files - uploaded images and files
+/storage/app/public/media/
+/public/media/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.svg
+*.webp
+*.avif
+*.pdf
+*.doc
+*.docx
+*.zip
+*.rar
+
+# Test files
+test-*.jpg
+test-*.png
+test-*.pdf
+*-test.*
 Homestead.json
 Homestead.yaml
 Thumbs.db
@@ -36,3 +61,7 @@ database/database.sqlite
 .env.testing
 .phpunit.cache
 .idea/*/workspace.xml
+
+# Development files
+.phpunit.cache
+*.cache

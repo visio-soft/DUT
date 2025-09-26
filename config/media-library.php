@@ -12,7 +12,17 @@ return [
      * The maximum file size of an item in bytes.
      * Adding a larger file will result in an exception.
      */
-    'max_file_size' => 1024 * 1024 * 10, // 10MB
+    'max_file_size' => 1024 * 1024 * 50, // 50MB - Yüksek çözünürlüklü resimler için artırıldı
+
+    /*
+     * Alternative maximum file size configurations for different scenarios
+     */
+    'max_file_size_fallback' => [
+        'small' => 1024 * 1024 * 2,  // 2MB
+        'medium' => 1024 * 1024 * 10, // 10MB
+        'large' => 1024 * 1024 * 25,  // 25MB
+        'xlarge' => 1024 * 1024 * 50, // 50MB
+    ],
 
     /*
      * This queue connection will be used to generate derived and responsive images.
@@ -30,6 +40,11 @@ return [
      * By default all conversions will be performed on a queue.
      */
     'queue_conversions_by_default' => false,
+
+    /*
+     * Disable image processing to avoid GD/Imagick dependencies
+     */
+    'perform_conversions' => false,
 
     /*
      * Should database transactions be run after database commits?
