@@ -117,9 +117,11 @@ class CategoryResource extends Resource
                     ->label('Proje Alanı Fotoğrafları')
                     ->collection('project_files')
                     ->multiple()
+                    ->maxSize(51200) // 50MB in KB
                     ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'])
                     ->panelLayout('compact')
                     ->required()
+                    ->helperText('Maksimum dosya boyutu: 50MB per dosya. Desteklenen formatlar: JPEG, JPG, PNG, WebP, PDF. Yüksek çözünürlüklü resimler desteklenir.')
                     ->columnSpanFull(),
 
             ])
