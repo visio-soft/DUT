@@ -82,11 +82,29 @@ class Project extends Model implements HasMedia
             ->useFallbackPath(public_path('/images/placeholder-project.jpg'));
     }
 
-    public function registerMediaConversions(?Media $media = null): void
-    {
-        // Media conversions disabled to avoid errors
-        // If thumbnails are needed, use CSS resizing in frontend
-    }
+    // Media conversions disabled to avoid image processing dependencies
+    // public function registerMediaConversions(?Media $media = null): void
+    // {
+    //     // Optimize large images automatically
+    //     $this->addMediaConversion('thumb')
+    //         ->width(300)
+    //         ->height(300)
+    //         ->sharpen(10)
+    //         ->performOnCollections('images');
+    //
+    //     $this->addMediaConversion('preview')
+    //         ->width(800)
+    //         ->height(800)
+    //         ->quality(85)
+    //         ->performOnCollections('images');
+    //
+    //     // Optimize original for web
+    //     $this->addMediaConversion('web-optimized')
+    //         ->width(2000)
+    //         ->height(2000)
+    //         ->quality(85)
+    //         ->performOnCollections('images');
+    // }
 
     // Getter for backward compatibility if needed
     public function getNameAttribute()

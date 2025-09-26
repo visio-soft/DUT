@@ -27,7 +27,7 @@ return [
      */
     'allowed_image_types' => [
         'image/jpeg',
-        'image/jpg', 
+        'image/jpg',
         'image/png',
         'image/webp',
         'image/gif',

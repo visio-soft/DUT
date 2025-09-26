@@ -122,6 +122,10 @@ class CategoryResource extends Resource
                     ->panelLayout('compact')
                     ->required()
                     ->helperText('Maksimum dosya boyutu: 50MB per dosya. Desteklenen formatlar: JPEG, JPG, PNG, WebP, PDF. Yüksek çözünürlüklü resimler desteklenir.')
+                    ->imageResizeMode('contain')
+                    ->imageCropAspectRatio(null)
+                    ->imageResizeTargetWidth('2000')
+                    ->imageResizeTargetHeight('2000')
                     ->columnSpanFull(),
 
             ])
