@@ -40,7 +40,9 @@ class AppServiceProvider extends ServiceProvider
         @ini_set('post_max_size', '30M');
         @ini_set('memory_limit', '256M');
         @ini_set('max_execution_time', '300');
-    }    /**
+    }
+
+    /**
      * Convert PHP memory notation to bytes
      */
     private function convertToBytes(string $value): int

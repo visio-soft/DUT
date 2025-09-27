@@ -24,34 +24,24 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# PHP upload optimizations for high-resolution image uploads (Enhanced)
+# PHP upload optimizations for image uploads
 <IfModule mod_php.c>
-    php_value upload_max_filesize 100M
-    php_value post_max_size 120M
-    php_value max_execution_time 600
-    php_value memory_limit 512M
-    php_value max_input_time 600
-    php_value max_input_vars 5000
-    php_value file_uploads On
-    php_value auto_detect_line_endings On
+    php_value upload_max_filesize 25M
+    php_value post_max_size 30M
+    php_value max_execution_time 300
+    php_value memory_limit 256M
+    php_value max_input_time 300
+    php_value max_input_vars 3000
 </IfModule>
 
 # For PHP-FPM (if .htaccess php_value doesn't work)
 <IfModule mod_fcgid.c>
-    FcgidMaxRequestLen 125829120
-    FcgidIOTimeout 600
-    FcgidConnectTimeout 600
-    FcgidBusyTimeout 600
-</IfModule>
-
-# For Nginx with PHP-FPM
-<IfModule mod_headers.c>
-    Header always set X-Upload-Max-Size "100M"
+    FcgidMaxRequestLen 31457280
 </IfModule>
 
 # Additional PHP-FPM configuration
 <IfModule mod_env.c>
-    SetEnv PHP_VALUE "upload_max_filesize=50M; post_max_size=60M; memory_limit=256M; max_execution_time=300; max_input_time=300"
+    SetEnv PHP_VALUE "upload_max_filesize=25M; post_max_size=30M; memory_limit=256M; max_execution_time=300; max_input_time=300"
 </IfModule>
 
 # Security headers for file uploads
@@ -60,19 +50,4 @@
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
-</IfModule>
-
-
-# ENHANCED PHP UPLOAD SETTINGS - AUTO GENERATED
-<IfModule mod_php.c>
-    php_value upload_max_filesize 100M
-    php_value post_max_size 120M
-    php_value max_execution_time 600
-    php_value memory_limit 512M
-    php_value max_input_time 600
-    php_value max_input_vars 5000
-    php_value file_uploads On
-</IfModule>
-<IfModule mod_fcgid.c>
-    FcgidMaxRequestLen 125829120
 </IfModule>

@@ -32,27 +32,24 @@ return [
         'image/webp'
     ],
 
-
-
     /*
      * PHP ini settings for file uploads - handled in AppServiceProvider
      */
     'php_settings' => [
-        'upload_max_filesize' => '100M',
-        'post_max_size' => '120M',
-        'memory_limit' => '512M',
-        'max_execution_time' => 600,
-        'max_input_time' => 600,
+        'upload_max_filesize' => '25M',
+        'post_max_size' => '30M',
+        'memory_limit' => '256M',
+        'max_execution_time' => 300,
+        'max_input_time' => 300,
     ],
 
     /*
      * Image processing settings
      */
     'image_processing' => [
-        'max_width' => 6000,  // Daha yüksek çözünürlük için artırıldı
-        'max_height' => 6000, // Daha yüksek çözünürlük için artırıldı
-        'quality' => 90,      // Daha yüksek kalite
+        'max_width' => 2000,
+        'max_height' => 2000,
+        'quality' => 85,
         'auto_orient' => true,
-        'preserve_metadata' => false, // Dosya boyutunu düşürmek için
     ],
 ];
