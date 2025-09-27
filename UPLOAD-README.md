@@ -6,8 +6,8 @@ Sistem **20MB maksimum dosya boyutu** ile çalışır.
 
 ### Filament Resources
 
--   **OneriResource**: `maxSize(20480)` - 20MB limit
--   **CategoryResource**: `maxSize(20480)` - 20MB limit
+-   **OneriResource**: `maxSize(20480)` - 20MB limit (sadece resim)
+-   **CategoryResource**: `maxSize(20480)` - 20MB limit (sadece resim)
 
 ### Config Dosyları
 
@@ -94,4 +94,5 @@ php artisan optimize:clear
 ## 🎯 **Sonuç**
 
 ✅ Uygulama kodu hazır - 20MB limit aktif  
+📸 Sadece resim dosyaları (JPEG, JPG, PNG, WebP)  
 ⚠️ Sunucu ayarları gerekli - yukarıdaki adımları takip edin

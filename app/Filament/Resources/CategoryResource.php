@@ -118,10 +118,10 @@ class CategoryResource extends Resource
                     ->collection('project_files')
                     ->multiple()
                     ->maxSize(20480) // 20MB limit
-                    ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'])
+                    ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
                     ->panelLayout('compact')
                     ->required()
-                    ->helperText('Maksimum dosya boyutu: 20MB per dosya')
+                    ->helperText('Sadece resim dosyaları. Maksimum dosya boyutu: 20MB')
                     ->imageResizeMode('contain')
                     ->imageResizeTargetWidth('2000')
                     ->imageResizeTargetHeight('2000')

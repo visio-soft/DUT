@@ -23,29 +23,16 @@ return [
     'max_file_size_bytes' => 20 * 1024 * 1024, // 20MB
 
     /*
-     * Allowed image types
+     * Allowed image types - Sadece temel resim formatları
      */
     'allowed_image_types' => [
         'image/jpeg',
         'image/jpg',
         'image/png',
-        'image/webp',
-        'image/gif',
-        'image/bmp',
-        'image/svg+xml'
+        'image/webp'
     ],
 
-    /*
-     * Allowed document types
-     */
-    'allowed_document_types' => [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain'
-    ],
+
 
     /*
      * PHP ini settings for file uploads - handled in AppServiceProvider

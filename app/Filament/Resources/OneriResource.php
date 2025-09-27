@@ -100,7 +100,7 @@ class OneriResource extends Resource
                             ->maxFiles(1)
                             ->maxSize(20480) // 20MB limit
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->helperText('Maksimum dosya boyutu: 20MB')
+                            ->helperText('Sadece resim dosyaları. Maksimum dosya boyutu: 20MB')
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('2000')
                             ->imageResizeTargetHeight('2000')
