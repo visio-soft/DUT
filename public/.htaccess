@@ -24,10 +24,10 @@
     RewriteRule ^ index.php [L]
 </IfModule>
 
-# PHP upload optimizations for high-resolution image uploads
+# PHP upload optimizations for image uploads
 <IfModule mod_php.c>
-    php_value upload_max_filesize 50M
-    php_value post_max_size 60M
+    php_value upload_max_filesize 25M
+    php_value post_max_size 30M
     php_value max_execution_time 300
     php_value memory_limit 256M
     php_value max_input_time 300
@@ -36,12 +36,12 @@
 
 # For PHP-FPM (if .htaccess php_value doesn't work)
 <IfModule mod_fcgid.c>
-    FcgidMaxRequestLen 62914560
+    FcgidMaxRequestLen 31457280
 </IfModule>
 
 # Additional PHP-FPM configuration
 <IfModule mod_env.c>
-    SetEnv PHP_VALUE "upload_max_filesize=50M; post_max_size=60M; memory_limit=256M; max_execution_time=300; max_input_time=300"
+    SetEnv PHP_VALUE "upload_max_filesize=25M; post_max_size=30M; memory_limit=256M; max_execution_time=300; max_input_time=300"
 </IfModule>
 
 # Security headers for file uploads

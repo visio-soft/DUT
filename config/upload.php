@@ -15,44 +15,29 @@ return [
     /*
      * Maximum file size in megabytes
      */
-    'max_file_size_mb' => 50,
+    'max_file_size_mb' => 20,
 
     /*
      * Maximum file size in bytes (calculated from MB)
      */
-    'max_file_size_bytes' => 50 * 1024 * 1024, // 50MB
+    'max_file_size_bytes' => 20 * 1024 * 1024, // 20MB
 
     /*
-     * Allowed image types
+     * Allowed image types - Sadece temel resim formatları
      */
     'allowed_image_types' => [
         'image/jpeg',
         'image/jpg',
         'image/png',
-        'image/webp',
-        'image/gif',
-        'image/bmp',
-        'image/svg+xml'
-    ],
-
-    /*
-     * Allowed document types
-     */
-    'allowed_document_types' => [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain'
+        'image/webp'
     ],
 
     /*
      * PHP ini settings for file uploads - handled in AppServiceProvider
      */
     'php_settings' => [
-        'upload_max_filesize' => '50M',
-        'post_max_size' => '60M',
+        'upload_max_filesize' => '25M',
+        'post_max_size' => '30M',
         'memory_limit' => '256M',
         'max_execution_time' => 300,
         'max_input_time' => 300,
@@ -62,8 +47,8 @@ return [
      * Image processing settings
      */
     'image_processing' => [
-        'max_width' => 4000,
-        'max_height' => 4000,
+        'max_width' => 2000,
+        'max_height' => 2000,
         'quality' => 85,
         'auto_orient' => true,
     ],

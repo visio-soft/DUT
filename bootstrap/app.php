@@ -13,9 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies('*');
 
-        // Global middleware for file upload limits
-        $middleware->append(App\Http\Middleware\HandleFileUploadLimits::class);
-
         $middleware->alias([
             'guest' => App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
