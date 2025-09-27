@@ -90,7 +90,7 @@ class OneriResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
 
-                        // Resim upload - Spatie Media Library ile
+                        // Resim upload
                         SpatieMediaLibraryFileUpload::make('images')
                             ->label('Öneri Tasarım Görseli')
                             ->collection('images')
@@ -98,11 +98,10 @@ class OneriResource extends Resource
                             ->imagePreviewHeight('200')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
-                            ->maxSize(51200) // 50MB in KB
+                            ->maxSize(20480) // 20MB limit
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->helperText('Maksimum dosya boyutu: 50MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP. Yüksek çözünürlüklü resimler desteklenir.')
+                            ->helperText('Maksimum dosya boyutu: 20MB')
                             ->imageResizeMode('contain')
-                            ->imageCropAspectRatio(null)
                             ->imageResizeTargetWidth('2000')
                             ->imageResizeTargetHeight('2000')
                             ->columnSpanFull(),
