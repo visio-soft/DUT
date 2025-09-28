@@ -1310,15 +1310,17 @@
                                 <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $suggestion->title }}</h2>
                             </div>
 
+                            @if($suggestion->createdBy)
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <!-- profile/user icon (matching projects) -->
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                    Öneren: {{ $suggestion->createdBy->name ?? 'Anonim' }}
+                                    Öneren: {{ $suggestion->createdBy->name }}
                                 </span>
                             </div>
+                            @endif
 
                             @if($suggestion->description)
                             <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.5;">

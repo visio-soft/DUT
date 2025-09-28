@@ -122,7 +122,9 @@
                                                 </p>
                                             @endif
                                             <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                                <span>{{ $suggestion->createdBy->name ?? 'Anonim' }}</span>
+                                                @if($suggestion->createdBy)
+                                                <span>{{ $suggestion->createdBy->name }}</span>
+                                                @endif
                                                 <span>{{ $suggestion->created_at->format('d.m.Y') }}</span>
                                                 @if($suggestion->likes_count > 0)
                                                     <span class="flex items-center">
@@ -156,10 +158,12 @@
                         </div>
 
                         <!-- Creator -->
+                        @if($project->createdBy)
                         <div>
                             <span class="text-sm font-medium text-gray-500">Oluşturan</span>
-                            <p class="text-sm text-gray-900 mt-1">{{ $project->createdBy->name ?? 'Anonim' }}</p>
+                            <p class="text-sm text-gray-900 mt-1">{{ $project->createdBy->name }}</p>
                         </div>
+                        @endif
 
                         @if($project->start_date || $project->end_date)
                             <!-- Project Timeline -->
