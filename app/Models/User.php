@@ -61,13 +61,23 @@ class User extends Authenticatable implements FilamentUser
         if ($panel->getId() === 'admin') {
             return $this->hasAnyRole(['admin', 'super_admin']);
         }
-        
+
         return true;
     }
 
     public function oneriComments(): HasMany
     {
         return $this->hasMany(OneriComment::class);
+    }
+
+    public function createdOneriler(): HasMany
+    {
+        return $this->hasMany(Oneri::class, 'created_by_id');
+    }
+
+    public function updatedOneriler(): HasMany
+    {
+        return $this->hasMany(Oneri::class, 'updated_by_id');
     }
 
     // Design functionality removed - projectDesignLikes relationship no longer needed

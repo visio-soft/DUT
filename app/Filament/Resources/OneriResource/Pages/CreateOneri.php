@@ -13,7 +13,12 @@ class CreateOneri extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['created_by_id'] = Auth::id();
+        // Admin panelinde created_by_id manuel olarak seçilmişse onu kullan
+        // Eğer seçilmemişse (null) boş bırak (anonim öneri olur)
+        // Eğer hiç değer yoksa mevcut admin kullanıcısını ata
+        if (!array_key_exists('created_by_id', $data)) {
+            $data['created_by_id'] = Auth::id();
+        }
 
         // Ensure category_id is set
         if (empty($data['category_id'])) {

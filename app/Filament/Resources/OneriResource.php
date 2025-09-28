@@ -53,6 +53,13 @@ class OneriResource extends Resource
                                 return Category::first()?->id;
                             })
                             ->placeholder('Proje kategorisi seçin'),
+                        Forms\Components\Select::make('created_by_id')
+                            ->label('Öneriyi Oluşturan Kullanıcı')
+                            ->relationship('createdBy', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Kullanıcı seçin (boş bırakılırsa anonim)')
+                            ->helperText('Bu alanı boş bırakırsanız öneri anonim olarak görünecektir'),
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
                             ->required()
@@ -122,6 +129,13 @@ class OneriResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('createdBy.name')
+                    ->label('Oluşturan')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('Anonim')
+                    ->badge()
+                    ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
@@ -155,6 +169,21 @@ class OneriResource extends Resource
                 SelectFilter::make('category')
                     ->label('Kategori')
                     ->relationship('category', 'name'),
+
+                SelectFilter::make('creator_type')
+                    ->label('Oluşturan Tür')
+                    ->options([
+                        'with_user' => 'Kullanıcı Atanmış',
+                        'anonymous' => 'Anonim',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
+                        if ($value === 'with_user') {
+                            $query->whereNotNull('created_by_id');
+                        } elseif ($value === 'anonymous') {
+                            $query->whereNull('created_by_id');
+                        }
+                    }),
 
                 // Konum filtresi: İlçe ve Mahalle dropdownları
                 Filter::make('location')

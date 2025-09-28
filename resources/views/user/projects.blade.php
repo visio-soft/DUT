@@ -219,7 +219,7 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        
+
         .tree-view {
             position: sticky;
             top: 2rem;
@@ -260,7 +260,7 @@
         .stat-label {
             font-size: 0.875rem;
         }
-        
+
         .main-content-grid {
             grid-template-columns: 1fr;
             gap: 1rem;
@@ -272,18 +272,18 @@
         width: 100%;
         min-width: 0; /* Allow shrinking */
     }
-    
+
     .project-card-wrapper {
         width: 100%;
         max-width: none;
     }
-    
+
     .main-content-grid .user-card {
         width: 100%;
         max-width: none;
         margin: 0;
     }
-    
+
     /* Ensure grid takes full available space */
     .main-content-grid {
         width: 100%;
@@ -500,14 +500,16 @@
                                 <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $project->name }}</h2>
                             </div>
 
+                            @if($project->createdBy)
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                    Proje Yöneticisi: {{ $project->createdBy->name ?? 'Anonim' }}
+                                    Proje Yöneticisi: {{ $project->createdBy->name }}
                                 </span>
                             </div>
+                            @endif
 
                             <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.5;">
                                 <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
@@ -603,14 +605,16 @@
                                                 <h4 style="font-size: 1rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.2;">{{ $suggestion->title }}</h4>
                                             </div>
 
+                                            @if($suggestion->createdBy)
                                             <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
                                                 <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                                 </svg>
                                                 <span style="font-size: 0.75rem; color: rgba(255,255,255,0.8); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                                    {{ $suggestion->createdBy->name ?? 'Anonim' }}
+                                                    {{ $suggestion->createdBy->name }}
                                                 </span>
                                             </div>
+                                            @endif
 
                                             <p style="font-size: 0.875rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                                 <svg style="width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
