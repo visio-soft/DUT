@@ -40,7 +40,7 @@
 *.docx
 *.zip
 *.rar
-
+composer.lock
 # Test files
 test-*.jpg
 test-*.png
