@@ -27,11 +27,13 @@ Route::get('/debug-upload', function () {
     ]);
 })->name('debug.upload');
 
-// User Panel Routes
-Route::get('/', [UserController::class, 'index'])->name('user.index');
-Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
-Route::get('/projects/{id}/suggestions', [UserController::class, 'projectSuggestions'])->name('user.project.suggestions');
-Route::get('/suggestions/{id}', [UserController::class, 'suggestionDetail'])->name('user.suggestion.detail');
+// User Panel Routes - Require Authentication
+Route::middleware('auth')->group(function () {
+    Route::get('/', [UserController::class, 'index'])->name('user.index');
+    Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
+    Route::get('/projects/{id}/suggestions', [UserController::class, 'projectSuggestions'])->name('user.project.suggestions');
+    Route::get('/suggestions/{id}', [UserController::class, 'suggestionDetail'])->name('user.suggestion.detail');
+});
 
 // User Authentication Routes
 Route::middleware('guest')->group(function () {

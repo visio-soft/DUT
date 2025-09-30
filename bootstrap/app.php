@@ -16,6 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guest' => App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
+
+        // Configure authentication redirects
+        $middleware->redirectGuestsTo('/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Spatie Media Library resim işleme hatalarını yakala
