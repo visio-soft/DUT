@@ -103,6 +103,8 @@ return [
     'terms_agreement' => 'Hesap oluşturarak :terms ve :privacy\'nı kabul etmiş olursunuz.',
     'terms_of_use' => 'Kullanım Şartları',
     'privacy_policy' => 'Gizlilik Politikası',
+    'project_suggestions' => 'Proje Önerileri',
+    'back_to_projects' => 'Projelere Dön',
     
     // Footer
     'footer_description' => 'Şehrimizi birlikte dönüştürmek için oluşturulmuş katılımcı demokrasi platformu',
