@@ -42,7 +42,7 @@
                 <a href="/signin" class="text-sm">Sign in</a>
                 <a href="/signup" class="text-sm">Sign up</a>
             </nav>
-            <button id="themeToggle" class="px-3 py-1 border rounded text-sm border-panel">Karanlık/Açık</button>
+            <button id="themeToggle" class="px-3 py-1 border rounded text-sm border-panel">Karanlık/Açık (Dark/Light)</button>
         </div>
     </div>
 </header>
