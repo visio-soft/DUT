@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+:root {
+    --green-600: #16a34a;
+    --green-700: #15803d;
+    --green-800: #166534;
+}
+</style>
 <div class="min-h-screen bg-gray-50">
     <!-- Header Section -->
     <div class="bg-white shadow-sm border-b">
@@ -171,7 +178,7 @@
                         <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Yorum Ekle
+                        Yorum Ekle (Add Comment)
                     </h3>
 
                     <!-- Success/Error Messages -->
@@ -277,11 +284,15 @@
                                 Tüm yorumlar onaylandıktan sonra görünür olur
                             </div>
                             <button type="submit"
-                                    class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
+                                    style="background-color: var(--green-600); color: white; padding: 0.5rem 1.5rem; border-radius: 0.375rem; transition: all 0.2s;"
+                                    onmouseover="this.style.backgroundColor='var(--green-700)'" 
+                                    onmouseout="this.style.backgroundColor='var(--green-600)'"
+                                    onfocus="this.style.outline='2px solid var(--green-500)'; this.style.outlineOffset='2px'"
+                                    onblur="this.style.outline='none'">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                                 </svg>
-                                Yorum Gönder
+                                Yorum Gönder (Submit Comment)
                             </button>
                         </div>
                     </form>
@@ -334,17 +345,21 @@
 
                         <!-- Action Buttons -->
                         <div class="pt-4 border-t border-gray-200 space-y-2">
-                            <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                Öneriyi Beğen
+                            <button style="width: 100%; padding: 0.5rem 1rem; background-color: var(--green-600); color: white; border-radius: 0.375rem; transition: all 0.2s;"
+                                    onmouseover="this.style.backgroundColor='var(--green-700)'" 
+                                    onmouseout="this.style.backgroundColor='var(--green-600)'">
+                                Öneriyi Beğen (Like Suggestion)
                             </button>
                             <button onclick="document.getElementById('comment').focus(); document.getElementById('comment').scrollIntoView({behavior: 'smooth'});"
                                     class="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                                Yorum Yap
+                                Yorum Yap (Write Comment)
                             </button>
                             @if($suggestion->project)
                                 <a href="{{ route('public.projects.show', $suggestion->project->id) }}"
-                                   class="block w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-center">
-                                    Projeyi Görüntüle
+                                   style="display: block; width: 100%; padding: 0.5rem 1rem; background-color: var(--green-700); color: white; border-radius: 0.375rem; transition: all 0.2s; text-align: center; text-decoration: none;"
+                                   onmouseover="this.style.backgroundColor='var(--green-800)'" 
+                                   onmouseout="this.style.backgroundColor='var(--green-700)'">
+                                    Projeyi Görüntüle (View Project)
                                 </a>
                             @endif
                         </div>

@@ -1,6 +1,13 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+:root {
+    --green-600: #16a34a;
+    --green-700: #15803d;
+    --green-800: #166534;
+}
+</style>
 <div class="min-h-screen bg-gray-50">
     <!-- Header Section -->
     <div class="bg-white shadow-sm border-b">
@@ -192,11 +199,13 @@
 
                         <!-- Action Buttons -->
                         <div class="pt-4 border-t border-gray-200 space-y-2">
-                            <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                Projeyi Beğen
+                            <button style="width: 100%; padding: 0.5rem 1rem; background-color: var(--green-600); color: white; border-radius: 0.375rem; transition: all 0.2s;"
+                                    onmouseover="this.style.backgroundColor='var(--green-700)'" 
+                                    onmouseout="this.style.backgroundColor='var(--green-600)'">
+                                Projeyi Beğen (Like Project)
                             </button>
                             <button class="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                                Öneri Ekle
+                                Öneri Ekle (Add Suggestion)
                             </button>
                         </div>
                     </div>
