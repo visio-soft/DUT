@@ -2348,6 +2348,17 @@ h6 { font-size: 1rem; font-weight: 500; }
     display: inline-flex;
     align-items: center;
     cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius-md);
+    transition: var(--transition-normal);
+    background: transparent;
+    color: #053640;
+    font-weight: 500;
+}
+
+.language-selector-button:hover {
+    background-color: rgba(26, 191, 107, 0.1);
+    color: #1ABF6B;
 }
 
 .language-selector-dropdown {
@@ -2359,7 +2370,7 @@ h6 { font-size: 1rem; font-weight: 500; }
     background: #ffffff;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-lg);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(26, 191, 107, 0.2);
     z-index: 60;
 }
 
