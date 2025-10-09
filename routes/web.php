@@ -3,7 +3,11 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\LanguageController;
 use App\Http\Middleware\HandleFileUploadLimits;
+
+// Language switching route
+Route::get('/language/{locale}', [LanguageController::class, 'switch'])->name('language.switch');
 
 // Debug route for upload issues
 Route::get('/debug-upload', function () {

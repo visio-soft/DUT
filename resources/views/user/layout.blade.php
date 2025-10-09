@@ -97,15 +97,29 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                         </svg>
-                        Ana Sayfa
+                        {{ __('messages.home') }}
                     </a>
                     <a href="{{ route('user.projects') }}"
                        class="user-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                         </svg>
-                        Projeler
+                        {{ __('messages.projects') }}
                     </a>
+
+                    <!-- Language Switcher -->
+                    <div class="flex items-center ml-2" style="gap: 0.25rem;">
+                        <a href="{{ route('language.switch', 'tr') }}" 
+                           class="language-btn {{ app()->getLocale() == 'tr' ? 'active' : '' }}"
+                           title="Türkçe">
+                            TR
+                        </a>
+                        <a href="{{ route('language.switch', 'en') }}" 
+                           class="language-btn {{ app()->getLocale() == 'en' ? 'active' : '' }}"
+                           title="English">
+                            EN
+                        </a>
+                    </div>
 
                     @auth
                         <div class="flex items-center space-x-3">
@@ -113,7 +127,7 @@
                                 <svg class="w-5 h-5 mr-2" style="color: #1ABF6B;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
-                                <span class="text-sm" style="color: #053640;">Merhaba, {{ Auth::user()->name }}</span>
+                                <span class="text-sm" style="color: #053640;">{{ __('messages.hello') }}, {{ Auth::user()->name }}</span>
                             </div>
                             <form method="POST" action="{{ route('user.logout') }}" style="display: inline;">
                                 @csrf
@@ -131,13 +145,13 @@
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
                                 </svg>
-                                Giriş
+                                {{ __('messages.login') }}
                             </a>
                             <a href="{{ route('user.register') }}" class="auth-btn auth-btn-register">
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
                                 </svg>
-                                Kayıt
+                                {{ __('messages.register') }}
                             </a>
                         </div>
                     @endauth
@@ -161,13 +175,30 @@
                             Projeler
                         </a>
 
+                        <!-- Mobile Language Switcher -->
+                        <div class="mobile-nav-link" style="padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m10.5 21 5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 0 1 6-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 0 1-3.827-5.802"/>
+                            </svg>
+                            <div style="display: flex; gap: 0.25rem;">
+                                <a href="{{ route('language.switch', 'tr') }}" 
+                                   class="language-btn-mobile {{ app()->getLocale() == 'tr' ? 'active' : '' }}">
+                                    TR
+                                </a>
+                                <a href="{{ route('language.switch', 'en') }}" 
+                                   class="language-btn-mobile {{ app()->getLocale() == 'en' ? 'active' : '' }}">
+                                    EN
+                                </a>
+                            </div>
+                        </div>
+
                         @auth
                             <div class="mobile-auth-section">
                                 <div class="mobile-user-info">
                                     <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 1-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                     </svg>
-                                    <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
+                                    <span class="text-sm text-white/90">{{ __('messages.hello') }}, {{ Auth::user()->name }}</span>
                                 </div>
                                 <form method="POST" action="{{ route('user.logout') }}" class="w-full">
                                     @csrf
@@ -185,13 +216,13 @@
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
                                     </svg>
-                                    Giriş
+                                    {{ __('messages.login') }}
                                 </a>
                                 <a href="{{ route('user.register') }}" class="mobile-auth-btn mobile-auth-btn-register">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
                                     </svg>
-                                    Kayıt
+                                    {{ __('messages.register') }}
                                 </a>
                             </div>
                         @endauth
@@ -255,7 +286,7 @@
                             </div>
                         </div>
                         <p class="footer-description">
-                            Şehrimizi birlikte dönüştürmek için oluşturulmuş katılımcı demokrasi platformu
+                            {{ __('messages.footer_description') }}
                         </p>
                     </div>
 
