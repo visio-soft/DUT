@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', $project->name . ' Önerileri - DUT Vote')
+@section('title', $project->name . ' ' . __('user.suggestions') . ' - DUT Vote')
 
 @section('content')
 <!-- CSS Styles -->
@@ -1100,7 +1100,7 @@
                 </svg>
                 <div class="project-title-section">
                     <h1 class="project-title">{{ $project->name }}</h1>
-                    <p class="project-subtitle">Proje Önerileri</p>
+                    <p class="project-subtitle">{{ __('user.project_suggestions') }}</p>
                 </div>
             </div>
 
@@ -1128,7 +1128,7 @@
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                         </svg>
-                        Projelere Dön
+                        {{ __('user.back_to_projects') }}
                     </a>
                 </div>
 
@@ -1193,7 +1193,7 @@
                                 </div>
                                 <div style="font-size: 1rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }}; font-weight: 700;">
                                     @if($isExpired)
-                                        Süre Dolmuş - Beğeni Devre Dışı
+                                        {{ __('user.expired_likes_disabled') }}
                                     @elseif($remainingTime)
                                         {{ $remainingTime['formatted'] }} kaldı
                                     @else
@@ -1339,7 +1339,7 @@
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                     </svg>
-                                    {{ $suggestion->likes->count() }} Beğeni
+                                    {{ $suggestion->likes->count() }} {{ __('user.likes') }}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -1367,7 +1367,7 @@
                                         data-project-id="{{ $project->id }}"
                                         data-category="{{ $suggestion->category_id ?? 'default' }}"
                                         data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
-                                        title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)' }}"
+                                        title="{{ $isProjectExpired ? __('user.expired_no_likes') : __('user.only_one_like_per_category') }}"
                                         {{ $isProjectExpired ? 'disabled' : '' }}
                                     <svg class="like-icon like-icon-large" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
@@ -1380,7 +1380,7 @@
                                     <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                     </svg>
-                                    <span style="font-weight:600;">Detay</span>
+                                    <span style="font-weight:600;">{{ __('user.details') }}</span>
                                 </a>
                             </div>
                         </div>
@@ -1477,7 +1477,7 @@ function toggleLike(suggestionId) {
     }
 
     @guest
-        showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
+        showMessage('{{ __('user.must_login_to_like') }}', 'error');
         setTimeout(() => {
             window.location.href = '{{ route('user.login') }}';
         }, 2000);
@@ -1557,7 +1557,7 @@ function toggleLike(suggestionId) {
                     heartIcon.style.fill = 'none';
                 }
 
-                showMessage('Beğeni kaldırıldı.', 'info');
+                showMessage('{{ __('user.like_removed') }}', 'info');
             }
 
             // Update sidebar like counts
