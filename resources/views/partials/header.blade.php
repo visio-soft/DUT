@@ -11,6 +11,9 @@
 
         @if (Route::has('login'))
             <nav class="flex items-center space-x-2 sm:space-x-4">
+                <!-- Language Selector -->
+                <x-language-selector />
+                
                 @auth
                     <a
                         href="{{ url('/dashboard') }}"

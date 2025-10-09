@@ -107,6 +107,9 @@
                         Projeler
                     </a>
 
+                    <!-- Language Selector -->
+                    <x-language-selector />
+
                     @auth
                         <div class="flex items-center space-x-3">
                             <div class="flex items-center">

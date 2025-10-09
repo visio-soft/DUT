@@ -5,6 +5,14 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Middleware\HandleFileUploadLimits;
 
+// Language switching route
+Route::get('/language/{locale}', function ($locale) {
+    if (in_array($locale, ['tr', 'en'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('language.switch');
+
 // Debug route for upload issues
 Route::get('/debug-upload', function () {
     return response()->json([
