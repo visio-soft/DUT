@@ -89,7 +89,7 @@
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            <span class="text-sm text-gray-600">Oluşturulma:</span>
+                            <span class="text-sm text-gray-600">{{ __('common.creation') }}:</span>
                             <span class="font-medium">{{ $project->created_at->format('d.m.Y H:i') }}</span>
                         </div>
                     </div>
@@ -174,7 +174,7 @@
                                         <p>Başlangıç: {{ \Carbon\Carbon::parse($project->start_date)->format('d.m.Y') }}</p>
                                     @endif
                                     @if($project->end_date)
-                                        <p>Bitiş: {{ \Carbon\Carbon::parse($project->end_date)->format('d.m.Y') }}</p>
+                                        <p>{{ __('common.project_end') }}: {{ \Carbon\Carbon::parse($project->end_date)->format('d.m.Y') }}</p>
                                     @endif
                                 </div>
                             </div>

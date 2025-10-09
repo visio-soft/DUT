@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', $project->name . ' Önerileri - DUT Vote')
+@section('title', $project->name . ' ' . __('common.suggestions_title_suffix') . ' - DUT Vote')
 
 @section('content')
 <!-- CSS Styles -->
@@ -1100,7 +1100,7 @@
                 </svg>
                 <div class="project-title-section">
                     <h1 class="project-title">{{ $project->name }}</h1>
-                    <p class="project-subtitle">Proje Önerileri</p>
+                    <p class="project-subtitle">{{ __('common.project_suggestions') }}</p>
                 </div>
             </div>
 
@@ -1122,7 +1122,7 @@
                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
                         </svg>
-                        İstatistikler
+                        {{ __('common.statistics') }}
                     </h2>
                     <a href="{{ route('user.projects') }}" class="stats-back-btn">
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1143,7 +1143,7 @@
                         </div>
                     </div>
                     <h3 class="stat-number blue">{{ $totalSuggestions }}</h3>
-                    <p class="stat-label">Toplam Öneri</p>
+                    <p class="stat-label">{{ __('common.total_suggestions_count') }}</p>
                 </div>
 
                 <!-- Total Likes Card -->
@@ -1156,7 +1156,7 @@
                         </div>
                     </div>
                     <h3 class="stat-number red">{{ $totalLikes }}</h3>
-                    <p class="stat-label">Toplam Beğeni</p>
+                    <p class="stat-label">{{ __('common.total_likes_count') }}</p>
                 </div>
 
                 <!-- Total Comments Card -->
@@ -1169,7 +1169,7 @@
                         </div>
                     </div>
                     <h3 class="stat-number yellow">{{ $totalComments }}</h3>
-                    <p class="stat-label">Toplam Yorum</p>
+                    <p class="stat-label">{{ __('common.total_comments_count') }}</p>
                 </div>
                 </div>
                 </div>
@@ -1189,15 +1189,15 @@
                             </svg>
                             <div style="text-align: left;">
                                 <div style="font-size: 0.875rem; color: {{ $isExpired ? 'var(--red-700)' : 'var(--green-700)' }}; font-weight: 500;">
-                                    Proje Bitiş: {{ $project->end_datetime->format('d.m.Y H:i') }}
+                                    {{ __('common.project_end') }}: {{ $project->end_datetime->format('d.m.Y H:i') }}
                                 </div>
                                 <div style="font-size: 1rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }}; font-weight: 700;">
                                     @if($isExpired)
-                                        Süre Dolmuş - Beğeni Devre Dışı
+                                        {{ __('common.expired_voting_disabled') }}
                                     @elseif($remainingTime)
-                                        {{ $remainingTime['formatted'] }} kaldı
+                                        {{ $remainingTime['formatted'] }} {{ __('common.time_remaining') }}
                                     @else
-                                        Süresiz
+                                        {{ __('common.unlimited_time') }}
                                     @endif
                                 </div>
                             </div>
@@ -1219,7 +1219,7 @@
                         <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                         </svg>
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Öneri Listesi</h3>
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.suggestion_list') }}</h3>
                     </div>
 
                     <!-- Info about voting system -->
@@ -1230,10 +1230,10 @@
                             </svg>
                             <div>
                                 <p style="font-size: 0.75rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
-                                    <strong>Oylama Sistemi:</strong> Bu proje kategorisinde sadece bir öneri için oy kullanabilirsiniz.
+                                    {{ __('common.voting_system_info') }}
                                 </p>
                                 <p style="font-size: 0.7rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
-                                    Seçiminizi değiştirmek için başka bir öneriye tıklayın. ○ işareti mevcut seçiminizi gösterir.
+                                    {{ __('common.voting_system_change_info') }}
                                 </p>
                             </div>
                         </div>
@@ -1339,7 +1339,7 @@
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                     </svg>
-                                    {{ $suggestion->likes->count() }} Beğeni
+                                    {{ $suggestion->likes->count() }} {{ __('common.likes') }}
                                 </div>
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -1407,7 +1407,7 @@
                     <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
                     </svg>
-                    İlk önerilerin eklenmesi bekleniyor.
+                    {{ __('common.waiting_for_first_projects') }}
                 </p>
             </div>
         </div>
@@ -1477,7 +1477,7 @@ function toggleLike(suggestionId) {
     }
 
     @guest
-        showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
+        showMessage('{{ __('common.login_required_like') }}', 'error');
         setTimeout(() => {
             window.location.href = '{{ route('user.login') }}';
         }, 2000);
@@ -1557,7 +1557,7 @@ function toggleLike(suggestionId) {
                     heartIcon.style.fill = 'none';
                 }
 
-                showMessage('Beğeni kaldırıldı.', 'info');
+                showMessage('{{ __('common.like_removed') }}', 'info');
             }
 
             // Update sidebar like counts

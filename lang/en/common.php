@@ -12,7 +12,7 @@ return [
     'turkish' => 'Türkçe',
     'english' => 'English',
     'language' => 'Language',
-    
+
     // Footer translations
     'platform' => 'Platform',
     'about' => 'About',
@@ -22,7 +22,7 @@ return [
     'participatory_platform' => 'A participatory democracy platform created to transform our city together',
     'driving_urban' => 'Driving Urban',
     'transformation' => 'Transformation',
-    
+
     // Page content
     'explore_projects' => 'Explore Projects',
     'featured_projects' => 'Featured Projects',
@@ -30,12 +30,12 @@ return [
     'all_projects' => 'All Projects',
     'back_to_home' => 'Back to Home',
     'back_to_projects' => 'Back to Projects',
-    
+
     // Hero section
     'transform_city_together' => 'Transform the City <span style="color: var(--green-700);">Together</span>',
     'hero_description' => 'Create projects, share suggestions, and identify the best ideas together to make our city more beautiful and livable.',
     'more_info' => 'More Info',
-    
+
     // Projects
     'featured_projects_description' => 'The most popular projects and creative suggestions that will transform our city',
     'project_image' => 'Project Image',
@@ -47,13 +47,13 @@ return [
     'view_project' => 'View Project',
     'no_projects_yet' => 'No projects yet',
     'waiting_for_first_projects' => 'Waiting for the first projects to be added.',
-    
+
     // Statistics
     'general_statistics' => 'General Statistics',
     'total_projects' => 'Total Projects',
     'total_suggestions' => 'Total Suggestions',
     'total_likes' => 'Total Likes',
-    
+
     // Project list
     'project_list' => 'Project List',
     'voting_system' => 'Voting System',
@@ -64,4 +64,112 @@ return [
     'suggestion_liked' => '✓ Suggestion liked! You can like only one suggestion in this category.',
     'project_expired_message' => 'Project deadline has passed - Cannot like',
     'suggestion_like_tooltip' => 'Only one suggestion can be liked in this category (Radio button logic)',
+
+    // Auth pages
+    'email_address' => 'Email Address',
+    'password' => 'Password',
+    'remember_me' => 'Remember Me',
+    'dont_have_account' => 'Don\'t have an account yet?',
+    'create_account' => 'Create Account',
+    'full_name' => 'Full Name',
+    'password_confirmation' => 'Confirm Password',
+    'terms_agreement' => 'By creating an account, you agree to our',
+    'terms_of_service' => 'Terms of Service',
+    'privacy_policy' => 'Privacy Policy',
+    'and' => 'and',
+    'already_have_account' => 'Already have an account?',
+    'join_transform_city' => 'Join us to transform our city together',
+    'account_benefits' => 'Log in to your account to access all platform features',
+    'at_least_6_chars' => 'At least 6 characters',
+    'confirm_password' => 'Confirm your password',
+    'name_surname_placeholder' => 'Your name and surname',
+    'error' => 'Error',
+
+    // Project suggestions page
+    'project_suggestions' => 'Project Suggestions',
+    'statistics' => 'Statistics',
+    'total_suggestions_count' => 'Total Suggestions',
+    'total_likes_count' => 'Total Likes',
+    'total_comments_count' => 'Total Comments',
+    'suggestion_list' => 'Suggestion List',
+    'project_end' => 'Project End',
+    'expired_voting_disabled' => 'Expired - Voting Disabled',
+    'unlimited_time' => 'Unlimited',
+
+    // Project details
+    'detail' => 'Detail',
+    'details' => 'Details',
+    'suggestion_details' => 'Suggestion Details',
+    'end_date' => 'End Date',
+    'comments' => 'Comments',
+    'comment' => 'Comment',
+    'pending' => 'pending',
+    'anonymous' => 'Anonymous',
+    'you_need_to_login' => 'You need to log in to like',
+    'you_need_to_login_comment' => 'You must log in to comment',
+    'login_required_like' => 'You need to log in to like.',
+    'login_required_comment' => 'You must log in to comment',
+    'log_in' => 'Log In',
+    'login_for_like_reply' => 'For like and reply •',
+
+    // Voting and interaction
+    'voting_system_info' => 'Voting System: You can vote for only one suggestion in this project category.',
+    'voting_system_change_info' => 'Click another suggestion to change your choice. The ○ mark shows your current selection.',
+
+    // Like messages
+    'project_expired_no_like' => 'This project has expired. No more likes can be made.',
+    'suggestion_liked_success' => '✓ Suggestion liked! You can like only one suggestion in this category.',
+    'like_removed' => 'Like removed.',
+    'comment_liked' => 'Comment liked!',
+    'like_error' => 'An error occurred during the like process.',
+    'likes' => 'likes',
+    'like' => 'like',
+    'project_expired_tooltip' => 'Project expired - Cannot like',
+    'suggestion_like_category_tooltip' => 'Only one suggestion can be liked in this category',
+
+    // Additional translations for suggestions page
+    'suggestions_title_suffix' => 'Suggestions', // For "Project Name Suggestions" in page title
+    'all_projects_button' => 'All Projects',
+    'back_to_project' => 'Back to Project',
+    'creation_date' => 'Created',
+    'created_date' => 'Creation Date',
+    'creation' => 'Creation',
+    'time_remaining' => 'remaining', // For time countdown like "5 days remaining"
+
+    // Comment and reply translations
+    'write_your_comment' => 'Write Your Comment',
+    'submit_comment' => 'Submit Comment',
+    'reply' => 'Reply',
+    'replies' => 'replies',
+    'reply_to_user' => 'reply to',
+    'write_reply_to' => 'Write a reply to',
+    'sending' => 'Sending...',
+    'replying' => 'Replying...',
+    'comment_sent_success' => 'Your comment has been sent successfully. It will be displayed after approval.',
+    'reply_sent_success' => 'Your reply has been sent successfully. It will be displayed after approval.',
+    'comment_send_error' => 'An error occurred while sending the comment.',
+    'reply_send_error' => 'An error occurred while sending the reply.',
+    'please_enter_comment' => 'Please enter comment content.',
+    'please_enter_reply' => 'Please enter reply content.',
+    'this_user' => 'This user',
+    'comment_or_reply_pending' => 'This comment will be visible to everyone after approval.',
+    'comment_pending' => 'This comment will be visible to everyone after approval.',
+    'reply_pending' => 'This reply will be visible to everyone after approval.',
+    'cancel' => 'Cancel',
+    'description' => 'Description',
+    'clear' => 'Clear',
+    'project' => 'Project',
+    'like_button' => 'Like',
+    'time_expired' => 'Time Expired',
+    'total_comments' => 'Total Comments',
+    'recent_likes' => 'Recent Likes',
+    'back_to_project' => 'Back to Project',
+    'all_projects_button' => 'All Projects',
+    'project_expired_no_like' => 'The project has expired and cannot be liked.',
+    'login_required_like' => 'You need to log in to like.',
+    'suggestion_liked_success' => 'Suggestion liked successfully!',
+    'like_removed' => 'Like removed.',
+    'pending_approval' => 'Pending Approval',
+    'you' => 'You',
+    'language' => 'Language',
 ];

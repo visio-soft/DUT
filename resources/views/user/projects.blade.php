@@ -561,7 +561,7 @@
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                     </svg>
-                                    Bitiş: {{ $project->end_datetime->format('d.m.Y H:i') }}
+                                    {{ __('common.project_end') }}: {{ $project->end_datetime->format('d.m.Y H:i') }}
                                 </div>
                                 @endif
 
@@ -656,7 +656,7 @@
                                                 <svg style="width: 0.75rem; height: 0.75rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
                                                 </svg>
-                                                <span>{{ $suggestion->comments->count() }} Yorum</span>
+                                                <span>{{ $suggestion->comments->count() }} {{ __('common.comment') }}</span>
                                             </div>
                                         </div>
 
@@ -692,7 +692,7 @@
                                                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                                 </svg>
-                                                Detay
+                                                {{ __('common.detail') }}
                                             </a>
                                         </div>
                                     </div>
@@ -1070,7 +1070,7 @@ function toggleLike(suggestionId) {
     }
 
     @guest
-        showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
+        showMessage('{{ __('common.login_required_like') }}', 'error');
         setTimeout(() => {
             window.location.href = '{{ route('user.login') }}';
         }, 2000);
@@ -1154,7 +1154,7 @@ function toggleLike(suggestionId) {
                     heartIcon.style.fill = 'none';
                 }
 
-                showMessage('Beğeni kaldırıldı.', 'info');
+                showMessage('{{ __('common.like_removed') }}', 'info');
             }
         },
         error: function(xhr) {

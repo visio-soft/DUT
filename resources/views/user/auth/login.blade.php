@@ -12,7 +12,7 @@
                     {{ __('common.login') }}
                 </h1>
                 <p style="color: var(--gray-600); font-size: 0.95rem;">
-                    Hesabınıza giriş yaparak platformun tüm özelliklerinden yararlanın
+                    {{ __('common.account_benefits') }}
                 </p>
             </div>
 
@@ -24,7 +24,7 @@
                             <svg style="width: 1.25rem; height: 1.25rem; display: inline; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
                             </svg>
-                            Hata
+                            {{ __('common.error') }}
                         </div>
                         <ul style="margin: 0; padding-left: 1.5rem;">
                             @foreach ($errors->all() as $error)
@@ -51,7 +51,7 @@
                     <!-- Email -->
                     <div>
                         <label for="email" style="display: block; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-                            E-posta Adresi
+                            {{ __('common.email_address') }}
                         </label>
                         <input
                             type="email"
@@ -69,7 +69,7 @@
                     <!-- Password -->
                     <div>
                         <label for="password" style="display: block; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-                            Şifre
+                            {{ __('common.password') }}
                         </label>
                         <input
                             type="password"
@@ -91,7 +91,7 @@
                                 name="remember"
                                 style="width: 1rem; height: 1rem; accent-color: var(--green-600); border-radius: 3px;"
                             >
-                            Beni hatırla
+                            {{ __('common.remember_me') }}
                         </label>
                     </div>
 
@@ -113,7 +113,7 @@
             <div class="user-card-actions" style="padding: 1.5rem; border-top: 1px solid var(--green-100); background: var(--green-50);">
                 <div class="text-center" style="width: 100%;">
                     <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">
-                        Henüz hesabınız yok mu?
+                        {{ __('common.dont_have_account') }}
                     </p>
                     <a
                         href="{{ route('user.register') }}"
@@ -123,7 +123,7 @@
                         <svg style="width: 1.125rem; height: 1.125rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM3 20a6 6 0 0 1 12 0v1H3v-1Z"/>
                         </svg>
-                        Hesap Oluştur
+                        {{ __('common.create_account') }}
                     </a>
                 </div>
             </div>
