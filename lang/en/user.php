@@ -33,14 +33,18 @@ return [
     
     // Projects Page
     'all_projects' => 'All Projects',
+    'general_statistics' => 'General Statistics',
     'total_projects' => 'Total Projects',
     'total_suggestions' => 'Total Suggestions',
     'total_likes' => 'Total Likes',
     'project_list' => 'Project List',
     'voting_system' => 'Voting System',
     'voting_system_desc' => 'You can only vote for one suggestion in each project category.',
+    'voting_change_hint' => 'To change your selection, click on another suggestion. ○ mark shows your current selection.',
     'all_suggestions' => 'All Suggestions',
     'project_manager' => 'Project Manager',
+    'end' => 'End',
+    'remaining_time' => 'Remaining',
     'expired_likes_disabled' => 'Expired - Likes Disabled',
     'suggestions_count' => 'Suggestions',
     'comments' => 'Comments',
@@ -53,6 +57,10 @@ return [
     'like_removed' => 'Like removed.',
     'error_occurred' => 'An error occurred',
     'error_liking' => 'An error occurred while liking.',
+    'selection_changed_from' => 'Your selection has been changed from',
+    'to' => 'to',
+    'suggestion_liked' => 'Suggestion liked! Only one suggestion can be liked in this category.',
+    'project_expired_no_likes' => 'This project has expired. No more likes can be made.',
     
     // Suggestion Detail
     'breadcrumb_home' => 'Home',

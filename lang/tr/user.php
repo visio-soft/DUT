@@ -33,14 +33,18 @@ return [
     
     // Projects Page
     'all_projects' => 'Tüm Projeler',
+    'general_statistics' => 'Genel İstatistikler',
     'total_projects' => 'Toplam Proje',
     'total_suggestions' => 'Toplam Öneri',
     'total_likes' => 'Toplam Beğeni',
     'project_list' => 'Proje Listesi',
     'voting_system' => 'Oylama Sistemi',
     'voting_system_desc' => 'Her proje kategorisinde sadece bir öneri için oy kullanabilirsiniz.',
+    'voting_change_hint' => 'Seçiminizi değiştirmek için başka bir öneriye tıklayın. ○ işareti mevcut seçiminizi gösterir.',
     'all_suggestions' => 'Tüm Öneriler',
     'project_manager' => 'Proje Yöneticisi',
+    'end' => 'Bitiş',
+    'remaining_time' => 'Kalan',
     'expired_likes_disabled' => 'Süre Dolmuş - Beğeni Devre Dışı',
     'suggestions_count' => 'Öneri',
     'comments' => 'Yorum',
@@ -53,6 +57,10 @@ return [
     'like_removed' => 'Beğeni kaldırıldı.',
     'error_occurred' => 'Bir hata oluştu',
     'error_liking' => 'Beğeni işlemi sırasında bir hata oluştu.',
+    'selection_changed_from' => 'Seçiminiz',
+    'to' => 'önerisinden',
+    'suggestion_liked' => 'Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.',
+    'project_expired_no_likes' => 'Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.',
     
     // Suggestion Detail
     'breadcrumb_home' => 'Ana Sayfa',
