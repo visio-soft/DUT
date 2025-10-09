@@ -93,6 +93,16 @@ return [
     'password_confirmation' => 'Şifre Tekrarı',
     'name' => 'Ad',
     'remember_me' => 'Beni hatırla',
+    'login_description' => 'Hesabınıza giriş yaparak platformun tüm özelliklerinden yararlanın',
+    'register_description' => 'Dönüşümün bir parçası olmak için yeni bir hesap oluşturun',
+    'create_account' => 'Hesap Oluştur',
+    'back_to_home' => 'Ana Sayfaya Dön',
+    'error' => 'Hata',
+    'password_confirmation_placeholder' => 'Şifrenizi tekrar giriniz',
+    'min_6_characters' => 'En az 6 karakter',
+    'terms_agreement' => 'Hesap oluşturarak :terms ve :privacy\'nı kabul etmiş olursunuz.',
+    'terms_of_use' => 'Kullanım Şartları',
+    'privacy_policy' => 'Gizlilik Politikası',
     
     // Footer
     'footer_description' => 'Şehrimizi birlikte dönüştürmek için oluşturulmuş katılımcı demokrasi platformu',

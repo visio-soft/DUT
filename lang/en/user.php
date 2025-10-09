@@ -93,6 +93,16 @@ return [
     'password_confirmation' => 'Password Confirmation',
     'name' => 'Name',
     'remember_me' => 'Remember me',
+    'login_description' => 'Login to your account to access all platform features',
+    'register_description' => 'Create a new account to become part of the transformation',
+    'create_account' => 'Create Account',
+    'back_to_home' => 'Back to Home',
+    'error' => 'Error',
+    'password_confirmation_placeholder' => 'Re-enter your password',
+    'min_6_characters' => 'At least 6 characters',
+    'terms_agreement' => 'By creating an account, you agree to the :terms and :privacy.',
+    'terms_of_use' => 'Terms of Use',
+    'privacy_policy' => 'Privacy Policy',
     
     // Footer
     'footer_description' => 'A participatory democracy platform created to transform our city together',
