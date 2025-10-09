@@ -104,6 +104,18 @@ return [
     
     // Misc
     'anonymous' => 'Anonim',
+    'suggestion_detail' => 'Öneri Detayı',
+    'suggestion_image' => 'Öneri Görseli',
+    'last_liked_by' => 'Son Beğenenler',
+    'reply' => 'Cevap',
+    'replies' => 'Cevaplar',
+    'reply_to_user' => 'kullanıcısına cevap',
+    'reply_to_user_placeholder' => ':name kullanıcısına cevap yazın...',
+    'this_user' => 'Bu kullanıcı',
+    'characters' => 'karakter',
+    'comment_pending_approval' => 'Bu :type onaylandıktan sonra herkese görünür olacaktır.',
+    'please_enter_comment' => 'Lütfen yorum içeriğini giriniz.',
+    'please_enter_reply' => 'Lütfen cevap içeriğini giriniz.',
     'details' => 'Detaylar',
     'budget' => 'Bütçe',
     'estimated_duration' => 'Tahmini Süre',

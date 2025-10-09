@@ -10,7 +10,7 @@
             <!-- Single Random Background Image -->
             <div class="background-image-container">
                 <img src="{{ $randomBackgroundImage }}"
-                     alt="Öneri Detayı"
+                     alt="{{ __('user.suggestion_detail') }}"
                      class="background-image-main"
                      loading="eager">
             </div>
@@ -21,11 +21,11 @@
     <div class="user-container">
         <!-- Breadcrumb -->
         <nav class="breadcrumb" style="position: relative; z-index: 3;">
-            <a href="{{ route('user.index') }}">Ana Sayfa</a>
+            <a href="{{ route('user.index') }}">{{ __('user.breadcrumb_home') }}</a>
             <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
             </svg>
-            <a href="{{ route('user.projects') }}">Projeler</a>
+            <a href="{{ route('user.projects') }}">{{ __('user.breadcrumb_projects') }}</a>
             <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
             </svg>
@@ -155,7 +155,7 @@
                             <img id="suggestion-image" src="{{ $suggestion->getFirstMediaUrl('images') }}"
                                  alt="{{ $suggestion->title }}"
                                  style="width: 100%; height: 24rem; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: transform 0.3s ease;"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 24rem; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg);&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 4rem; height: 4rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 1rem;&quot;>Öneri Görseli</p></div></div>';"
+                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 24rem; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg);&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 4rem; height: 4rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 1rem;&quot;>{{ __('user.suggestion_image') }}</p></div></div>';"
                                  onmouseover="this.style.transform='scale(1.05)'; document.getElementById('zoom-overlay').style.opacity='1';"
                                  onmouseout="this.style.transform='scale(1)'; document.getElementById('zoom-overlay').style.opacity='0';">
 
@@ -195,7 +195,7 @@
                                     data-suggestion-id="{{ $suggestion->id }}"
                                     data-category="{{ $suggestion->category_id ?? 'default' }}"
                                     data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
-                                    title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir' }}"
+                                    title="{{ $isProjectExpired ? __('user.expired_no_likes') : __('user.only_one_like_per_category') }}"
                                     {{ $isProjectExpired ? 'disabled' : '' }}
                                     onmouseover="{{ $isProjectExpired ? '' : 'this.style.background=\'rgba(220, 38, 38, 0.95)\'; this.style.transform=\'translateY(-2px) scale(1.05)\'' }}"
                                     onmouseout="{{ $isProjectExpired ? '' : 'this.style.background=\'rgba(239, 68, 68, 0.95)\'; this.style.transform=\'translateY(0) scale(1)\'' }}">
@@ -206,7 +206,7 @@
                                 </svg>
 
                                 <!-- Like Text and Count -->
-                                <span>Beğen</span>
+                                <span>{{ __('user.like') }}</span>
                                 <span class="like-count" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 0.125rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; min-width: 1.5rem; text-align: center;">{{ $suggestion->likes->count() }}</span>
                             </button>
                         </div>
@@ -232,7 +232,7 @@
                             <svg style="width: 1.25rem; height: 1.25rem; color: var(--blue-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/>
                             </svg>
-                            Yorumlar ({{ $suggestion->approvedComments->count() }}{{ $userPendingComments->count() > 0 ? ' + ' . $userPendingComments->count() . ' beklemede' : '' }})
+                            {{ __('user.comments_section') }} ({{ $suggestion->approvedComments->count() }}{{ $userPendingComments->count() > 0 ? ' + ' . $userPendingComments->count() . ' ' . __('user.pending') : '' }})
                         </h3>
 
                         @if($suggestion->approvedComments->count() > 0 || $userPendingComments->count() > 0)
@@ -259,7 +259,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
                                             </svg>
                                             <span style="font-size: 0.85rem; color: var(--blue-700);">
-                                                <strong>{{ $comment->parent->user->name ?? 'Anonim' }}</strong> kullanıcısına cevap
+                                                <strong>{{ $comment->parent->user->name ?? __('user.anonymous') }}</strong> {{ __('user.reply_to_user') }}
                                             </span>
                                         </div>
                                         @endif
@@ -280,7 +280,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
                                             </svg>
                                             <small style="color: var(--yellow-700); font-size: 0.85rem;">
-                                                Bu {{ $comment->parent_id ? 'cevap' : 'yorum' }} onaylandıktan sonra herkese görünür olacaktır.
+                                                {{ __('user.comment_pending_approval', ['type' => $comment->parent_id ? __('user.reply') : __('user.comment')]) }}
                                             </small>
                                         </div>
                                     </div>
@@ -327,11 +327,11 @@
                                                     <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
                                                     </svg>
-                                                    Cevapla
+                                                    {{ __('user.reply') }}
                                                 </button>
                                             @else
                                                 <span style="font-size: 0.875rem; color: var(--gray-500);">
-                                                    <a href="{{ route('user.login') }}" style="color: var(--blue-600);">Giriş yapın</a> • Beğeni ve cevap için
+                                                    <a href="{{ route('user.login') }}" style="color: var(--blue-600);">{{ __('user.login') }}</a> • {{ __('user.login_to_like_reply') }}
                                                 </span>
                                             @endauth
                                         </div>
@@ -339,12 +339,12 @@
                                         <div style="display: flex; align-items: center; gap: 1rem;">
                                             @if($comment->likes->count() > 0)
                                                 <span style="font-size: 0.875rem; color: var(--gray-500);">
-                                                    {{ $comment->likes->count() }} beğeni
+                                                    {{ $comment->likes->count() }} {{ __('user.likes') }}
                                                 </span>
                                             @endif
                                             @if($comment->approvedReplies->count() > 0)
                                                 <span style="font-size: 0.875rem; color: var(--gray-500);">
-                                                    {{ $comment->approvedReplies->count() }} cevap
+                                                    {{ $comment->approvedReplies->count() }} {{ __('user.replies') }}
                                                 </span>
                                             @endif
                                         </div>
@@ -357,14 +357,14 @@
                                                 <textarea
                                                     name="comment"
                                                     id="reply-text-{{ $comment->id }}"
-                                                    placeholder="{{ $comment->user->name ?? 'Bu kullanıcı' }} kullanıcısına cevap yazın..."
+                                                    placeholder="{{ __('user.reply_to_user_placeholder', ['name' => $comment->user->name ?? __('user.this_user')]) }}"
                                                     required
                                                     maxlength="1000"
                                                     style="width: 100%; min-height: 80px; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; resize: vertical; background: white;">
                                                 </textarea>
                                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                                                     <small style="color: var(--gray-500); font-size: 0.75rem;">
-                                                        <span id="reply-char-count-{{ $comment->id }}">0</span>/1000 karakter
+                                                        <span id="reply-char-count-{{ $comment->id }}">0</span>/1000 {{ __('user.characters') }}
                                                     </small>
                                                 </div>
                                             </div>
@@ -428,14 +428,14 @@
                                                         </button>
                                                     @else
                                                         <span style="font-size: 0.8rem; color: var(--green-600);">
-                                                            <a href="{{ route('user.login') }}" style="color: var(--blue-600);">Giriş yapın</a>
+                                                            <a href="{{ route('user.login') }}" style="color: var(--blue-600);">{{ __('user.login') }}</a>
                                                         </span>
                                                     @endauth
                                                 </div>
 
                                                 @if($reply->likes->count() > 0)
                                                     <span style="font-size: 0.8rem; color: var(--green-600);">
-                                                        {{ $reply->likes->count() }} beğeni
+                                                        {{ $reply->likes->count() }} {{ __('user.likes') }}
                                                     </span>
                                                 @endif
                                             </div>
@@ -494,7 +494,7 @@
                                     <svg style="width: 1.25rem; height: 1.25rem; color: var(--blue-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"/>
                                     </svg>
-                                    Yorumunuzu Yazın
+                                    {{ __('user.write_your_comment') }}
                                 </h4>
 
                                 <form id="comment-submit-form" onsubmit="submitComment(event)">
@@ -510,7 +510,7 @@
                                         </textarea>
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                                             <small style="color: var(--gray-500); font-size: 0.8rem;">
-                                                <span id="char-count">0</span>/1000 karakter
+                                                <span id="char-count">0</span>/1000 {{ __('user.characters') }}
                                             </small>
                                             <small style="color: var(--gray-500); font-size: 0.8rem;">
                                                 * Yorumlar onaylandıktan sonra görüntülenir
@@ -526,7 +526,7 @@
                                             <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/>
                                             </svg>
-                                            Yorumu Gönder
+                                            {{ __('user.send_comment') }}
                                         </button>
                                         <button
                                             type="reset"
@@ -561,7 +561,7 @@
                                     <svg style="width: 1rem; height: 1rem; color: var(--red-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                     </svg>
-                                    Toplam Beğeni
+                                    {{ __('user.total_likes') }}
                                 </span>
                                 <span class="stat-value">{{ $suggestion->likes->count() }}</span>
                             </div>
@@ -570,7 +570,7 @@
                                     <svg style="width: 1rem; height: 1rem; color: var(--blue-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 0 1-2.555-.337A5.972 5.972 0 0 1 5.41 20.97a5.969 5.969 0 0 1-.474-.065 4.48 4.48 0 0 0 .978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25Z"/>
                                     </svg>
-                                    Toplam Yorum
+                                    {{ __('user.total_comments') }}
                                 </span>
                                 <span class="stat-value">{{ $suggestion->approvedComments->count() }}</span>
                             </div>
@@ -593,7 +593,7 @@
                             <svg style="width: 1.25rem; height: 1.25rem; color: var(--purple-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/>
                             </svg>
-                            Son Beğenenler
+                            {{ __('user.last_liked_by') }}
                         </h4>
                         <div class="d-flex" style="flex-direction: column; gap: 0.5rem;">
                             @foreach($suggestion->likes->take(5) as $like)
@@ -637,7 +637,7 @@
 <script>
 // Show expired message for expired projects
 function showExpiredMessage() {
-    showMessage('Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.', 'error');
+    showMessage('{{ __('user.project_expired_no_likes') }}', 'error');
 }
 
 // Toggle like with AJAX (Radio button logic: one per category)
@@ -712,9 +712,9 @@ function toggleLike(suggestionId) {
                 }
 
                 if (response.switched_from) {
-                    showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
+                    showMessage(`✓ {{ __('user.selection_changed_from') }} "${response.switched_from}" {{ __('user.to') }} "${response.current_title}".`, 'success');
                 } else {
-                    showMessage('✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.', 'success');
+                    showMessage('✓ {{ __('user.suggestion_liked') }}', 'success');
                 }
             } else {
                 clickedButton.classList.remove('liked');
@@ -725,11 +725,11 @@ function toggleLike(suggestionId) {
                     heartIcon.style.fill = 'none';
                 }
 
-                showMessage('Beğeni kaldırıldı.', 'info');
+                showMessage('{{ __('user.like_removed') }}', 'info');
             }
         },
         error: function(xhr) {
-            let message = 'Bir hata oluştu.';
+            let message = '{{ __('user.error_occurred') }}.';
             if (xhr.responseJSON && xhr.responseJSON.error) {
                 message = xhr.responseJSON.error;
             }
@@ -1294,7 +1294,7 @@ function submitComment(event) {
     const commentText = document.getElementById('comment-text').value.trim();
 
     if (!commentText) {
-        showMessage('Lütfen yorum içeriğini giriniz.', 'error');
+        showMessage('{{ __('user.please_enter_comment') }}', 'error');
         return;
     }
 
@@ -1318,7 +1318,7 @@ function submitComment(event) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            showMessage('Yorumunuz başarıyla gönderildi. Onaylandıktan sonra görüntülenecektir.', 'success');
+            showMessage('{{ __('user.comment_sent_success') }}', 'success');
             resetCommentForm();
 
             // Reload page to show the pending comment
@@ -1336,7 +1336,7 @@ function submitComment(event) {
     .finally(() => {
         // Re-enable form
         submitBtn.disabled = false;
-        submitBtn.innerHTML = '<svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg> Yorumu Gönder';
+        submitBtn.innerHTML = '<svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"/></svg> {{ __('user.send_comment') }}';
     });
 }
 
@@ -1425,7 +1425,7 @@ function submitReply(event, commentId) {
     const replyText = document.getElementById(`reply-text-${commentId}`).value.trim();
 
     if (!replyText) {
-        showMessage('Lütfen cevap içeriğini giriniz.', 'error');
+        showMessage('{{ __('user.please_enter_reply') }}', 'error');
         return;
     }
 
@@ -1512,7 +1512,7 @@ function toggleCommentLike(commentId) {
                 likeButton.style.borderColor = 'var(--red-200)';
                 heartIcon.style.fill = 'currentColor';
 
-                showMessage('Yorum beğenildi!', 'success');
+                showMessage('{{ __('user.comment_liked') }}', 'success');
             } else {
                 // Remove liked state
                 likeButton.classList.remove('liked');

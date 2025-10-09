@@ -104,6 +104,18 @@ return [
     
     // Misc
     'anonymous' => 'Anonymous',
+    'suggestion_detail' => 'Suggestion Detail',
+    'suggestion_image' => 'Suggestion Image',
+    'last_liked_by' => 'Last Liked By',
+    'reply' => 'Reply',
+    'replies' => 'Replies',
+    'reply_to_user' => 'replying to',
+    'reply_to_user_placeholder' => 'Write a reply to :name...',
+    'this_user' => 'this user',
+    'characters' => 'characters',
+    'comment_pending_approval' => 'This :type will be visible to everyone after approval.',
+    'please_enter_comment' => 'Please enter comment content.',
+    'please_enter_reply' => 'Please enter reply content.',
     'details' => 'Details',
     'budget' => 'Budget',
     'estimated_duration' => 'Estimated Duration',
