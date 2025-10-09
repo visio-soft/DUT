@@ -11,6 +11,8 @@ return [
     
     // Hero Section
     'hero_title' => 'Transform the City Together',
+    'hero_title_part1' => 'Transform the City',
+    'hero_title_part2' => 'Together',
     'hero_description' => 'Create projects, share suggestions, and determine the best ideas together to make our city more beautiful and livable.',
     'explore_projects' => 'Explore Projects',
     'more_info' => 'More information',

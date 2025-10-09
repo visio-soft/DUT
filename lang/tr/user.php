@@ -11,6 +11,8 @@ return [
     
     // Hero Section
     'hero_title' => 'Şehri Birlikte Dönüştürelim',
+    'hero_title_part1' => 'Şehri Birlikte',
+    'hero_title_part2' => 'Dönüştürelim',
     'hero_description' => 'Şehrimizin daha güzel, daha yaşanabilir olması için projeler oluşturun, öneriler paylaşın ve en iyi fikirleri birlikte belirleyin.',
     'explore_projects' => 'Projeleri Keşfet',
     'more_info' => 'Daha fazla bilgi',
