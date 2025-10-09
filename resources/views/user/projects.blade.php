@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', 'Projeler - DUT Vote')
+@section('title', __('common.projects') . ' - DUT Vote')
 
 @section('content')
 <!-- Header Section -->
@@ -326,7 +326,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                 </svg>
                 <div class="project-title-section">
-                    <h1>Tüm Projeler</h1>
+                    <h1>{{ __('common.all_projects') }}</h1>
                 </div>
             </div>
 
@@ -349,7 +349,7 @@
                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="width: 1.5rem; height: 1.5rem;">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/>
                         </svg>
-                        Genel İstatistikler
+                        {{ __('common.general_statistics') }}
                     </h2>
                 </div>
 
@@ -364,7 +364,7 @@
                             </div>
                         </div>
                         <h3 class="stat-number green">{{ $totalProjects }}</h3>
-                        <p class="stat-label">Toplam Proje</p>
+                        <p class="stat-label">{{ __('common.total_projects') }}</p>
                     </div>
 
                     <!-- Total Suggestions Card -->
@@ -377,7 +377,7 @@
                             </div>
                         </div>
                         <h3 class="stat-number blue">{{ $totalSuggestions }}</h3>
-                        <p class="stat-label">Toplam Öneri</p>
+                        <p class="stat-label">{{ __('common.total_suggestions') }}</p>
                     </div>
 
                     <!-- Total Likes Card -->
@@ -390,7 +390,7 @@
                             </div>
                         </div>
                         <h3 class="stat-number red">{{ $totalLikes }}</h3>
-                        <p class="stat-label">Toplam Beğeni</p>
+                        <p class="stat-label">{{ __('common.total_likes') }}</p>
                     </div>
                 </div>
             </div>
@@ -411,7 +411,7 @@
                         <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                         </svg>
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Proje Listesi</h3>
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.project_list') }}</h3>
                     </div>
 
                     <!-- Info about voting system -->
@@ -422,10 +422,10 @@
                             </svg>
                             <div>
                                 <p style="font-size: 0.75rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
-                                    <strong>Oylama Sistemi:</strong> Her proje kategorisinde sadece bir öneri için oy kullanabilirsiniz.
+                                    <strong>{{ __('common.voting_system') }}:</strong> {{ __('common.voting_system_description') }}
                                 </p>
                                 <p style="font-size: 0.7rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
-                                    Seçiminizi değiştirmek için başka bir öneriye tıklayın. ○ işareti mevcut seçiminizi gösterir.
+                                    {{ __('common.voting_system_help') }}
                                 </p>
                             </div>
                         </div>
@@ -516,7 +516,7 @@
                                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                 </svg>
-                                <span>Tüm Öneriler</span>
+                                <span>{{ __('common.all_suggestions') }}</span>
                             </a>
 
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
@@ -534,7 +534,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                    Proje Yöneticisi: {{ $project->createdBy->name }}
+                                    {{ __('common.project_manager') }}: {{ $project->createdBy->name }}
                                 </span>
                             </div>
                             @endif
@@ -553,7 +553,7 @@
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                     </svg>
-                                    {{ $project->oneriler->count() }} Öneri
+                                    {{ $project->oneriler->count() }} {{ __('common.suggestion') }}
                                 </div>
 
                                 @if($project->end_datetime)
@@ -561,7 +561,7 @@
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                     </svg>
-                                    Bitiş: {{ $project->end_datetime->format('d.m.Y H:i') }}
+                                    {{ __('common.project_end') }}: {{ $project->end_datetime->format('d.m.Y H:i') }}
                                 </div>
                                 @endif
 
@@ -575,11 +575,11 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                         </svg>
                                         @if($isExpired)
-                                            <span>Süre Dolmuş - Beğeni Devre Dışı</span>
+                                            <span>{{ __('common.expired') }} - {{ __('common.project_expired_message') }}</span>
                                         @elseif($remainingTime)
-                                            <span>Kalan: {{ $remainingTime['formatted'] }}</span>
+                                            <span>{{ __('common.remaining') }}: {{ $remainingTime['formatted'] }}</span>
                                         @else
-                                            <span>Süresiz</span>
+                                            <span>{{ __('common.unlimited') }}</span>
                                         @endif
                                     </div>
                                 @endif
@@ -603,7 +603,7 @@
                                 <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: white;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                 </svg>
-                                <h3 style="font-size: 1.125rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Öneriler ({{ $project->oneriler->count() }})</h3>
+                                <h3 style="font-size: 1.125rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">{{ __('common.suggestions') }} ({{ $project->oneriler->count() }})</h3>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 @foreach($project->oneriler as $suggestion)
@@ -656,7 +656,7 @@
                                                 <svg style="width: 0.75rem; height: 0.75rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
                                                 </svg>
-                                                <span>{{ $suggestion->comments->count() }} Yorum</span>
+                                                <span>{{ $suggestion->comments->count() }} {{ __('common.comment') }}</span>
                                             </div>
                                         </div>
 
@@ -673,7 +673,7 @@
                                                         data-project-id="{{ $project->id }}"
                                                         data-category="{{ $suggestion->category_id ?? 'default' }}"
                                                         data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
-                                                        title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)' }}"
+                                                        title="{{ $isProjectExpired ? __('common.project_expired_message') : __('common.suggestion_like_tooltip') }}"
                                                         {{ $isProjectExpired ? 'disabled' : '' }}>
 
                                                     <svg class="like-icon" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -692,7 +692,7 @@
                                                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                                 </svg>
-                                                Detay
+                                                {{ __('common.detail') }}
                                             </a>
                                         </div>
                                     </div>
@@ -1070,7 +1070,7 @@ function toggleLike(suggestionId) {
     }
 
     @guest
-        showMessage('Beğeni yapmak için giriş yapmanız gerekiyor.', 'error');
+        showMessage('{{ __('common.login_required_like') }}', 'error');
         setTimeout(() => {
             window.location.href = '{{ route('user.login') }}';
         }, 2000);
@@ -1143,7 +1143,7 @@ function toggleLike(suggestionId) {
                 if (response.switched_from) {
                     showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
                 } else {
-                    showMessage('✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.', 'success');
+                    showMessage('{{ __("common.suggestion_liked") }}', 'success');
                 }
             } else {
                 clickedButton.classList.remove('liked');
@@ -1154,7 +1154,7 @@ function toggleLike(suggestionId) {
                     heartIcon.style.fill = 'none';
                 }
 
-                showMessage('Beğeni kaldırıldı.', 'info');
+                showMessage('{{ __('common.like_removed') }}', 'info');
             }
         },
         error: function(xhr) {

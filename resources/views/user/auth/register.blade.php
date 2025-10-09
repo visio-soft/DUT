@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', 'Hesap Oluştur - DUT Vote')
+@section('title', __('common.create_account') . ' - DUT Vote')
 
 @section('content')
 <div class="min-h-screen flex items-center justify-center section-padding" style="padding-top: 2rem; padding-bottom: 2rem;">
@@ -9,10 +9,10 @@
             <!-- Header -->
             <div class="user-card-header text-center">
                 <h1 class="user-card-title" style="font-size: 1.75rem; margin-bottom: 0.5rem;">
-                    Hesap Oluştur
+                    {{ __('common.create_account') }}
                 </h1>
                 <p style="color: var(--gray-600); font-size: 0.95rem;">
-                    Şehrimizi birlikte dönüştürmek için aramıza katılın
+                    {{ __('common.join_transform_city') }}
                 </p>
             </div>
 
@@ -24,7 +24,7 @@
                             <svg style="width: 1.25rem; height: 1.25rem; display: inline; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
                             </svg>
-                            Hata
+                            {{ __('common.error') }}
                         </div>
                         <ul style="margin: 0; padding-left: 1.5rem;">
                             @foreach ($errors->all() as $error)
@@ -51,7 +51,7 @@
                     <!-- Name -->
                     <div>
                         <label for="name" style="display: block; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-                            Ad Soyad
+                            {{ __('common.full_name') }}
                         </label>
                         <input
                             type="text"
@@ -60,7 +60,7 @@
                             value="{{ old('name') }}"
                             required
                             style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--green-200); border-radius: var(--radius-md); font-size: 0.95rem; transition: var(--transition-normal); background: white;"
-                            placeholder="Adınız ve soyadınız"
+                            placeholder="{{ __('common.name_surname_placeholder') }}"
                             onfocus="this.style.borderColor='var(--green-400)'; this.style.boxShadow='var(--green-shadow)'"
                             onblur="this.style.borderColor='var(--green-200)'; this.style.boxShadow='none'"
                         >
@@ -69,7 +69,7 @@
                     <!-- Email -->
                     <div>
                         <label for="email" style="display: block; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-                            E-posta Adresi
+                            {{ __('common.email_address') }}
                         </label>
                         <input
                             type="email"
@@ -87,7 +87,7 @@
                     <!-- Password -->
                     <div>
                         <label for="password" style="display: block; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-                            Şifre
+                            {{ __('common.password') }}
                         </label>
                         <input
                             type="password"
@@ -95,7 +95,7 @@
                             name="password"
                             required
                             style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--green-200); border-radius: var(--radius-md); font-size: 0.95rem; transition: var(--transition-normal); background: white;"
-                            placeholder="En az 6 karakter"
+                            placeholder="{{ __('common.at_least_6_chars') }}"
                             onfocus="this.style.borderColor='var(--green-400)'; this.style.boxShadow='var(--green-shadow)'"
                             onblur="this.style.borderColor='var(--green-200)'; this.style.boxShadow='none'"
                         >
@@ -104,7 +104,7 @@
                     <!-- Password Confirmation -->
                     <div>
                         <label for="password_confirmation" style="display: block; font-weight: 500; color: var(--gray-700); margin-bottom: 0.5rem;">
-                            Şifre Onayı
+                            {{ __('common.password_confirmation') }}
                         </label>
                         <input
                             type="password"
@@ -112,7 +112,7 @@
                             name="password_confirmation"
                             required
                             style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--green-200); border-radius: var(--radius-md); font-size: 0.95rem; transition: var(--transition-normal); background: white;"
-                            placeholder="Şifrenizi tekrar giriniz"
+                            placeholder="{{ __('common.confirm_password') }}"
                             onfocus="this.style.borderColor='var(--green-400)'; this.style.boxShadow='var(--green-shadow)'"
                             onblur="this.style.borderColor='var(--green-200)'; this.style.boxShadow='none'"
                         >
@@ -127,7 +127,7 @@
                                 style="width: 1rem; height: 1rem; accent-color: var(--green-600); border-radius: 3px; margin-top: 0.125rem; flex-shrink: 0;"
                             >
                             <span>
-                                Hesap oluşturarak <a href="#" style="color: var(--green-600); text-decoration: underline;">Kullanım Şartları</a> ve <a href="#" style="color: var(--green-600); text-decoration: underline;">Gizlilik Politikası</a>'nı kabul etmiş olursunuz.
+                                {{ __('common.terms_agreement') }} <a href="#" style="color: var(--green-600); text-decoration: underline;">{{ __('common.terms_of_service') }}</a> {{ __('common.and') }} <a href="#" style="color: var(--green-600); text-decoration: underline;">{{ __('common.privacy_policy') }}</a>
                             </span>
                         </label>
                     </div>
@@ -141,7 +141,7 @@
                         <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 1 1-8 0 4 4 0 0 1 8 0ZM3 20a6 6 0 0 1 12 0v1H3v-1Z"/>
                         </svg>
-                        Hesap Oluştur
+                        {{ __('common.create_account') }}
                     </button>
                 </form>
             </div>
@@ -150,7 +150,7 @@
             <div class="user-card-actions" style="padding: 1.5rem; border-top: 1px solid var(--green-100); background: var(--green-50);">
                 <div class="text-center" style="width: 100%;">
                     <p style="color: var(--gray-600); font-size: 0.9rem; margin-bottom: 1rem;">
-                        Zaten hesabınız var mı?
+                        {{ __('common.already_have_account') }}
                     </p>
                     <a
                         href="{{ route('user.login') }}"
@@ -160,7 +160,7 @@
                         <svg style="width: 1.125rem; height: 1.125rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
                         </svg>
-                        Giriş Yap
+                        {{ __('common.login') }}
                     </a>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                 <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
                 </svg>
-                Ana Sayfaya Dön
+                {{ __('common.back_to_home') }}
             </a>
         </div>
     </div>

@@ -49,7 +49,7 @@
 
                     <!-- Suggestion Description -->
                     <div class="mb-6">
-                        <h3 class="text-xl font-semibold text-gray-900 mb-3">Öneri Detayları</h3>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-3">{{ __('common.suggestion_details') }}</h3>
                         <div class="prose prose-sm max-w-none">
                             {!! nl2br(e($suggestion->description)) !!}
                         </div>
@@ -96,7 +96,7 @@
                             <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            <span class="text-sm text-gray-600">Oluşturulma:</span>
+                            <span class="text-sm text-gray-600">{{ __('common.creation') }}:</span>
                             <span class="font-medium">{{ $suggestion->created_at->format('d.m.Y H:i') }}</span>
                         </div>
                     </div>
@@ -148,14 +148,14 @@
                             <svg class="w-6 h-6 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
                             </svg>
-                            Yorumlar ({{ $suggestion->approvedComments->count() }})
+                            {{ __('common.comments') }} ({{ $suggestion->approvedComments->count() }})
                         </h3>
 
                         <div class="space-y-4">
                             @foreach($suggestion->approvedComments as $comment)
                                 <div class="border-l-4 border-blue-200 pl-4 py-2">
                                     <div class="flex items-start justify-between mb-2">
-                                        <span class="font-medium text-gray-900">{{ $comment->user ? $comment->user->name : 'Anonim' }}</span>
+                                        <span class="font-medium text-gray-900">{{ $comment->user ? $comment->user->name : __('common.anonymous') }}</span>
                                         <span class="text-xs text-gray-500">{{ $comment->created_at->format('d.m.Y H:i') }}</span>
                                     </div>
                                     <p class="text-sm text-gray-700">{{ $comment->comment }}</p>
