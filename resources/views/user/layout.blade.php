@@ -97,14 +97,14 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                         </svg>
-                        Ana Sayfa
+                        {{ __('common.home') }}
                     </a>
                     <a href="{{ route('user.projects') }}"
                        class="user-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                         </svg>
-                        Projeler
+                        {{ __('common.projects') }}
                     </a>
 
                     <!-- Language Selector -->
@@ -116,7 +116,7 @@
                                 <svg class="w-5 h-5 mr-2" style="color: #1ABF6B;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
-                                <span class="text-sm" style="color: #053640;">Merhaba, {{ Auth::user()->name }}</span>
+                                <span class="text-sm" style="color: #053640;">{{ __('common.hello') }}, {{ Auth::user()->name }}</span>
                             </div>
                             <form method="POST" action="{{ route('user.logout') }}" style="display: inline;">
                                 @csrf
@@ -124,7 +124,7 @@
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"/>
                                     </svg>
-                                    Çıkış
+                                    {{ __('common.logout') }}
                                 </button>
                             </form>
                         </div>
@@ -134,13 +134,13 @@
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
                                 </svg>
-                                Giriş
+                                {{ __('common.login') }}
                             </a>
                             <a href="{{ route('user.register') }}" class="auth-btn auth-btn-register">
                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
                                 </svg>
-                                Kayıt
+                                {{ __('common.register') }}
                             </a>
                         </div>
                     @endauth
@@ -154,14 +154,14 @@
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                             </svg>
-                            Ana Sayfa
+                            {{ __('common.home') }}
                         </a>
                         <a href="{{ route('user.projects') }}"
                            class="mobile-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                             </svg>
-                            Projeler
+                            {{ __('common.projects') }}
                         </a>
 
                         @auth
@@ -170,7 +170,7 @@
                                     <svg class="w-5 h-5 mr-2 text-green-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 1-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                     </svg>
-                                    <span class="text-sm text-white/90">Merhaba, {{ Auth::user()->name }}</span>
+                                    <span class="text-sm text-white/90">{{ __('common.hello') }}, {{ Auth::user()->name }}</span>
                                 </div>
                                 <form method="POST" action="{{ route('user.logout') }}" class="w-full">
                                     @csrf
@@ -178,7 +178,7 @@
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"/>
                                         </svg>
-                                        Çıkış
+                                        {{ __('common.logout') }}
                                     </button>
                                 </form>
                             </div>
@@ -188,13 +188,13 @@
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
                                     </svg>
-                                    Giriş
+                                    {{ __('common.login') }}
                                 </a>
                                 <a href="{{ route('user.register') }}" class="mobile-auth-btn mobile-auth-btn-register">
                                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
                                     </svg>
-                                    Kayıt
+                                    {{ __('common.register') }}
                                 </a>
                             </div>
                         @endauth
@@ -253,12 +253,12 @@
                                 </defs>
                             </svg>
                             <div class="footer-logo-text">
-                                <span class="footer-logo-title">Driving Urban</span>
-                                <span class="footer-logo-subtitle">Transformation</span>
+                                <span class="footer-logo-title">{{ __('common.driving_urban') }}</span>
+                                <span class="footer-logo-subtitle">{{ __('common.transformation') }}</span>
                             </div>
                         </div>
                         <p class="footer-description">
-                            Şehrimizi birlikte dönüştürmek için oluşturulmuş katılımcı demokrasi platformu
+                            {{ __('common.participatory_platform') }}
                         </p>
                     </div>
 
@@ -268,7 +268,7 @@
                                 <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                 </svg>
-                                Platform
+                                {{ __('common.platform') }}
                             </h4>
                             <ul>
                                 <li>
@@ -276,7 +276,7 @@
                                         <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                                         </svg>
-                                        Ana Sayfa
+                                        {{ __('common.home') }}
                                     </a>
                                 </li>
                                 <li>
@@ -284,7 +284,7 @@
                                         <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                                         </svg>
-                                        Projeler
+                                        {{ __('common.projects') }}
                                     </a>
                                 </li>
                                 <li>
@@ -292,7 +292,7 @@
                                         <svg class="inline w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
                                         </svg>
-                                        Hakkında
+                                        {{ __('common.about') }}
                                     </a>
                                 </li>
                             </ul>
@@ -303,7 +303,7 @@
                                 <svg class="inline w-4 h-4 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"/>
                                 </svg>
-                                İletişim
+                                {{ __('common.contact') }}
                             </h4>
                             <ul>
                                 <li>
@@ -349,12 +349,12 @@
 
                 <div class="footer-bottom">
                     <div class="footer-credits">
-                        <p>© 2025 DUT Vote. Tüm hakları saklıdır.</p>
+                        <p>© 2025 DUT Vote. {{ __('common.all_rights_reserved') }}</p>
                         <p class="developed-by">
                             <svg class="icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z"/>
                             </svg>
-                            <a href="https://visiosoft.com.tr" target="_blank">VisioSoft</a> tarafından geliştirildi
+                            <a href="https://visiosoft.com.tr" target="_blank">VisioSoft</a> {{ __('common.developed_by') }}
                         </p>
                     </div>
                 </div>
