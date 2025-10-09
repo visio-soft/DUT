@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', $project->name . ' Önerileri - DUT Vote')
+@section('title', $project->name . ' ' . __('messages.suggestions_title') . ' - DUT Vote')
 
 @section('content')
 <!-- CSS Styles -->
@@ -1100,7 +1100,7 @@
                 </svg>
                 <div class="project-title-section">
                     <h1 class="project-title">{{ $project->name }}</h1>
-                    <p class="project-subtitle">Proje Önerileri</p>
+                    <p class="project-subtitle">{{ __('messages.project_suggestions') }}</p>
                 </div>
             </div>
 
@@ -1128,7 +1128,7 @@
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                         </svg>
-                        Projelere Dön
+                        {{ __('messages.back_to_projects') }}
                     </a>
                 </div>
 

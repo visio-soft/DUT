@@ -78,4 +78,8 @@ return [
     // Project Details
     'created_by' => 'Oluşturan',
     'project_details' => 'Proje Detayları',
+    'project_suggestions' => 'Proje Önerileri',
+    'back_to_projects' => 'Projelere Dön',
+    'suggestions_title' => 'Önerileri',
+    'all_projects' => 'Tüm Projeler',
 ];

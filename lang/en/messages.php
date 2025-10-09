@@ -78,4 +78,8 @@ return [
     // Project Details
     'created_by' => 'Created by',
     'project_details' => 'Project Details',
+    'project_suggestions' => 'Project Suggestions',
+    'back_to_projects' => 'Back to Projects',
+    'suggestions_title' => 'Suggestions',
+    'all_projects' => 'All Projects',
 ];
