@@ -53,6 +53,13 @@ class OneriResource extends Resource
                                 return Category::first()?->id;
                             })
                             ->placeholder('Proje kategorisi seçin'),
+                        Forms\Components\Select::make('created_by_id')
+                            ->label('Öneriyi Oluşturan Kullanıcı')
+                            ->relationship('createdBy', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Kullanıcı seçin (boş bırakılırsa anonim)')
+                            ->helperText('Bu alanı boş bırakırsanız öneri anonim olarak görünecektir'),
                         Forms\Components\TextInput::make('title')
                             ->label('Başlık')
                             ->required()
@@ -90,7 +97,7 @@ class OneriResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
 
-                        // Resim upload - Spatie Media Library ile
+                        // Resim upload
                         SpatieMediaLibraryFileUpload::make('images')
                             ->label('Öneri Tasarım Görseli')
                             ->collection('images')
@@ -98,8 +105,12 @@ class OneriResource extends Resource
                             ->imagePreviewHeight('200')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
+                            ->maxSize(20480) // 20MB limit
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->helperText('Maksimum dosya boyutu: 10MB. Desteklenen formatlar: JPEG, JPG, PNG, WebP.')
+                            ->helperText('Sadece resim dosyaları. Maksimum dosya boyutu: 20MB')
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth('2000')
+                            ->imageResizeTargetHeight('2000')
                             ->columnSpanFull(),
                     ])
                     ->columnSpan(1),
@@ -118,6 +129,13 @@ class OneriResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('createdBy.name')
+                    ->label('Oluşturan')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('Anonim')
+                    ->badge()
+                    ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
@@ -151,6 +169,21 @@ class OneriResource extends Resource
                 SelectFilter::make('category')
                     ->label('Kategori')
                     ->relationship('category', 'name'),
+
+                SelectFilter::make('creator_type')
+                    ->label('Oluşturan Tür')
+                    ->options([
+                        'with_user' => 'Kullanıcı Atanmış',
+                        'anonymous' => 'Anonim',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        $value = $data['value'] ?? null;
+                        if ($value === 'with_user') {
+                            $query->whereNotNull('created_by_id');
+                        } elseif ($value === 'anonymous') {
+                            $query->whereNull('created_by_id');
+                        }
+                    }),
 
                 // Konum filtresi: İlçe ve Mahalle dropdownları
                 Filter::make('location')

@@ -127,7 +127,9 @@
                                         </p>
                                     @endif
                                     <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span>{{ $suggestion->project->createdBy->name ?? 'Anonim' }}</span>
+                                        @if($suggestion->project->createdBy)
+                                        <span>{{ $suggestion->project->createdBy->name }}</span>
+                                        @endif
                                         <span>{{ $suggestion->project->created_at->format('d.m.Y') }}</span>
                                         @if($suggestion->project->budget)
                                             <span class="text-green-600 font-medium">₺{{ number_format((float)$suggestion->project->budget, 0, ',', '.') }}</span>
@@ -153,7 +155,7 @@
                             @foreach($suggestion->approvedComments as $comment)
                                 <div class="border-l-4 border-blue-200 pl-4 py-2">
                                     <div class="flex items-start justify-between mb-2">
-                                        <span class="font-medium text-gray-900">{{ $comment->user->name ?? 'Anonim' }}</span>
+                                        <span class="font-medium text-gray-900">{{ $comment->user ? $comment->user->name : 'Anonim' }}</span>
                                         <span class="text-xs text-gray-500">{{ $comment->created_at->format('d.m.Y H:i') }}</span>
                                     </div>
                                     <p class="text-sm text-gray-700">{{ $comment->comment }}</p>
@@ -300,10 +302,12 @@
                         </div>
 
                         <!-- Creator -->
+                        @if($suggestion->createdBy)
                         <div>
                             <span class="text-sm font-medium text-gray-500">Öneren Kişi</span>
-                            <p class="text-sm text-gray-900 mt-1">{{ $suggestion->createdBy->name ?? 'Anonim' }}</p>
+                            <p class="text-sm text-gray-900 mt-1">{{ $suggestion->createdBy->name }}</p>
                         </div>
+                        @endif
 
                         @if($suggestion->project)
                             <!-- Related Project -->

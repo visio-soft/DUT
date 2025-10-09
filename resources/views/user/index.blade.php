@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', 'Ana Sayfa - DUT Vote')
+@section('title', __('common.home') . ' - DUT Vote')
 
 @section('content')
 <!-- Hero Section -->
@@ -30,7 +30,7 @@
                     <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                     </svg>
-                    Projeleri Keşfet
+                    {{ __('common.explore_projects') }}
                 </a>
                 <a href="#projects" class="btn btn-secondary">
                     Daha fazla bilgi
@@ -47,7 +47,7 @@
 <section id="projects" class="section-padding-lg">
     <div class="user-container">
         <div class="text-center content-spacing-xl">
-            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Öne Çıkan Projeler</h2>
+            <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">{{ __('common.featured_projects') }}</h2>
             <p style="font-size: 1.125rem; color: var(--gray-600); max-width: 600px; margin: 0 auto;">
                 Şehrimizi dönüştürecek en popüler projeler ve yaratıcı öneriler
             </p>
@@ -148,7 +148,7 @@
         @if($randomProjects->count() > 0)
         <div class="text-center view-all-projects-section">
             <a href="{{ route('user.projects') }}" class="btn btn-secondary">
-                Tüm Projeleri Görüntüle
+                {{ __('common.view_all_projects') }}
                 <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"/>
                 </svg>

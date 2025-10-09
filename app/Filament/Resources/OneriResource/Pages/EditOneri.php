@@ -10,6 +10,21 @@ class EditOneri extends EditRecord
 {
     protected static string $resource = OneriResource::class;
 
+    /**
+     * Preserve existing created_by_id when the edit form submits a null value.
+     * This prevents attempting to write NULL into a NOT NULL DB column.
+     */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        // If the created_by_id key exists but is explicitly null (admin cleared the selector),
+        // remove it so the existing value on the model is preserved and not overwritten with NULL.
+        if (array_key_exists('created_by_id', $data) && is_null($data['created_by_id'])) {
+            unset($data['created_by_id']);
+        }
+
+        return $data;
+    }
+
     protected function getFormActions(): array
     {
         return [

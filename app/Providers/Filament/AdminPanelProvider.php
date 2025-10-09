@@ -50,9 +50,13 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])->plugins([
-                FilamentShieldPlugin::make(),
             ])
-            ;
+            ->renderHook(
+                'panels::scripts.after',
+                fn (): string => view('chunks.chunked-upload-scripts')->render()
+            )
+            ->plugins([
+                FilamentShieldPlugin::make(),
+            ]);
     }
 }

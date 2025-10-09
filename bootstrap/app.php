@@ -12,8 +12,17 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies('*');
+
         $middleware->alias([
             'guest' => App\Http\Middleware\RedirectIfAuthenticated::class,
+        ]);
+
+        // Configure authentication redirects
+        $middleware->redirectGuestsTo('/login');
+        
+        // Add locale middleware to web group
+        $middleware->web(append: [
+            \App\Http\Middleware\SetLocale::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

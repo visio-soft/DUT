@@ -160,7 +160,7 @@
                         <svg style="width: 1.125rem; height: 1.125rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
                         </svg>
-                        Giriş Yap
+                        {{ __('common.login') }}
                     </a>
                 </div>
             </div>
@@ -177,7 +177,7 @@
                 <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
                 </svg>
-                Ana Sayfaya Dön
+                {{ __('common.back_to_home') }}
             </a>
         </div>
     </div>

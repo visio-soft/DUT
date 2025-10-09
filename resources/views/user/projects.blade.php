@@ -1,6 +1,6 @@
 @extends('user.layout')
 
-@section('title', 'Projeler - DUT Vote')
+@section('title', __('common.projects') . ' - DUT Vote')
 
 @section('content')
 <!-- Header Section -->
@@ -219,7 +219,7 @@
             max-width: 1400px;
             margin: 0 auto;
         }
-        
+
         .tree-view {
             position: sticky;
             top: 2rem;
@@ -260,7 +260,7 @@
         .stat-label {
             font-size: 0.875rem;
         }
-        
+
         .main-content-grid {
             grid-template-columns: 1fr;
             gap: 1rem;
@@ -272,18 +272,18 @@
         width: 100%;
         min-width: 0; /* Allow shrinking */
     }
-    
+
     .project-card-wrapper {
         width: 100%;
         max-width: none;
     }
-    
+
     .main-content-grid .user-card {
         width: 100%;
         max-width: none;
         margin: 0;
     }
-    
+
     /* Ensure grid takes full available space */
     .main-content-grid {
         width: 100%;
@@ -326,7 +326,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                 </svg>
                 <div class="project-title-section">
-                    <h1>Tüm Projeler</h1>
+                    <h1>{{ __('common.all_projects') }}</h1>
                 </div>
             </div>
 
@@ -435,15 +435,15 @@
                         @foreach($projects as $project)
                         <div style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
                             <!-- Project Node -->
-                            <div class="tree-project"
+                            <a href="{{ route('user.project.suggestions', $project->id) }}" class="tree-project"
                                  data-project-id="{{ $project->id }}"
-                                 onclick="scrollToProject({{ $project->id }})">
+                                 style="display: flex; align-items: center; padding: 0.5rem; border-radius: 0.5rem; transition: background-color 0.2s; text-decoration: none;">
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($project->name, 25) }}</span>
                                 <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $project->oneriler->count() }})</span>
-                            </div>
+                            </a>
 
                             <!-- Suggestions -->
                             @if($project->oneriler->count() > 0)
@@ -493,21 +493,51 @@
 
                         <!-- Project Content -->
                         <div style="position: relative; z-index: 3; padding: 2rem; color: white;">
+                            <!-- Tüm Önerileri Göster Butonu - Sağ Üst -->
+                            <a href="{{ route('user.project.suggestions', $project->id) }}"
+                               style="position: absolute; top: 1rem; right: 1rem;
+                                      background: rgba(255,255,255,0.2);
+                                      border: 1px solid rgba(255,255,255,0.4);
+                                      color: white;
+                                      padding: 0.5rem 1rem;
+                                      border-radius: 0.5rem;
+                                      font-size: 0.75rem;
+                                      font-weight: 500;
+                                      text-decoration: none;
+                                      transition: all 0.3s;
+                                      backdrop-filter: blur(4px);
+                                      display: flex;
+                                      align-items: center;
+                                      gap: 0.25rem;
+                                      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+                                      box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
+                               onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.3)';"
+                               onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.2)';">
+                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                                </svg>
+                                <span>Tüm Öneriler</span>
+                            </a>
+
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.75rem; color: rgba(255,255,255,0.9);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                                 </svg>
-                                <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $project->name }}</h2>
+                                <a href="{{ route('user.project.suggestions', $project->id) }}" style="text-decoration: none;">
+                                    <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: color 0.2s;">{{ $project->name }}</h2>
+                                </a>
                             </div>
 
+                            @if($project->createdBy)
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                    Proje Yöneticisi: {{ $project->createdBy->name ?? 'Anonim' }}
+                                    Proje Yöneticisi: {{ $project->createdBy->name }}
                                 </span>
                             </div>
+                            @endif
 
                             <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.5;">
                                 <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
@@ -576,7 +606,7 @@
                                 <h3 style="font-size: 1.125rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Öneriler ({{ $project->oneriler->count() }})</h3>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                @foreach($project->oneriler->take(2) as $suggestion)
+                                @foreach($project->oneriler as $suggestion)
                                 <div id="suggestion-{{ $suggestion->id }}" style="position: relative; min-height: 180px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
                                     <!-- Suggestion Background Image -->
                                     @if($suggestion->getFirstMediaUrl('images'))
@@ -603,14 +633,16 @@
                                                 <h4 style="font-size: 1rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.2;">{{ $suggestion->title }}</h4>
                                             </div>
 
+                                            @if($suggestion->createdBy)
                                             <div style="display: flex; align-items: center; margin-bottom: 0.75rem;">
                                                 <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                                 </svg>
                                                 <span style="font-size: 0.75rem; color: rgba(255,255,255,0.8); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                                    {{ $suggestion->createdBy->name ?? 'Anonim' }}
+                                                    {{ $suggestion->createdBy->name }}
                                                 </span>
                                             </div>
+                                            @endif
 
                                             <p style="font-size: 0.875rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                                 <svg style="width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
@@ -666,19 +698,6 @@
                                     </div>
                                 </div>
                                 @endforeach
-
-                                @if($project->oneriler->count() > 2)
-                                <div style="grid-column: 1 / -1; text-align: center; margin-top: 0.5rem;">
-                                    <a href="{{ route('user.project.suggestions', $project->id) }}"
-                                       class="btn-show-more"
-                                       style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white; padding: 0.75rem 1.5rem; border-radius: var(--radius-lg); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.3s; backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin: 0 auto; text-shadow: 0 1px 2px rgba(0,0,0,0.5); text-decoration: none;">
-                                        <svg style="width: 1rem; height: 1rem; color: rgba(255,255,255,0.9);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                                        </svg>
-                                        <span>ve {{ $project->oneriler->count() - 2 }} öneri daha...</span>
-                                    </a>
-                                </div>
-                                @endif
                             </div>
                         </div>
                         @else
