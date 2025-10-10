@@ -47,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\SetLocale::class,
             ])
             ->authMiddleware([
                 Authenticate::class,
@@ -56,7 +57,7 @@ class AdminPanelProvider extends PanelProvider
                 fn (): string => view('chunks.chunked-upload-scripts')->render()
             )
             ->renderHook(
-                'panels::global-search.end',
+                'panels::global-search.after',
                 fn (): string => view('components.admin-language-selector')->render()
             )
             ->plugins([
