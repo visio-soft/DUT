@@ -55,6 +55,10 @@ class AdminPanelProvider extends PanelProvider
                 'panels::scripts.after',
                 fn (): string => view('chunks.chunked-upload-scripts')->render()
             )
+            ->renderHook(
+                'panels::global-search.end',
+                fn (): string => view('components.admin-language-selector')->render()
+            )
             ->plugins([
                 FilamentShieldPlugin::make(),
             ]);
