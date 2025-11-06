@@ -22,5 +22,16 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             NormalAdminUserSeeder::class,
         ]);
+
+        // Kategoriler ekle
+        $this->call([
+            CategorySeeder::class,
+        ]);
+
+        // Proje ve Öneriler ekle
+        $this->call([
+            ProjectSeeder::class,
+            OneriSeeder::class,
+        ]);
     }
 }
