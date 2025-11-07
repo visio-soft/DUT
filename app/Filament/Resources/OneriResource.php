@@ -77,14 +77,19 @@ class OneriResource extends Resource
                                     ->prefix('₺')
                                     ->placeholder('Örn: 50000'),
 
-                                Forms\Components\TextInput::make('estimated_duration')
-                                    ->label('Tahmini Süre')
-                                    ->numeric()
-                                    ->minValue(1)
-                                    ->maxValue(365)
-                                    ->suffix('gün')
-                                    ->placeholder('Örn: 30'),
+                                Forms\Components\Toggle::make('hide_budget')
+                                    ->label('Bütçeyi Gizle')
+                                    ->helperText('Aktif olursa bütçe kullanıcı panelinde görünmez')
+                                    ->default(false),
                             ]),
+
+                        Forms\Components\TextInput::make('estimated_duration')
+                            ->label('Tahmini Süre')
+                            ->numeric()
+                            ->minValue(1)
+                            ->maxValue(365)
+                            ->suffix('gün')
+                            ->placeholder('Örn: 30'),
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
@@ -141,6 +146,10 @@ class OneriResource extends Resource
                 Tables\Columns\TextColumn::make('budget')->label('Bütçe')
                     ->money('TRY')
                     ->sortable(),
+                Tables\Columns\IconColumn::make('hide_budget')
+                    ->label('Bütçe Gizli')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('likes_count')
                     ->label('Beğeni Sayısı')
                     ->counts('likes')
@@ -216,36 +225,30 @@ class OneriResource extends Resource
                         }
                     }),
 
-                // Bütçe filtresi: miktar + az/çok toggle
+                // Bütçe filtresi: aralık bazlı
                 Filter::make('budget_filter')
-                    ->label('Bütçe')
+                    ->label('Bütçe Aralığı')
                     ->form([
-                        Forms\Components\Grid::make()
+                        Forms\Components\Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->label('Bütçe')
+                                Forms\Components\TextInput::make('min_budget')
+                                    ->label('Minimum Bütçe (₺)')
                                     ->numeric()
-                                    ->default(0),
+                                    ->placeholder('Örn: 10000'),
 
-                                Forms\Components\Toggle::make('is_more')
-                                    ->label(function (callable $get) {
-                                        $amount = $get('amount');
-                                        return $amount ? ($amount . "₺'dan fazla?") : 'Bütçe Belirleyin';
-                                    })
-                                    ->inline(false),
-                            ])
-                            ->columns(2),
+                                Forms\Components\TextInput::make('max_budget')
+                                    ->label('Maksimum Bütçe (₺)')
+                                    ->numeric()
+                                    ->placeholder('Örn: 100000'),
+                            ]),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (empty($data['amount'])) {
-                            return;
+                        if (!empty($data['min_budget'])) {
+                            $query->where('budget', '>=', $data['min_budget']);
                         }
 
-                        $amount = $data['amount'];
-                        if (!empty($data['is_more'])) {
-                            $query->where('budget', '>=', $amount);
-                        } else {
-                            $query->where('budget', '<=', $amount);
+                        if (!empty($data['max_budget'])) {
+                            $query->where('budget', '<=', $data['max_budget']);
                         }
                     }),
 

@@ -29,6 +29,7 @@ class Project extends Model implements HasMedia
         'start_date',
         'end_date',
         'budget',
+        'hide_budget',
         'latitude',
         'longitude',
         'address',
@@ -44,6 +45,7 @@ class Project extends Model implements HasMedia
         'start_date' => 'date',
         'end_date' => 'date',
         'budget' => 'decimal:2',
+        'hide_budget' => 'boolean',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];

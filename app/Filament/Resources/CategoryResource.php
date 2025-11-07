@@ -34,6 +34,15 @@ class CategoryResource extends Resource
                 Forms\Components\Section::make('Temel Bilgiler')
                     ->icon('heroicon-o-information-circle')
                     ->schema([
+                        Forms\Components\Select::make('parent_id')
+                            ->label('Üst Kategori')
+                            ->relationship('parent', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Üst kategori seçin (isteğe bağlı)')
+                            ->helperText('Alt kategori oluşturmak için bir üst kategori seçin.')
+                            ->columnSpanFull(),
+
                         Forms\Components\TextInput::make('name')
                             ->label('Proje Adı')
                             ->required()
@@ -141,6 +150,12 @@ class CategoryResource extends Resource
                     ->circular()
                     ->height(50)
                     ->width(50),
+
+                Tables\Columns\TextColumn::make('parent.name')
+                    ->label('Üst Kategori')
+                    ->searchable()
+                    ->placeholder('Ana Kategori')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('name')->label('Proje Adı')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('description')
@@ -258,6 +273,52 @@ class CategoryResource extends Resource
 
                         if (!empty($data['neighborhood'])) {
                             $query->where('neighborhood', $data['neighborhood']);
+                        }
+                    }),
+
+                // Tarih filtresi
+                Filter::make('date_range')
+                    ->label('Tarih Aralığı')
+                    ->form([
+                        Forms\Components\DatePicker::make('start_from')
+                            ->label('Başlangıç Tarihi (Min)')
+                            ->placeholder('Başlangıç')
+                            ->native(false),
+                        
+                        Forms\Components\DatePicker::make('start_until')
+                            ->label('Başlangıç Tarihi (Max)')
+                            ->placeholder('Bitiş')
+                            ->native(false),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['start_from'])) {
+                            $query->whereDate('start_datetime', '>=', $data['start_from']);
+                        }
+
+                        if (!empty($data['start_until'])) {
+                            $query->whereDate('start_datetime', '<=', $data['start_until']);
+                        }
+                    }),
+
+                // Durum filtresi (Oylama durumu)
+                Filter::make('voting_status')
+                    ->label('Oylama Durumu')
+                    ->form([
+                        Forms\Components\Select::make('status')
+                            ->label('Durum')
+                            ->options([
+                                'active' => 'Aktif (Oy verilebilir)',
+                                'expired' => 'Süresi Dolmuş',
+                            ])
+                            ->placeholder('Tümü'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['status'])) {
+                            if ($data['status'] === 'active') {
+                                $query->where('end_datetime', '>', now());
+                            } elseif ($data['status'] === 'expired') {
+                                $query->where('end_datetime', '<=', now());
+                            }
                         }
                     }),
             ])

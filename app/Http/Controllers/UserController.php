@@ -42,15 +42,78 @@ class UserController extends Controller
     /**
      * Projeler sayfası - Tüm projeler ve öneriler
      */
-    public function projects()
+    public function projects(Request $request)
     {
+        // Filtre query parametrelerini al
+        $filters = $request->only(['category', 'district', 'neighborhood', 'status', 'min_budget', 'max_budget']);
+
         // Tüm kategorileri (projeleri) önerileriyle birlikte getir
-        $projects = Category::with([
+        $projectsQuery = Category::with([
                 'oneriler.likes',
                 'oneriler.createdBy'
             ])
-            ->has('oneriler') // Sadece önerisi olan kategoriler
-            ->get();
+            ->has('oneriler'); // Sadece önerisi olan kategoriler
+
+        // Kategori filtresi
+        if (!empty($filters['category'])) {
+            $projectsQuery->where('id', $filters['category']);
+        }
+
+        // İlçe filtresi
+        if (!empty($filters['district'])) {
+            $projectsQuery->where('district', $filters['district']);
+        }
+
+        // Mahalle filtresi
+        if (!empty($filters['neighborhood'])) {
+            $projectsQuery->where('neighborhood', $filters['neighborhood']);
+        }
+
+        // Durum filtresi (Oylama durumu)
+        if (!empty($filters['status'])) {
+            if ($filters['status'] === 'active') {
+                $projectsQuery->where('end_datetime', '>', now());
+            } elseif ($filters['status'] === 'expired') {
+                $projectsQuery->where('end_datetime', '<=', now());
+            }
+        }
+
+        $projects = $projectsQuery->get();
+
+        // Bütçe filtreleme (öneri seviyesinde)
+        if (!empty($filters['min_budget']) || !empty($filters['max_budget'])) {
+            $projects = $projects->map(function ($project) use ($filters) {
+                $project->oneriler = $project->oneriler->filter(function ($oneri) use ($filters) {
+                    $budgetMatch = true;
+                    
+                    if (!empty($filters['min_budget']) && $oneri->budget < $filters['min_budget']) {
+                        $budgetMatch = false;
+                    }
+                    
+                    if (!empty($filters['max_budget']) && $oneri->budget > $filters['max_budget']) {
+                        $budgetMatch = false;
+                    }
+                    
+                    return $budgetMatch;
+                });
+                
+                return $project;
+            })->filter(function ($project) {
+                return $project->oneriler->count() > 0;
+            });
+        }
+
+        // Tüm kategorileri filtre için al
+        $allCategories = Category::has('oneriler')->orderBy('name')->get();
+        
+        // İlçe listesi
+        $districts = array_keys(config('istanbul_neighborhoods', []));
+        
+        // Seçili ilçeye göre mahalleler
+        $neighborhoods = [];
+        if (!empty($filters['district'])) {
+            $neighborhoods = config('istanbul_neighborhoods.' . $filters['district'], []);
+        }
 
         // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
         $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
@@ -61,7 +124,15 @@ class UserController extends Controller
             $randomBackgroundImage = $imageData ? $imageData['url'] : null;
         }
 
-        return view('user.projects', compact('projects', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.projects', compact(
+            'projects', 
+            'hasBackgroundImages', 
+            'randomBackgroundImage',
+            'allCategories',
+            'districts',
+            'neighborhoods',
+            'filters'
+        ));
     }
 
     /**
