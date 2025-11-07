@@ -1335,6 +1335,34 @@
 
                             <!-- Suggestion Meta -->
                             <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem;">
+                                @if(($suggestion->min_budget || $suggestion->max_budget) && !$suggestion->hide_budget && !$suggestion->category->hide_budget)
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
+                                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6V4.5m0 0h1.5m-1.5 0V3.75A.75.75 0 0 1 4.5 3h1.5m6.75 0v.75A.75.75 0 0 1 12 5.25v-2.25A.75.75 0 0 1 12.75 3h1.5m-1.5 0v.75a.75.75 0 0 0 .75.75h.75m-1.5 0V3.75a.75.75 0 0 1 .75-.75h1.5M15 4.5v.75a.75.75 0 0 0 .75.75h.75m-1.5 0V3.75a.75.75 0 0 1 .75-.75h1.5m-1.5 0v.75a.75.75 0 0 0 .75.75h.75M3 18.75v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5m-18 0v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5m-18 0v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5M3 15v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5m-18 0v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5m-18 0v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5M3 12v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5m-18 0v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5m-18 0v-1.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75v1.5M3 9V7.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 .75.75V9m-18 0v-1.5A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 .75.75v1.5" />
+                                        </svg>
+                                        @if($suggestion->min_budget && $suggestion->max_budget)
+                                            ₺{{ number_format((float)$suggestion->min_budget, 0, ',', '.') }} - ₺{{ number_format((float)$suggestion->max_budget, 0, ',', '.') }}
+                                        @elseif($suggestion->min_budget)
+                                            ₺{{ number_format((float)$suggestion->min_budget, 0, ',', '.') }}+
+                                        @elseif($suggestion->max_budget)
+                                            ₺{{ number_format((float)$suggestion->max_budget, 0, ',', '.') }}
+                                        @endif
+                                    </div>
+                                @endif
+                                @if($suggestion->min_estimated_duration || $suggestion->max_estimated_duration)
+                                    <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
+                                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                        @if($suggestion->min_estimated_duration && $suggestion->max_estimated_duration)
+                                            {{ $suggestion->min_estimated_duration }} - {{ $suggestion->max_estimated_duration }} gün
+                                        @elseif($suggestion->min_estimated_duration)
+                                            {{ $suggestion->min_estimated_duration }} gün
+                                        @elseif($suggestion->max_estimated_duration)
+                                            {{ $suggestion->max_estimated_duration }} gün
+                                        @endif
+                                    </div>
+                                @endif
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>

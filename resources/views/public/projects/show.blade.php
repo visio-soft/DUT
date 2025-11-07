@@ -50,13 +50,21 @@
 
                     <!-- Project Details -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-                        @if($project->budget)
+                        @if($project->min_budget || $project->max_budget)
                             <div class="flex items-center space-x-2">
                                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
                                 </svg>
                                 <span class="text-sm text-gray-600">Bütçe:</span>
-                                <span class="font-medium text-green-600">₺{{ number_format((float)$project->budget, 0, ',', '.') }}</span>
+                                <span class="font-medium text-green-600">
+                                    @if($project->min_budget && $project->max_budget)
+                                        ₺{{ number_format((float)$project->min_budget, 0, ',', '.') }} - ₺{{ number_format((float)$project->max_budget, 0, ',', '.') }}
+                                    @elseif($project->min_budget)
+                                        ₺{{ number_format((float)$project->min_budget, 0, ',', '.') }}+
+                                    @elseif($project->max_budget)
+                                        ₺{{ number_format((float)$project->max_budget, 0, ',', '.') }}
+                                    @endif
+                                </span>
                             </div>
                         @endif
 

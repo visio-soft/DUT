@@ -69,27 +69,50 @@ class OneriResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
 
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\Fieldset::make('Bütçe Aralığı')
                             ->schema([
-                                Forms\Components\TextInput::make('budget')
-                                    ->label('Bütçe')
-                                    ->numeric()
-                                    ->prefix('₺')
-                                    ->placeholder('Örn: 50000'),
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('min_budget')
+                                            ->label('Minimum Bütçe')
+                                            ->numeric()
+                                            ->prefix('₺')
+                                            ->placeholder('Örn: 300'),
 
-                                Forms\Components\Toggle::make('hide_budget')
-                                    ->label('Bütçeyi Gizle')
-                                    ->helperText('Aktif olursa bütçe kullanıcı panelinde görünmez')
-                                    ->default(false),
-                            ]),
+                                        Forms\Components\TextInput::make('max_budget')
+                                            ->label('Maksimum Bütçe')
+                                            ->numeric()
+                                            ->prefix('₺')
+                                            ->placeholder('Örn: 500'),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
 
-                        Forms\Components\TextInput::make('estimated_duration')
-                            ->label('Tahmini Süre')
-                            ->numeric()
-                            ->minValue(1)
-                            ->maxValue(365)
-                            ->suffix('gün')
-                            ->placeholder('Örn: 30'),
+                        Forms\Components\Fieldset::make('Tahmini Süre Aralığı')
+                            ->schema([
+                                Forms\Components\Grid::make(2)
+                                    ->schema([
+                                        Forms\Components\TextInput::make('min_estimated_duration')
+                                            ->label('Minimum Süre')
+                                            ->numeric()
+                                            ->minValue(1)
+                                            ->suffix('gün')
+                                            ->placeholder('Örn: 30'),
+
+                                        Forms\Components\TextInput::make('max_estimated_duration')
+                                            ->label('Maksimum Süre')
+                                            ->numeric()
+                                            ->minValue(1)
+                                            ->suffix('gün')
+                                            ->placeholder('Örn: 60'),
+                                    ]),
+                            ])
+                            ->columnSpanFull(),
+
+                        Forms\Components\Toggle::make('hide_budget')
+                            ->label('Bütçeyi Gizle')
+                            ->helperText('Bütçe bilgisini kullanıcı panelinde gizler.')
+                            ->default(false),
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make('Konum')
@@ -143,13 +166,19 @@ class OneriResource extends Resource
                     ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label('Bütçe')
-                    ->money('TRY')
+                Tables\Columns\TextColumn::make('budget_range')
+                    ->label('Bütçe Aralığı')
+                    ->formatStateUsing(function ($record) {
+                        if ($record->min_budget && $record->max_budget) {
+                            return '₺' . number_format($record->min_budget, 2, ',', '.') . ' - ₺' . number_format($record->max_budget, 2, ',', '.');
+                        } elseif ($record->min_budget) {
+                            return '₺' . number_format($record->min_budget, 2, ',', '.');
+                        } elseif ($record->max_budget) {
+                            return '₺' . number_format($record->max_budget, 2, ',', '.');
+                        }
+                        return 'Belirtilmemiş';
+                    })
                     ->sortable(),
-                Tables\Columns\IconColumn::make('hide_budget')
-                    ->label('Bütçe Gizli')
-                    ->boolean()
-                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('likes_count')
                     ->label('Beğeni Sayısı')
                     ->counts('likes')
@@ -162,9 +191,18 @@ class OneriResource extends Resource
                     ->badge()
                     ->color('info')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('estimated_duration')
+                Tables\Columns\TextColumn::make('estimated_duration_range')
                     ->label('Tahmini Süre')
-                    ->suffix(' gün')
+                    ->formatStateUsing(function ($record) {
+                        if ($record->min_estimated_duration && $record->max_estimated_duration) {
+                            return $record->min_estimated_duration . ' - ' . $record->max_estimated_duration . ' gün';
+                        } elseif ($record->min_estimated_duration) {
+                            return $record->min_estimated_duration . ' gün';
+                        } elseif ($record->max_estimated_duration) {
+                            return $record->max_estimated_duration . ' gün';
+                        }
+                        return 'Belirtilmemiş';
+                    })
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
@@ -244,11 +282,11 @@ class OneriResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (!empty($data['min_budget'])) {
-                            $query->where('budget', '>=', $data['min_budget']);
+                            $query->where('min_budget', '>=', $data['min_budget']);
                         }
 
                         if (!empty($data['max_budget'])) {
-                            $query->where('budget', '<=', $data['max_budget']);
+                            $query->where('max_budget', '<=', $data['max_budget']);
                         }
                     }),
 

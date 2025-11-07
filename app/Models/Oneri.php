@@ -27,7 +27,8 @@ class Oneri extends Model implements HasMedia
         'title',
         'description',
         'estimated_duration',
-        'budget',
+        'min_budget',
+        'max_budget',
         'hide_budget',
         'latitude',
         'longitude',
@@ -42,7 +43,8 @@ class Oneri extends Model implements HasMedia
 
     protected $casts = [
         'estimated_duration' => 'integer',
-        'budget' => 'decimal:2',
+        'min_budget' => 'decimal:2',
+        'max_budget' => 'decimal:2',
         'hide_budget' => 'boolean',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',

@@ -80,6 +80,12 @@ class CategoryResource extends Resource
                                     ->after('start_datetime')
                                     ->helperText('Proje bitiş tarihi geçtikten sonra beğeni yapılamaz.'),
                             ]),
+
+                        Forms\Components\Toggle::make('hide_budget')
+                            ->label('Önerilerin Bütçesini Gizle')
+                            ->helperText('Aktif olursa bu projeye ait tüm önerilerin bütçeleri kullanıcı panelinde görünmez')
+                            ->default(false)
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 
@@ -196,6 +202,11 @@ class CategoryResource extends Resource
                     ->badge()
                     ->color(fn ($record) => $record && $record->end_datetime && $record->isExpired() ? 'danger' : 'success')
                     ->sortable(false),
+
+                Tables\Columns\IconColumn::make('hide_budget')
+                    ->label('Bütçe Gizli')
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 Tables\Columns\TextColumn::make('country')
                     ->label('Ülke')

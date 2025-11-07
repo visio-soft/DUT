@@ -52,10 +52,10 @@ class UserController extends Controller
                 'oneriler' => function ($query) use ($filters) {
                     // Bütçe filtresini query seviyesinde uygula
                     if (!empty($filters['min_budget'])) {
-                        $query->where('budget', '>=', $filters['min_budget']);
+                        $query->where('min_budget', '>=', $filters['min_budget']);
                     }
                     if (!empty($filters['max_budget'])) {
-                        $query->where('budget', '<=', $filters['max_budget']);
+                        $query->where('max_budget', '<=', $filters['max_budget']);
                     }
                 },
                 'oneriler.likes',
@@ -91,10 +91,10 @@ class UserController extends Controller
         if (!empty($filters['min_budget']) || !empty($filters['max_budget'])) {
             $projectsQuery->whereHas('oneriler', function ($query) use ($filters) {
                 if (!empty($filters['min_budget'])) {
-                    $query->where('budget', '>=', $filters['min_budget']);
+                    $query->where('min_budget', '>=', $filters['min_budget']);
                 }
                 if (!empty($filters['max_budget'])) {
-                    $query->where('budget', '<=', $filters['max_budget']);
+                    $query->where('max_budget', '<=', $filters['max_budget']);
                 }
             });
         }

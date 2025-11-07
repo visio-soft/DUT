@@ -29,9 +29,19 @@
             <label for="location" class="form-label">Konum</label>
             <input type="text" name="location" id="location" class="form-control">
         </div>
-        <div class="mb-3">
-            <label for="budget" class="form-label">Bütçe</label>
-            <input type="number" name="budget" id="budget" class="form-control" step="0.01">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="min_budget" class="form-label">Minimum Bütçe</label>
+                    <input type="number" name="min_budget" id="min_budget" class="form-control" step="0.01">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="max_budget" class="form-label">Maksimum Bütçe</label>
+                    <input type="number" name="max_budget" id="max_budget" class="form-control" step="0.01">
+                </div>
+            </div>
         </div>
         <div class="mb-3">
             <label for="image" class="form-label">Resim</label>
