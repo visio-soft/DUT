@@ -58,7 +58,13 @@ class Category extends Model implements HasMedia
         return $this->hasMany(Oneri::class, 'category_id');
     }
 
-    // eski projects() metodunu koruyoruz
+    /**
+     * Alias for oneriler() for backward compatibility.
+     * Returns the same relationship as oneriler().
+     * 
+     * @deprecated Use oneriler() instead
+     * @return HasMany
+     */
     public function projects(): HasMany
     {
         return $this->oneriler();

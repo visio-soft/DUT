@@ -49,6 +49,15 @@ class UserController extends Controller
 
         // Tüm kategorileri (projeleri) önerileriyle birlikte getir
         $projectsQuery = Category::with([
+                'oneriler' => function ($query) use ($filters) {
+                    // Bütçe filtresini query seviyesinde uygula
+                    if (!empty($filters['min_budget'])) {
+                        $query->where('budget', '>=', $filters['min_budget']);
+                    }
+                    if (!empty($filters['max_budget'])) {
+                        $query->where('budget', '<=', $filters['max_budget']);
+                    }
+                },
                 'oneriler.likes',
                 'oneriler.createdBy'
             ])
@@ -78,30 +87,19 @@ class UserController extends Controller
             }
         }
 
-        $projects = $projectsQuery->get();
-
-        // Bütçe filtreleme (öneri seviyesinde)
+        // Bütçe filtresi varsa, sadece önerisi olan kategorileri al
         if (!empty($filters['min_budget']) || !empty($filters['max_budget'])) {
-            $projects = $projects->map(function ($project) use ($filters) {
-                $project->oneriler = $project->oneriler->filter(function ($oneri) use ($filters) {
-                    $budgetMatch = true;
-                    
-                    if (!empty($filters['min_budget']) && $oneri->budget < $filters['min_budget']) {
-                        $budgetMatch = false;
-                    }
-                    
-                    if (!empty($filters['max_budget']) && $oneri->budget > $filters['max_budget']) {
-                        $budgetMatch = false;
-                    }
-                    
-                    return $budgetMatch;
-                });
-                
-                return $project;
-            })->filter(function ($project) {
-                return $project->oneriler->count() > 0;
+            $projectsQuery->whereHas('oneriler', function ($query) use ($filters) {
+                if (!empty($filters['min_budget'])) {
+                    $query->where('budget', '>=', $filters['min_budget']);
+                }
+                if (!empty($filters['max_budget'])) {
+                    $query->where('budget', '<=', $filters['max_budget']);
+                }
             });
         }
+
+        $projects = $projectsQuery->get();
 
         // Tüm kategorileri filtre için al
         $allCategories = Category::has('oneriler')->orderBy('name')->get();
