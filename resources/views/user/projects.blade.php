@@ -404,8 +404,90 @@
 
         @if($projects->count() > 0)
         <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
-            <!-- Sol Taraf: Tree View -->
+            <!-- Sol Taraf: Filters & Tree View -->
             <div>
+                <!-- Filters Section -->
+                <div class="filters-section" style="background: white; border: 1px solid var(--gray-200); border-radius: var(--radius-lg); padding: 1rem; margin-bottom: 1.5rem; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                        <h3 style="font-size: 1rem; font-weight: 600; color: var(--gray-900); margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+                            <svg style="width: 1.25rem; height: 1.25rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                            </svg>
+                            Filtreler
+                        </h3>
+                        @if(request()->hasAny(['category', 'district', 'neighborhood', 'status', 'min_budget', 'max_budget']))
+                        <a href="{{ route('user.projects') }}" style="font-size: 0.75rem; color: var(--green-600); text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.25rem;">
+                            <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Sıfırla
+                        </a>
+                        @endif
+                    </div>
+
+                    <form method="GET" action="{{ route('user.projects') }}" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <!-- Kategori Filtresi -->
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.25rem;">Kategori</label>
+                            <select name="category" class="filter-select" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">Tümü</option>
+                                @foreach($allCategories as $cat)
+                                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                                    {{ Str::limit($cat->name, 30) }}
+                                </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- İlçe Filtresi -->
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.25rem;">İlçe</label>
+                            <select name="district" id="district-filter" class="filter-select" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">Tümü</option>
+                                @foreach($districts as $district)
+                                <option value="{{ $district }}" {{ request('district') == $district ? 'selected' : '' }}>{{ $district }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Mahalle Filtresi -->
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.25rem;">Mahalle</label>
+                            <select name="neighborhood" id="neighborhood-filter" class="filter-select" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">Tümü</option>
+                                @foreach($neighborhoods as $neighborhood)
+                                <option value="{{ $neighborhood }}" {{ request('neighborhood') == $neighborhood ? 'selected' : '' }}>{{ $neighborhood }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Durum Filtresi -->
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.25rem;">Oylama Durumu</label>
+                            <select name="status" class="filter-select" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">Tümü</option>
+                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Aktif (Oy Verilebilir)</option>
+                                <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Süresi Dolmuş</option>
+                            </select>
+                        </div>
+
+                        <!-- Bütçe Aralığı Filtresi -->
+                        <div>
+                            <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--gray-700); margin-bottom: 0.25rem;">Bütçe Aralığı</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <input type="number" name="min_budget" placeholder="Min ₺" value="{{ request('min_budget') }}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem;">
+                                <input type="number" name="max_budget" placeholder="Max ₺" value="{{ request('max_budget') }}" style="width: 100%; padding: 0.5rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem;">
+                            </div>
+                        </div>
+
+                        <!-- Filtrele Butonu -->
+                        <button type="submit" style="width: 100%; padding: 0.625rem; background: var(--green-600); color: white; border: none; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s;">
+                            Filtrele
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Tree View -->
                 <div class="tree-view">
                     <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                         <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -1190,6 +1272,36 @@ function toggleLike(suggestionId) {
 // Call on load and resize
 window.addEventListener('load', adjustLayout);
 window.addEventListener('resize', adjustLayout);
+
+// Filter: Dynamic neighborhood loading based on district
+document.addEventListener('DOMContentLoaded', function() {
+    const districtSelect = document.getElementById('district-filter');
+    const neighborhoodSelect = document.getElementById('neighborhood-filter');
+    
+    if (districtSelect && neighborhoodSelect) {
+        // Neighborhood data from config
+        const neighborhoodData = @json(config('istanbul_neighborhoods', []));
+        
+        districtSelect.addEventListener('change', function() {
+            const selectedDistrict = this.value;
+            
+            // Clear current neighborhoods
+            neighborhoodSelect.innerHTML = '<option value="">Tümü</option>';
+            
+            // If a district is selected, populate neighborhoods
+            if (selectedDistrict && neighborhoodData[selectedDistrict]) {
+                const neighborhoods = neighborhoodData[selectedDistrict];
+                neighborhoods.forEach(function(neighborhood) {
+                    const option = document.createElement('option');
+                    option.value = neighborhood;
+                    option.textContent = neighborhood;
+                    neighborhoodSelect.appendChild(option);
+                });
+            }
+        });
+    }
+});
+
 </script>
     </div>
 </div>
