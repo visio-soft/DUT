@@ -4,8 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\Category;
-use App\Models\Project;
-use App\Models\ProjectDesign;
+use App\Models\Oneri;
 use App\Models\User;
 use Carbon\Carbon;
 
@@ -40,27 +39,26 @@ class CreateTestCategory extends Command
             return;
         }
 
-        // Test projesi oluştur
-        $testProject = Project::create([
+        // Test önerisi oluştur
+        $testOneri = Oneri::create([
             'category_id' => $testCategory->id,
             'created_by_id' => $user->id,
-            'title' => 'Test Projesi - Zaman Sayacı',
-            'description' => 'Bu proje zaman sayacını test etmek için oluşturulmuştur. 2 dakika sonra süresi dolacak.',
-            'start_date' => $now->format('Y-m-d'),
-            'end_date' => $now->copy()->addMinutes(2)->format('Y-m-d'),
-            'budget' => 50000,
+            'title' => 'Test Önerisi - Zaman Sayacı',
+            'description' => 'Bu öneri zaman sayacını test etmek için oluşturulmuştur. 2 dakika sonra süresi dolacak.',
+            'min_budget' => 40000,
+            'max_budget' => 60000,
             'city' => 'İstanbul',
             'district' => 'Kadıköy',
             'neighborhood' => 'Moda',
             'address' => 'Test Adresi'
         ]);
 
-        $this->info("\nTest projesi oluşturuldu!");
-        $this->info("ID: " . $testProject->id);
-        $this->info("Başlık: " . $testProject->title);
-        $this->info("Kategori: " . $testProject->category->name);
+        $this->info("\nTest önerisi oluşturuldu!");
+        $this->info("ID: " . $testOneri->id);
+        $this->info("Başlık: " . $testOneri->title);
+        $this->info("Kategori: " . $testOneri->category->name);
 
         // Design functionality removed - no longer creating test designs
-        $this->info("\nTest tamamlandı! Proje başarıyla oluşturuldu.");
+        $this->info("\nTest tamamlandı! Öneri başarıyla oluşturuldu.");
     }
 }

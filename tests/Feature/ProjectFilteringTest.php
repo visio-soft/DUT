@@ -24,33 +24,35 @@ class ProjectFilteringTest extends TestCase
     }
 
     /**
-     * Test that category hierarchy works correctly.
+     * Test that category hierarchy works correctly with MainCategory.
      */
     public function test_category_can_have_parent_and_children(): void
     {
-        $parentCategory = Category::create([
-            'name' => 'Parent Category',
-            'description' => 'This is a parent category',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+        $mainCategory = \App\Models\MainCategory::create([
+            'name' => 'Main Category',
+            'description' => 'This is a main category',
             'aktif' => true,
         ]);
 
-        $childCategory = Category::create([
-            'name' => 'Child Category',
-            'description' => 'This is a child category',
-            'parent_id' => $parentCategory->id,
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+        $category1 = Category::create([
+            'name' => 'Category 1',
+            'description' => 'This is first category under main',
+            'main_category_id' => $mainCategory->id,
             'aktif' => true,
         ]);
 
-        $this->assertEquals($parentCategory->id, $childCategory->parent->id);
-        $this->assertEquals(1, $parentCategory->children()->count());
-        $this->assertTrue($parentCategory->aktif);
-        $this->assertTrue($childCategory->aktif);
+        $category2 = Category::create([
+            'name' => 'Category 2',
+            'description' => 'This is second category under main',
+            'main_category_id' => $mainCategory->id,
+            'aktif' => true,
+        ]);
+
+        $this->assertEquals($mainCategory->id, $category1->mainCategory->id);
+        $this->assertEquals($mainCategory->id, $category2->mainCategory->id);
+        $this->assertEquals(2, $mainCategory->categories()->count());
+        $this->assertTrue($category1->aktif);
+        $this->assertTrue($category2->aktif);
     }
 
     /**
@@ -61,9 +63,7 @@ class ProjectFilteringTest extends TestCase
         $category = Category::create([
             'name' => 'Test Category',
             'description' => 'Test Description',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
         $user = User::create([
@@ -78,7 +78,8 @@ class ProjectFilteringTest extends TestCase
             'created_by_id' => $user->id,
             'title' => 'Test Suggestion with Visible Budget',
             'description' => 'Test Description',
-            'budget' => 50000,
+            'min_budget' => 45000,
+            'max_budget' => 55000,
             'hide_budget' => false,
         ]);
 
@@ -87,14 +88,15 @@ class ProjectFilteringTest extends TestCase
             'created_by_id' => $user->id,
             'title' => 'Test Suggestion with Hidden Budget',
             'description' => 'Test Description',
-            'budget' => 75000,
+            'min_budget' => 70000,
+            'max_budget' => 80000,
             'hide_budget' => true,
         ]);
 
         $this->assertFalse($oneriVisible->hide_budget);
         $this->assertTrue($oneriHidden->hide_budget);
-        $this->assertEquals(50000, $oneriVisible->budget);
-        $this->assertEquals(75000, $oneriHidden->budget);
+        $this->assertEquals(45000, $oneriVisible->min_budget);
+        $this->assertEquals(80000, $oneriHidden->max_budget);
     }
 
     /**
@@ -113,17 +115,13 @@ class ProjectFilteringTest extends TestCase
         $category1 = Category::create([
             'name' => 'Category 1',
             'description' => 'Description 1',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
         $category2 = Category::create([
             'name' => 'Category 2',
             'description' => 'Description 2',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
         Oneri::create([
@@ -163,17 +161,13 @@ class ProjectFilteringTest extends TestCase
         $activeCategory = Category::create([
             'name' => 'Active Category',
             'description' => 'Active Description',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
-        $expiredCategory = Category::create([
-            'name' => 'Expired Category',
-            'description' => 'Expired Description',
-            'start_datetime' => now()->subDays(60),
-            'end_datetime' => now()->subDays(30),
-            'neighborhood' => 'Test Neighborhood',
+        $inactiveCategory = Category::create([
+            'name' => 'Inactive Category',
+            'description' => 'Inactive Description',
+            'aktif' => false,
         ]);
 
         Oneri::create([
@@ -184,9 +178,9 @@ class ProjectFilteringTest extends TestCase
         ]);
 
         Oneri::create([
-            'category_id' => $expiredCategory->id,
+            'category_id' => $inactiveCategory->id,
             'created_by_id' => $user->id,
-            'title' => 'Expired Suggestion',
+            'title' => 'Inactive Suggestion',
             'description' => 'Description',
         ]);
 
@@ -195,10 +189,9 @@ class ProjectFilteringTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Active Category');
 
-        // Test expired filter
-        $response = $this->actingAs($user)->get('/projects?status=expired');
+        // Test all projects
+        $response = $this->actingAs($user)->get('/projects');
         $response->assertStatus(200);
-        $response->assertSee('Expired Category');
     }
 
     /**
@@ -217,9 +210,7 @@ class ProjectFilteringTest extends TestCase
         $category = Category::create([
             'name' => 'Test Category',
             'description' => 'Test Description',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
         Oneri::create([
@@ -227,7 +218,8 @@ class ProjectFilteringTest extends TestCase
             'created_by_id' => $user->id,
             'title' => 'Low Budget Suggestion',
             'description' => 'Description',
-            'budget' => 10000,
+            'min_budget' => 8000,
+            'max_budget' => 12000,
         ]);
 
         Oneri::create([
@@ -235,7 +227,8 @@ class ProjectFilteringTest extends TestCase
             'created_by_id' => $user->id,
             'title' => 'High Budget Suggestion',
             'description' => 'Description',
-            'budget' => 100000,
+            'min_budget' => 90000,
+            'max_budget' => 110000,
         ]);
 
         // Test budget range filter
@@ -252,18 +245,12 @@ class ProjectFilteringTest extends TestCase
         $activeCategory = Category::create([
             'name' => 'Active Category',
             'description' => 'Active Description',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
             'aktif' => true,
         ]);
 
         $inactiveCategory = Category::create([
             'name' => 'Inactive Category',
             'description' => 'Inactive Description',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
             'aktif' => false,
         ]);
 
@@ -283,95 +270,64 @@ class ProjectFilteringTest extends TestCase
      */
     public function test_category_hierarchy_path_is_generated_correctly(): void
     {
-        $grandParent = Category::create([
-            'name' => 'Grand Parent',
+        $mainCategory = \App\Models\MainCategory::create([
+            'name' => 'Main Category',
             'description' => 'Level 1',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
             'aktif' => true,
         ]);
 
-        $parent = Category::create([
-            'name' => 'Parent',
+        $category1 = Category::create([
+            'name' => 'Category 1',
             'description' => 'Level 2',
-            'parent_id' => $grandParent->id,
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+            'main_category_id' => $mainCategory->id,
             'aktif' => true,
         ]);
 
-        $child = Category::create([
-            'name' => 'Child',
-            'description' => 'Level 3',
-            'parent_id' => $parent->id,
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'neighborhood' => 'Test Neighborhood',
+        $category2 = Category::create([
+            'name' => 'Category 2',
+            'description' => 'Level 2',
+            'main_category_id' => $mainCategory->id,
             'aktif' => true,
         ]);
 
-        // Test hierarchy paths
-        $this->assertEquals('Grand Parent', $grandParent->getHierarchyPath());
-        $this->assertEquals('Grand Parent > Parent', $parent->getHierarchyPath());
-        $this->assertEquals('Grand Parent > Parent > Child', $child->getHierarchyPath());
+        // Test hierarchy relationships
+        $this->assertEquals($mainCategory->id, $category1->mainCategory->id);
+        $this->assertEquals($mainCategory->id, $category2->mainCategory->id);
+        $this->assertEquals(2, $mainCategory->categories()->count());
     }
 
     /**
-     * Test that multiple filters can be combined (category, location, date, status).
+     * Test that multiple filters can be combined (category, status).
      */
     public function test_categories_can_be_filtered_with_multiple_criteria(): void
     {
-        // Create active category in a specific district
+        // Create active category
         $activeCategory = Category::create([
             'name' => 'Active Category',
             'description' => 'Test',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'district' => 'Kadıköy',
-            'neighborhood' => 'Moda',
             'aktif' => true,
         ]);
 
-        // Create inactive category in a different district
+        // Create inactive category
         $inactiveCategory = Category::create([
             'name' => 'Inactive Category',
             'description' => 'Test',
-            'start_datetime' => now(),
-            'end_datetime' => now()->addDays(30),
-            'district' => 'Beşiktaş',
-            'neighborhood' => 'Ortaköy',
             'aktif' => false,
         ]);
 
-        // Create expired category
-        $expiredCategory = Category::create([
-            'name' => 'Expired Category',
+        // Create another active category
+        $anotherActiveCategory = Category::create([
+            'name' => 'Another Active Category',
             'description' => 'Test',
-            'start_datetime' => now()->subDays(60),
-            'end_datetime' => now()->subDays(30),
-            'district' => 'Kadıköy',
-            'neighborhood' => 'Moda',
             'aktif' => true,
         ]);
 
-        // Test combining aktif and district filters
-        $filtered = Category::where('aktif', true)
-            ->where('district', 'Kadıköy')
-            ->get();
+        // Test aktif filter
+        $filtered = Category::where('aktif', true)->get();
 
         $this->assertEquals(2, $filtered->count());
         $this->assertTrue($filtered->contains($activeCategory));
-        $this->assertTrue($filtered->contains($expiredCategory));
+        $this->assertTrue($filtered->contains($anotherActiveCategory));
         $this->assertFalse($filtered->contains($inactiveCategory));
-
-        // Test combining aktif and date filters (active projects)
-        $activeAndNotExpired = Category::where('aktif', true)
-            ->where('end_datetime', '>', now())
-            ->get();
-
-        $this->assertEquals(1, $activeAndNotExpired->count());
-        $this->assertTrue($activeAndNotExpired->contains($activeCategory));
     }
 }
