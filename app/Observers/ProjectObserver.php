@@ -21,6 +21,13 @@ class ProjectObserver
         }
     }
 
+    public function saving(Project $project): void
+    {
+        if ($project->project_group_id && $project->projectGroup) {
+            $project->category_id = $project->projectGroup->category_id;
+        }
+    }
+
     /**
      * Handle the Project "deleting" event.
      * Parent project silinince child design ve design like'ları da silinsin

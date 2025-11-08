@@ -23,11 +23,13 @@ class Project extends Model implements HasMedia
         'category_id',
         'created_by_id',
         'updated_by_id',
+        'project_group_id',
         'title',
         'description',
         'start_date',
         'end_date',
-        'budget',
+        'min_budget',
+        'max_budget',
         'latitude',
         'longitude',
         'address',
@@ -42,7 +44,8 @@ class Project extends Model implements HasMedia
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'budget' => 'decimal:2',
+        'min_budget' => 'decimal:2',
+        'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];
@@ -60,6 +63,11 @@ class Project extends Model implements HasMedia
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
+    public function projectGroup(): BelongsTo
+    {
+        return $this->belongsTo(ProjectGroup::class, 'project_group_id');
     }
 
     // Design relationship removed - no longer needed

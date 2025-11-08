@@ -57,6 +57,11 @@ class Category extends Model implements HasMedia
         return $this->hasMany(Suggestion::class, 'category_id');
     }
 
+    public function projectGroups(): HasMany
+    {
+        return $this->hasMany(ProjectGroup::class, 'category_id');
+    }
+
     // Keep old projects() method for backward compatibility
     public function projects(): HasMany
     {
