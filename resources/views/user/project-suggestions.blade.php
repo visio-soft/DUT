@@ -1105,11 +1105,11 @@
             </div>
 
             @php
-                $totalSuggestions = $project->oneriler->count();
-                $totalLikes = $project->oneriler->sum(function($suggestion) {
+                $totalSuggestions = $project->suggestions->count();
+                $totalLikes = $project->suggestions->sum(function($suggestion) {
                     return $suggestion->likes->count();
                 });
-                $totalComments = $project->oneriler->sum(function($suggestion) {
+                $totalComments = $project->suggestions->sum(function($suggestion) {
                     return $suggestion->comments->count();
                 });
             @endphp
@@ -1210,7 +1210,7 @@
 </section><!-- Main Content Section -->
 <div class="section-padding">
     <div class="user-container">
-        @if($project->oneriler->count() > 0)
+        @if($project->suggestions->count() > 0)
         <div class="d-grid" style="grid-template-columns: 1fr 3fr; gap: 2rem;">
             <!-- Sol Taraf: Suggestion Tree View -->
             <div>
@@ -1247,12 +1247,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">{{ $project->name }}</span>
-                                <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $project->oneriler->count() }})</span>
+                                <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $project->suggestions->count() }})</span>
                             </div>
 
                             <!-- Suggestions -->
                             <div class="tree-suggestions" style="margin-left: 1rem; margin-top: 0.5rem;">
-                                @foreach($project->oneriler->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
+                                @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
                                 <div class="tree-suggestion" style="display: flex; align-items: center; padding: 0.375rem 0.5rem; margin-bottom: 0.25rem; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.2s; font-size: 0.8rem;"
                                      onclick="scrollToSuggestion({{ $suggestion->id }})">
                                     <svg style="width: 0.75rem; height: 0.75rem; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -1276,7 +1276,7 @@
             <!-- Sağ Taraf: Suggestion Cards -->
             <div>
                 <div class="d-flex" style="flex-direction: column; gap: 2rem;">
-                    @foreach($project->oneriler->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
+                    @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
                     <div id="suggestion-{{ $suggestion->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
                         <!-- Suggestion Background Image -->
                         @php

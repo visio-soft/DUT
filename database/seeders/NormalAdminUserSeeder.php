@@ -15,14 +15,14 @@ class NormalAdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin rolü oluştur
+        // Create admin role
         $adminRole = Role::firstOrCreate(['name' => 'admin']);
         
-        // Admin rolüne kullanıcı ve öneri izinlerini ata
+        // Assign user and suggestion permissions to admin role
         $userPermissions = Permission::where('name', 'like', '%user%')->get();
-        $oneriPermissions = Permission::where('name', 'like', '%oneri%')->get();
+        $suggestionPermissions = Permission::where('name', 'like', '%suggestion%')->get();
         
-        $allPermissions = $userPermissions->merge($oneriPermissions);
+        $allPermissions = $userPermissions->merge($suggestionPermissions);
         $adminRole->syncPermissions($allPermissions);
         
         // Normal admin kullanıcısı oluştur (OMEGA BRANCH VERSION)
@@ -37,10 +37,10 @@ class NormalAdminUserSeeder extends Seeder
             $omegaAdmin->save();
         }
         
-        // Admin rolünü kullanıcıya ata
+        // Assign admin role to user
         $omegaAdmin->assignRole('admin');
         
-        // Normal admin kullanıcısı oluştur (MAIN BRANCH VERSION)
+        // Create normal admin user (MAIN BRANCH VERSION)
         $normalAdmin = User::where('email', 'normaladmin@dut.com')->first();
         
         if (!$normalAdmin) {
@@ -52,11 +52,11 @@ class NormalAdminUserSeeder extends Seeder
             $normalAdmin->save();
         }
         
-        // Admin rolünü kullanıcıya ata
+        // Assign admin role to user
         $normalAdmin->assignRole('admin');
-        echo "Normal admin kullanıcıları oluşturuldu:\n";
+        echo "Normal admin users created:\n";
         echo "1. Omega Admin - Email: omega@admin.com, Password: omega456\n";
         echo "2. Normal Admin Main - Email: normaladmin@dut.com, Password: main123\n";
-        echo "Bu kullanıcılar User yönetimini ve Öneri yönetimini görebilir, Role yönetimini göremez.\n";
+        echo "These users can view User management and Suggestion management, but not Role management.\n";
     }
 }

@@ -333,9 +333,9 @@
             @php
                 // Genel istatistikler
                 $totalProjects = $projects->count();
-                $totalSuggestions = $projects->sum(function($project) { return $project->oneriler->count(); });
+                $totalSuggestions = $projects->sum(function($project) { return $project->suggestions->count(); });
                 $totalLikes = $projects->sum(function($project) {
-                    return $project->oneriler->sum(function($suggestion) {
+                    return $project->suggestions->sum(function($suggestion) {
                         return $suggestion->likes->count();
                     });
                 });
@@ -442,13 +442,13 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
                                 </svg>
                                 <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($project->name, 25) }}</span>
-                                <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $project->oneriler->count() }})</span>
+                                <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $project->suggestions->count() }})</span>
                             </a>
 
                             <!-- Suggestions -->
-                            @if($project->oneriler->count() > 0)
+                            @if($project->suggestions->count() > 0)
                             <div class="tree-suggestions">
-                                @foreach($project->oneriler as $suggestion)
+                                @foreach($project->suggestions as $suggestion)
                                 <div class="tree-suggestion"
                                      onclick="scrollToSuggestion({{ $suggestion->id }})">
                                     <svg style="width: 0.75rem; height: 0.75rem; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -553,7 +553,7 @@
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                     </svg>
-                                    {{ $project->oneriler->count() }} {{ __('common.suggestion') }}
+                                    {{ $project->suggestions->count() }} {{ __('common.suggestion') }}
                                 </div>
 
                                 @if($project->end_datetime)
@@ -597,16 +597,16 @@
                         </div>
 
                         <!-- Suggestions -->
-                        @if($project->oneriler->count() > 0)
+                        @if($project->suggestions->count() > 0)
                         <div style="position: relative; z-index: 3; padding: 0 2rem 2rem 2rem;">
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: white;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                                 </svg>
-                                <h3 style="font-size: 1.125rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">{{ __('common.suggestions') }} ({{ $project->oneriler->count() }})</h3>
+                                <h3 style="font-size: 1.125rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">{{ __('common.suggestions') }} ({{ $project->suggestions->count() }})</h3>
                             </div>
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                @foreach($project->oneriler as $suggestion)
+                                @foreach($project->suggestions as $suggestion)
                                 <div id="suggestion-{{ $suggestion->id }}" style="position: relative; min-height: 180px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
                                     <!-- Suggestion Background Image -->
                                     @if($suggestion->getFirstMediaUrl('images'))

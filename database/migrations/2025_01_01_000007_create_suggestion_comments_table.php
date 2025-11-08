@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oneri_comments', function (Blueprint $table) {
+        Schema::create('suggestion_comments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('oneri_id')->constrained('oneriler')->onDelete('cascade');
+            $table->foreignId('suggestion_id')->constrained('suggestions')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->text('comment');
             $table->boolean('is_approved')->default(false);
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // Additional indexes for performance
-            $table->index(['oneri_id', 'is_approved']);
+            $table->index(['suggestion_id', 'is_approved']);
             $table->index('created_at');
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oneri_comments');
+        Schema::dropIfExists('suggestion_comments');
     }
 };

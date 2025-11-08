@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('oneri_comments', function (Blueprint $table) {
+        Schema::table('suggestion_comments', function (Blueprint $table) {
             $table->unsignedBigInteger('parent_id')->nullable()->after('user_id');
             $table->foreign('parent_id')->references('id')->on('oneri_comments')->onDelete('cascade');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('oneri_comments', function (Blueprint $table) {
+        Schema::table('suggestion_comments', function (Blueprint $table) {
             $table->dropForeign(['parent_id']);
             $table->dropColumn('parent_id');
         });

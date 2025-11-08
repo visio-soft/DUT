@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oneriler', function (Blueprint $table) {
+        Schema::create('suggestions', function (Blueprint $table) {
             $table->id();
 
             // Relationships
@@ -22,11 +22,11 @@ return new class extends Migration
             // Basic Information
             $table->string('title')->index();
             $table->text('description')->nullable();
-            $table->integer('estimated_duration')->nullable()->comment('Tahmini işlem süresi (gün)');
+            $table->integer('estimated_duration')->nullable()->comment('Estimated duration (days)');
 
             // Project Dates
-            $table->dateTime('start_date')->nullable()->comment('Proje başlangıç tarihi ve saati');
-            $table->dateTime('end_date')->nullable()->comment('Proje bitiş tarihi ve saati');
+            $table->dateTime('start_date')->nullable()->comment('Project start date and time');
+            $table->dateTime('end_date')->nullable()->comment('Project end date and time');
 
             // Budget
             $table->decimal('budget', 15, 2)->nullable();
@@ -39,8 +39,8 @@ return new class extends Migration
             $table->string('city', 100)->default('İstanbul');
             $table->string('district', 100)->nullable();
             $table->string('neighborhood', 100)->nullable();
-            $table->string('street_cadde', 150)->nullable();
-            $table->string('street_sokak', 150)->nullable();
+            $table->string('street_avenue', 150)->nullable();
+            $table->string('street_road', 150)->nullable();
 
             // Timestamps
             $table->timestamps();
@@ -56,6 +56,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oneriler');
+        Schema::dropIfExists('suggestions');
     }
 };

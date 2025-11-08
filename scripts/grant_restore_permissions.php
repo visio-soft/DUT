@@ -10,10 +10,10 @@ use Spatie\Permission\Models\Permission;
 
 $adminRole = Role::where('name', 'admin')->first();
 $permissions = [
-    'restore_oneri',
-    'restore_any_oneri',
-    'force_delete_oneri',
-    'force_delete_any_oneri',
+    'restore_suggestion',
+    'restore_any_suggestion',
+    'force_delete_suggestion',
+    'force_delete_any_suggestion',
     'restore_category',
     'restore_any_category',
     'force_delete_category',

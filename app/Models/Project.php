@@ -17,8 +17,8 @@ class Project extends Model implements HasMedia
 {
     use InteractsWithMedia,SoftDeletes;
 
-    // Map the legacy 'projects' model to the current 'oneriler' table
-    protected $table = 'oneriler';
+    // Map the legacy 'projects' model to the current 'suggestions' table
+    protected $table = 'suggestions';
 
     protected $fillable = [
         'category_id',
@@ -36,8 +36,8 @@ class Project extends Model implements HasMedia
         'city',
         'district',
         'neighborhood',
-        'street_cadde',
-        'street_sokak',
+        'street_avenue',
+        'street_road',
     ];
 
     protected $casts = [
