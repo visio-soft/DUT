@@ -30,7 +30,7 @@ class OneriResource extends Resource
 
     protected static ?string $navigationLabel = 'Öneriler';
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Öneri Yönetimi';
+    protected static ?string $navigationGroup = 'Proje Yönetimi';
 
     public static function form(Form $form): Form
     {
