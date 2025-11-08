@@ -41,12 +41,12 @@ class PortfolioProjectGroupTest extends TestCase
     public function test_portfolio_has_many_project_groups_relationship(): void
     {
         $portfolio = Portfolio::create(['name' => 'Test Portfolio']);
-        
+
         ProjectGroup::create([
             'name' => 'Group 1',
             'portfolio_id' => $portfolio->id,
         ]);
-        
+
         ProjectGroup::create([
             'name' => 'Group 2',
             'portfolio_id' => $portfolio->id,
@@ -79,8 +79,8 @@ class PortfolioProjectGroupTest extends TestCase
 
     public function test_project_group_id_is_in_fillable_attributes(): void
     {
-        $project = new Project();
-        $suggestion = new Suggestion();
+        $project = new Project;
+        $suggestion = new Suggestion;
 
         $this->assertContains('project_group_id', $project->getFillable());
         $this->assertContains('project_group_id', $suggestion->getFillable());
