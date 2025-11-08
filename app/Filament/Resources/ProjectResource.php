@@ -69,12 +69,12 @@ class ProjectResource extends Resource
                             ->placeholder(__('common.select_project_group'))
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('name')
-                                    ->label('Project Group Name')
+                                    ->label(__('common.project_group'))
                                     ->required()
                                     ->maxLength(255),
-                                Forms\Components\Select::make('project_category_id')
-                                    ->label('Project Category')
-                                    ->relationship('projectCategory', 'name')
+                                Forms\Components\Select::make('category_id')
+                                    ->label(__('common.project_category'))
+                                    ->relationship('category', 'name')
                                     ->required()
                                     ->searchable()
                                     ->preload(),

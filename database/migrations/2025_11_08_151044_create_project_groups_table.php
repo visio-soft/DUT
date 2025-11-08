@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('project_groups', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('project_category_id')->constrained('project_categories')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -16,28 +16,42 @@ class ProjectGroupResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-folder';
 
-    protected static ?string $navigationGroup = 'Project Management';
+    protected static ?string $navigationGroup = null;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('common.project_management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('common.project_groups');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('common.project_groups');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('common.project_group');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Project Group Name')
+                    ->label(__('common.project_group'))
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('project_category_id')
-                    ->label('Project Category')
-                    ->relationship('projectCategory', 'name')
+                Forms\Components\Select::make('category_id')
+                    ->label(__('common.project_category'))
+                    ->relationship('category', 'name')
                     ->required()
                     ->searchable()
-                    ->preload()
-                    ->createOptionForm([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Project Category Name')
-                            ->required()
-                            ->maxLength(255),
-                    ]),
+                    ->preload(),
             ]);
     }
 
@@ -51,19 +65,19 @@ class ProjectGroupResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->label('Project Group Name'),
-                Tables\Columns\TextColumn::make('projectCategory.name')
+                    ->label(__('common.project_group')),
+                Tables\Columns\TextColumn::make('category.name')
                     ->searchable()
                     ->sortable()
-                    ->label('Project Category'),
+                    ->label(__('common.project_category')),
                 Tables\Columns\TextColumn::make('projects_count')
                     ->counts('projects')
-                    ->label('Projects')
+                    ->label(__('common.projects'))
                     ->badge()
                     ->color('info'),
                 Tables\Columns\TextColumn::make('suggestions_count')
                     ->counts('suggestions')
-                    ->label('Suggestions')
+                    ->label(__('common.suggestions'))
                     ->badge()
                     ->color('warning'),
                 Tables\Columns\TextColumn::make('created_at')
