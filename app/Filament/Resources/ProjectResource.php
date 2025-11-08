@@ -79,18 +79,6 @@ class ProjectResource extends Resource
                                     ->searchable()
                                     ->preload(),
                             ]),
-                        Forms\Components\Select::make('category_id')
-                            ->label(__('common.project_category'))
-                            ->options(function () {
-                                return Category::all()->pluck('name', 'id');
-                            })
-                            ->searchable()
-                            ->preload()
-                            ->required()
-                            ->default(function () {
-                                return Category::first()?->id;
-                            })
-                            ->placeholder(__('common.select_project_category')),
                         Forms\Components\Select::make('created_by_id')
                             ->label(__('common.project_creator'))
                             ->relationship('createdBy', 'name')
@@ -114,11 +102,17 @@ class ProjectResource extends Resource
                                 Forms\Components\DatePicker::make('end_date')
                                     ->label(__('common.end_date')),
 
-                                Forms\Components\TextInput::make('budget')
-                                    ->label(__('common.budget'))
+                                Forms\Components\TextInput::make('min_budget')
+                                    ->label(__('common.min_budget'))
                                     ->numeric()
                                     ->prefix('₺')
-                                    ->placeholder(__('common.budget_example')),
+                                    ->placeholder(__('common.min_budget_example')),
+
+                                Forms\Components\TextInput::make('max_budget')
+                                    ->label(__('common.max_budget'))
+                                    ->numeric()
+                                    ->prefix('₺')
+                                    ->placeholder(__('common.max_budget_example')),
                             ]),
                     ])
                     ->columnSpan(1),
@@ -177,7 +171,11 @@ class ProjectResource extends Resource
                     ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('district')->label(__('common.district'))->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label(__('common.neighborhood'))->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label(__('common.budget'))
+                Tables\Columns\TextColumn::make('min_budget')->label(__('common.min_budget'))
+                    ->money('TRY')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('max_budget')->label(__('common.max_budget'))
                     ->money('TRY')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('start_date')->label(__('common.start_date'))->date('d.m.Y')->sortable()
@@ -190,9 +188,6 @@ class ProjectResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
-                SelectFilter::make('category')
-                    ->label(__('common.category'))
-                    ->relationship('category', 'name'),
 
                 SelectFilter::make('project_group')
                     ->label(__('common.project_group'))
@@ -250,31 +245,24 @@ class ProjectResource extends Resource
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->label(__('common.budget'))
+                                Forms\Components\TextInput::make('min_budget')
+                                    ->label(__('common.min_budget'))
                                     ->numeric()
-                                    ->default(0),
-
-                                Forms\Components\Toggle::make('is_more')
-                                    ->label(function (callable $get) {
-                                        $amount = $get('amount');
-
-                                        return $amount ? ($amount."₺'dan fazla?") : 'Bütçe Belirleyin';
-                                    })
-                                    ->inline(false),
+                                    ->placeholder(__('common.min_budget_example')),
+                                Forms\Components\TextInput::make('max_budget')
+                                    ->label(__('common.max_budget'))
+                                    ->numeric()
+                                    ->placeholder(__('common.max_budget_example')),
                             ])
                             ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (empty($data['amount'])) {
-                            return;
+                        if (! empty($data['min_budget'])) {
+                            $query->where('min_budget', '>=', $data['min_budget']);
                         }
 
-                        $amount = $data['amount'];
-                        if (! empty($data['is_more'])) {
-                            $query->where('budget', '>=', $amount);
-                        } else {
-                            $query->where('budget', '<=', $amount);
+                        if (! empty($data['max_budget'])) {
+                            $query->where('max_budget', '<=', $data['max_budget']);
                         }
                     }),
             ])
@@ -339,8 +327,8 @@ class ProjectResource extends Resource
                 ]),
             ])
             ->groups([
-                Group::make('category.name')
-                    ->label(__('common.project'))
+                Group::make('projectGroup.name')
+                    ->label(__('common.project_group'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
                         $category = $record->category;
                         $end = __('common.not_specified');
@@ -353,7 +341,7 @@ class ProjectResource extends Resource
                     }),
 
             ])
-            ->defaultGroup('category.name');
+            ->defaultGroup('projectGroup.name');
 
     }
 

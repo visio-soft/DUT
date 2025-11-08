@@ -28,7 +28,8 @@ class Project extends Model implements HasMedia
         'description',
         'start_date',
         'end_date',
-        'budget',
+        'min_budget',
+        'max_budget',
         'latitude',
         'longitude',
         'address',
@@ -43,7 +44,8 @@ class Project extends Model implements HasMedia
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
-        'budget' => 'decimal:2',
+        'min_budget' => 'decimal:2',
+        'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];
