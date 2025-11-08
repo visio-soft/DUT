@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('oneriler', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             $table->foreignId('assigned_user_id')
                 ->nullable()
                 ->constrained('users')
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('oneriler', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             $table->dropForeign(['assigned_user_id']);
             $table->dropIndex(['assigned_user_id']);
             $table->dropColumn('assigned_user_id');

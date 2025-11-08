@@ -2,23 +2,22 @@
 
 namespace App\Models;
 
-use App\Observers\OneriObserver;
+use App\Observers\SuggestionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-#[ObservedBy([OneriObserver::class])]
-class Oneri extends Model implements HasMedia
+#[ObservedBy([SuggestionObserver::class])]
+class Suggestion extends Model implements HasMedia
 {
     use InteractsWithMedia,SoftDeletes;
 
-    protected $table = 'oneriler';
+    protected $table = 'suggestions';
 
     protected $fillable = [
         'category_id',
@@ -35,8 +34,8 @@ class Oneri extends Model implements HasMedia
         'city',
         'district',
         'neighborhood',
-        'street_cadde',
-        'street_sokak',
+        'street_avenue',
+        'street_road',
     ];
 
     protected $casts = [
@@ -66,17 +65,17 @@ class Oneri extends Model implements HasMedia
 
     public function likes(): HasMany
     {
-        return $this->hasMany(OneriLike::class);
+        return $this->hasMany(SuggestionLike::class);
     }
 
     public function comments(): HasMany
     {
-        return $this->hasMany(OneriComment::class);
+        return $this->hasMany(SuggestionComment::class);
     }
 
     public function approvedComments(): HasMany
     {
-        return $this->hasMany(OneriComment::class)->where('is_approved', true)->whereNull('parent_id');
+        return $this->hasMany(SuggestionComment::class)->where('is_approved', true)->whereNull('parent_id');
     }
 
     public function getLikesCountAttribute(): int
@@ -106,7 +105,7 @@ class Oneri extends Model implements HasMedia
                 'image/png',
                 'image/webp',
                 'image/gif',
-                'image/bmp'
+                'image/bmp',
             ])
             ->useFallbackUrl('/images/placeholder-suggestion.jpg')
             ->useFallbackPath(public_path('/images/placeholder-suggestion.jpg'));

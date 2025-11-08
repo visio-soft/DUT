@@ -2,11 +2,11 @@
 
 namespace App\Policies;
 
+use App\Models\Suggestion;
 use App\Models\User;
-use App\Models\Oneri;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class OneriPolicy
+class SuggestionPolicy
 {
     use HandlesAuthorization;
 
@@ -21,7 +21,7 @@ class OneriPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Oneri $oneri): bool
+    public function view(User $user, Suggestion $suggestion): bool
     {
         return $user->can('view_oneri');
     }
@@ -37,7 +37,7 @@ class OneriPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Oneri $oneri): bool
+    public function update(User $user, Suggestion $suggestion): bool
     {
         return $user->can('update_oneri');
     }
@@ -45,7 +45,7 @@ class OneriPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Oneri $oneri): bool
+    public function delete(User $user, Suggestion $suggestion): bool
     {
         return $user->can('delete_oneri');
     }
@@ -61,7 +61,7 @@ class OneriPolicy
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, Oneri $oneri): bool
+    public function forceDelete(User $user, Suggestion $suggestion): bool
     {
         return $user->can('force_delete_oneri');
     }
@@ -77,7 +77,7 @@ class OneriPolicy
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, Oneri $oneri): bool
+    public function restore(User $user, Suggestion $suggestion): bool
     {
         return $user->can('restore_oneri');
     }
@@ -93,7 +93,7 @@ class OneriPolicy
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, Oneri $oneri): bool
+    public function replicate(User $user, Suggestion $suggestion): bool
     {
         return $user->can('replicate_oneri');
     }

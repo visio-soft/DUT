@@ -39,7 +39,7 @@ class CreateTestUser extends Command
         $this->info('Test user created/updated successfully!');
         $this->info('Email: test@example.com');
         $this->info('Password: password');
-        $this->info('User ID: ' . $user->id);
+        $this->info('User ID: '.$user->id);
 
         return Command::SUCCESS;
     }

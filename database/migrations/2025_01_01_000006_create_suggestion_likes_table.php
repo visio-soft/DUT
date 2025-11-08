@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oneri_likes', function (Blueprint $table) {
+        Schema::create('suggestion_likes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('oneri_id')->constrained('oneriler')->onDelete('cascade');
+            $table->foreignId('suggestion_id')->constrained('suggestions')->onDelete('cascade');
             $table->timestamps();
 
             // Bir kullanıcı bir öneriye sadece bir kez beğeni verebilir
-            $table->unique(['user_id', 'oneri_id']);
+            $table->unique(['user_id', 'suggestion_id']);
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oneri_likes');
+        Schema::dropIfExists('suggestion_likes');
     }
 };

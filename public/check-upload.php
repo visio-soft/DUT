@@ -8,16 +8,18 @@
  * Kullanım: public/check-upload.php olarak kaydedin ve
  * https://yoursite.com/check-upload.php adresini açın
  */
-
 $requiredSettings = [
     'upload_max_filesize' => '25M',
     'post_max_size' => '30M',
     'memory_limit' => '256M',
-    'max_execution_time' => '300'
+    'max_execution_time' => '300',
 ];
 
-function parseSize($size) {
-    if ($size === '-1') return -1;
+function parseSize($size)
+{
+    if ($size === '-1') {
+        return -1;
+    }
     $unit = strtoupper(substr($size, -1));
     $value = (int) substr($size, 0, -1);
 
@@ -26,18 +28,23 @@ function parseSize($size) {
         case 'M': $value *= 1024;
         case 'K': $value *= 1024;
     }
+
     return $value;
 }
 
-function formatSize($bytes) {
-    if ($bytes === -1) return 'Unlimited';
+function formatSize($bytes)
+{
+    if ($bytes === -1) {
+        return 'Unlimited';
+    }
     $units = ['B', 'KB', 'MB', 'GB'];
     $i = 0;
     while ($bytes >= 1024 && $i < count($units) - 1) {
         $bytes /= 1024;
         $i++;
     }
-    return round($bytes, 2) . ' ' . $units[$i];
+
+    return round($bytes, 2).' '.$units[$i];
 }
 
 ?>
@@ -71,74 +78,74 @@ function formatSize($bytes) {
 
     <?php
     $allOk = true;
-    $warnings = [];
-    $errors = [];
+$warnings = [];
+$errors = [];
 
-    echo '<div class="check">';
-    echo '<h2>📋 Mevcut PHP Ayarları</h2>';
-    echo '<table>';
-    echo '<thead><tr><th>Ayar</th><th>Mevcut Değer</th><th>Gerekli Değer</th><th>Durum</th></tr></thead>';
-    echo '<tbody>';
+echo '<div class="check">';
+echo '<h2>📋 Mevcut PHP Ayarları</h2>';
+echo '<table>';
+echo '<thead><tr><th>Ayar</th><th>Mevcut Değer</th><th>Gerekli Değer</th><th>Durum</th></tr></thead>';
+echo '<tbody>';
 
-    foreach ($requiredSettings as $setting => $required) {
-        $current = ini_get($setting);
-        $currentBytes = parseSize($current);
-        $requiredBytes = parseSize($required);
+foreach ($requiredSettings as $setting => $required) {
+    $current = ini_get($setting);
+    $currentBytes = parseSize($current);
+    $requiredBytes = parseSize($required);
 
-        $status = 'ok';
-        $statusText = 'OK';
+    $status = 'ok';
+    $statusText = 'OK';
 
-        if ($currentBytes !== -1 && $requiredBytes !== -1 && $currentBytes < $requiredBytes) {
-            $status = 'error';
-            $statusText = 'DÜŞÜK';
-            $allOk = false;
-            $errors[] = "$setting değeri $current, olması gereken $required";
-        } elseif ($currentBytes !== -1 && $requiredBytes !== -1 && $currentBytes < ($requiredBytes * 1.5)) {
-            $status = 'warning';
-            $statusText = 'SINIRDA';
-            $warnings[] = "$setting değeri $current, daha yüksek olabilir";
-        }
-
-        echo "<tr>";
-        echo "<td><code>$setting</code></td>";
-        echo "<td>" . formatSize($currentBytes) . " <small>($current)</small></td>";
-        echo "<td>" . formatSize($requiredBytes) . " <small>($required)</small></td>";
-        echo "<td><span class='status $status'>$statusText</span></td>";
-        echo "</tr>";
+    if ($currentBytes !== -1 && $requiredBytes !== -1 && $currentBytes < $requiredBytes) {
+        $status = 'error';
+        $statusText = 'DÜŞÜK';
+        $allOk = false;
+        $errors[] = "$setting değeri $current, olması gereken $required";
+    } elseif ($currentBytes !== -1 && $requiredBytes !== -1 && $currentBytes < ($requiredBytes * 1.5)) {
+        $status = 'warning';
+        $statusText = 'SINIRDA';
+        $warnings[] = "$setting değeri $current, daha yüksek olabilir";
     }
 
-    echo '</tbody></table>';
+    echo '<tr>';
+    echo "<td><code>$setting</code></td>";
+    echo '<td>'.formatSize($currentBytes)." <small>($current)</small></td>";
+    echo '<td>'.formatSize($requiredBytes)." <small>($required)</small></td>";
+    echo "<td><span class='status $status'>$statusText</span></td>";
+    echo '</tr>';
+}
+
+echo '</tbody></table>';
+echo '</div>';
+
+// Özet
+if ($allOk && empty($warnings)) {
+    echo '<div class="check success">';
+    echo '<h2>✅ Tebrikler!</h2>';
+    echo '<p><strong>Tüm PHP ayarları 20MB dosya upload için uygun.</strong></p>';
+    echo '<p>Artık Laravel uygulamanızda 20MB\'a kadar dosya yükleyebilirsiniz.</p>';
     echo '</div>';
-
-    // Özet
-    if ($allOk && empty($warnings)) {
-        echo '<div class="check success">';
-        echo '<h2>✅ Tebrikler!</h2>';
-        echo '<p><strong>Tüm PHP ayarları 20MB dosya upload için uygun.</strong></p>';
-        echo '<p>Artık Laravel uygulamanızda 20MB\'a kadar dosya yükleyebilirsiniz.</p>';
-        echo '</div>';
-    } elseif (!empty($warnings) && empty($errors)) {
-        echo '<div class="check warning">';
-        echo '<h2>⚠️ Uyarı</h2>';
-        echo '<p>Ayarlar çalışır durumda ama iyileştirilebilir:</p>';
-        echo '<ul>';
-        foreach ($warnings as $warning) {
-            echo "<li>$warning</li>";
-        }
-        echo '</ul>';
-        echo '</div>';
-    } else {
-        echo '<div class="check error">';
-        echo '<h2>❌ Sorun Var</h2>';
-        echo '<p><strong>Aşağıdaki ayarları düzeltmeniz gerekiyor:</strong></p>';
-        echo '<ul>';
-        foreach ($errors as $error) {
-            echo "<li>$error</li>";
-        }
-        echo '</ul>';
-        echo '</div>';
+} elseif (! empty($warnings) && empty($errors)) {
+    echo '<div class="check warning">';
+    echo '<h2>⚠️ Uyarı</h2>';
+    echo '<p>Ayarlar çalışır durumda ama iyileştirilebilir:</p>';
+    echo '<ul>';
+    foreach ($warnings as $warning) {
+        echo "<li>$warning</li>";
     }
-    ?>
+    echo '</ul>';
+    echo '</div>';
+} else {
+    echo '<div class="check error">';
+    echo '<h2>❌ Sorun Var</h2>';
+    echo '<p><strong>Aşağıdaki ayarları düzeltmeniz gerekiyor:</strong></p>';
+    echo '<ul>';
+    foreach ($errors as $error) {
+        echo "<li>$error</li>";
+    }
+    echo '</ul>';
+    echo '</div>';
+}
+?>
 
     <div class="check">
         <h2>🛠️ Nasıl Düzeltilir?</h2>

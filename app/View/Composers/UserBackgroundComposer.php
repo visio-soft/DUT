@@ -16,7 +16,7 @@ class UserBackgroundComposer
             'hasBackgroundImages' => BackgroundImageHelper::hasBackgroundImages(),
             'randomBackgroundImage' => BackgroundImageHelper::getRandomSuggestionImage(),
             'backgroundImages' => BackgroundImageHelper::getRandomSuggestionImages(5),
-            'carouselImageSets' => BackgroundImageHelper::getCarouselImages(3, 5)
+            'carouselImageSets' => BackgroundImageHelper::getCarouselImages(3, 5),
         ]);
     }
 }

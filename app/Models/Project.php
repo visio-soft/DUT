@@ -6,7 +6,6 @@ use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -17,8 +16,8 @@ class Project extends Model implements HasMedia
 {
     use InteractsWithMedia,SoftDeletes;
 
-    // Map the legacy 'projects' model to the current 'oneriler' table
-    protected $table = 'oneriler';
+    // Map the legacy 'projects' model to the current 'suggestions' table
+    protected $table = 'suggestions';
 
     protected $fillable = [
         'category_id',
@@ -36,8 +35,8 @@ class Project extends Model implements HasMedia
         'city',
         'district',
         'neighborhood',
-        'street_cadde',
-        'street_sokak',
+        'street_avenue',
+        'street_road',
     ];
 
     protected $casts = [
@@ -75,7 +74,7 @@ class Project extends Model implements HasMedia
                 'image/gif',
                 'image/webp',
                 'image/bmp',
-                'image/svg+xml'
+                'image/svg+xml',
             ])
             ->singleFile()
             ->useFallbackUrl('/images/placeholder-project.jpg')

@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OneriCommentLike extends Model
+class SuggestionCommentLike extends Model
 {
-    protected $table = 'oneri_comment_likes';
+    protected $table = 'suggestion_comment_likes';
 
     protected $fillable = [
-        'oneri_comment_id',
+        'suggestion_comment_id',
         'user_id',
     ];
 
@@ -20,15 +20,15 @@ class OneriCommentLike extends Model
     ];
 
     /**
-     * Beğeninin ait olduğu yorum
+     * The comment this like belongs to
      */
     public function comment(): BelongsTo
     {
-        return $this->belongsTo(OneriComment::class, 'oneri_comment_id');
+        return $this->belongsTo(SuggestionComment::class, 'suggestion_comment_id');
     }
 
     /**
-     * Beğeniyi yapan kullanıcı
+     * The user who created the like
      */
     public function user(): BelongsTo
     {

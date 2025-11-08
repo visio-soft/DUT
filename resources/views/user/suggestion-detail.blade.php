@@ -175,7 +175,7 @@
                                 $userHasLikedInProject = false;
                                 $userLikedSuggestionInProject = null;
                                 if (Auth::check()) {
-                                    $projectSuggestions = \App\Models\Oneri::where('category_id', $suggestion->category_id)->get();
+                                    $projectSuggestions = \App\Models\Suggestion::where('category_id', $suggestion->category_id)->get();
                                     foreach($projectSuggestions as $projectSuggestion) {
                                         if ($projectSuggestion->likes->where('user_id', Auth::id())->count() > 0) {
                                             $userHasLikedInProject = true;

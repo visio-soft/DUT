@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('oneriler', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             // Drop foreign key first
             $table->dropForeign(['created_by_id']);
 
@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('oneriler', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             // Drop foreign key
             $table->dropForeign(['created_by_id']);
 

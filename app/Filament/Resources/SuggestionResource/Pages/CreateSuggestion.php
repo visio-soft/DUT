@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Filament\Resources\OneriResource\Pages;
+namespace App\Filament\Resources\SuggestionResource\Pages;
 
-use App\Filament\Resources\OneriResource;
-use Filament\Actions;
+use App\Filament\Resources\SuggestionResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
-class CreateOneri extends CreateRecord
+class CreateSuggestion extends CreateRecord
 {
-    protected static string $resource = OneriResource::class;
+    protected static string $resource = SuggestionResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Admin panelinde created_by_id manuel olarak seçilmişse onu kullan
         // Eğer seçilmemişse (null) boş bırak (anonim öneri olur)
         // Eğer hiç değer yoksa mevcut admin kullanıcısını ata
-        if (!array_key_exists('created_by_id', $data)) {
+        if (! array_key_exists('created_by_id', $data)) {
             $data['created_by_id'] = Auth::id();
         }
 
@@ -68,22 +67,24 @@ class CreateOneri extends CreateRecord
                         } else {
                             \Filament\Notifications\Notification::make()
                                 ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->body('Lütfen gerekli alanları kontrol edin: '.$e->getMessage())
                                 ->danger()
                                 ->send();
                         }
+
                         return;
                     } catch (\Exception $e) {
                         \Filament\Notifications\Notification::make()
                             ->title('Hata!')
-                            ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
+                            ->body('Öneri oluşturulurken bir hata oluştu: '.$e->getMessage())
                             ->danger()
                             ->send();
+
                         return;
                     }
                 })
                 ->extraAttributes([
-                    'class' => 'w-full justify-center mb-2'
+                    'class' => 'w-full justify-center mb-2',
                 ]),
 
             // İptal butonu
@@ -92,7 +93,7 @@ class CreateOneri extends CreateRecord
                 ->color('gray')
                 ->size('lg')
                 ->extraAttributes([
-                    'class' => 'w-full justify-center'
+                    'class' => 'w-full justify-center',
                 ]),
         ];
     }

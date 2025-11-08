@@ -2,12 +2,12 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use Filament\Panel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
-use Filament\Panel;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class UserRoleAccessTest extends TestCase
 {
@@ -16,7 +16,7 @@ class UserRoleAccessTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create roles
         Role::create(['name' => 'user', 'guard_name' => 'web']);
         Role::create(['name' => 'admin', 'guard_name' => 'web']);
@@ -34,12 +34,14 @@ class UserRoleAccessTest extends TestCase
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        
+
         $user->assignRole('user');
 
         // Create mock admin panel
-        $adminPanel = new class extends Panel {
-            public function getId(): string {
+        $adminPanel = new class extends Panel
+        {
+            public function getId(): string
+            {
                 return 'admin';
             }
         };
@@ -58,12 +60,14 @@ class UserRoleAccessTest extends TestCase
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        
+
         $user->assignRole('admin');
 
         // Create mock admin panel
-        $adminPanel = new class extends Panel {
-            public function getId(): string {
+        $adminPanel = new class extends Panel
+        {
+            public function getId(): string
+            {
                 return 'admin';
             }
         };
@@ -82,12 +86,14 @@ class UserRoleAccessTest extends TestCase
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        
+
         $user->assignRole('super_admin');
 
         // Create mock admin panel
-        $adminPanel = new class extends Panel {
-            public function getId(): string {
+        $adminPanel = new class extends Panel
+        {
+            public function getId(): string
+            {
                 return 'admin';
             }
         };
@@ -108,17 +114,19 @@ class UserRoleAccessTest extends TestCase
         ]);
 
         $user = User::where('email', 'newuser@example.com')->first();
-        
+
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('user'));
-        
+
         // Verify they cannot access admin panel
-        $adminPanel = new class extends Panel {
-            public function getId(): string {
+        $adminPanel = new class extends Panel
+        {
+            public function getId(): string
+            {
                 return 'admin';
             }
         };
-        
+
         $this->assertFalse($user->canAccessPanel($adminPanel));
     }
 }

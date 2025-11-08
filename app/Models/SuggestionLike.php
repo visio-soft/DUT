@@ -5,11 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class OneriLike extends Model
+class SuggestionLike extends Model
 {
     protected $fillable = [
         'user_id',
-        'oneri_id',
+        'suggestion_id',
     ];
 
     public function user(): BelongsTo
@@ -17,8 +17,8 @@ class OneriLike extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function oneri(): BelongsTo
+    public function suggestion(): BelongsTo
     {
-        return $this->belongsTo(Oneri::class);
+        return $this->belongsTo(Suggestion::class);
     }
 }

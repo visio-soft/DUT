@@ -1,16 +1,14 @@
 <?php
 
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-
 // Spatie models
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 $email = 'admin@admin.com';
 $password = 'password'; // provided password
@@ -47,6 +45,6 @@ try {
 
     echo "Done. Login: {$email} Password: {$password}\n";
 } catch (Throwable $e) {
-    echo 'Error: ' . $e->getMessage() . PHP_EOL;
+    echo 'Error: '.$e->getMessage().PHP_EOL;
     exit(1);
 }

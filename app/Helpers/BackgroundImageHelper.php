@@ -2,7 +2,7 @@
 
 namespace App\Helpers;
 
-use App\Models\Oneri;
+use App\Models\Suggestion;
 
 class BackgroundImageHelper
 {
@@ -12,7 +12,7 @@ class BackgroundImageHelper
      */
     public static function getRandomSuggestionImage(): ?string
     {
-        $suggestion = Oneri::whereHas('media', function ($query) {
+        $suggestion = Suggestion::whereHas('media', function ($query) {
             $query->where('collection_name', 'images');
         })->inRandomOrder()->first();
 
@@ -28,7 +28,7 @@ class BackgroundImageHelper
      */
     public static function getRandomSuggestionImages(int $count = 5): array
     {
-        $suggestions = Oneri::whereHas('media', function ($query) {
+        $suggestions = Suggestion::whereHas('media', function ($query) {
             $query->where('collection_name', 'images');
         })->inRandomOrder()->limit($count * 2)->get(); // Get more to ensure variety
 
@@ -38,7 +38,7 @@ class BackgroundImageHelper
                 $images[] = [
                     'url' => $suggestion->getFirstMediaUrl('images'),
                     'title' => $suggestion->title,
-                    'id' => $suggestion->id
+                    'id' => $suggestion->id,
                 ];
             }
         }
@@ -52,7 +52,7 @@ class BackgroundImageHelper
     public static function getCarouselImages(int $setCount = 3, int $imagesPerSet = 5): array
     {
         $totalNeeded = $setCount * $imagesPerSet;
-        $suggestions = Oneri::whereHas('media', function ($query) {
+        $suggestions = Suggestion::whereHas('media', function ($query) {
             $query->where('collection_name', 'images');
         })->inRandomOrder()->limit($totalNeeded * 2)->get();
 
@@ -62,7 +62,7 @@ class BackgroundImageHelper
                 $images[] = [
                     'url' => $suggestion->getFirstMediaUrl('images'),
                     'title' => $suggestion->title,
-                    'id' => $suggestion->id
+                    'id' => $suggestion->id,
                 ];
             }
         }
@@ -82,7 +82,7 @@ class BackgroundImageHelper
      */
     public static function getRandomBackgroundImage(): ?array
     {
-        $suggestion = Oneri::whereHas('media', function ($query) {
+        $suggestion = Suggestion::whereHas('media', function ($query) {
             $query->where('collection_name', 'images');
         })->inRandomOrder()->first();
 
@@ -90,7 +90,7 @@ class BackgroundImageHelper
             return [
                 'url' => $suggestion->getFirstMediaUrl('images'),
                 'title' => $suggestion->title,
-                'id' => $suggestion->id
+                'id' => $suggestion->id,
             ];
         }
 
@@ -102,7 +102,7 @@ class BackgroundImageHelper
      */
     public static function hasBackgroundImages(): bool
     {
-        return Oneri::whereHas('media', function ($query) {
+        return Suggestion::whereHas('media', function ($query) {
             $query->where('collection_name', 'images');
         })->exists();
     }

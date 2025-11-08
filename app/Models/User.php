@@ -19,7 +19,6 @@ class User extends Authenticatable implements FilamentUser
 
     use HasRoles;
 
-
     /**
      * The attributes that are mass assignable.
      *
@@ -72,12 +71,12 @@ class User extends Authenticatable implements FilamentUser
 
     public function createdOneriler(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'created_by_id');
+        return $this->hasMany(Suggestion::class, 'created_by_id');
     }
 
     public function updatedOneriler(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'updated_by_id');
+        return $this->hasMany(Suggestion::class, 'updated_by_id');
     }
 
     // Design functionality removed - projectDesignLikes relationship no longer needed

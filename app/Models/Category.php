@@ -10,8 +10,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Category extends Model implements HasMedia
 {
-    use SoftDeletes;
     use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $fillable = ['name', 'description', 'start_datetime', 'end_datetime', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
 
@@ -23,15 +23,15 @@ class Category extends Model implements HasMedia
         parent::boot();
 
         static::deleting(function ($category) {
-            // When soft deleting a category, also soft delete its related oneriler
-            if (!$category->isForceDeleting()) {
-                $category->oneriler()->delete();
+            // When soft deleting a category, also soft delete its related suggestions
+            if (! $category->isForceDeleting()) {
+                $category->suggestions()->delete();
             }
         });
 
         static::restoring(function ($category) {
-            // When restoring a category, also restore its related oneriler
-            $category->oneriler()->withTrashed()->restore();
+            // When restoring a category, also restore its related suggestions
+            $category->suggestions()->withTrashed()->restore();
         });
     }
 
@@ -52,15 +52,15 @@ class Category extends Model implements HasMedia
      */
     protected $attributes = [];
 
-    public function oneriler(): HasMany
+    public function suggestions(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'category_id');
+        return $this->hasMany(Suggestion::class, 'category_id');
     }
 
-    // eski projects() metodunu koruyoruz
+    // Keep old projects() method for backward compatibility
     public function projects(): HasMany
     {
-        return $this->oneriler();
+        return $this->suggestions();
     }
 
     /**
@@ -68,7 +68,7 @@ class Category extends Model implements HasMedia
      */
     public function isExpired(): bool
     {
-        if (!$this->end_datetime) {
+        if (! $this->end_datetime) {
             return false;
         }
 
@@ -80,7 +80,7 @@ class Category extends Model implements HasMedia
      */
     public function getRemainingTime(): ?array
     {
-        if (!$this->end_datetime || $this->isExpired()) {
+        if (! $this->end_datetime || $this->isExpired()) {
             return null;
         }
 
@@ -95,7 +95,7 @@ class Category extends Model implements HasMedia
             'seconds' => $diff->s,
             'total_hours' => ($diff->days * 24) + $diff->h,
             'total_minutes' => (($diff->days * 24) + $diff->h) * 60 + $diff->i,
-            'formatted' => $this->formatRemainingTime($diff)
+            'formatted' => $this->formatRemainingTime($diff),
         ];
     }
 
@@ -120,7 +120,7 @@ class Category extends Model implements HasMedia
      */
     public function getFormattedEndDatetime(): ?string
     {
-        if (!$this->end_datetime) {
+        if (! $this->end_datetime) {
             return null;
         }
 

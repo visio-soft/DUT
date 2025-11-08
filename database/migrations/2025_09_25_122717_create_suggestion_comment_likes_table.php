@@ -11,21 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('oneri_comment_likes', function (Blueprint $table) {
+        Schema::create('suggestion_comment_likes', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('oneri_comment_id');
+            $table->unsignedBigInteger('suggestion_comment_id');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
             // Foreign keys
-            $table->foreign('oneri_comment_id')->references('id')->on('oneri_comments')->onDelete('cascade');
+            $table->foreign('suggestion_comment_id')->references('id')->on('oneri_comments')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             // Unique constraint - bir kullanıcı bir yorumu sadece bir kez beğenebilir
-            $table->unique(['oneri_comment_id', 'user_id']);
+            $table->unique(['suggestion_comment_id', 'user_id']);
 
             // Indexes for performance
-            $table->index(['oneri_comment_id']);
+            $table->index(['suggestion_comment_id']);
             $table->index(['user_id']);
         });
     }
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('oneri_comment_likes');
+        Schema::dropIfExists('suggestion_comment_likes');
     }
 };

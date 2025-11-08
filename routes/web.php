@@ -1,15 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\HandleFileUploadLimits;
+use Illuminate\Support\Facades\Route;
 
 // Language switching route
 Route::get('/language/{locale}', function ($locale) {
     if (in_array($locale, ['tr', 'en'])) {
         session(['locale' => $locale]);
     }
+
     return redirect()->back();
 })->name('language.switch');
 
@@ -18,7 +19,7 @@ Route::get('/debug-upload', function () {
     return response()->json([
         'php_limits' => HandleFileUploadLimits::getCurrentLimits(),
         'media_library_max' => config('media-library.max_file_size'),
-        'media_library_max_mb' => round(config('media-library.max_file_size') / 1024 / 1024, 2) . ' MB',
+        'media_library_max_mb' => round(config('media-library.max_file_size') / 1024 / 1024, 2).' MB',
         'upload_config' => config('upload'),
         'server_info' => [
             'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',

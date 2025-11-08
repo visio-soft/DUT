@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\OneriResource\Pages;
+namespace App\Filament\Resources\SuggestionResource\Pages;
 
-use App\Filament\Resources\OneriResource;
+use App\Filament\Resources\SuggestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditOneri extends EditRecord
+class EditSuggestion extends EditRecord
 {
-    protected static string $resource = OneriResource::class;
+    protected static string $resource = SuggestionResource::class;
 
     /**
      * Preserve existing created_by_id when the edit form submits a null value.
@@ -56,17 +56,19 @@ class EditOneri extends EditRecord
                         } else {
                             \Filament\Notifications\Notification::make()
                                 ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->body('Lütfen gerekli alanları kontrol edin: '.$e->getMessage())
                                 ->danger()
                                 ->send();
                         }
+
                         return;
                     } catch (\Exception $e) {
                         \Filament\Notifications\Notification::make()
                             ->title('Hata!')
-                            ->body('Öneri güncellenirken bir hata oluştu: ' . $e->getMessage())
+                            ->body('Öneri güncellenirken bir hata oluştu: '.$e->getMessage())
                             ->danger()
                             ->send();
+
                         return;
                     }
                 }),
