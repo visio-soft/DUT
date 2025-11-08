@@ -61,10 +61,19 @@ class Category extends Model implements HasMedia
     }
 
     /**
+     * English alias for oneriler() relationship.
+     * Returns suggestions belonging to this category.
+     */
+    public function suggestions(): HasMany
+    {
+        return $this->oneriler();
+    }
+
+    /**
      * Alias for oneriler() for backward compatibility.
      * Returns the same relationship as oneriler().
      *
-     * @deprecated Use oneriler() instead
+     * @deprecated Use suggestions() instead
      */
     public function projects(): HasMany
     {

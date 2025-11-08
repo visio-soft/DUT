@@ -70,14 +70,41 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(OneriComment::class);
     }
 
+    /**
+     * English alias for oneriComments() relationship.
+     * Comments made by this user on suggestions.
+     */
+    public function suggestionComments(): HasMany
+    {
+        return $this->oneriComments();
+    }
+
     public function createdOneriler(): HasMany
     {
         return $this->hasMany(Oneri::class, 'created_by_id');
     }
 
+    /**
+     * English alias for createdOneriler() relationship.
+     * Suggestions created by this user.
+     */
+    public function createdSuggestions(): HasMany
+    {
+        return $this->createdOneriler();
+    }
+
     public function updatedOneriler(): HasMany
     {
         return $this->hasMany(Oneri::class, 'updated_by_id');
+    }
+
+    /**
+     * English alias for updatedOneriler() relationship.
+     * Suggestions updated by this user.
+     */
+    public function updatedSuggestions(): HasMany
+    {
+        return $this->updatedOneriler();
     }
 
     // Design functionality removed - projectDesignLikes relationship no longer needed
