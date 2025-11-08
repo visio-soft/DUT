@@ -10,12 +10,12 @@ class ProjectGroup extends Model
 {
     protected $fillable = [
         'name',
-        'portfolio_id',
+        'project_category_id',
     ];
 
-    public function portfolio(): BelongsTo
+    public function projectCategory(): BelongsTo
     {
-        return $this->belongsTo(Portfolio::class);
+        return $this->belongsTo(ProjectCategory::class, 'project_category_id');
     }
 
     public function projects(): HasMany

@@ -73,9 +73,9 @@ class SuggestionResource extends Resource
                                     ->label('Project Group Name')
                                     ->required()
                                     ->maxLength(255),
-                                Forms\Components\Select::make('portfolio_id')
-                                    ->label('Portfolio')
-                                    ->relationship('portfolio', 'name')
+                                Forms\Components\Select::make('project_category_id')
+                                    ->label('Project Category')
+                                    ->relationship('projectCategory', 'name')
                                     ->required()
                                     ->searchable()
                                     ->preload(),

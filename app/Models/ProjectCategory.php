@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Portfolio extends Model
+class ProjectCategory extends Model
 {
     protected $fillable = [
         'name',
@@ -13,6 +13,6 @@ class Portfolio extends Model
 
     public function projectGroups(): HasMany
     {
-        return $this->hasMany(ProjectGroup::class);
+        return $this->hasMany(ProjectGroup::class, 'project_category_id');
     }
 }

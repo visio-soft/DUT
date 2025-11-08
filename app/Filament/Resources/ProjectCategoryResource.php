@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PortfolioResource\Pages;
-use App\Models\Portfolio;
+use App\Filament\Resources\ProjectCategoryResource\Pages;
+use App\Models\ProjectCategory;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
-class PortfolioResource extends Resource
+class ProjectCategoryResource extends Resource
 {
-    protected static ?string $model = Portfolio::class;
+    protected static ?string $model = ProjectCategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-briefcase';
 
@@ -23,7 +23,7 @@ class PortfolioResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label('Portfolio Name')
+                    ->label('Project Category Name')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -39,7 +39,7 @@ class PortfolioResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()
-                    ->label('Portfolio Name'),
+                    ->label('Project Category Name'),
                 Tables\Columns\TextColumn::make('project_groups_count')
                     ->counts('projectGroups')
                     ->label('Project Groups')
@@ -77,9 +77,9 @@ class PortfolioResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPortfolios::route('/'),
-            'create' => Pages\CreatePortfolio::route('/create'),
-            'edit' => Pages\EditPortfolio::route('/{record}/edit'),
+            'index' => Pages\ListProjectCategories::route('/'),
+            'create' => Pages\CreateProjectCategory::route('/create'),
+            'edit' => Pages\EditProjectCategory::route('/{record}/edit'),
         ];
     }
 }
