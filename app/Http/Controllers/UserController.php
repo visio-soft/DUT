@@ -6,6 +6,7 @@ use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
 use App\Models\Suggestion;
 use App\Models\SuggestionComment;
+use App\Models\SuggestionCommentLike;
 use App\Models\SuggestionLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,16 +27,9 @@ class UserController extends Controller
             ->limit(3)
             ->get();
 
-        // Get random background image (different on each page refresh)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.index', compact('randomProjects', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.index', array_merge(compact('randomProjects'), $backgroundData));
     }
 
     /**
@@ -51,16 +45,9 @@ class UserController extends Controller
             ->has('suggestions') // Only categories with suggestions
             ->get();
 
-        // Get random background image (different on each page refresh)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.projects', compact('projects', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.projects', array_merge(compact('projects'), $backgroundData));
     }
 
     /**
@@ -76,16 +63,9 @@ class UserController extends Controller
         ])
             ->findOrFail($id);
 
-        // Get random background image (different on each page refresh)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.project-suggestions', compact('project', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.project-suggestions', array_merge(compact('project'), $backgroundData));
     }
 
     /**
@@ -115,16 +95,12 @@ class UserController extends Controller
                 ->get();
         }
 
-        // Get random background image (different on each page refresh)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.suggestion-detail', compact('suggestion', 'hasBackgroundImages', 'randomBackgroundImage', 'userPendingComments'));
+        return view('user.suggestion-detail', array_merge(
+            compact('suggestion', 'userPendingComments'),
+            $backgroundData
+        ));
     }
 
     /**
@@ -172,7 +148,7 @@ class UserController extends Controller
                 $existingLike->delete();
                 SuggestionLike::create([
                     'user_id' => $user->id,
-                    'oneri_id' => $suggestionId,
+                    'suggestion_id' => $suggestionId,
                 ]);
                 $liked = true;
             }
@@ -180,7 +156,7 @@ class UserController extends Controller
             // Yeni beğeni ekle
             SuggestionLike::create([
                 'user_id' => $user->id,
-                'oneri_id' => $suggestionId,
+                'suggestion_id' => $suggestionId,
             ]);
             $liked = true;
         }
@@ -231,7 +207,7 @@ class UserController extends Controller
         try {
             // Yorum ekleme (varsayılan olarak onaysız)
             $comment = SuggestionComment::create([
-                'oneri_id' => $suggestion->id,
+                'suggestion_id' => $suggestion->id,
                 'user_id' => $user->id,
                 'comment' => trim($request->comment),
                 'is_approved' => false, // Admin onayı gerekiyor
@@ -274,7 +250,7 @@ class UserController extends Controller
         try {
             // Cevap ekleme (varsayılan olarak onaysız)
             $reply = SuggestionComment::create([
-                'oneri_id' => $parentComment->oneri_id,
+                'suggestion_id' => $parentComment->suggestion_id,
                 'user_id' => $user->id,
                 'parent_id' => $parentComment->id,
                 'comment' => trim($request->comment),
@@ -309,7 +285,7 @@ class UserController extends Controller
 
         try {
             // Kullanıcının bu yoruma beğenisi var mı kontrol et
-            $existingLike = OneriCommentLike::where('oneri_comment_id', $commentId)
+            $existingLike = SuggestionCommentLike::where('suggestion_comment_id', $commentId)
                 ->where('user_id', $user->id)
                 ->first();
 
@@ -319,15 +295,15 @@ class UserController extends Controller
                 $liked = false;
             } else {
                 // Beğeni ekle
-                OneriCommentLike::create([
-                    'oneri_comment_id' => $commentId,
+                SuggestionCommentLike::create([
+                    'suggestion_comment_id' => $commentId,
                     'user_id' => $user->id,
                 ]);
                 $liked = true;
             }
 
             // Güncel beğeni sayısını hesapla
-            $likesCount = OneriCommentLike::where('oneri_comment_id', $commentId)->count();
+            $likesCount = SuggestionCommentLike::where('suggestion_comment_id', $commentId)->count();
 
             return response()->json([
                 'success' => true,
@@ -342,5 +318,22 @@ class UserController extends Controller
                 'message' => 'Beğeni işlemi sırasında bir hata oluştu.',
             ], 500);
         }
+    }
+
+    /**
+     * Get background image data for views
+     * Centralizes the background image logic to avoid duplication
+     */
+    private function getBackgroundImageData(): array
+    {
+        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
+        $randomBackgroundImage = null;
+
+        if ($hasBackgroundImages) {
+            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
+            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
+        }
+
+        return compact('hasBackgroundImages', 'randomBackgroundImage');
     }
 }

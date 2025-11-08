@@ -24,7 +24,7 @@ class ProjectObserver
     public function saving(Project $project): void
     {
         // Do not override if category_id is already set (e.g., inferred by form hooks)
-        if (!empty($project->category_id)) {
+        if (! empty($project->category_id)) {
             return;
         }
 
