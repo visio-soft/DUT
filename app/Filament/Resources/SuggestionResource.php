@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OneriResource\Pages;
-use App\Filament\Resources\OneriResource\RelationManagers;
-use App\Models\Oneri;
+use App\Filament\Resources\SuggestionResource\Pages;
+use App\Filament\Resources\SuggestionResource\RelationManagers;
+use App\Models\Suggestion;
 use App\Models\Category;
 use App\Rules\ImageFormatRule;
 use Filament\Forms;
@@ -22,27 +22,47 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
-class OneriResource extends Resource
+class SuggestionResource extends Resource
 {
-    protected static ?string $model = Oneri::class;
-    protected static ?string $pluralModelLabel = 'Öneriler';
-    protected static ?string $modelLabel = 'Öneri';
+    protected static ?string $model = Suggestion::class;
+    protected static ?string $pluralModelLabel = null;
+    protected static ?string $modelLabel = null;
 
-    protected static ?string $navigationLabel = 'Öneriler';
+    protected static ?string $navigationLabel = null;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-    protected static ?string $navigationGroup = 'Öneri Yönetimi';
+    protected static ?string $navigationGroup = null;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('common.suggestions');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('common.suggestions');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('common.suggestion');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('common.suggestion_management');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Temel Bilgiler')
+                Forms\Components\Section::make(__('common.basic_information'))
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         Forms\Components\Select::make('category_id')
-                            ->label('Proje Kategorisi')
+                            ->label(__('common.project_category'))
                             ->options(function () {
-                                // Tüm kategorileri göster
+                                // Show all categories
                                 return Category::all()->pluck('name', 'id');
                             })
                             ->searchable()
@@ -52,54 +72,54 @@ class OneriResource extends Resource
                                 // Set first category as default
                                 return Category::first()?->id;
                             })
-                            ->placeholder('Proje kategorisi seçin'),
+                            ->placeholder(__('common.select_project_category')),
                         Forms\Components\Select::make('created_by_id')
-                            ->label('Öneriyi Oluşturan Kullanıcı')
+                            ->label(__('common.suggestion_creator'))
                             ->relationship('createdBy', 'name')
                             ->searchable()
                             ->preload()
-                            ->placeholder('Kullanıcı seçin (boş bırakılırsa anonim)')
-                            ->helperText('Bu alanı boş bırakırsanız öneri anonim olarak görünecektir'),
+                            ->placeholder(__('common.select_user_or_anonymous'))
+                            ->helperText(__('common.anonymous_suggestion_helper')),
                         Forms\Components\TextInput::make('title')
-                            ->label('Başlık')
+                            ->label(__('common.title'))
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
-                            ->label('Açıklama')
+                            ->label(__('common.description'))
                             ->rows(3)
                             ->columnSpanFull(),
 
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('budget')
-                                    ->label('Bütçe')
+                                    ->label(__('common.budget'))
                                     ->numeric()
                                     ->prefix('₺')
-                                    ->placeholder('Örn: 50000'),
+                                    ->placeholder(__('common.budget_example')),
 
                                 Forms\Components\TextInput::make('estimated_duration')
-                                    ->label('Tahmini Süre')
+                                    ->label(__('common.estimated_duration'))
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue(365)
-                                    ->suffix('gün')
-                                    ->placeholder('Örn: 30'),
+                                    ->suffix(__('common.days'))
+                                    ->placeholder(__('common.duration_example')),
                             ]),
                     ])
                     ->columnSpan(1),
-                Forms\Components\Section::make('Konum')
+                Forms\Components\Section::make(__('common.location'))
                     ->icon('heroicon-o-map-pin')
                     ->schema([
                         // Sadece detaylı tarif alanı bırakıldı
                         Forms\Components\Textarea::make('address_details')
-                            ->label('Detaylı Tarif')
-                            ->placeholder('Detaylı adres tarifi (ör. bina, kapı, kat, vb.)')
+                            ->label(__('common.detailed_address'))
+                            ->placeholder(__('common.detailed_address_example'))
                             ->rows(3)
                             ->columnSpanFull(),
 
-                        // Resim upload
+                        // Image upload
                         SpatieMediaLibraryFileUpload::make('images')
-                            ->label('Öneri Tasarım Görseli')
+                            ->label(__('common.suggestion_design_image'))
                             ->collection('images')
                             ->image()
                             ->imagePreviewHeight('200')
@@ -107,7 +127,7 @@ class OneriResource extends Resource
                             ->maxFiles(1)
                             ->maxSize(20480) // 20MB limit
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
-                            ->helperText('Sadece resim dosyaları. Maksimum dosya boyutu: 20MB')
+                            ->helperText(__('common.image_upload_helper'))
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth('2000')
                             ->imageResizeTargetHeight('2000')
@@ -123,58 +143,58 @@ class OneriResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')->sortable()->label('ID'),
-                SpatieMediaLibraryImageColumn::make('images')->label('Resim')
+                SpatieMediaLibraryImageColumn::make('images')->label(__('common.image'))
                     ->collection('images')
                     ->circular()
                     ->height(50)
                     ->width(50),
-                Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('createdBy.name')
-                    ->label('Oluşturan')
+                    ->label(__('common.creator'))
                     ->searchable()
                     ->sortable()
-                    ->placeholder('Anonim')
+                    ->placeholder(__('common.anonymous'))
                     ->badge()
                     ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
-                Tables\Columns\TextColumn::make('district')->label('İlçe')->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('neighborhood')->label('Mahalle')->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label('Bütçe')
+                Tables\Columns\TextColumn::make('district')->label(__('common.district'))->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('neighborhood')->label(__('common.neighborhood'))->searchable()->limit(30),
+                Tables\Columns\TextColumn::make('budget')->label(__('common.budget'))
                     ->money('TRY')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('likes_count')
-                    ->label('Beğeni Sayısı')
+                    ->label(__('common.like_count'))
                     ->counts('likes')
                     ->badge()
                     ->color('success')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('comments_count')
-                    ->label('Yorum Sayısı')
+                    ->label(__('common.comment_count'))
                     ->counts('comments')
                     ->badge()
                     ->color('info')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('estimated_duration')
-                    ->label('Tahmini Süre')
-                    ->suffix(' gün')
+                    ->label(__('common.estimated_duration'))
+                    ->suffix(' ' . __('common.days'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('end_date')->label('Bitiş')->date('d.m.Y')->sortable()
+                Tables\Columns\TextColumn::make('end_date')->label(__('common.end_date'))->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label('Oluşturulma')
+                Tables\Columns\TextColumn::make('created_at')->dateTime('d.m.Y H:i')->label(__('common.created_at'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 TrashedFilter::make(),
                 SelectFilter::make('category')
-                    ->label('Kategori')
+                    ->label(__('common.category'))
                     ->relationship('category', 'name'),
 
                 SelectFilter::make('creator_type')
-                    ->label('Oluşturan Tür')
+                    ->label(__('common.creator_type'))
                     ->options([
-                        'with_user' => 'Kullanıcı Atanmış',
-                        'anonymous' => 'Anonim',
+                        'with_user' => __('common.user_assigned'),
+                        'anonymous' => __('common.anonymous'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         $value = $data['value'] ?? null;
@@ -185,12 +205,12 @@ class OneriResource extends Resource
                         }
                     }),
 
-                // Konum filtresi: İlçe ve Mahalle dropdownları
+                // Location filter: District and Neighborhood dropdowns
                 Filter::make('location')
-                    ->label('Konum')
+                    ->label(__('common.location'))
                     ->form([
                         Forms\Components\Select::make('district')
-                            ->label('İlçe')
+                            ->label(__('common.district'))
                             ->options(function () {
                                 $keys = array_keys(config('istanbul_neighborhoods', []));
                                 return array_combine($keys, $keys);
@@ -198,7 +218,7 @@ class OneriResource extends Resource
                             ->searchable(),
 
                         Forms\Components\Select::make('neighborhood')
-                            ->label('Mahalle')
+                            ->label(__('common.neighborhood'))
                             ->options(function (callable $get) {
                                 $district = $get('district');
                                 $map = config('istanbul_neighborhoods', []);
@@ -216,14 +236,14 @@ class OneriResource extends Resource
                         }
                     }),
 
-                // Bütçe filtresi: miktar + az/çok toggle
+                // Budget filter: amount + more/less toggle
                 Filter::make('budget_filter')
-                    ->label('Bütçe')
+                    ->label(__('common.budget'))
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('amount')
-                                    ->label('Bütçe')
+                                    ->label(__('common.budget'))
                                     ->numeric()
                                     ->default(0),
 
@@ -249,19 +269,19 @@ class OneriResource extends Resource
                         }
                     }),
 
-                // Beğeni filtresi
+                // Like filter
                 Filter::make('likes_filter')
-                    ->label('Beğeni Sayısı')
+                    ->label(__('common.like_count'))
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([
                                 Forms\Components\TextInput::make('min_likes')
-                                    ->label('Minimum Beğeni')
+                                    ->label(__('common.min_likes'))
                                     ->numeric()
                                     ->default(0),
 
                                 Forms\Components\TextInput::make('max_likes')
-                                    ->label('Maksimum Beğeni')
+                                    ->label(__('common.max_likes'))
                                     ->numeric(),
                             ])
                             ->columns(2),
@@ -286,30 +306,30 @@ class OneriResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->visible(fn ($record) => !$record->trashed())
                         ->requiresConfirmation()
-                        ->modalHeading('Öneriyi Sil')
-                        ->modalDescription('Bu öneriyi silmek istediğinizden emin misiniz? Silinen öneriler geri getirilebilir.')
-                        ->modalSubmitActionLabel('Evet, Sil')
-                        ->successNotificationTitle('Öneri başarıyla silindi'),
+                        ->modalHeading(__('common.delete_suggestion'))
+                        ->modalDescription(__('common.delete_suggestion_description'))
+                        ->modalSubmitActionLabel(__('common.yes_delete'))
+                        ->successNotificationTitle(__('common.suggestion_deleted')),
 
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->modalHeading('Öneriyi Geri Getir')
-                        ->modalDescription('Bu öneriyi geri getirmek istediğinizden emin misiniz?')
-                        ->modalSubmitActionLabel('Evet, Geri Getir')
-                        ->successNotificationTitle('Öneri başarıyla geri getirildi'),
+                        ->modalHeading(__('common.restore_suggestion'))
+                        ->modalDescription(__('common.restore_suggestion_description'))
+                        ->modalSubmitActionLabel(__('common.yes_restore'))
+                        ->successNotificationTitle(__('common.suggestion_restored')),
 
                     Tables\Actions\ForceDeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading('Öneriyi Kalıcı Olarak Sil')
-                        ->modalDescription('Bu öneriyi kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
-                        ->successNotificationTitle('Öneri kalıcı olarak silindi'),
+                        ->modalHeading(__('common.force_delete_suggestion'))
+                        ->modalDescription(__('common.force_delete_suggestion_description'))
+                        ->modalSubmitActionLabel(__('common.yes_force_delete'))
+                        ->successNotificationTitle(__('common.suggestion_force_deleted')),
                 ])
-                ->label('Aksiyonlar')
+                ->label(__('common.actions'))
                 ->icon('heroicon-m-ellipsis-vertical')
                 ->size('sm')
                 ->color('gray')
@@ -318,38 +338,38 @@ class OneriResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading('Seçili Önerileri Sil')
-                        ->modalDescription('Seçili önerileri silmek istediğinizden emin misiniz? Silinen öneriler geri getirilebilir.')
-                        ->modalSubmitActionLabel('Evet, Sil')
-                        ->successNotificationTitle('Seçili öneriler başarıyla silindi'),
+                        ->modalHeading(__('common.delete_selected_suggestions'))
+                        ->modalDescription(__('common.delete_selected_suggestions_description'))
+                        ->modalSubmitActionLabel(__('common.yes_delete'))
+                        ->successNotificationTitle(__('common.selected_suggestions_deleted')),
 
                     Tables\Actions\RestoreBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading('Seçili Önerileri Geri Getir')
-                        ->modalDescription('Seçili önerileri geri getirmek istediğinizden emin misiniz?')
-                        ->modalSubmitActionLabel('Evet, Geri Getir')
-                        ->successNotificationTitle('Seçili öneriler başarıyla geri getirildi'),
+                        ->modalHeading(__('common.restore_selected_suggestions'))
+                        ->modalDescription(__('common.restore_selected_suggestions_description'))
+                        ->modalSubmitActionLabel(__('common.yes_restore'))
+                        ->successNotificationTitle(__('common.selected_suggestions_restored')),
 
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading('Seçili Önerileri Kalıcı Olarak Sil')
-                        ->modalDescription('Seçili önerileri kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
-                        ->successNotificationTitle('Seçili öneriler kalıcı olarak silindi'),
+                        ->modalHeading(__('common.force_delete_selected_suggestions'))
+                        ->modalDescription(__('common.force_delete_selected_suggestions_description'))
+                        ->modalSubmitActionLabel(__('common.yes_force_delete'))
+                        ->successNotificationTitle(__('common.selected_suggestions_force_deleted')),
                 ]),
             ])
             ->groups([
                 Group::make('category.name')
-                    ->label('Proje')
+                    ->label(__('common.project'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
                         $category = $record->category;
-                        $end = 'Belirtilmemiş';
+                        $end = __('common.not_specified');
 
                         if ($category && $category->end_datetime) {
                             $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
                         }
 
-                        return "Bitiş: {$end}";
+                        return __('common.end') . ": {$end}";
                     }),
 
             ])
@@ -384,7 +404,7 @@ class OneriResource extends Resource
     {
         return [
             \Filament\Actions\Action::make('create_new')
-                ->label('Yeni Öneri Oluştur')
+                ->label(__('common.create_new_suggestion'))
                 ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->url(function (): string {
