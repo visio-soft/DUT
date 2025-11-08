@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase;
-use App\Models\User;
 use App\Models\Category;
 use App\Models\Oneri;
-use Spatie\Permission\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class ProjectFilteringTest extends TestCase
 {
@@ -17,7 +17,7 @@ class ProjectFilteringTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create roles
         Role::create(['name' => 'user', 'guard_name' => 'web']);
         Role::create(['name' => 'admin', 'guard_name' => 'web']);
@@ -140,9 +140,9 @@ class ProjectFilteringTest extends TestCase
             'description' => 'Description 2',
         ]);
 
-        $response = $this->actingAs($user)->get('/projects?category=' . $category1->id);
+        $response = $this->actingAs($user)->get('/projects?category='.$category1->id);
         $response->assertStatus(200);
-        
+
         // The response should contain data from category1 only
         $response->assertSee('Category 1');
     }
@@ -360,7 +360,7 @@ class ProjectFilteringTest extends TestCase
         $filtered = Category::where('aktif', true)
             ->where('district', 'Kadıköy')
             ->get();
-        
+
         $this->assertEquals(2, $filtered->count());
         $this->assertTrue($filtered->contains($activeCategory));
         $this->assertTrue($filtered->contains($expiredCategory));
@@ -370,7 +370,7 @@ class ProjectFilteringTest extends TestCase
         $activeAndNotExpired = Category::where('aktif', true)
             ->where('end_datetime', '>', now())
             ->get();
-        
+
         $this->assertEquals(1, $activeAndNotExpired->count());
         $this->assertTrue($activeAndNotExpired->contains($activeCategory));
     }

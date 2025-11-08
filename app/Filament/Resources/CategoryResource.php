@@ -3,28 +3,31 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
-use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TrashedFilter;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Tables\Filters\Filter;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $navigationGroup = 'Proje Yönetimi';
+
     protected static ?string $navigationLabel = 'Proje Kategorisi';
+
     protected static ?string $pluralModelLabel = 'Proje Kategorileri';
+
     protected static ?string $modelLabel = 'Proje Kategorisi';
 
     public static function form(Form $form): Form
@@ -148,8 +151,7 @@ class CategoryResource extends Resource
                     ->imageResizeTargetHeight('2000')
                     ->columnSpanFull(),
 
-            ])
-        ;
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -200,7 +202,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('remaining_time')
                     ->label('Kalan Süre')
                     ->getStateUsing(function ($record) {
-                        if (!$record->end_datetime) {
+                        if (! $record->end_datetime) {
                             return 'Belirsiz';
                         }
 
@@ -209,6 +211,7 @@ class CategoryResource extends Resource
                         }
 
                         $remaining = $record->getRemainingTime();
+
                         return $remaining ? $remaining['formatted'] : 'Süre Dolmuş';
                     })
                     ->badge()
@@ -300,6 +303,7 @@ class CategoryResource extends Resource
                             ->label('İlçe')
                             ->options(function () {
                                 $keys = array_keys(config('istanbul_neighborhoods', []));
+
                                 return array_combine($keys, $keys);
                             })
                             ->searchable(),
@@ -309,16 +313,17 @@ class CategoryResource extends Resource
                             ->options(function (callable $get) {
                                 $district = $get('district');
                                 $map = config('istanbul_neighborhoods', []);
+
                                 return $map[$district] ?? [];
                             })
                             ->searchable(),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (!empty($data['district'])) {
+                        if (! empty($data['district'])) {
                             $query->where('district', $data['district']);
                         }
 
-                        if (!empty($data['neighborhood'])) {
+                        if (! empty($data['neighborhood'])) {
                             $query->where('neighborhood', $data['neighborhood']);
                         }
                     }),
@@ -331,18 +336,18 @@ class CategoryResource extends Resource
                             ->label('Başlangıç Tarihi (Min)')
                             ->placeholder('Başlangıç')
                             ->native(false),
-                        
+
                         Forms\Components\DatePicker::make('start_until')
                             ->label('Başlangıç Tarihi (Max)')
                             ->placeholder('Bitiş')
                             ->native(false),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (!empty($data['start_from'])) {
+                        if (! empty($data['start_from'])) {
                             $query->whereDate('start_datetime', '>=', $data['start_from']);
                         }
 
-                        if (!empty($data['start_until'])) {
+                        if (! empty($data['start_until'])) {
                             $query->whereDate('start_datetime', '<=', $data['start_until']);
                         }
                     }),
@@ -360,7 +365,7 @@ class CategoryResource extends Resource
                             ->placeholder('Tümü'),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (!empty($data['status'])) {
+                        if (! empty($data['status'])) {
                             if ($data['status'] === 'active') {
                                 $query->where('end_datetime', '>', now());
                             } elseif ($data['status'] === 'expired') {
@@ -389,10 +394,10 @@ class CategoryResource extends Resource
                     ->successNotificationTitle('Proje kalıcı olarak silindi'),
 
                 Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => !$record->trashed()),
+                    ->visible(fn ($record) => ! $record->trashed()),
 
                 Tables\Actions\DeleteAction::make()
-                    ->visible(fn ($record) => !$record->trashed())
+                    ->visible(fn ($record) => ! $record->trashed())
                     ->requiresConfirmation()
                     ->modalHeading('Projeyi Sil')
                     ->modalDescription('Bu projeyi silmek istediğinizden emin misiniz? Bu kategorideki tüm öneriler de silinecektir. Silinen projeler geri getirilebilir.')

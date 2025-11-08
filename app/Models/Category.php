@@ -3,16 +3,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Category extends Model implements HasMedia
 {
-    use SoftDeletes;
     use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $fillable = ['name', 'description', 'parent_id', 'aktif', 'start_datetime', 'end_datetime', 'hide_budget', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
 
@@ -25,7 +25,7 @@ class Category extends Model implements HasMedia
 
         static::deleting(function ($category) {
             // When soft deleting a category, also soft delete its related oneriler
-            if (!$category->isForceDeleting()) {
+            if (! $category->isForceDeleting()) {
                 $category->oneriler()->delete();
             }
         });
@@ -63,9 +63,8 @@ class Category extends Model implements HasMedia
     /**
      * Alias for oneriler() for backward compatibility.
      * Returns the same relationship as oneriler().
-     * 
+     *
      * @deprecated Use oneriler() instead
-     * @return HasMany
      */
     public function projects(): HasMany
     {
@@ -93,7 +92,7 @@ class Category extends Model implements HasMedia
      */
     public function isExpired(): bool
     {
-        if (!$this->end_datetime) {
+        if (! $this->end_datetime) {
             return false;
         }
 
@@ -105,7 +104,7 @@ class Category extends Model implements HasMedia
      */
     public function getRemainingTime(): ?array
     {
-        if (!$this->end_datetime || $this->isExpired()) {
+        if (! $this->end_datetime || $this->isExpired()) {
             return null;
         }
 
@@ -120,7 +119,7 @@ class Category extends Model implements HasMedia
             'seconds' => $diff->s,
             'total_hours' => ($diff->days * 24) + $diff->h,
             'total_minutes' => (($diff->days * 24) + $diff->h) * 60 + $diff->i,
-            'formatted' => $this->formatRemainingTime($diff)
+            'formatted' => $this->formatRemainingTime($diff),
         ];
     }
 
@@ -145,7 +144,7 @@ class Category extends Model implements HasMedia
      */
     public function getFormattedEndDatetime(): ?string
     {
-        if (!$this->end_datetime) {
+        if (! $this->end_datetime) {
             return null;
         }
 
@@ -160,13 +159,13 @@ class Category extends Model implements HasMedia
     {
         $path = [];
         $current = $this;
-        
+
         // Build path from current to root (will be reversed later)
         while ($current) {
             array_unshift($path, $current->name);
             $current = $current->parent;
         }
-        
+
         return implode(' > ', $path);
     }
 
