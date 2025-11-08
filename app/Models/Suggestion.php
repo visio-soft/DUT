@@ -65,12 +65,12 @@ class Suggestion extends Model implements HasMedia
 
     public function likes(): HasMany
     {
-        return $this->hasMany(SuggestionLike::class);
+        return $this->hasMany(SuggestionLike::class, 'suggestion_id');
     }
 
     public function comments(): HasMany
     {
-        return $this->hasMany(SuggestionComment::class);
+        return $this->hasMany(SuggestionComment::class, 'suggestion_id');
     }
 
     public function approvedComments(): HasMany

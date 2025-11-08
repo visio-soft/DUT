@@ -400,9 +400,9 @@ class SuggestionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOneriler::route('/'),
-            'create' => Pages\CreateOneri::route('/create'),
-            'edit' => Pages\EditOneri::route('/{record}/edit'),
+            'index' => Pages\ListSuggestions::route('/'),
+            'create' => Pages\CreateSuggestion::route('/create'),
+            'edit' => Pages\EditSuggestion::route('/{record}/edit'),
         ];
     }
 
