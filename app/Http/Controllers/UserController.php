@@ -17,16 +17,16 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Rastgele kategoriler (projeler) al
-        $randomProjects = Category::with(['oneriler' => function ($query) {
-            $query->limit(3); // Her kategoriden max 3 öneri
+        // Get random categories (projects)
+        $randomProjects = Category::with(['suggestions' => function ($query) {
+            $query->limit(3); // Max 3 suggestions per category
         }])
-            ->has('oneriler') // Sadece önerisi olan kategoriler
+            ->has('suggestions') // Only categories with suggestions
             ->inRandomOrder()
             ->limit(3)
             ->get();
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        // Get random background image (different on each page refresh)
         $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
         $randomBackgroundImage = null;
 
@@ -43,15 +43,15 @@ class UserController extends Controller
      */
     public function projects()
     {
-        // Tüm kategorileri (projeleri) önerileriyle birlikte getir
+        // Get all categories (projects) with their suggestions
         $projects = Category::with([
-            'oneriler.likes',
-            'oneriler.createdBy',
+            'suggestions.likes',
+            'suggestions.createdBy',
         ])
-            ->has('oneriler') // Sadece önerisi olan kategoriler
+            ->has('suggestions') // Only categories with suggestions
             ->get();
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        // Get random background image (different on each page refresh)
         $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
         $randomBackgroundImage = null;
 
@@ -68,15 +68,15 @@ class UserController extends Controller
      */
     public function projectSuggestions($id)
     {
-        // Projeyi (kategoriyi) önerileriyle birlikte getir
+        // Get the project (category) with its suggestions
         $project = Category::with([
-            'oneriler.likes',
-            'oneriler.comments',
-            'oneriler.createdBy',
+            'suggestions.likes',
+            'suggestions.comments',
+            'suggestions.createdBy',
         ])
             ->findOrFail($id);
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        // Get random background image (different on each page refresh)
         $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
         $randomBackgroundImage = null;
 
@@ -104,18 +104,18 @@ class UserController extends Controller
         ])
             ->findOrFail($id);
 
-        // Kullanıcının bu öneriye yazdığı onaylanmamış yorumları da getir (hem ana yorumlar hem cevaplar)
+        // Get unapproved comments by the user for this suggestion (both main comments and replies)
         $userPendingComments = collect();
         if (Auth::check()) {
             $userPendingComments = SuggestionComment::with(['user', 'parent.user'])
-                ->where('oneri_id', $id)
+                ->where('suggestion_id', $id)
                 ->where('user_id', Auth::id())
                 ->where('is_approved', false)
                 ->orderBy('created_at', 'desc')
                 ->get();
         }
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
+        // Get random background image (different on each page refresh)
         $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
         $randomBackgroundImage = null;
 
@@ -148,25 +148,25 @@ class UserController extends Controller
             ], 403);
         }
 
-        // Aynı kategorideki (projedeki) diğer beğenileri kontrol et
-        $existingLike = SuggestionLike::whereHas('oneri', function ($query) use ($categoryId) {
+        // Check other likes in the same category (project)
+        $existingLike = SuggestionLike::whereHas('suggestion', function ($query) use ($categoryId) {
             $query->where('category_id', $categoryId);
         })
             ->where('user_id', $user->id)
-            ->with('oneri')
+            ->with('suggestion')
             ->first();
 
         $switchedFrom = null;
         $liked = false;
 
         if ($existingLike) {
-            // Eğer bu öneriye beğeni varsa kaldır, başka öneriye ise değiştir
-            if ($existingLike->oneri_id == $suggestionId) {
+            // If there is a like for this suggestion, remove it; otherwise switch to another suggestion
+            if ($existingLike->suggestion_id == $suggestionId) {
                 $existingLike->delete();
                 $liked = false;
             } else {
-                // Eski beğeniyi kaydet (hangi öneriden değiştirildiğini bilmek için)
-                $switchedFrom = $existingLike->oneri->title;
+                // Save old like (to know which suggestion was changed from)
+                $switchedFrom = $existingLike->suggestion->title;
 
                 // Eski beğeniyi sil, yeni beğeni ekle
                 $existingLike->delete();
@@ -188,7 +188,7 @@ class UserController extends Controller
         // Güncel beğeni sayısını hesapla
         $likesCount = $suggestion->fresh()->likes()->count();
 
-        // Bu kategorideki tüm önerilerin güncel beğeni sayılarını al
+        // Get updated like counts for all suggestions in this category
         $allSuggestionsInCategory = Suggestion::where('category_id', $categoryId)
             ->withCount('likes')
             ->get()

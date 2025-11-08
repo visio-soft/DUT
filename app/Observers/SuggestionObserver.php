@@ -2,33 +2,34 @@
 
 namespace App\Observers;
 
+use App\Models\Suggestion;
 use Illuminate\Support\Facades\Auth;
 
 class SuggestionObserver
 {
-    public function creating(Oneri $oneri): void
+    public function creating(Suggestion $suggestion): void
     {
         if (Auth::check()) {
-            $oneri->created_by_id = Auth::id();
+            $suggestion->created_by_id = Auth::id();
         }
     }
 
-    public function updating(Oneri $oneri): void
+    public function updating(Suggestion $suggestion): void
     {
         if (Auth::check()) {
-            $oneri->updated_by_id = Auth::id();
+            $suggestion->updated_by_id = Auth::id();
         }
     }
 
     /**
-     * Handle the Oneri "deleting" event.
-     * Parent oneri silinince child design ve design like'ları da silinsin
+     * Handle the Suggestion "deleting" event.
+     * Delete child design and design likes when parent suggestion is deleted
      */
-    public function deleting(Oneri $oneri): void
+    public function deleting(Suggestion $suggestion): void
     {
-        // Önce design varsa onu sil (bu otomatik olarak design like'ları da silecek)
-        if ($oneri->design) {
-            $oneri->design->delete();
+        // Delete design first if it exists (this will automatically delete design likes)
+        if ($suggestion->design) {
+            $suggestion->design->delete();
         }
     }
 }
