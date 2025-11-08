@@ -19,6 +19,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Forms\Get;
 
 class ProjectResource extends Resource
 {
@@ -61,12 +62,15 @@ class ProjectResource extends Resource
                 Forms\Components\Section::make(__('common.basic_information'))
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\Select::make('project_group_id')
+                        Forms\Components\Select::make('projectGroups')
                             ->label(__('common.project_group'))
-                            ->relationship('projectGroup', 'name')
+                            ->relationship('projectGroups', 'name')
                             ->searchable()
                             ->preload()
+                            ->multiple()
+                            ->required()
                             ->placeholder(__('common.select_project_group'))
+                            ->helperText(__('common.category_is_inferred_from_group'))
                             ->createOptionForm([
                                 Forms\Components\TextInput::make('name')
                                     ->label(__('common.project_group'))
@@ -156,7 +160,7 @@ class ProjectResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('projectGroup.name')
+                Tables\Columns\TextColumn::make('projectGroups.name')
                     ->label(__('common.project_group'))
                     ->searchable()
                     ->sortable()
@@ -191,7 +195,7 @@ class ProjectResource extends Resource
 
                 SelectFilter::make('project_group')
                     ->label(__('common.project_group'))
-                    ->relationship('projectGroup', 'name'),
+                    ->relationship('projectGroups', 'name'),
 
                 SelectFilter::make('creator_type')
                     ->label(__('common.creator_type'))
@@ -327,10 +331,10 @@ class ProjectResource extends Resource
                 ]),
             ])
             ->groups([
-                Group::make('projectGroup.name')
+                Group::make('projectGroups.name')
                     ->label(__('common.project_group'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
-                        $category = $record->category;
+                        $category = $record->projectGroups->first()?->category;
                         $end = __('common.not_specified');
 
                         if ($category && $category->end_datetime) {
@@ -341,7 +345,7 @@ class ProjectResource extends Resource
                     }),
 
             ])
-            ->defaultGroup('projectGroup.name');
+            ->defaultGroup('projectGroups.name');
 
     }
 

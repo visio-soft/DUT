@@ -6,6 +6,7 @@ use App\Observers\SuggestionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -23,11 +24,11 @@ class Suggestion extends Model implements HasMedia
         'category_id',
         'created_by_id',
         'updated_by_id',
-        'project_group_id',
         'title',
         'description',
         'estimated_duration',
-        'budget',
+        'min_budget',
+        'max_budget',
         'latitude',
         'longitude',
         'address',
@@ -41,7 +42,8 @@ class Suggestion extends Model implements HasMedia
 
     protected $casts = [
         'estimated_duration' => 'integer',
-        'budget' => 'decimal:2',
+        'min_budget' => 'decimal:2',
+        'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
     ];
@@ -64,9 +66,10 @@ class Suggestion extends Model implements HasMedia
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    public function projectGroup(): BelongsTo
+    public function projectGroups(): BelongsToMany
     {
-        return $this->belongsTo(ProjectGroup::class, 'project_group_id');
+        return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
+                    ->withTimestamps();
     }
 
     public function likes(): HasMany

@@ -23,8 +23,18 @@ class ProjectObserver
 
     public function saving(Project $project): void
     {
-        if ($project->project_group_id && $project->projectGroup) {
-            $project->category_id = $project->projectGroup->category_id;
+        // Do not override if category_id is already set (e.g., inferred by form hooks)
+        if (!empty($project->category_id)) {
+            return;
+        }
+
+        // If project groups are attached and at least one has a category
+        $firstGroupWithCategory = $project->projectGroups()
+            ->with('category')
+            ->first();
+
+        if ($firstGroupWithCategory && $firstGroupWithCategory->category_id) {
+            $project->category_id = $firstGroupWithCategory->category_id;
         }
     }
 

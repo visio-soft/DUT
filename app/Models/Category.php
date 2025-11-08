@@ -13,7 +13,7 @@ class Category extends Model implements HasMedia
     use InteractsWithMedia;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'description', 'start_datetime', 'end_datetime', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
+    protected $fillable = ['name'];
 
     /**
      * Automatically cascade deletes to related models when soft deleting

@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             $table->decimal('min_budget', 15, 2)->nullable()->after('budget');
             $table->decimal('max_budget', 15, 2)->nullable()->after('min_budget');
         });
 
-        Schema::table('projects', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             $table->dropColumn('budget');
         });
     }
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('projects', function (Blueprint $table) {
+        Schema::table('suggestions', function (Blueprint $table) {
             $table->decimal('budget', 15, 2)->nullable();
             $table->dropColumn('min_budget');
             $table->dropColumn('max_budget');

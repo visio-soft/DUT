@@ -6,6 +6,7 @@ use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -23,7 +24,6 @@ class Project extends Model implements HasMedia
         'category_id',
         'created_by_id',
         'updated_by_id',
-        'project_group_id',
         'title',
         'description',
         'start_date',
@@ -65,9 +65,10 @@ class Project extends Model implements HasMedia
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
-    public function projectGroup(): BelongsTo
+    public function projectGroups(): BelongsToMany
     {
-        return $this->belongsTo(ProjectGroup::class, 'project_group_id');
+        return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
+                    ->withTimestamps();
     }
 
     // Design relationship removed - no longer needed

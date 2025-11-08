@@ -62,24 +62,6 @@ class SuggestionResource extends Resource
                 Forms\Components\Section::make(__('common.basic_information'))
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\Select::make('project_group_id')
-                            ->label(__('common.project_group'))
-                            ->relationship('projectGroup', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->placeholder(__('common.select_project_group'))
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('name')
-                                    ->label(__('common.project_group'))
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\Select::make('category_id')
-                                    ->label(__('common.project_category'))
-                                    ->relationship('category', 'name')
-                                    ->required()
-                                    ->searchable()
-                                    ->preload(),
-                            ]),
                         Forms\Components\Select::make('category_id')
                             ->label(__('common.project_category'))
                             ->options(function () {
@@ -112,11 +94,17 @@ class SuggestionResource extends Resource
 
                         Forms\Components\Grid::make(2)
                             ->schema([
-                                Forms\Components\TextInput::make('budget')
-                                    ->label(__('common.budget'))
+                                Forms\Components\TextInput::make('min_budget')
+                                    ->label(__('common.min_budget'))
                                     ->numeric()
                                     ->prefix('₺')
-                                    ->placeholder(__('common.budget_example')),
+                                    ->placeholder(__('common.min_budget_example')),
+
+                                Forms\Components\TextInput::make('max_budget')
+                                    ->label(__('common.max_budget'))
+                                    ->numeric()
+                                    ->prefix('₺')
+                                    ->placeholder(__('common.max_budget_example')),
 
                                 Forms\Components\TextInput::make('estimated_duration')
                                     ->label(__('common.estimated_duration'))
@@ -179,7 +167,10 @@ class SuggestionResource extends Resource
                     ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('district')->label(__('common.district'))->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('neighborhood')->label(__('common.neighborhood'))->searchable()->limit(30),
-                Tables\Columns\TextColumn::make('budget')->label(__('common.budget'))
+                Tables\Columns\TextColumn::make('min_budget')->label(__('common.min_budget'))
+                    ->money('TRY')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('max_budget')->label(__('common.max_budget'))
                     ->money('TRY')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('likes_count')
