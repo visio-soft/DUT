@@ -153,6 +153,24 @@ class Category extends Model implements HasMedia
     }
 
     /**
+     * Get the full hierarchy path (for display purposes)
+     * Example: "Parent > Child > Current"
+     */
+    public function getHierarchyPath(): string
+    {
+        $path = [];
+        $current = $this;
+        
+        // Build path from current to root (will be reversed later)
+        while ($current) {
+            array_unshift($path, $current->name);
+            $current = $current->parent;
+        }
+        
+        return implode(' > ', $path);
+    }
+
+    /**
      * Register media collections used by Category.
      */
     public function registerMediaCollections(): void

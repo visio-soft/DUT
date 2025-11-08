@@ -167,9 +167,15 @@ class CategoryResource extends Resource
                     ->label('Üst Kategori')
                     ->searchable()
                     ->placeholder('Ana Kategori')
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->badge()
+                    ->color('gray')
+                    ->toggleable(isToggledHiddenByDefault: false),
 
-                Tables\Columns\TextColumn::make('name')->label('Proje Adı')->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Proje Adı')
+                    ->searchable()
+                    ->sortable()
+                    ->description(fn ($record) => $record->parent_id ? '└─ Alt Kategori' : null),
                 Tables\Columns\TextColumn::make('description')
                     ->label('Açıklama')
                     ->limit(100)
