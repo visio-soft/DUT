@@ -36,6 +36,15 @@ class OneriComment extends Model
     }
 
     /**
+     * English alias for oneri() relationship.
+     * The suggestion this comment belongs to.
+     */
+    public function suggestion(): BelongsTo
+    {
+        return $this->oneri();
+    }
+
+    /**
      * Yorumu yazan kullanıcı
      */
     public function user(): BelongsTo

@@ -7,12 +7,21 @@ use App\Models\Oneri;
 use App\Models\OneriLike;
 use App\Models\OneriComment;
 use App\Models\OneriCommentLike;
-use App\Helpers\BackgroundImageHelper;
+use App\Services\ViewDataService;
+use App\Services\SuggestionQueryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    protected ViewDataService $viewDataService;
+    protected SuggestionQueryService $suggestionQueryService;
+
+    public function __construct(ViewDataService $viewDataService, SuggestionQueryService $suggestionQueryService)
+    {
+        $this->viewDataService = $viewDataService;
+        $this->suggestionQueryService = $suggestionQueryService;
+    }
     /**
      * Ana sayfa - Hero section ve rastgele projeler
      */
@@ -27,16 +36,12 @@ class UserController extends Controller
             ->limit(3)
             ->get();
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->viewDataService->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.index', compact('randomProjects', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.index', array_merge(
+            compact('randomProjects'),
+            $backgroundData
+        ));
     }
 
     /**
@@ -47,89 +52,21 @@ class UserController extends Controller
         // Filtre query parametrelerini al
         $filters = $request->only(['category', 'district', 'neighborhood', 'status', 'min_budget', 'max_budget']);
 
-        // Tüm kategorileri (projeleri) önerileriyle birlikte getir
-        $projectsQuery = Category::with([
-                'oneriler' => function ($query) use ($filters) {
-                    // Bütçe filtresini query seviyesinde uygula
-                    if (!empty($filters['min_budget'])) {
-                        $query->where('min_budget', '>=', $filters['min_budget']);
-                    }
-                    if (!empty($filters['max_budget'])) {
-                        $query->where('max_budget', '<=', $filters['max_budget']);
-                    }
-                },
-                'oneriler.likes',
-                'oneriler.createdBy'
-            ])
-            ->has('oneriler'); // Sadece önerisi olan kategoriler
-
-        // Kategori filtresi
-        if (!empty($filters['category'])) {
-            $projectsQuery->where('id', $filters['category']);
-        }
-
-        // İlçe filtresi
-        if (!empty($filters['district'])) {
-            $projectsQuery->where('district', $filters['district']);
-        }
-
-        // Mahalle filtresi
-        if (!empty($filters['neighborhood'])) {
-            $projectsQuery->where('neighborhood', $filters['neighborhood']);
-        }
-
-        // Durum filtresi (Oylama durumu)
-        if (!empty($filters['status'])) {
-            if ($filters['status'] === 'active') {
-                $projectsQuery->where('end_datetime', '>', now());
-            } elseif ($filters['status'] === 'expired') {
-                $projectsQuery->where('end_datetime', '<=', now());
-            }
-        }
-
-        // Bütçe filtresi varsa, sadece önerisi olan kategorileri al
-        if (!empty($filters['min_budget']) || !empty($filters['max_budget'])) {
-            $projectsQuery->whereHas('oneriler', function ($query) use ($filters) {
-                if (!empty($filters['min_budget'])) {
-                    $query->where('min_budget', '>=', $filters['min_budget']);
-                }
-                if (!empty($filters['max_budget'])) {
-                    $query->where('max_budget', '<=', $filters['max_budget']);
-                }
-            });
-        }
-
-        $projects = $projectsQuery->get();
+        // Use service to build query with filters
+        $projects = $this->suggestionQueryService->buildCategoryQueryWithSuggestions($filters)->get();
 
         // Tüm kategorileri filtre için al
         $allCategories = Category::has('oneriler')->orderBy('name')->get();
         
-        // İlçe listesi
-        $districts = array_keys(config('istanbul_neighborhoods', []));
-        
-        // Seçili ilçeye göre mahalleler
-        $neighborhoods = [];
-        if (!empty($filters['district'])) {
-            $neighborhoods = config('istanbul_neighborhoods.' . $filters['district'], []);
-        }
+        // İlçe ve mahalle listeleri
+        $districts = $this->suggestionQueryService->getAllDistricts();
+        $neighborhoods = $this->suggestionQueryService->getNeighborhoodsForDistrict($filters['district'] ?? null);
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->viewDataService->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.projects', compact(
-            'projects', 
-            'hasBackgroundImages', 
-            'randomBackgroundImage',
-            'allCategories',
-            'districts',
-            'neighborhoods',
-            'filters'
+        return view('user.projects', array_merge(
+            compact('projects', 'allCategories', 'districts', 'neighborhoods', 'filters'),
+            $backgroundData
         ));
     }
 
@@ -146,16 +83,12 @@ class UserController extends Controller
             ])
             ->findOrFail($id);
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->viewDataService->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.project-suggestions', compact('project', 'hasBackgroundImages', 'randomBackgroundImage'));
+        return view('user.project-suggestions', array_merge(
+            compact('project'),
+            $backgroundData
+        ));
     }
 
     /**
@@ -185,16 +118,12 @@ class UserController extends Controller
                 ->get();
         }
 
-        // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
-        $hasBackgroundImages = BackgroundImageHelper::hasBackgroundImages();
-        $randomBackgroundImage = null;
+        $backgroundData = $this->viewDataService->getBackgroundImageData();
 
-        if ($hasBackgroundImages) {
-            $imageData = BackgroundImageHelper::getRandomBackgroundImage();
-            $randomBackgroundImage = $imageData ? $imageData['url'] : null;
-        }
-
-        return view('user.suggestion-detail', compact('suggestion', 'hasBackgroundImages', 'randomBackgroundImage', 'userPendingComments'));
+        return view('user.suggestion-detail', array_merge(
+            compact('suggestion', 'userPendingComments'),
+            $backgroundData
+        ));
     }
 
     /**

@@ -21,4 +21,13 @@ class OneriLike extends Model
     {
         return $this->belongsTo(Oneri::class);
     }
+
+    /**
+     * English alias for oneri() relationship.
+     * The suggestion this like belongs to.
+     */
+    public function suggestion(): BelongsTo
+    {
+        return $this->oneri();
+    }
 }
