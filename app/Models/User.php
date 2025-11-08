@@ -76,7 +76,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function updatedOneriler(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'updated_by_id');
+        return $this->hasMany(Suggestion::class, 'updated_by_id');
     }
 
     // Design functionality removed - projectDesignLikes relationship no longer needed
