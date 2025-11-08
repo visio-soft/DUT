@@ -40,7 +40,7 @@ class OneriResource extends Resource
                     ->icon('heroicon-o-information-circle')
                     ->schema([
                         Forms\Components\Select::make('category_id')
-                            ->label('Proje Kategorisi')
+                            ->label('Kategori')
                             ->options(function () {
                                 // Tüm kategorileri göster
                                 return Category::all()->pluck('name', 'id');
@@ -52,7 +52,26 @@ class OneriResource extends Resource
                                 // Set first category as default
                                 return Category::first()?->id;
                             })
-                            ->placeholder('Proje kategorisi seçin'),
+                            ->placeholder('Kategori seçin')
+                            ->reactive()
+                            ->afterStateUpdated(fn (callable $set) => $set('project_id', null)),
+                        
+                        Forms\Components\Select::make('project_id')
+                            ->label('Proje')
+                            ->options(function (callable $get) {
+                                $categoryId = $get('category_id');
+                                if (!$categoryId) {
+                                    return Project::where('aktif', true)->pluck('name', 'id');
+                                }
+                                return Project::where('category_id', $categoryId)
+                                    ->where('aktif', true)
+                                    ->pluck('name', 'id');
+                            })
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('Proje seçin (opsiyonel)')
+                            ->helperText('İsterseniz bu öneriyi bir projeye bağlayabilirsiniz'),
+                        
                         Forms\Components\Select::make('created_by_id')
                             ->label('Öneriyi Oluşturan Kullanıcı')
                             ->relationship('createdBy', 'name')
@@ -157,6 +176,21 @@ class OneriResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label('Başlık')->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('category.name')
+                    ->label('Kategori')
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('primary')
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('project.name')
+                    ->label('Proje')
+                    ->searchable()
+                    ->sortable()
+                    ->placeholder('Projeye Atanmamış')
+                    ->badge()
+                    ->color('info')
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('createdBy.name')
                     ->label('Oluşturan')
                     ->searchable()
@@ -216,6 +250,10 @@ class OneriResource extends Resource
                 SelectFilter::make('category')
                     ->label('Kategori')
                     ->relationship('category', 'name'),
+
+                SelectFilter::make('project')
+                    ->label('Proje')
+                    ->relationship('project', 'name'),
 
                 SelectFilter::make('creator_type')
                     ->label('Oluşturan Tür')
