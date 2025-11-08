@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\SuggestionResource\Pages;
-use App\Filament\Resources\SuggestionResource\RelationManagers;
+use App\Filament\Resources\ProjectResource\Pages;
 use App\Models\Category;
-use App\Models\Suggestion;
+use App\Models\Project;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -21,9 +20,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class SuggestionResource extends Resource
+class ProjectResource extends Resource
 {
-    protected static ?string $model = Suggestion::class;
+    protected static ?string $model = Project::class;
 
     protected static ?string $pluralModelLabel = null;
 
@@ -31,28 +30,28 @@ class SuggestionResource extends Resource
 
     protected static ?string $navigationLabel = null;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?string $navigationGroup = null;
 
     public static function getNavigationLabel(): string
     {
-        return __('common.suggestions');
+        return __('common.projects');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('common.suggestions');
+        return __('common.projects');
     }
 
     public static function getModelLabel(): string
     {
-        return __('common.suggestion');
+        return __('common.project');
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('common.suggestion_management');
+        return __('common.project_management');
     }
 
     public static function form(Form $form): Form
@@ -83,24 +82,21 @@ class SuggestionResource extends Resource
                         Forms\Components\Select::make('category_id')
                             ->label(__('common.project_category'))
                             ->options(function () {
-                                // Show all categories
                                 return Category::all()->pluck('name', 'id');
                             })
                             ->searchable()
                             ->preload()
                             ->required()
                             ->default(function () {
-                                // Set first category as default
                                 return Category::first()?->id;
                             })
                             ->placeholder(__('common.select_project_category')),
                         Forms\Components\Select::make('created_by_id')
-                            ->label(__('common.suggestion_creator'))
+                            ->label(__('common.project_creator'))
                             ->relationship('createdBy', 'name')
                             ->searchable()
                             ->preload()
-                            ->placeholder(__('common.select_user_or_anonymous'))
-                            ->helperText(__('common.anonymous_suggestion_helper')),
+                            ->placeholder(__('common.select_user')),
                         Forms\Components\TextInput::make('title')
                             ->label(__('common.title'))
                             ->required()
@@ -112,41 +108,37 @@ class SuggestionResource extends Resource
 
                         Forms\Components\Grid::make(2)
                             ->schema([
+                                Forms\Components\DatePicker::make('start_date')
+                                    ->label(__('common.start_date')),
+
+                                Forms\Components\DatePicker::make('end_date')
+                                    ->label(__('common.end_date')),
+
                                 Forms\Components\TextInput::make('budget')
                                     ->label(__('common.budget'))
                                     ->numeric()
                                     ->prefix('₺')
                                     ->placeholder(__('common.budget_example')),
-
-                                Forms\Components\TextInput::make('estimated_duration')
-                                    ->label(__('common.estimated_duration'))
-                                    ->numeric()
-                                    ->minValue(1)
-                                    ->maxValue(365)
-                                    ->suffix(__('common.days'))
-                                    ->placeholder(__('common.duration_example')),
                             ]),
                     ])
                     ->columnSpan(1),
                 Forms\Components\Section::make(__('common.location'))
                     ->icon('heroicon-o-map-pin')
                     ->schema([
-                        // Sadece detaylı tarif alanı bırakıldı
                         Forms\Components\Textarea::make('address_details')
                             ->label(__('common.detailed_address'))
                             ->placeholder(__('common.detailed_address_example'))
                             ->rows(3)
                             ->columnSpanFull(),
 
-                        // Image upload
                         SpatieMediaLibraryFileUpload::make('images')
-                            ->label(__('common.suggestion_design_image'))
+                            ->label(__('common.project_image'))
                             ->collection('images')
                             ->image()
                             ->imagePreviewHeight('200')
                             ->panelLayout('integrated')
                             ->maxFiles(1)
-                            ->maxSize(20480) // 20MB limit
+                            ->maxSize(20480)
                             ->acceptedFileTypes(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
                             ->helperText(__('common.image_upload_helper'))
                             ->imageResizeMode('contain')
@@ -170,11 +162,17 @@ class SuggestionResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('projectGroup.name')
+                    ->label(__('common.project_group'))
+                    ->searchable()
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
                 Tables\Columns\TextColumn::make('createdBy.name')
                     ->label(__('common.creator'))
                     ->searchable()
                     ->sortable()
-                    ->placeholder(__('common.anonymous'))
+                    ->placeholder(__('common.not_assigned'))
                     ->badge()
                     ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
                 Tables\Columns\TextColumn::make('district')->label(__('common.district'))->searchable()->sortable(),
@@ -182,22 +180,7 @@ class SuggestionResource extends Resource
                 Tables\Columns\TextColumn::make('budget')->label(__('common.budget'))
                     ->money('TRY')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('likes_count')
-                    ->label(__('common.like_count'))
-                    ->counts('likes')
-                    ->badge()
-                    ->color('success')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('comments_count')
-                    ->label(__('common.comment_count'))
-                    ->counts('comments')
-                    ->badge()
-                    ->color('info')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('estimated_duration')
-                    ->label(__('common.estimated_duration'))
-                    ->suffix(' '.__('common.days'))
-                    ->sortable()
+                Tables\Columns\TextColumn::make('start_date')->label(__('common.start_date'))->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('end_date')->label(__('common.end_date'))->date('d.m.Y')->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -211,22 +194,25 @@ class SuggestionResource extends Resource
                     ->label(__('common.category'))
                     ->relationship('category', 'name'),
 
+                SelectFilter::make('project_group')
+                    ->label(__('common.project_group'))
+                    ->relationship('projectGroup', 'name'),
+
                 SelectFilter::make('creator_type')
                     ->label(__('common.creator_type'))
                     ->options([
                         'with_user' => __('common.user_assigned'),
-                        'anonymous' => __('common.anonymous'),
+                        'not_assigned' => __('common.not_assigned'),
                     ])
                     ->query(function (Builder $query, array $data) {
                         $value = $data['value'] ?? null;
                         if ($value === 'with_user') {
                             $query->whereNotNull('created_by_id');
-                        } elseif ($value === 'anonymous') {
+                        } elseif ($value === 'not_assigned') {
                             $query->whereNull('created_by_id');
                         }
                     }),
 
-                // Location filter: District and Neighborhood dropdowns
                 Filter::make('location')
                     ->label(__('common.location'))
                     ->form([
@@ -259,7 +245,6 @@ class SuggestionResource extends Resource
                         }
                     }),
 
-                // Budget filter: amount + more/less toggle
                 Filter::make('budget_filter')
                     ->label(__('common.budget'))
                     ->form([
@@ -292,35 +277,6 @@ class SuggestionResource extends Resource
                             $query->where('budget', '<=', $amount);
                         }
                     }),
-
-                // Like filter
-                Filter::make('likes_filter')
-                    ->label(__('common.like_count'))
-                    ->form([
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('min_likes')
-                                    ->label(__('common.min_likes'))
-                                    ->numeric()
-                                    ->default(0),
-
-                                Forms\Components\TextInput::make('max_likes')
-                                    ->label(__('common.max_likes'))
-                                    ->numeric(),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        $query->withCount('likes');
-
-                        if (! empty($data['min_likes'])) {
-                            $query->having('likes_count', '>=', $data['min_likes']);
-                        }
-
-                        if (! empty($data['max_likes'])) {
-                            $query->having('likes_count', '<=', $data['max_likes']);
-                        }
-                    }),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -330,28 +286,28 @@ class SuggestionResource extends Resource
                     Tables\Actions\DeleteAction::make()
                         ->visible(fn ($record) => ! $record->trashed())
                         ->requiresConfirmation()
-                        ->modalHeading(__('common.delete_suggestion'))
-                        ->modalDescription(__('common.delete_suggestion_description'))
+                        ->modalHeading(__('common.delete_project'))
+                        ->modalDescription(__('common.delete_project_description'))
                         ->modalSubmitActionLabel(__('common.yes_delete'))
-                        ->successNotificationTitle(__('common.suggestion_deleted')),
+                        ->successNotificationTitle(__('common.project_deleted')),
 
                     Tables\Actions\RestoreAction::make()
                         ->icon('heroicon-o-arrow-path')
                         ->color('success')
                         ->requiresConfirmation()
-                        ->modalHeading(__('common.restore_suggestion'))
-                        ->modalDescription(__('common.restore_suggestion_description'))
+                        ->modalHeading(__('common.restore_project'))
+                        ->modalDescription(__('common.restore_project_description'))
                         ->modalSubmitActionLabel(__('common.yes_restore'))
-                        ->successNotificationTitle(__('common.suggestion_restored')),
+                        ->successNotificationTitle(__('common.project_restored')),
 
                     Tables\Actions\ForceDeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->modalHeading(__('common.force_delete_suggestion'))
-                        ->modalDescription(__('common.force_delete_suggestion_description'))
+                        ->modalHeading(__('common.force_delete_project'))
+                        ->modalDescription(__('common.force_delete_project_description'))
                         ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                        ->successNotificationTitle(__('common.suggestion_force_deleted')),
+                        ->successNotificationTitle(__('common.project_force_deleted')),
                 ])
                     ->label(__('common.actions'))
                     ->icon('heroicon-m-ellipsis-vertical')
@@ -362,24 +318,24 @@ class SuggestionResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading(__('common.delete_selected_suggestions'))
-                        ->modalDescription(__('common.delete_selected_suggestions_description'))
+                        ->modalHeading(__('common.delete_selected_projects'))
+                        ->modalDescription(__('common.delete_selected_projects_description'))
                         ->modalSubmitActionLabel(__('common.yes_delete'))
-                        ->successNotificationTitle(__('common.selected_suggestions_deleted')),
+                        ->successNotificationTitle(__('common.selected_projects_deleted')),
 
                     Tables\Actions\RestoreBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading(__('common.restore_selected_suggestions'))
-                        ->modalDescription(__('common.restore_selected_suggestions_description'))
+                        ->modalHeading(__('common.restore_selected_projects'))
+                        ->modalDescription(__('common.restore_selected_projects_description'))
                         ->modalSubmitActionLabel(__('common.yes_restore'))
-                        ->successNotificationTitle(__('common.selected_suggestions_restored')),
+                        ->successNotificationTitle(__('common.selected_projects_restored')),
 
                     Tables\Actions\ForceDeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading(__('common.force_delete_selected_suggestions'))
-                        ->modalDescription(__('common.force_delete_selected_suggestions_description'))
+                        ->modalHeading(__('common.force_delete_selected_projects'))
+                        ->modalDescription(__('common.force_delete_selected_projects_description'))
                         ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                        ->successNotificationTitle(__('common.selected_suggestions_force_deleted')),
+                        ->successNotificationTitle(__('common.selected_projects_force_deleted')),
                 ]),
             ])
             ->groups([
@@ -403,7 +359,6 @@ class SuggestionResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        // Remove the SoftDeletingScope so TrashedFilter can work (show/only trashed)
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([SoftDeletingScope::class]);
     }
@@ -411,16 +366,16 @@ class SuggestionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CommentsRelationManager::class,
+            //
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListSuggestions::route('/'),
-            'create' => Pages\CreateSuggestion::route('/create'),
-            'edit' => Pages\EditSuggestion::route('/{record}/edit'),
+            'index' => Pages\ListProjects::route('/'),
+            'create' => Pages\CreateProject::route('/create'),
+            'edit' => Pages\EditProject::route('/{record}/edit'),
         ];
     }
 
@@ -428,7 +383,7 @@ class SuggestionResource extends Resource
     {
         return [
             \Filament\Actions\Action::make('create_new')
-                ->label(__('common.create_new_suggestion'))
+                ->label(__('common.create_new_project'))
                 ->icon('heroicon-o-plus')
                 ->color('primary')
                 ->url(function (): string {

@@ -23,6 +23,7 @@ class Suggestion extends Model implements HasMedia
         'category_id',
         'created_by_id',
         'updated_by_id',
+        'project_group_id',
         'title',
         'description',
         'estimated_duration',
@@ -61,6 +62,11 @@ class Suggestion extends Model implements HasMedia
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by_id');
+    }
+
+    public function projectGroup(): BelongsTo
+    {
+        return $this->belongsTo(ProjectGroup::class, 'project_group_id');
     }
 
     public function likes(): HasMany
