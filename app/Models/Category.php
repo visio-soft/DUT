@@ -6,15 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Category extends Model implements HasMedia
+class Category extends Model
 {
-    use InteractsWithMedia;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'description', 'parent_id', 'aktif', 'start_datetime', 'end_datetime', 'hide_budget', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
+    protected $fillable = ['name', 'description', 'main_category_id', 'aktif'];
 
     /**
      * Automatically cascade deletes to related models when soft deleting
@@ -42,18 +39,8 @@ class Category extends Model implements HasMedia
      * @var array
      */
     protected $casts = [
-        'start_datetime' => 'datetime',
-        'end_datetime' => 'datetime',
-        'hide_budget' => 'boolean',
         'aktif' => 'boolean',
     ];
-
-    /**
-     * Default attribute values.
-     *
-     * @var array
-     */
-    protected $attributes = [];
 
     public function oneriler(): HasMany
     {
@@ -72,109 +59,10 @@ class Category extends Model implements HasMedia
     }
 
     /**
-     * Parent category relationship
+     * Main category relationship (ana kategori)
      */
-    public function parent(): BelongsTo
+    public function mainCategory(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'parent_id');
-    }
-
-    /**
-     * Children categories relationship
-     */
-    public function children(): HasMany
-    {
-        return $this->hasMany(Category::class, 'parent_id');
-    }
-
-    /**
-     * Check if the project is expired (past end_datetime)
-     */
-    public function isExpired(): bool
-    {
-        if (! $this->end_datetime) {
-            return false;
-        }
-
-        return now()->greaterThan($this->end_datetime);
-    }
-
-    /**
-     * Get remaining time until project ends
-     */
-    public function getRemainingTime(): ?array
-    {
-        if (! $this->end_datetime || $this->isExpired()) {
-            return null;
-        }
-
-        $now = now();
-        $endTime = $this->end_datetime;
-        $diff = $now->diff($endTime);
-
-        return [
-            'days' => $diff->days,
-            'hours' => $diff->h,
-            'minutes' => $diff->i,
-            'seconds' => $diff->s,
-            'total_hours' => ($diff->days * 24) + $diff->h,
-            'total_minutes' => (($diff->days * 24) + $diff->h) * 60 + $diff->i,
-            'formatted' => $this->formatRemainingTime($diff),
-        ];
-    }
-
-    /**
-     * Format remaining time for display
-     */
-    private function formatRemainingTime($diff): string
-    {
-        if ($diff->days > 0) {
-            return "{$diff->days} gün {$diff->h} saat";
-        } elseif ($diff->h > 0) {
-            return "{$diff->h} saat {$diff->i} dakika";
-        } elseif ($diff->i > 0) {
-            return "{$diff->i} dakika";
-        } else {
-            return "{$diff->s} saniye";
-        }
-    }
-
-    /**
-     * Get formatted end datetime for display
-     */
-    public function getFormattedEndDatetime(): ?string
-    {
-        if (! $this->end_datetime) {
-            return null;
-        }
-
-        return $this->end_datetime->format('d.m.Y H:i');
-    }
-
-    /**
-     * Get the full hierarchy path (for display purposes)
-     * Example: "Parent > Child > Current"
-     */
-    public function getHierarchyPath(): string
-    {
-        $path = [];
-        $current = $this;
-
-        // Build path from current to root (will be reversed later)
-        while ($current) {
-            array_unshift($path, $current->name);
-            $current = $current->parent;
-        }
-
-        return implode(' > ', $path);
-    }
-
-    /**
-     * Register media collections used by Category.
-     */
-    public function registerMediaCollections(): void
-    {
-        // collection for project related files (images, docs, etc.)
-        $this->addMediaCollection('project_files');
+        return $this->belongsTo(MainCategory::class, 'main_category_id');
     }
 }
