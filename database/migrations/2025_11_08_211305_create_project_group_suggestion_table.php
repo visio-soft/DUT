@@ -53,7 +53,7 @@ return new class extends Migration
     public function down(): void
     {
         // Add the old column back only if it doesn't exist
-        if (!Schema::hasColumn('suggestions', 'project_group_id')) {
+        if (! Schema::hasColumn('suggestions', 'project_group_id')) {
             Schema::table('suggestions', function (Blueprint $table) {
                 $table->foreignId('project_group_id')->nullable()->constrained('project_groups')->onDelete('set null');
             });
@@ -70,4 +70,3 @@ return new class extends Migration
         Schema::dropIfExists('project_group_suggestion');
     }
 };
-

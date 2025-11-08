@@ -22,7 +22,7 @@ class CreateProject extends CreateRecord
             ])->throw();
         }
 
-        $groups = ProjectGroup::query()->select('id','category_id')->whereIn('id', $selected)->get();
+        $groups = ProjectGroup::query()->select('id', 'category_id')->whereIn('id', $selected)->get();
         $categoryIds = $groups->pluck('category_id')->filter()->unique()->values();
 
         if ($categoryIds->count() !== 1) {

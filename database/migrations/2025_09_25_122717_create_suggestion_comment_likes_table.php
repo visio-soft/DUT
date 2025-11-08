@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Foreign keys
-            $table->foreign('suggestion_comment_id')->references('id')->on('oneri_comments')->onDelete('cascade');
+            $table->foreign('suggestion_comment_id')->references('id')->on('suggestion_comments')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
 
             // Unique constraint - bir kullanıcı bir yorumu sadece bir kez beğenebilir

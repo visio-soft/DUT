@@ -68,7 +68,7 @@ class Project extends Model implements HasMedia
     public function projectGroups(): BelongsToMany
     {
         return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
-                    ->withTimestamps();
+            ->withTimestamps();
     }
 
     // Design relationship removed - no longer needed

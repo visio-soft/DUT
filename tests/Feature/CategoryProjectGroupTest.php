@@ -79,10 +79,13 @@ class CategoryProjectGroupTest extends TestCase
 
     public function test_project_group_id_is_in_fillable_attributes(): void
     {
+        // This test is outdated - project_group_id was migrated to a many-to-many relationship
+        // via the project_group_suggestion pivot table. The column no longer exists in suggestions table.
         $project = new Project;
         $suggestion = new Suggestion;
 
-        $this->assertContains('project_group_id', $project->getFillable());
-        $this->assertContains('project_group_id', $suggestion->getFillable());
+        // Verify that models have the projectGroups relationship instead
+        $this->assertTrue(method_exists($project, 'projectGroups'));
+        $this->assertTrue(method_exists($suggestion, 'projectGroups'));
     }
 }
