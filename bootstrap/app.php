@@ -19,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Configure authentication redirects
         $middleware->redirectGuestsTo('/login');
-        
+
         // Add locale middleware to web group
         $middleware->web(append: [
             \App\Http\Middleware\SetLocale::class,

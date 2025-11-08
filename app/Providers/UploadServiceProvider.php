@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Http\UploadedFile;
 use Filament\Notifications\Notification;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
 
 class UploadServiceProvider extends ServiceProvider
@@ -46,7 +46,7 @@ class UploadServiceProvider extends ServiceProvider
     {
         // Add custom validation rule for large files
         \Illuminate\Support\Facades\Validator::extend('large_file', function ($attribute, $value, $parameters, $validator) {
-            if (!$value instanceof UploadedFile) {
+            if (! $value instanceof UploadedFile) {
                 return true; // Let other validators handle non-files
             }
 
@@ -58,7 +58,7 @@ class UploadServiceProvider extends ServiceProvider
                 $fileSizeMB = round($value->getSize() / 1024 / 1024, 2);
 
                 throw ValidationException::withMessages([
-                    $attribute => "Dosya boyutu çok büyük! Maksimum: {$maxSizeMB}MB, Yüklenen: {$fileSizeMB}MB. Lütfen daha küçük bir dosya seçin veya resmi sıkıştırın."
+                    $attribute => "Dosya boyutu çok büyük! Maksimum: {$maxSizeMB}MB, Yüklenen: {$fileSizeMB}MB. Lütfen daha küçük bir dosya seçin veya resmi sıkıştırın.",
                 ]);
             }
 
@@ -91,7 +91,7 @@ class UploadServiceProvider extends ServiceProvider
     private function handleUploadError(int $error): void
     {
         $errorMessages = [
-            UPLOAD_ERR_INI_SIZE => 'Dosya boyutu PHP upload_max_filesize limitini aşıyor (' . ini_get('upload_max_filesize') . ')',
+            UPLOAD_ERR_INI_SIZE => 'Dosya boyutu PHP upload_max_filesize limitini aşıyor ('.ini_get('upload_max_filesize').')',
             UPLOAD_ERR_FORM_SIZE => 'Dosya boyutu form MAX_FILE_SIZE limitini aşıyor',
             UPLOAD_ERR_PARTIAL => 'Dosya kısmen yüklendi, lütfen tekrar deneyin',
             UPLOAD_ERR_NO_FILE => 'Hiç dosya yüklenmedi',
@@ -101,7 +101,7 @@ class UploadServiceProvider extends ServiceProvider
         ];
 
         if ($error !== UPLOAD_ERR_OK && isset($errorMessages[$error])) {
-            logger("Upload Error: " . $errorMessages[$error]);
+            logger('Upload Error: '.$errorMessages[$error]);
 
             // If in web context, show user-friendly notification
             if (app()->runningInConsole() === false) {

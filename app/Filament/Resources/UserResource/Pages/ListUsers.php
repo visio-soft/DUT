@@ -3,12 +3,12 @@
 namespace App\Filament\Resources\UserResource\Pages;
 
 use App\Filament\Resources\UserResource;
-use Filament\Actions;
-use Filament\Resources\Pages\ListRecords;
-use Filament\Forms;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use Filament\Actions;
+use Filament\Forms;
+use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class ListUsers extends ListRecords
 {
@@ -20,7 +20,7 @@ class ListUsers extends ListRecords
             Actions\CreateAction::make()
                 ->label('Yeni Kullanıcı')
                 ->icon('heroicon-o-plus'),
-                
+
             Actions\Action::make('create_multiple')
                 ->label('Toplu Kullanıcı Oluştur')
                 ->icon('heroicon-o-users')
@@ -37,20 +37,20 @@ class ListUsers extends ListRecords
                                 ->maxValue(100)
                                 ->default(1)
                                 ->helperText('1-100 arası kullanıcı oluşturabilirsiniz'),
-                                
+
                             Forms\Components\TextInput::make('email_domain')
                                 ->label('E-posta Domain')
                                 ->required()
                                 ->default('basaksehir.bel.tr')
                                 ->placeholder('örnek: basaksehir.bel.tr')
                                 ->helperText('E-posta formatı: X@[domain] şeklinde olacak'),
-                                
+
                             Forms\Components\TextInput::make('password')
                                 ->label('Ortak Şifre')
                                 ->password()
                                 ->required()
                                 ->helperText('Tüm kullanıcılar için aynı şifre kullanılacak'),
-                                
+
                             Forms\Components\Select::make('roles')
                                 ->label('Roller')
                                 ->multiple()
@@ -66,40 +66,41 @@ class ListUsers extends ListRecords
                     $password = $data['password'];
                     $emailDomain = $data['email_domain'];
                     $roles = $data['roles'] ?? [];
-                    
+
                     $createdCount = 0;
                     $errors = [];
-                    
+
                     for ($i = 1; $i <= $userCount; $i++) {
                         try {
                             $email = "{$i}@{$emailDomain}";
                             $name = "Kullanıcı {$i}";
-                            
+
                             // E-posta benzersizliği kontrolü
                             if (User::where('email', $email)->exists()) {
                                 $errors[] = "{$email} - Bu e-posta adresi zaten kullanılıyor";
+
                                 continue;
                             }
-                            
+
                             $user = User::create([
                                 'name' => $name,
                                 'email' => $email,
                                 'password' => Hash::make($password),
                                 'email_verified_at' => now(),
                             ]);
-                            
+
                             // Roller atanması
-                            if (!empty($roles)) {
+                            if (! empty($roles)) {
                                 $roleModels = Role::whereIn('id', $roles)->get();
                                 $user->assignRole($roleModels);
                             }
-                            
+
                             $createdCount++;
                         } catch (\Exception $e) {
-                            $errors[] = "{$i}@{$emailDomain} - Hata: " . $e->getMessage();
+                            $errors[] = "{$i}@{$emailDomain} - Hata: ".$e->getMessage();
                         }
                     }
-                    
+
                     if ($createdCount > 0) {
                         \Filament\Notifications\Notification::make()
                             ->title("{$createdCount} kullanıcı başarıyla oluşturuldu")
@@ -108,8 +109,8 @@ class ListUsers extends ListRecords
                             ->persistent()
                             ->send();
                     }
-                    
-                    if (!empty($errors)) {
+
+                    if (! empty($errors)) {
                         \Filament\Notifications\Notification::make()
                             ->title('Bazı kullanıcılar oluşturulamadı')
                             ->body(implode("\n", $errors))

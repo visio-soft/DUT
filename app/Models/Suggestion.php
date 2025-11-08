@@ -6,7 +6,6 @@ use App\Observers\SuggestionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -106,7 +105,7 @@ class Suggestion extends Model implements HasMedia
                 'image/png',
                 'image/webp',
                 'image/gif',
-                'image/bmp'
+                'image/bmp',
             ])
             ->useFallbackUrl('/images/placeholder-suggestion.jpg')
             ->useFallbackPath(public_path('/images/placeholder-suggestion.jpg'));

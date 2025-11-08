@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum ProjectStatusEnum: string implements HasColor,HasLabel
+enum ProjectStatusEnum: string implements HasColor, HasLabel
 {
     case DRAFT = 'draft';
     case ACTIVE = 'active';
@@ -21,7 +21,6 @@ enum ProjectStatusEnum: string implements HasColor,HasLabel
             self::ARCHIVED => 'Archived',
         };
     }
-
 
     public function getColor(): string|array|null
     {

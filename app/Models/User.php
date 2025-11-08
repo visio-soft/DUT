@@ -19,7 +19,6 @@ class User extends Authenticatable implements FilamentUser
 
     use HasRoles;
 
-
     /**
      * The attributes that are mass assignable.
      *

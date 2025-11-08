@@ -4,32 +4,35 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SuggestionResource\Pages;
 use App\Filament\Resources\SuggestionResource\RelationManagers;
-use App\Models\Suggestion;
 use App\Models\Category;
-use App\Rules\ImageFormatRule;
+use App\Models\Suggestion;
+use Carbon\Carbon;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Table;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Grouping\Group;
-use Carbon\Carbon;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 
 class SuggestionResource extends Resource
 {
     protected static ?string $model = Suggestion::class;
+
     protected static ?string $pluralModelLabel = null;
+
     protected static ?string $modelLabel = null;
 
     protected static ?string $navigationLabel = null;
+
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
     protected static ?string $navigationGroup = null;
 
     public static function getNavigationLabel(): string
@@ -175,7 +178,7 @@ class SuggestionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('estimated_duration')
                     ->label(__('common.estimated_duration'))
-                    ->suffix(' ' . __('common.days'))
+                    ->suffix(' '.__('common.days'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('end_date')->label(__('common.end_date'))->date('d.m.Y')->sortable()
@@ -213,6 +216,7 @@ class SuggestionResource extends Resource
                             ->label(__('common.district'))
                             ->options(function () {
                                 $keys = array_keys(config('istanbul_neighborhoods', []));
+
                                 return array_combine($keys, $keys);
                             })
                             ->searchable(),
@@ -222,16 +226,17 @@ class SuggestionResource extends Resource
                             ->options(function (callable $get) {
                                 $district = $get('district');
                                 $map = config('istanbul_neighborhoods', []);
+
                                 return $map[$district] ?? [];
                             })
                             ->searchable(),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (!empty($data['district'])) {
+                        if (! empty($data['district'])) {
                             $query->where('district', $data['district']);
                         }
 
-                        if (!empty($data['neighborhood'])) {
+                        if (! empty($data['neighborhood'])) {
                             $query->where('neighborhood', $data['neighborhood']);
                         }
                     }),
@@ -250,7 +255,8 @@ class SuggestionResource extends Resource
                                 Forms\Components\Toggle::make('is_more')
                                     ->label(function (callable $get) {
                                         $amount = $get('amount');
-                                        return $amount ? ($amount . "₺'dan fazla?") : 'Bütçe Belirleyin';
+
+                                        return $amount ? ($amount."₺'dan fazla?") : 'Bütçe Belirleyin';
                                     })
                                     ->inline(false),
                             ])
@@ -262,7 +268,7 @@ class SuggestionResource extends Resource
                         }
 
                         $amount = $data['amount'];
-                        if (!empty($data['is_more'])) {
+                        if (! empty($data['is_more'])) {
                             $query->where('budget', '>=', $amount);
                         } else {
                             $query->where('budget', '<=', $amount);
@@ -289,11 +295,11 @@ class SuggestionResource extends Resource
                     ->query(function (Builder $query, array $data) {
                         $query->withCount('likes');
 
-                        if (!empty($data['min_likes'])) {
+                        if (! empty($data['min_likes'])) {
                             $query->having('likes_count', '>=', $data['min_likes']);
                         }
 
-                        if (!empty($data['max_likes'])) {
+                        if (! empty($data['max_likes'])) {
                             $query->having('likes_count', '<=', $data['max_likes']);
                         }
                     }),
@@ -301,10 +307,10 @@ class SuggestionResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()
-                        ->visible(fn ($record) => !$record->trashed()),
+                        ->visible(fn ($record) => ! $record->trashed()),
 
                     Tables\Actions\DeleteAction::make()
-                        ->visible(fn ($record) => !$record->trashed())
+                        ->visible(fn ($record) => ! $record->trashed())
                         ->requiresConfirmation()
                         ->modalHeading(__('common.delete_suggestion'))
                         ->modalDescription(__('common.delete_suggestion_description'))
@@ -329,10 +335,10 @@ class SuggestionResource extends Resource
                         ->modalSubmitActionLabel(__('common.yes_force_delete'))
                         ->successNotificationTitle(__('common.suggestion_force_deleted')),
                 ])
-                ->label(__('common.actions'))
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->size('sm')
-                ->color('gray')
+                    ->label(__('common.actions'))
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -369,7 +375,7 @@ class SuggestionResource extends Resource
                             $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
                         }
 
-                        return __('common.end') . ": {$end}";
+                        return __('common.end').": {$end}";
                     }),
 
             ])

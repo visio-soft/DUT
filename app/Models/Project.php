@@ -6,7 +6,6 @@ use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -75,7 +74,7 @@ class Project extends Model implements HasMedia
                 'image/gif',
                 'image/webp',
                 'image/bmp',
-                'image/svg+xml'
+                'image/svg+xml',
             ])
             ->singleFile()
             ->useFallbackUrl('/images/placeholder-project.jpg')

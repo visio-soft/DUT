@@ -56,17 +56,19 @@ class EditSuggestion extends EditRecord
                         } else {
                             \Filament\Notifications\Notification::make()
                                 ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->body('Lütfen gerekli alanları kontrol edin: '.$e->getMessage())
                                 ->danger()
                                 ->send();
                         }
+
                         return;
                     } catch (\Exception $e) {
                         \Filament\Notifications\Notification::make()
                             ->title('Hata!')
-                            ->body('Öneri güncellenirken bir hata oluştu: ' . $e->getMessage())
+                            ->body('Öneri güncellenirken bir hata oluştu: '.$e->getMessage())
                             ->danger()
                             ->send();
+
                         return;
                     }
                 }),

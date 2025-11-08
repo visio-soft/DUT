@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
 use App\Models\Suggestion;
-use App\Models\SuggestionLike;
 use App\Models\SuggestionComment;
-use App\Models\SuggestionCommentLike;
-use App\Helpers\BackgroundImageHelper;
+use App\Models\SuggestionLike;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,9 +18,9 @@ class UserController extends Controller
     public function index()
     {
         // Rastgele kategoriler (projeler) al
-        $randomProjects = Category::with(['oneriler' => function($query) {
-                $query->limit(3); // Her kategoriden max 3 öneri
-            }])
+        $randomProjects = Category::with(['oneriler' => function ($query) {
+            $query->limit(3); // Her kategoriden max 3 öneri
+        }])
             ->has('oneriler') // Sadece önerisi olan kategoriler
             ->inRandomOrder()
             ->limit(3)
@@ -46,9 +45,9 @@ class UserController extends Controller
     {
         // Tüm kategorileri (projeleri) önerileriyle birlikte getir
         $projects = Category::with([
-                'oneriler.likes',
-                'oneriler.createdBy'
-            ])
+            'oneriler.likes',
+            'oneriler.createdBy',
+        ])
             ->has('oneriler') // Sadece önerisi olan kategoriler
             ->get();
 
@@ -71,10 +70,10 @@ class UserController extends Controller
     {
         // Projeyi (kategoriyi) önerileriyle birlikte getir
         $project = Category::with([
-                'oneriler.likes',
-                'oneriler.comments',
-                'oneriler.createdBy'
-            ])
+            'oneriler.likes',
+            'oneriler.comments',
+            'oneriler.createdBy',
+        ])
             ->findOrFail($id);
 
         // Arka plan için rastgele resim al (her sayfa yenilenmesinde farklı)
@@ -95,14 +94,14 @@ class UserController extends Controller
     public function suggestionDetail($id)
     {
         $suggestion = Suggestion::with([
-                'category',
-                'likes.user',
-                'approvedComments.user',
-                'approvedComments.likes.user',
-                'approvedComments.approvedReplies.user',
-                'approvedComments.approvedReplies.likes.user',
-                'createdBy'
-            ])
+            'category',
+            'likes.user',
+            'approvedComments.user',
+            'approvedComments.likes.user',
+            'approvedComments.approvedReplies.user',
+            'approvedComments.approvedReplies.likes.user',
+            'createdBy',
+        ])
             ->findOrFail($id);
 
         // Kullanıcının bu öneriye yazdığı onaylanmamış yorumları da getir (hem ana yorumlar hem cevaplar)
@@ -133,7 +132,7 @@ class UserController extends Controller
      */
     public function toggleLike(Request $request, $suggestionId)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
         }
 
@@ -145,14 +144,14 @@ class UserController extends Controller
         if ($suggestion->category && $suggestion->category->isExpired()) {
             return response()->json([
                 'error' => 'Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.',
-                'expired' => true
+                'expired' => true,
             ], 403);
         }
 
         // Aynı kategorideki (projedeki) diğer beğenileri kontrol et
-        $existingLike = SuggestionLike::whereHas('oneri', function($query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
-            })
+        $existingLike = SuggestionLike::whereHas('oneri', function ($query) use ($categoryId) {
+            $query->where('category_id', $categoryId);
+        })
             ->where('user_id', $user->id)
             ->with('oneri')
             ->first();
@@ -173,7 +172,7 @@ class UserController extends Controller
                 $existingLike->delete();
                 SuggestionLike::create([
                     'user_id' => $user->id,
-                    'oneri_id' => $suggestionId
+                    'oneri_id' => $suggestionId,
                 ]);
                 $liked = true;
             }
@@ -181,7 +180,7 @@ class UserController extends Controller
             // Yeni beğeni ekle
             SuggestionLike::create([
                 'user_id' => $user->id,
-                'oneri_id' => $suggestionId
+                'oneri_id' => $suggestionId,
             ]);
             $liked = true;
         }
@@ -205,7 +204,7 @@ class UserController extends Controller
             'category_id' => $categoryId,
             'message' => $liked
                 ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi! (Kategori başına sadece bir beğeni)')
-                : 'Beğeni kaldırıldı!'
+                : 'Beğeni kaldırıldı!',
         ]);
     }
 
@@ -214,16 +213,16 @@ class UserController extends Controller
      */
     public function storeComment(Request $request, $suggestionId)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
         }
 
         $request->validate([
-            'comment' => 'required|string|max:1000|min:3'
+            'comment' => 'required|string|max:1000|min:3',
         ], [
             'comment.required' => 'Yorum içeriği gereklidir.',
             'comment.max' => 'Yorum en fazla 1000 karakter olabilir.',
-            'comment.min' => 'Yorum en az 3 karakter olmalıdır.'
+            'comment.min' => 'Yorum en az 3 karakter olmalıdır.',
         ]);
 
         $suggestion = Suggestion::findOrFail($suggestionId);
@@ -235,19 +234,19 @@ class UserController extends Controller
                 'oneri_id' => $suggestion->id,
                 'user_id' => $user->id,
                 'comment' => trim($request->comment),
-                'is_approved' => false // Admin onayı gerekiyor
+                'is_approved' => false, // Admin onayı gerekiyor
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Yorumunuz başarıyla gönderildi. Onaylandıktan sonra görüntülenecektir.',
-                'comment_id' => $comment->id
+                'comment_id' => $comment->id,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Yorum eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
+                'message' => 'Yorum eklenirken bir hata oluştu. Lütfen tekrar deneyin.',
             ], 500);
         }
     }
@@ -257,16 +256,16 @@ class UserController extends Controller
      */
     public function storeReply(Request $request, $commentId)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
         }
 
         $request->validate([
-            'comment' => 'required|string|max:1000|min:3'
+            'comment' => 'required|string|max:1000|min:3',
         ], [
             'comment.required' => 'Cevap içeriği gereklidir.',
             'comment.max' => 'Cevap en fazla 1000 karakter olabilir.',
-            'comment.min' => 'Cevap en az 3 karakter olmalıdır.'
+            'comment.min' => 'Cevap en az 3 karakter olmalıdır.',
         ]);
 
         $parentComment = SuggestionComment::findOrFail($commentId);
@@ -279,19 +278,19 @@ class UserController extends Controller
                 'user_id' => $user->id,
                 'parent_id' => $parentComment->id,
                 'comment' => trim($request->comment),
-                'is_approved' => false // Admin onayı gerekiyor
+                'is_approved' => false, // Admin onayı gerekiyor
             ]);
 
             return response()->json([
                 'success' => true,
                 'message' => 'Cevabınız başarıyla gönderildi. Onaylandıktan sonra görüntülenecektir.',
-                'reply_id' => $reply->id
+                'reply_id' => $reply->id,
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cevap eklenirken bir hata oluştu. Lütfen tekrar deneyin.'
+                'message' => 'Cevap eklenirken bir hata oluştu. Lütfen tekrar deneyin.',
             ], 500);
         }
     }
@@ -301,7 +300,7 @@ class UserController extends Controller
      */
     public function toggleCommentLike(Request $request, $commentId)
     {
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
         }
 
@@ -322,7 +321,7 @@ class UserController extends Controller
                 // Beğeni ekle
                 OneriCommentLike::create([
                     'oneri_comment_id' => $commentId,
-                    'user_id' => $user->id
+                    'user_id' => $user->id,
                 ]);
                 $liked = true;
             }
@@ -334,13 +333,13 @@ class UserController extends Controller
                 'success' => true,
                 'liked' => $liked,
                 'likes_count' => $likesCount,
-                'message' => $liked ? 'Yorum beğenildi!' : 'Beğeni kaldırıldı!'
+                'message' => $liked ? 'Yorum beğenildi!' : 'Beğeni kaldırıldı!',
             ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Beğeni işlemi sırasında bir hata oluştu.'
+                'message' => 'Beğeni işlemi sırasında bir hata oluştu.',
             ], 500);
         }
     }

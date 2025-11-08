@@ -2,7 +2,6 @@
 
 namespace App\Observers;
 
-use App\Models\Suggestion;
 use Illuminate\Support\Facades\Auth;
 
 class SuggestionObserver

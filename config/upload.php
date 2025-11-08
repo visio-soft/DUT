@@ -29,7 +29,7 @@ return [
         'image/jpeg',
         'image/jpg',
         'image/png',
-        'image/webp'
+        'image/webp',
     ],
 
     /*

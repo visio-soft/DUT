@@ -23,7 +23,7 @@ class AppServiceProvider extends ServiceProvider
     {
         // Register view composer for user panel background images
         View::composer([
-            'user.*'
+            'user.*',
         ], UserBackgroundComposer::class);
 
         // Increase PHP limits for file uploads - Multiple approaches

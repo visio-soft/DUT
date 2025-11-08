@@ -8,7 +8,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CommentsRelationManager extends RelationManager
 {
@@ -127,7 +126,7 @@ class CommentsRelationManager extends RelationManager
                         ->icon(fn ($record) => $record->is_approved ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
                         ->color(fn ($record) => $record->is_approved ? 'danger' : 'success')
                         ->action(function ($record) {
-                            $record->update(['is_approved' => !$record->is_approved]);
+                            $record->update(['is_approved' => ! $record->is_approved]);
                         })
                         ->requiresConfirmation()
                         ->modalDescription(fn ($record) => $record->is_approved
@@ -144,10 +143,10 @@ class CommentsRelationManager extends RelationManager
                         ->modalDescription('Bu yorumu silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
                         ->successNotificationTitle('Yorum başarıyla silindi'),
                 ])
-                ->label('İşlemler')
-                ->icon('heroicon-m-ellipsis-vertical')
-                ->size('sm')
-                ->color('gray'),
+                    ->label('İşlemler')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->size('sm')
+                    ->color('gray'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

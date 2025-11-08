@@ -38,7 +38,7 @@ class BackgroundImageHelper
                 $images[] = [
                     'url' => $suggestion->getFirstMediaUrl('images'),
                     'title' => $suggestion->title,
-                    'id' => $suggestion->id
+                    'id' => $suggestion->id,
                 ];
             }
         }
@@ -62,7 +62,7 @@ class BackgroundImageHelper
                 $images[] = [
                     'url' => $suggestion->getFirstMediaUrl('images'),
                     'title' => $suggestion->title,
-                    'id' => $suggestion->id
+                    'id' => $suggestion->id,
                 ];
             }
         }
@@ -90,7 +90,7 @@ class BackgroundImageHelper
             return [
                 'url' => $suggestion->getFirstMediaUrl('images'),
                 'title' => $suggestion->title,
-                'id' => $suggestion->id
+                'id' => $suggestion->id,
             ];
         }
 

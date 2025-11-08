@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SuggestionResource\Pages;
 
 use App\Filament\Resources\SuggestionResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +15,7 @@ class CreateSuggestion extends CreateRecord
         // Admin panelinde created_by_id manuel olarak seçilmişse onu kullan
         // Eğer seçilmemişse (null) boş bırak (anonim öneri olur)
         // Eğer hiç değer yoksa mevcut admin kullanıcısını ata
-        if (!array_key_exists('created_by_id', $data)) {
+        if (! array_key_exists('created_by_id', $data)) {
             $data['created_by_id'] = Auth::id();
         }
 
@@ -68,22 +67,24 @@ class CreateSuggestion extends CreateRecord
                         } else {
                             \Filament\Notifications\Notification::make()
                                 ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: ' . $e->getMessage())
+                                ->body('Lütfen gerekli alanları kontrol edin: '.$e->getMessage())
                                 ->danger()
                                 ->send();
                         }
+
                         return;
                     } catch (\Exception $e) {
                         \Filament\Notifications\Notification::make()
                             ->title('Hata!')
-                            ->body('Öneri oluşturulurken bir hata oluştu: ' . $e->getMessage())
+                            ->body('Öneri oluşturulurken bir hata oluştu: '.$e->getMessage())
                             ->danger()
                             ->send();
+
                         return;
                     }
                 })
                 ->extraAttributes([
-                    'class' => 'w-full justify-center mb-2'
+                    'class' => 'w-full justify-center mb-2',
                 ]),
 
             // İptal butonu
@@ -92,7 +93,7 @@ class CreateSuggestion extends CreateRecord
                 ->color('gray')
                 ->size('lg')
                 ->extraAttributes([
-                    'class' => 'w-full justify-center'
+                    'class' => 'w-full justify-center',
                 ]),
         ];
     }

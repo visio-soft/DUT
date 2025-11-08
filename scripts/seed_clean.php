@@ -1,13 +1,13 @@
 <?php
 
 // Boot Laravel to access DB/Artisan
-require __DIR__ . '/../vendor/autoload.php';
-$app = require_once __DIR__ . '/../bootstrap/app.php';
+require __DIR__.'/../vendor/autoload.php';
+$app = require_once __DIR__.'/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 
 // Simple CLI args parsing: --keep=table1,table2 --seeders=ClassA,ClassB
 $opts = [];
@@ -23,8 +23,8 @@ foreach ($argv as $arg) {
 $keep = $opts['keep'] ?? ['migrations', 'categories'];
 $seeders = $opts['seeders'] ?? ['Database\\Seeders\\DatabaseSeeder'];
 
-echo "Keep tables: " . implode(', ', $keep) . PHP_EOL;
-echo "Seeders: " . implode(', ', $seeders) . PHP_EOL;
+echo 'Keep tables: '.implode(', ', $keep).PHP_EOL;
+echo 'Seeders: '.implode(', ', $seeders).PHP_EOL;
 
 function getAllTableNames()
 {
@@ -33,12 +33,14 @@ function getAllTableNames()
 
     if ($driver === 'pgsql') {
         $rows = DB::select("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
-        return array_map(fn($r) => $r->tablename, $rows);
+
+        return array_map(fn ($r) => $r->tablename, $rows);
     }
 
     if ($driver === 'sqlite') {
         $rows = DB::select("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'");
-        return array_map(fn($r) => $r->name, $rows);
+
+        return array_map(fn ($r) => $r->name, $rows);
     }
 
     // default: mysql
@@ -50,6 +52,7 @@ function getAllTableNames()
             $arr = (array) $r;
             $names[] = array_values($arr)[0];
         }
+
         return $names;
     } catch (Throwable $e) {
         throw $e;
@@ -59,11 +62,11 @@ function getAllTableNames()
 try {
     $all = getAllTableNames();
 } catch (Throwable $e) {
-    echo 'Failed to list tables: ' . $e->getMessage() . PHP_EOL;
+    echo 'Failed to list tables: '.$e->getMessage().PHP_EOL;
     exit(1);
 }
 
-$toTruncate = array_filter($all, fn($t) => !in_array($t, $keep));
+$toTruncate = array_filter($all, fn ($t) => ! in_array($t, $keep));
 
 if (count($toTruncate) === 0) {
     echo "No tables to truncate.\n";
@@ -71,13 +74,13 @@ if (count($toTruncate) === 0) {
     $pdo = DB::getPdo();
     $driver = $pdo->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-    echo "Truncating: " . implode(', ', $toTruncate) . PHP_EOL;
+    echo 'Truncating: '.implode(', ', $toTruncate).PHP_EOL;
 
     try {
         if ($driver === 'mysql') {
             DB::statement('SET FOREIGN_KEY_CHECKS=0');
             foreach ($toTruncate as $table) {
-                DB::statement("TRUNCATE `" . $table . "`");
+                DB::statement('TRUNCATE `'.$table.'`');
             }
             DB::statement('SET FOREIGN_KEY_CHECKS=1');
         } elseif ($driver === 'sqlite') {
@@ -88,14 +91,14 @@ if (count($toTruncate) === 0) {
             }
             DB::commit();
         } else { // pgsql and others
-            $quoted = array_map(fn($t) => '"' . $t . '"', $toTruncate);
-            $sql = 'TRUNCATE ' . implode(', ', $quoted) . ' RESTART IDENTITY CASCADE';
+            $quoted = array_map(fn ($t) => '"'.$t.'"', $toTruncate);
+            $sql = 'TRUNCATE '.implode(', ', $quoted).' RESTART IDENTITY CASCADE';
             DB::statement($sql);
         }
 
         echo "Truncate succeeded.\n";
     } catch (Throwable $e) {
-        echo 'Truncate error: ' . $e->getMessage() . PHP_EOL;
+        echo 'Truncate error: '.$e->getMessage().PHP_EOL;
         exit(1);
     }
 
@@ -106,7 +109,7 @@ if (count($toTruncate) === 0) {
         } catch (Throwable $e) {
             $count = 'ERR';
         }
-        echo $name . ': ' . $count . PHP_EOL;
+        echo $name.': '.$count.PHP_EOL;
     }
 }
 
@@ -116,14 +119,14 @@ foreach ($seeders as $seeder) {
     try {
         $exit = Artisan::call('db:seed', ['--class' => $seeder, '--force' => true]);
         $output = Artisan::output();
-        echo $output . PHP_EOL;
+        echo $output.PHP_EOL;
         if ($exit !== 0) {
             echo "Seeder $seeder exited with code: $exit\n";
         } else {
             echo "Seeder $seeder completed.\n";
         }
     } catch (Throwable $e) {
-        echo 'Seeder error: ' . $e->getMessage() . PHP_EOL;
+        echo 'Seeder error: '.$e->getMessage().PHP_EOL;
         exit(1);
     }
 }
