@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\OneriResource\Pages;
+namespace App\Filament\Resources\SuggestionResource\Pages;
 
-use App\Filament\Resources\OneriResource;
+use App\Filament\Resources\SuggestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
-class CreateOneri extends CreateRecord
+class CreateSuggestion extends CreateRecord
 {
-    protected static string $resource = OneriResource::class;
+    protected static string $resource = SuggestionResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

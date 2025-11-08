@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Oneri;
-use App\Models\OneriLike;
-use App\Models\OneriComment;
-use App\Models\OneriCommentLike;
+use App\Models\Suggestion;
+use App\Models\SuggestionLike;
+use App\Models\SuggestionComment;
+use App\Models\SuggestionCommentLike;
 use App\Helpers\BackgroundImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -94,7 +94,7 @@ class UserController extends Controller
      */
     public function suggestionDetail($id)
     {
-        $suggestion = Oneri::with([
+        $suggestion = Suggestion::with([
                 'category',
                 'likes.user',
                 'approvedComments.user',
@@ -108,7 +108,7 @@ class UserController extends Controller
         // Kullanıcının bu öneriye yazdığı onaylanmamış yorumları da getir (hem ana yorumlar hem cevaplar)
         $userPendingComments = collect();
         if (Auth::check()) {
-            $userPendingComments = OneriComment::with(['user', 'parent.user'])
+            $userPendingComments = SuggestionComment::with(['user', 'parent.user'])
                 ->where('oneri_id', $id)
                 ->where('user_id', Auth::id())
                 ->where('is_approved', false)
@@ -137,7 +137,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
         }
 
-        $suggestion = Oneri::with('category')->findOrFail($suggestionId);
+        $suggestion = Suggestion::with('category')->findOrFail($suggestionId);
         $user = Auth::user();
         $categoryId = $suggestion->category_id;
 
@@ -150,7 +150,7 @@ class UserController extends Controller
         }
 
         // Aynı kategorideki (projedeki) diğer beğenileri kontrol et
-        $existingLike = OneriLike::whereHas('oneri', function($query) use ($categoryId) {
+        $existingLike = SuggestionLike::whereHas('oneri', function($query) use ($categoryId) {
                 $query->where('category_id', $categoryId);
             })
             ->where('user_id', $user->id)
@@ -171,7 +171,7 @@ class UserController extends Controller
 
                 // Eski beğeniyi sil, yeni beğeni ekle
                 $existingLike->delete();
-                OneriLike::create([
+                SuggestionLike::create([
                     'user_id' => $user->id,
                     'oneri_id' => $suggestionId
                 ]);
@@ -179,7 +179,7 @@ class UserController extends Controller
             }
         } else {
             // Yeni beğeni ekle
-            OneriLike::create([
+            SuggestionLike::create([
                 'user_id' => $user->id,
                 'oneri_id' => $suggestionId
             ]);
@@ -190,7 +190,7 @@ class UserController extends Controller
         $likesCount = $suggestion->fresh()->likes()->count();
 
         // Bu kategorideki tüm önerilerin güncel beğeni sayılarını al
-        $allSuggestionsInCategory = Oneri::where('category_id', $categoryId)
+        $allSuggestionsInCategory = Suggestion::where('category_id', $categoryId)
             ->withCount('likes')
             ->get()
             ->pluck('likes_count', 'id')
@@ -226,12 +226,12 @@ class UserController extends Controller
             'comment.min' => 'Yorum en az 3 karakter olmalıdır.'
         ]);
 
-        $suggestion = Oneri::findOrFail($suggestionId);
+        $suggestion = Suggestion::findOrFail($suggestionId);
         $user = Auth::user();
 
         try {
             // Yorum ekleme (varsayılan olarak onaysız)
-            $comment = OneriComment::create([
+            $comment = SuggestionComment::create([
                 'oneri_id' => $suggestion->id,
                 'user_id' => $user->id,
                 'comment' => trim($request->comment),
@@ -269,12 +269,12 @@ class UserController extends Controller
             'comment.min' => 'Cevap en az 3 karakter olmalıdır.'
         ]);
 
-        $parentComment = OneriComment::findOrFail($commentId);
+        $parentComment = SuggestionComment::findOrFail($commentId);
         $user = Auth::user();
 
         try {
             // Cevap ekleme (varsayılan olarak onaysız)
-            $reply = OneriComment::create([
+            $reply = SuggestionComment::create([
                 'oneri_id' => $parentComment->oneri_id,
                 'user_id' => $user->id,
                 'parent_id' => $parentComment->id,
@@ -305,7 +305,7 @@ class UserController extends Controller
             return response()->json(['error' => 'Giriş yapmanız gerekiyor', 'success' => false], 401);
         }
 
-        $comment = OneriComment::findOrFail($commentId);
+        $comment = SuggestionComment::findOrFail($commentId);
         $user = Auth::user();
 
         try {

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\OneriResource\RelationManagers;
+namespace App\Filament\Resources\SuggestionResource\RelationManagers;
 
 use Filament\Forms;
 use Filament\Forms\Form;

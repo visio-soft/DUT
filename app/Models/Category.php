@@ -23,15 +23,15 @@ class Category extends Model implements HasMedia
         parent::boot();
 
         static::deleting(function ($category) {
-            // When soft deleting a category, also soft delete its related oneriler
+            // When soft deleting a category, also soft delete its related suggestions
             if (!$category->isForceDeleting()) {
-                $category->oneriler()->delete();
+                $category->suggestions()->delete();
             }
         });
 
         static::restoring(function ($category) {
-            // When restoring a category, also restore its related oneriler
-            $category->oneriler()->withTrashed()->restore();
+            // When restoring a category, also restore its related suggestions
+            $category->suggestions()->withTrashed()->restore();
         });
     }
 
@@ -52,15 +52,15 @@ class Category extends Model implements HasMedia
      */
     protected $attributes = [];
 
-    public function oneriler(): HasMany
+    public function suggestions(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'category_id');
+        return $this->hasMany(Suggestion::class, 'category_id');
     }
 
-    // eski projects() metodunu koruyoruz
+    // Keep old projects() method for backward compatibility
     public function projects(): HasMany
     {
-        return $this->oneriler();
+        return $this->suggestions();
     }
 
     /**

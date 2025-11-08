@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class OneriComment extends Model
+class SuggestionComment extends Model
 {
     use SoftDeletes;
 
-    protected $table = 'oneri_comments';
+    protected $table = 'suggestion_comments';
 
     protected $fillable = [
-        'oneri_id',
+        'suggestion_id',
         'user_id',
         'parent_id',
         'comment',
@@ -28,15 +28,15 @@ class OneriComment extends Model
     ];
 
     /**
-     * Yorumun ait olduğu öneri
+     * The suggestion this comment belongs to
      */
-    public function oneri(): BelongsTo
+    public function suggestion(): BelongsTo
     {
-        return $this->belongsTo(Oneri::class, 'oneri_id');
+        return $this->belongsTo(Suggestion::class, 'suggestion_id');
     }
 
     /**
-     * Yorumu yazan kullanıcı
+     * The user who created the comment
      */
     public function user(): BelongsTo
     {
@@ -44,7 +44,7 @@ class OneriComment extends Model
     }
 
     /**
-     * Scope - Sadece onaylanmış yorumlar
+     * Scope - Only approved comments
      */
     public function scopeApproved($query)
     {
@@ -52,7 +52,7 @@ class OneriComment extends Model
     }
 
     /**
-     * Scope - Onay bekleyen yorumlar
+     * Scope - Pending comments
      */
     public function scopePending($query)
     {
@@ -60,31 +60,31 @@ class OneriComment extends Model
     }
 
     /**
-     * Ana yorum (parent comment)
+     * Parent comment
      */
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(OneriComment::class, 'parent_id');
+        return $this->belongsTo(SuggestionComment::class, 'parent_id');
     }
 
     /**
-     * Alt yorumlar (replies)
+     * Replies
      */
     public function replies()
     {
-        return $this->hasMany(OneriComment::class, 'parent_id')->with(['user', 'replies']);
+        return $this->hasMany(SuggestionComment::class, 'parent_id')->with(['user', 'replies']);
     }
 
     /**
-     * Onaylanmış alt yorumlar
+     * Approved replies
      */
     public function approvedReplies()
     {
-        return $this->hasMany(OneriComment::class, 'parent_id')->where('is_approved', true)->with(['user', 'approvedReplies']);
+        return $this->hasMany(SuggestionComment::class, 'parent_id')->where('is_approved', true)->with(['user', 'approvedReplies']);
     }
 
     /**
-     * Scope - Sadece ana yorumlar (parent_id null olanlar)
+     * Scope - Only main comments (parent_id is null)
      */
     public function scopeMainComments($query)
     {
@@ -92,15 +92,15 @@ class OneriComment extends Model
     }
 
     /**
-     * Yorumun beğenileri
+     * Comment likes
      */
     public function likes()
     {
-        return $this->hasMany(OneriCommentLike::class, 'oneri_comment_id');
+        return $this->hasMany(SuggestionCommentLike::class, 'suggestion_comment_id');
     }
 
     /**
-     * Beğeni sayısını al
+     * Get likes count
      */
     public function getLikesCountAttribute(): int
     {

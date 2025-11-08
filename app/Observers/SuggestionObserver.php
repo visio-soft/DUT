@@ -2,10 +2,10 @@
 
 namespace App\Observers;
 
-use App\Models\Oneri;
+use App\Models\Suggestion;
 use Illuminate\Support\Facades\Auth;
 
-class OneriObserver
+class SuggestionObserver
 {
     public function creating(Oneri $oneri): void
     {

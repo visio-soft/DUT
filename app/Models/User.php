@@ -72,7 +72,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function createdOneriler(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'created_by_id');
+        return $this->hasMany(Suggestion::class, 'created_by_id');
     }
 
     public function updatedOneriler(): HasMany
