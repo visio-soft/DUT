@@ -86,6 +86,12 @@ class CategoryResource extends Resource
                             ->helperText('Aktif olursa bu projeye ait tüm önerilerin bütçeleri kullanıcı panelinde görünmez')
                             ->default(false)
                             ->columnSpanFull(),
+
+                        Forms\Components\Toggle::make('aktif')
+                            ->label('Aktif')
+                            ->helperText('Kategori aktif olduğunda kullanıcılar görebilir ve öneri ekleyebilir')
+                            ->default(true)
+                            ->columnSpanFull(),
                     ])
                     ->columns(2),
 
@@ -208,6 +214,12 @@ class CategoryResource extends Resource
                     ->boolean()
                     ->toggleable(isToggledHiddenByDefault: false),
 
+                Tables\Columns\IconColumn::make('aktif')
+                    ->label('Aktif')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: false),
+
                 Tables\Columns\TextColumn::make('country')
                     ->label('Ülke')
                     ->searchable()
@@ -255,6 +267,24 @@ class CategoryResource extends Resource
             ->defaultSort('name')
             ->filters([
                 TrashedFilter::make(),
+
+                // Aktif filtresi
+                Filter::make('aktif')
+                    ->label('Aktif Durum')
+                    ->form([
+                        Forms\Components\Select::make('aktif')
+                            ->label('Durum')
+                            ->options([
+                                '1' => 'Aktif',
+                                '0' => 'Pasif',
+                            ])
+                            ->placeholder('Tümü'),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (isset($data['aktif']) && $data['aktif'] !== '') {
+                            $query->where('aktif', (bool) $data['aktif']);
+                        }
+                    }),
 
                 // Konum filtresi: İlçe ve Mahalle dropdownları
                 Filter::make('location')

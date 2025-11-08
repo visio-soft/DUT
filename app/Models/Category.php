@@ -14,7 +14,7 @@ class Category extends Model implements HasMedia
     use SoftDeletes;
     use InteractsWithMedia;
 
-    protected $fillable = ['name', 'description', 'parent_id', 'start_datetime', 'end_datetime', 'hide_budget', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
+    protected $fillable = ['name', 'description', 'parent_id', 'aktif', 'start_datetime', 'end_datetime', 'hide_budget', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
 
     /**
      * Automatically cascade deletes to related models when soft deleting
@@ -45,6 +45,7 @@ class Category extends Model implements HasMedia
         'start_datetime' => 'datetime',
         'end_datetime' => 'datetime',
         'hide_budget' => 'boolean',
+        'aktif' => 'boolean',
     ];
 
     /**

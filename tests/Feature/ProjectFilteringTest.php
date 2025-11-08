@@ -34,6 +34,7 @@ class ProjectFilteringTest extends TestCase
             'start_datetime' => now(),
             'end_datetime' => now()->addDays(30),
             'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
         $childCategory = Category::create([
@@ -43,10 +44,13 @@ class ProjectFilteringTest extends TestCase
             'start_datetime' => now(),
             'end_datetime' => now()->addDays(30),
             'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
         ]);
 
         $this->assertEquals($parentCategory->id, $childCategory->parent->id);
         $this->assertEquals(1, $parentCategory->children()->count());
+        $this->assertTrue($parentCategory->aktif);
+        $this->assertTrue($childCategory->aktif);
     }
 
     /**
@@ -238,5 +242,39 @@ class ProjectFilteringTest extends TestCase
         $response = $this->actingAs($user)->get('/projects?min_budget=50000&max_budget=150000');
         $response->assertStatus(200);
         $response->assertSee('High Budget Suggestion');
+    }
+
+    /**
+     * Test that categories can be filtered by aktif status.
+     */
+    public function test_categories_can_be_filtered_by_aktif_status(): void
+    {
+        $activeCategory = Category::create([
+            'name' => 'Active Category',
+            'description' => 'Active Description',
+            'start_datetime' => now(),
+            'end_datetime' => now()->addDays(30),
+            'neighborhood' => 'Test Neighborhood',
+            'aktif' => true,
+        ]);
+
+        $inactiveCategory = Category::create([
+            'name' => 'Inactive Category',
+            'description' => 'Inactive Description',
+            'start_datetime' => now(),
+            'end_datetime' => now()->addDays(30),
+            'neighborhood' => 'Test Neighborhood',
+            'aktif' => false,
+        ]);
+
+        // Test that we can query active categories
+        $activeCategories = Category::where('aktif', true)->get();
+        $this->assertEquals(1, $activeCategories->count());
+        $this->assertEquals('Active Category', $activeCategories->first()->name);
+
+        // Test that we can query inactive categories
+        $inactiveCategories = Category::where('aktif', false)->get();
+        $this->assertEquals(1, $inactiveCategories->count());
+        $this->assertEquals('Inactive Category', $inactiveCategories->first()->name);
     }
 }
