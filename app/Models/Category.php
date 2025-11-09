@@ -60,14 +60,23 @@ class Category extends Model implements HasMedia
 
     /**
      * Get all projects through project groups.
-     * Since projects can belong to multiple groups, we can't use hasManyThrough.
-     * This is a convenience method to get distinct projects.
+     * Since projects can belong to multiple groups, this returns distinct projects.
      */
-    public function projects()
+    public function getProjectsAttribute()
     {
         return Project::whereHas('projectGroups', function ($query) {
             $query->where('project_groups.category_id', $this->id);
-        })->whereNull('project_id');
+        })->whereNull('project_id')->get();
+    }
+    
+    /**
+     * Get projects count for this category
+     */
+    public function getProjectsCountAttribute()
+    {
+        return Project::whereHas('projectGroups', function ($query) {
+            $query->where('project_groups.category_id', $this->id);
+        })->whereNull('project_id')->count();
     }
 
     /**

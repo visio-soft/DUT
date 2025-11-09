@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\SuggestionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -19,6 +20,17 @@ class Suggestion extends Model implements HasMedia
     use InteractsWithMedia,SoftDeletes;
 
     protected $table = 'suggestions';
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // Global scope to filter out projects (only get suggestions)
+        static::addGlobalScope('suggestions_only', function (Builder $builder) {
+            $builder->whereNotNull('project_id');
+        });
+    }
 
     protected $fillable = [
         'category_id',

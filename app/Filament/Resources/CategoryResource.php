@@ -82,8 +82,9 @@ class CategoryResource extends Resource
 
                 Tables\Columns\TextColumn::make('projects_count')
                     ->label(__('common.project_count'))
-                    ->counts('projects')
-                    ->sortable()
+                    ->state(function (Category $record): int {
+                        return $record->projects_count;
+                    })
                     ->badge()
                     ->color('info'),
 
@@ -107,10 +108,10 @@ class CategoryResource extends Resource
                 TrashedFilter::make(),
                 Filter::make('empty_categories')
                     ->label('Boş Kategoriler')
-                    ->query(fn ($query) => $query->doesntHave('projects')),
+                    ->query(fn ($query) => $query->doesntHave('projectGroups')),
                 Filter::make('active_categories')
                     ->label('Aktif Kategoriler')
-                    ->query(fn ($query) => $query->has('projects')),
+                    ->query(fn ($query) => $query->has('projectGroups')),
                 Filter::make('has_suggestions')
                     ->label('Önerisi Olan')
                     ->query(fn ($query) => $query->has('suggestions')),

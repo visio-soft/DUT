@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,6 +21,17 @@ class Project extends Model implements HasMedia
 
     // Map the legacy 'projects' model to the current 'suggestions' table
     protected $table = 'suggestions';
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // Global scope to filter out suggestions (only get projects)
+        static::addGlobalScope('projects_only', function (Builder $builder) {
+            $builder->whereNull('project_id');
+        });
+    }
 
     protected $fillable = [
         'category_id',

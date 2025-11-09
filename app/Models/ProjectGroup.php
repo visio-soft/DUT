@@ -21,11 +21,22 @@ class ProjectGroup extends Model
     public function projects(): BelongsToMany
     {
         return $this->belongsToMany(Project::class, 'project_group_suggestion', 'project_group_id', 'suggestion_id')
+            ->whereNull('suggestions.project_id') // Only projects (not suggestions)
             ->withTimestamps();
     }
 
-    // Keep suggestions() as alias for backward compatibility
+    // Get all suggestions through projects in this group
     public function suggestions(): BelongsToMany
+    {
+        return $this->belongsToMany(Suggestion::class, 'project_group_suggestion', 'project_group_id', 'suggestion_id')
+            ->whereNotNull('suggestions.project_id') // Only suggestions (not projects)
+            ->withTimestamps();
+    }
+    
+    /**
+     * Get all items (both projects and suggestions) in this group
+     */
+    public function allItems(): BelongsToMany
     {
         return $this->belongsToMany(Suggestion::class, 'project_group_suggestion', 'project_group_id', 'suggestion_id')
             ->withTimestamps();

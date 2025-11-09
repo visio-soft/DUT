@@ -158,12 +158,18 @@ class ProjectResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('projectGroups.category.name')
+                Tables\Columns\TextColumn::make('projectGroups.name')
+                    ->label(__('common.project_groups'))
+                    ->badge()
+                    ->separator(',')
+                    ->searchable()
+                    ->color('primary'),
+                Tables\Columns\TextColumn::make('category.name')
                     ->label(__('common.project_category'))
                     ->searchable()
-                    ->sortable()
                     ->badge()
-                    ->color('info'),
+                    ->color('info')
+                    ->placeholder(__('common.not_set')),
                 Tables\Columns\TextColumn::make('createdBy.name')
                     ->label(__('common.creator'))
                     ->searchable()
