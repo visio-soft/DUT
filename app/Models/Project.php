@@ -4,9 +4,11 @@ namespace App\Models;
 
 use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -19,6 +21,17 @@ class Project extends Model implements HasMedia
 
     // Map the legacy 'projects' model to the current 'suggestions' table
     protected $table = 'suggestions';
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // Global scope to filter out suggestions (only get projects)
+        static::addGlobalScope('projects_only', function (Builder $builder) {
+            $builder->whereNull('project_id');
+        });
+    }
 
     protected $fillable = [
         'category_id',
@@ -50,9 +63,28 @@ class Project extends Model implements HasMedia
         'longitude' => 'decimal:8',
     ];
 
+    public function projectGroups(): BelongsToMany
+    {
+        return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
+            ->withTimestamps();
+    }
+
     public function category(): BelongsTo
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class, 'category_id')
+            ->withDefault(function ($category, $project) {
+                // Get category through first project group
+                $firstGroup = $project->projectGroups->first();
+                if ($firstGroup) {
+                    return $firstGroup->category;
+                }
+                return $category;
+            });
+    }
+
+    public function suggestions(): HasMany
+    {
+        return $this->hasMany(Suggestion::class, 'project_id');
     }
 
     public function createdBy(): BelongsTo
@@ -63,12 +95,6 @@ class Project extends Model implements HasMedia
     public function updatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by_id');
-    }
-
-    public function projectGroups(): BelongsToMany
-    {
-        return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
-            ->withTimestamps();
     }
 
     // Design relationship removed - no longer needed
