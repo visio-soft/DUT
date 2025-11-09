@@ -140,6 +140,7 @@ class UserController extends Controller
     public function suggestionDetail($id)
     {
         $suggestion = Suggestion::with([
+            'project',
             'category',
             'likes.user',
             'approvedComments.user',

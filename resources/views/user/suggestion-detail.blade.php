@@ -91,7 +91,7 @@
                                 {{ $suggestion->created_at->format('d.m.Y') }}
                             </div>
 
-                            @if($suggestion->category && $suggestion->category->end_datetime)
+                            @if($suggestion->project $suggestion->category && $suggestion->category->end_date$suggestion->category && $suggestion->category->end_date $suggestion->project->end_datetime)
                                 @php
                                     $remainingTime = $suggestion->category->getRemainingTime();
                                     $isExpired = $suggestion->category->isExpired();
@@ -175,7 +175,7 @@
                                 $userHasLikedInProject = false;
                                 $userLikedSuggestionInProject = null;
                                 if (Auth::check()) {
-                                    $projectSuggestions = \App\Models\Suggestion::where('category_id', $suggestion->category_id)->get();
+                                    $projectSuggestions = \App\Models\Suggestion::where('project_id', $suggestion->project_id)->get();
                                     foreach($projectSuggestions as $projectSuggestion) {
                                         if ($projectSuggestion->likes->where('user_id', Auth::id())->count() > 0) {
                                             $userHasLikedInProject = true;
