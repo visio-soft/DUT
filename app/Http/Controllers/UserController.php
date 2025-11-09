@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
+use App\Models\Project;
 use App\Models\Suggestion;
 use App\Models\SuggestionComment;
 use App\Models\SuggestionCommentLike;
@@ -18,11 +19,17 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Get random categories (projects)
-        $randomProjects = Category::with(['suggestions' => function ($query) {
-            $query->limit(3); // Max 3 suggestions per category
-        }])
-            ->has('suggestions') // Only categories with suggestions
+        // Get random projects with their suggestions
+        $randomProjects = Project::with([
+            'suggestions' => function ($query) {
+                $query->limit(3); // Max 3 suggestions per project
+            },
+            'suggestions.likes',
+            'suggestions.createdBy',
+            'createdBy',
+            'projectGroups.category',
+        ])
+            ->has('suggestions') // Only projects with suggestions
             ->inRandomOrder()
             ->limit(3)
             ->get();
@@ -35,19 +42,76 @@ class UserController extends Controller
     /**
      * Projeler sayfası - Tüm projeler ve öneriler
      */
-    public function projects()
+    public function projects(Request $request)
     {
-        // Get all categories (projects) with their suggestions
-        $projects = Category::with([
+        // Start with base query for projects
+        $query = Project::with([
             'suggestions.likes',
             'suggestions.createdBy',
-        ])
-            ->has('suggestions') // Only categories with suggestions
-            ->get();
+            'createdBy',
+            'projectGroups.category',
+        ]);
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhere('district', 'like', "%{$search}%")
+                  ->orWhere('neighborhood', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $categoryId = $request->get('category');
+            $query->whereHas('projectGroups.category', function ($q) use ($categoryId) {
+                $q->where('categories.id', $categoryId);
+            });
+        }
+
+        // Filter by location (district)
+        if ($request->filled('district')) {
+            $query->where('district', $request->get('district'));
+        }
+
+        // Filter by neighborhood
+        if ($request->filled('neighborhood')) {
+            $query->where('neighborhood', $request->get('neighborhood'));
+        }
+
+        // Filter by status (active/expired based on end_date)
+        if ($request->filled('status')) {
+            $status = $request->get('status');
+            if ($status === 'active') {
+                $query->where(function ($q) {
+                    $q->whereNull('end_date')
+                      ->orWhere('end_date', '>=', now());
+                });
+            } elseif ($status === 'expired') {
+                $query->where('end_date', '<', now());
+            }
+        }
+
+        // Get filtered projects
+        $projects = $query->get();
+
+        // Get all categories for filter dropdown
+        $categories = Category::orderBy('name')->get();
+
+        // Get unique districts for filter dropdown
+        $districts = Project::whereNotNull('district')
+            ->distinct()
+            ->orderBy('district')
+            ->pluck('district');
 
         $backgroundData = $this->getBackgroundImageData();
 
-        return view('user.projects', array_merge(compact('projects'), $backgroundData));
+        return view('user.projects', array_merge(
+            compact('projects', 'categories', 'districts'),
+            $backgroundData
+        ));
     }
 
     /**
@@ -55,11 +119,13 @@ class UserController extends Controller
      */
     public function projectSuggestions($id)
     {
-        // Get the project (category) with its suggestions
-        $project = Category::with([
+        // Get the project with its suggestions
+        $project = Project::with([
             'suggestions.likes',
             'suggestions.comments',
             'suggestions.createdBy',
+            'createdBy',
+            'projectGroups.category',
         ])
             ->findOrFail($id);
 
@@ -112,21 +178,21 @@ class UserController extends Controller
             return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
         }
 
-        $suggestion = Suggestion::with('category')->findOrFail($suggestionId);
+        $suggestion = Suggestion::with('project')->findOrFail($suggestionId);
         $user = Auth::user();
-        $categoryId = $suggestion->category_id;
+        $projectId = $suggestion->project_id;
 
         // Proje süresi kontrol et
-        if ($suggestion->category && $suggestion->category->isExpired()) {
+        if ($suggestion->project && $suggestion->project->end_date && now()->greaterThan($suggestion->project->end_date)) {
             return response()->json([
                 'error' => 'Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.',
                 'expired' => true,
             ], 403);
         }
 
-        // Check other likes in the same category (project)
-        $existingLike = SuggestionLike::whereHas('suggestion', function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId);
+        // Check other likes in the same project
+        $existingLike = SuggestionLike::whereHas('suggestion', function ($query) use ($projectId) {
+            $query->where('project_id', $projectId);
         })
             ->where('user_id', $user->id)
             ->with('suggestion')
@@ -164,8 +230,8 @@ class UserController extends Controller
         // Güncel beğeni sayısını hesapla
         $likesCount = $suggestion->fresh()->likes()->count();
 
-        // Get updated like counts for all suggestions in this category
-        $allSuggestionsInCategory = Suggestion::where('category_id', $categoryId)
+        // Get updated like counts for all suggestions in this project
+        $allSuggestionsInProject = Suggestion::where('project_id', $projectId)
             ->withCount('likes')
             ->get()
             ->pluck('likes_count', 'id')
@@ -174,12 +240,12 @@ class UserController extends Controller
         return response()->json([
             'liked' => $liked,
             'likes_count' => $likesCount,
-            'all_likes' => $allSuggestionsInCategory,
+            'all_likes' => $allSuggestionsInProject,
             'switched_from' => $switchedFrom,
             'current_title' => $suggestion->title,
-            'category_id' => $categoryId,
+            'project_id' => $projectId,
             'message' => $liked
-                ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi! (Kategori başına sadece bir beğeni)')
+                ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi! (Proje başına sadece bir beğeni)')
                 : 'Beğeni kaldırıldı!',
         ]);
     }

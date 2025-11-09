@@ -395,9 +395,112 @@
                 </div>
             </div>
             @endif
+
+            <!-- Search and Filter Section -->
+            <div class="filter-search-section" style="max-width: 900px; margin: 2rem auto 0; padding: 0 1rem;">
+                <form method="GET" action="{{ route('user.projects') }}" id="filterForm" style="background: white; border-radius: var(--radius-xl); padding: 1.5rem; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06); border: 1px solid var(--gray-200);">
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1rem;">
+                        <!-- Search Input -->
+                        <div>
+                            <label for="search" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">
+                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                                </svg>
+                                {{ __('common.search') }}
+                            </label>
+                            <input type="text" name="search" id="search" value="{{ request('search') }}" 
+                                placeholder="{{ __('common.search_projects') }}" 
+                                style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem;">
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                        <!-- Category Filter -->
+                        @if($categories->count() > 0)
+                        <div>
+                            <label for="category" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">
+                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 0 1-1.125-1.125v-3.75ZM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-8.25ZM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-2.25Z"/>
+                                </svg>
+                                {{ __('common.category') }}
+                            </label>
+                            <select name="category" id="category" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">{{ __('common.all_categories') }}</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+
+                        <!-- District Filter -->
+                        @if($districts->count() > 0)
+                        <div>
+                            <label for="district" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">
+                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
+                                </svg>
+                                {{ __('common.district') }}
+                            </label>
+                            <select name="district" id="district" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">{{ __('common.all_districts') }}</option>
+                                @foreach($districts as $district)
+                                    <option value="{{ $district }}" {{ request('district') == $district ? 'selected' : '' }}>
+                                        {{ $district }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+
+                        <!-- Status Filter -->
+                        <div>
+                            <label for="status" style="display: block; font-size: 0.875rem; font-weight: 600; color: var(--gray-700); margin-bottom: 0.5rem;">
+                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                </svg>
+                                {{ __('common.status') }}
+                            </label>
+                            <select name="status" id="status" style="width: 100%; padding: 0.75rem 1rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-size: 0.875rem; background: white;">
+                                <option value="">{{ __('common.all_status') }}</option>
+                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>{{ __('common.active') }}</option>
+                                <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>{{ __('common.expired') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+                        <button type="button" onclick="clearFilters()" style="padding: 0.75rem 1.5rem; border: 1px solid var(--gray-300); background: white; color: var(--gray-700); border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                            </svg>
+                            {{ __('common.clear_filters') }}
+                        </button>
+                        <button type="submit" style="padding: 0.75rem 1.5rem; background: var(--green-600); color: white; border: none; border-radius: var(--radius-md); font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                            <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                            </svg>
+                            {{ __('common.apply_filters') }}
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </section>
+
+<script>
+function clearFilters() {
+    document.getElementById('search').value = '';
+    document.getElementById('category').value = '';
+    document.getElementById('district').value = '';
+    document.getElementById('status').value = '';
+    document.getElementById('filterForm').submit();
+}
+</script>
 
 <div class="section-padding">
     <div class="projects-wide-container">
@@ -477,9 +580,9 @@
                     @foreach($projects as $project)
                     <div id="project-{{ $project->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
                         <!-- Project Background Image -->
-                        @if($project->getFirstMediaUrl('project_files'))
+                        @if($project->getFirstMediaUrl('images'))
                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
-                            <img src="{{ $project->getFirstMediaUrl('project_files') }}"
+                            <img src="{{ $project->getFirstMediaUrl('images') }}"
                                  alt="{{ $project->name }}"
                                  style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3);"
                                  onerror="this.style.display='none';">
@@ -671,7 +774,7 @@
                                                         class="btn-like {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }} {{ $isProjectExpired ? 'expired' : '' }}"
                                                         data-suggestion-id="{{ $suggestion->id }}"
                                                         data-project-id="{{ $project->id }}"
-                                                        data-category="{{ $suggestion->category_id ?? 'default' }}"
+                                                        data-category="{{ $suggestion->project_id ?? 'default' }}"
                                                         data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
                                                         title="{{ $isProjectExpired ? __('common.project_expired_message') : __('common.suggestion_like_tooltip') }}"
                                                         {{ $isProjectExpired ? 'disabled' : '' }}>
