@@ -63,7 +63,7 @@ class Category extends Model implements HasMedia
      * Get all projects through project groups.
      * This provides convenient access to projects in the hierarchy.
      */
-    public function projects(): HasMany
+    public function projects(): HasManyThrough
     {
         return $this->hasManyThrough(
             Project::class,
