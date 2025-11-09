@@ -158,8 +158,8 @@ class ProjectResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('projectGroups.name')
-                    ->label(__('common.project_group'))
+                Tables\Columns\TextColumn::make('projectGroups.category.name')
+                    ->label(__('common.project_category'))
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -191,9 +191,11 @@ class ProjectResource extends Resource
             ->filters([
                 TrashedFilter::make(),
 
-                SelectFilter::make('project_group')
-                    ->label(__('common.project_group'))
-                    ->relationship('projectGroups', 'name'),
+                SelectFilter::make('category')
+                    ->label(__('common.project_category'))
+                    ->relationship('projectGroups.category', 'name')
+                    ->searchable()
+                    ->preload(),
 
                 SelectFilter::make('creator_type')
                     ->label(__('common.creator_type'))
@@ -329,8 +331,8 @@ class ProjectResource extends Resource
                 ]),
             ])
             ->groups([
-                Group::make('projectGroups.name')
-                    ->label(__('common.project_group'))
+                Group::make('projectGroups.category.name')
+                    ->label(__('common.project_category'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
                         $category = $record->projectGroups->first()?->category;
                         $end = __('common.not_specified');
@@ -343,7 +345,7 @@ class ProjectResource extends Resource
                     }),
 
             ])
-            ->defaultGroup('projectGroups.name');
+            ->defaultGroup('projectGroups.category.name');
 
     }
 

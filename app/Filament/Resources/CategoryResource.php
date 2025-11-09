@@ -54,10 +54,10 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->label(__('common.project_name'))
+                    ->label(__('common.project_category'))
                     ->required()
                     ->maxLength(255)
-                    ->placeholder(__('common.enter_project_name')),
+                    ->placeholder(__('common.enter_category_name')),
             ]);
     }
 
@@ -65,154 +65,62 @@ class CategoryResource extends Resource
     {
         return $table
             ->columns([
-                SpatieMediaLibraryImageColumn::make('files')
-                    ->label(__('common.image'))
-                    ->collection('project_files')
-                    ->circular()
-                    ->height(50)
-                    ->width(50),
-
-                Tables\Columns\TextColumn::make('name')->label(__('common.project_name'))->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->label(__('common.description'))
-                    ->limit(100)
+                Tables\Columns\TextColumn::make('id')
+                    ->sortable()
+                    ->label('ID'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('common.project_category'))
                     ->searchable()
-                    ->tooltip(function ($record): ?string {
-                        return $record->description;
-                    })
-                    ->placeholder(__('common.no_description')),
-
-                Tables\Columns\TextColumn::make('start_datetime')
-                    ->label(__('common.start'))
-                    ->dateTime('d.m.Y H:i')
-                    ->placeholder('-')
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('end_datetime')
-                    ->label(__('common.end'))
-                    ->dateTime('d.m.Y H:i')
-                    ->placeholder('-')
-                    ->sortable(),
-
-                Tables\Columns\TextColumn::make('remaining_time')
-                    ->label(__('common.remaining_time'))
-                    ->getStateUsing(function ($record) {
-                        if (! $record->end_datetime) {
-                            return __('common.indefinite');
-                        }
-
-                        if ($record->isExpired()) {
-                            return __('common.expired');
-                        }
-
-                        $remaining = $record->getRemainingTime();
-
-                        return $remaining ? $remaining['formatted'] : __('common.expired');
-                    })
+                Tables\Columns\TextColumn::make('project_groups_count')
+                    ->label('Proje Grup Sayısı')
+                    ->counts('projectGroups')
+                    ->sortable()
                     ->badge()
-                    ->color(fn ($record) => $record && $record->end_datetime && $record->isExpired() ? 'danger' : 'success')
-                    ->sortable(false),
+                    ->color('primary'),
 
-                Tables\Columns\TextColumn::make('country')
-                    ->label(__('common.country'))
-                    ->searchable()
-                    ->placeholder(__('common.not_specified'))
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('province')
-                    ->label(__('common.province'))
-                    ->searchable()
-                    ->placeholder(__('common.not_specified'))
-                    ->toggleable(isToggledHiddenByDefault: true),
-
-                Tables\Columns\TextColumn::make('district')
-                    ->label(__('common.district'))
-                    ->searchable()
-                    ->placeholder(__('common.not_specified')),
-
-                Tables\Columns\TextColumn::make('neighborhood')
-                    ->label(__('common.neighborhood'))
-                    ->searchable()
-                    ->placeholder(__('common.not_specified')),
-
-                Tables\Columns\TextColumn::make('detailed_address')
-                    ->label(__('common.detailed_address'))
-                    ->limit(50)
-                    ->searchable()
-                    ->placeholder(__('common.not_specified'))
-                    ->tooltip(function ($record): ?string {
-                        return $record->detailed_address;
-                    })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('projects_count')
+                    ->label(__('common.project_count'))
+                    ->counts('projects')
+                    ->sortable()
+                    ->badge()
+                    ->color('info'),
 
                 Tables\Columns\TextColumn::make('suggestions_count')
                     ->label(__('common.suggestion_count'))
                     ->counts('suggestions')
-                    ->sortable(),
-
+                    ->sortable()
+                    ->badge()
+                    ->color('warning'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label(__('common.created_at'))
-                    ->dateTime('d.m.Y H:i')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->defaultSort('name')
             ->filters([
                 TrashedFilter::make(),
-
-                // Konum filtresi: İlçe ve Mahalle dropdownları
-                Filter::make('location')
-                    ->label(__('common.location'))
-                    ->form([
-                        Forms\Components\Select::make('district')
-                            ->label(__('common.district'))
-                            ->options(function () {
-                                $keys = array_keys(config('istanbul_neighborhoods', []));
-
-                                return array_combine($keys, $keys);
-                            })
-                            ->searchable(),
-
-                        Forms\Components\Select::make('neighborhood')
-                            ->label(__('common.neighborhood'))
-                            ->options(function (callable $get) {
-                                $district = $get('district');
-                                $map = config('istanbul_neighborhoods', []);
-
-                                return $map[$district] ?? [];
-                            })
-                            ->searchable(),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (! empty($data['district'])) {
-                            $query->where('district', $data['district']);
-                        }
-
-                        if (! empty($data['neighborhood'])) {
-                            $query->where('neighborhood', $data['neighborhood']);
-                        }
-                    }),
+                Filter::make('empty_categories')
+                    ->label('Boş Kategoriler')
+                    ->query(fn ($query) => $query->doesntHave('projects')),
+                Filter::make('active_categories')
+                    ->label('Aktif Kategoriler')
+                    ->query(fn ($query) => $query->has('projects')),
+                Filter::make('has_suggestions')
+                    ->label('Önerisi Olan')
+                    ->query(fn ($query) => $query->has('suggestions')),
+            ])
+            ->emptyStateHeading('Henüz proje kategorisi yok')
+            ->emptyStateDescription('Yeni bir proje kategorisi oluşturarak başlayın.')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\RestoreAction::make()
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading(__('common.restore_project'))
-                    ->modalDescription(__('common.restore_project_description'))
-                    ->modalSubmitActionLabel(__('common.yes_restore'))
-                    ->successNotificationTitle(__('common.project_restored')),
-
-                Tables\Actions\ForceDeleteAction::make()
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading(__('common.force_delete_project'))
-                    ->modalDescription(__('common.force_delete_project_description'))
-                    ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                    ->successNotificationTitle(__('common.project_force_deleted')),
-
                 Tables\Actions\EditAction::make()
                     ->visible(fn ($record) => ! $record->trashed()),
 
@@ -226,26 +134,7 @@ class CategoryResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.delete_selected_projects'))
-                        ->modalDescription(__('common.delete_selected_projects_description'))
-                        ->modalSubmitActionLabel(__('common.yes_delete'))
-                        ->successNotificationTitle(__('common.selected_projects_deleted')),
-
-                    Tables\Actions\RestoreBulkAction::make()
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.restore_selected_projects'))
-                        ->modalDescription(__('common.restore_selected_projects_description'))
-                        ->modalSubmitActionLabel(__('common.yes_restore'))
-                        ->successNotificationTitle(__('common.selected_projects_restored')),
-
-                    Tables\Actions\ForceDeleteBulkAction::make()
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.force_delete_selected_projects'))
-                        ->modalDescription(__('common.force_delete_selected_projects_description'))
-                        ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                        ->successNotificationTitle(__('common.selected_projects_force_deleted')),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -271,6 +160,6 @@ class CategoryResource extends Resource
         // Allow TrashedFilter to control deleted rows by removing the soft deleting scope
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([SoftDeletingScope::class])
-            ->withCount('suggestions');
+            ->withCount(['projectGroups', 'projects', 'suggestions']);
     }
 }

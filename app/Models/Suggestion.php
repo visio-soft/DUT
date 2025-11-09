@@ -22,6 +22,7 @@ class Suggestion extends Model implements HasMedia
 
     protected $fillable = [
         'category_id',
+        'project_id',
         'created_by_id',
         'updated_by_id',
         'title',
@@ -54,6 +55,11 @@ class Suggestion extends Model implements HasMedia
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class, 'project_id');
     }
 
     public function createdBy(): BelongsTo

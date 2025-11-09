@@ -9,6 +9,8 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
 
 class ProjectGroupResource extends Resource
 {
@@ -69,7 +71,14 @@ class ProjectGroupResource extends Resource
                 Tables\Columns\TextColumn::make('category.name')
                     ->searchable()
                     ->sortable()
-                    ->label(__('common.project_category')),
+                    ->label(__('common.project_category'))
+                    ->badge()
+                    ->color(fn ($state) => match (strtolower((string) $state)) {
+                        'backend' => 'info',
+                        'frontend' => 'success',
+                        'mobile' => 'warning',
+                        default => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('projects_count')
                     ->counts('projects')
                     ->label(__('common.projects'))
@@ -89,8 +98,26 @@ class ProjectGroupResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('name')
             ->filters([
-                //
+                SelectFilter::make('category_id')
+                    ->label(__('common.project_category'))
+                    ->relationship('category', 'name')
+                    ->preload(),
+                Filter::make('empty_groups')
+                    ->label('Boş Gruplar')
+                    ->query(fn ($query) => $query->doesntHave('projects')),
+                Filter::make('active_groups')
+                    ->label('Aktif Gruplar')
+                    ->query(fn ($query) => $query->has('projects')),
+                Filter::make('has_suggestions')
+                    ->label('Önerisi Olan')
+                    ->query(fn ($query) => $query->has('suggestions')),
+            ])
+            ->emptyStateHeading('Henüz proje grubu yok')
+            ->emptyStateDescription('Yeni bir proje grubu oluşturarak başlayın.')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

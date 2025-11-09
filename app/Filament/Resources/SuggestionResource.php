@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\SuggestionResource\Pages;
 use App\Filament\Resources\SuggestionResource\RelationManagers;
-use App\Models\Category;
+use App\Models\Project;
 use App\Models\Suggestion;
 use Carbon\Carbon;
 use Filament\Forms;
@@ -62,20 +62,13 @@ class SuggestionResource extends Resource
                 Forms\Components\Section::make(__('common.basic_information'))
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\Select::make('category_id')
-                            ->label(__('common.project_category'))
-                            ->options(function () {
-                                // Show all categories
-                                return Category::all()->pluck('name', 'id');
-                            })
+                        Forms\Components\Select::make('project_id')
+                            ->label(__('common.project'))
+                            ->relationship('project', 'title')
                             ->searchable()
                             ->preload()
                             ->required()
-                            ->default(function () {
-                                // Set first category as default
-                                return Category::first()?->id;
-                            })
-                            ->placeholder(__('common.select_project_category')),
+                            ->placeholder(__('common.select_project')),
                         Forms\Components\Select::make('created_by_id')
                             ->label(__('common.suggestion_creator'))
                             ->relationship('createdBy', 'name')
@@ -198,9 +191,9 @@ class SuggestionResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
-                SelectFilter::make('category')
-                    ->label(__('common.category'))
-                    ->relationship('category', 'name'),
+                SelectFilter::make('project')
+                    ->label(__('common.project'))
+                    ->relationship('project', 'title'),
 
                 SelectFilter::make('creator_type')
                     ->label(__('common.creator_type'))
@@ -374,21 +367,21 @@ class SuggestionResource extends Resource
                 ]),
             ])
             ->groups([
-                Group::make('category.name')
+                Group::make('project.title')
                     ->label(__('common.project'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
-                        $category = $record->category;
+                        $project = $record->project;
                         $end = __('common.not_specified');
 
-                        if ($category && $category->end_datetime) {
-                            $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
+                        if ($project && $project->end_date) {
+                            $end = Carbon::parse($project->end_date)->format('d.m.Y');
                         }
 
                         return __('common.end').": {$end}";
                     }),
 
             ])
-            ->defaultGroup('category.name');
+            ->defaultGroup('project.title');
 
     }
 
