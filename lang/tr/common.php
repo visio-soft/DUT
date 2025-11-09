@@ -273,4 +273,15 @@ return [
     'force_delete_selected_projects' => 'Seçili Projeleri Kalıcı Olarak Sil',
     'force_delete_selected_projects_description' => 'Seçili projeleri kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz ve bu projelere ait tüm öneriler de silinecektir.',
     'selected_projects_force_deleted' => 'Seçili projeler kalıcı olarak silindi',
+
+    // Arama ve Filtreleme
+    'search' => 'Ara',
+    'search_projects' => 'Projeleri ad, açıklama veya konuma göre ara...',
+    'all_categories' => 'Tüm Kategoriler',
+    'all_districts' => 'Tüm İlçeler',
+    'status' => 'Durum',
+    'all_status' => 'Tüm Durumlar',
+    'active' => 'Aktif',
+    'clear_filters' => 'Filtreleri Temizle',
+    'apply_filters' => 'Filtreleri Uygula',
 ];

@@ -270,4 +270,15 @@ return [
     'force_delete_selected_projects' => 'Permanently Delete Selected Projects',
     'force_delete_selected_projects_description' => 'Are you sure you want to permanently delete the selected projects? This action cannot be undone and all suggestions for these projects will also be deleted.',
     'selected_projects_force_deleted' => 'Selected projects permanently deleted',
+
+    // Search and Filter
+    'search' => 'Search',
+    'search_projects' => 'Search projects by name, description or location...',
+    'all_categories' => 'All Categories',
+    'all_districts' => 'All Districts',
+    'status' => 'Status',
+    'all_status' => 'All Status',
+    'active' => 'Active',
+    'clear_filters' => 'Clear Filters',
+    'apply_filters' => 'Apply Filters',
 ];
