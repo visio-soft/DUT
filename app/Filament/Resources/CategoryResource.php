@@ -159,8 +159,9 @@ class CategoryResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         // Allow TrashedFilter to control deleted rows by removing the soft deleting scope
+        // Note: 'projects' count is handled via accessor (projects_count) due to complex many-to-many relationship
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([SoftDeletingScope::class])
-            ->withCount(['projectGroups', 'projects', 'suggestions']);
+            ->withCount(['projectGroups', 'suggestions']);
     }
 }

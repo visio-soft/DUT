@@ -59,16 +59,17 @@ class Category extends Model implements HasMedia
     }
 
     /**
-     * Get all projects through project groups.
+     * Get all projects through project groups (accessor).
      * Since projects can belong to multiple groups, this returns distinct projects.
+     * Note: This is an accessor, not a relationship. Use projects_count for counting.
      */
     public function getProjectsAttribute()
     {
         return Project::whereHas('projectGroups', function ($query) {
             $query->where('project_groups.category_id', $this->id);
-        })->whereNull('project_id')->get();
+        })->get();
     }
-    
+
     /**
      * Get projects count for this category
      */
@@ -76,7 +77,7 @@ class Category extends Model implements HasMedia
     {
         return Project::whereHas('projectGroups', function ($query) {
             $query->where('project_groups.category_id', $this->id);
-        })->whereNull('project_id')->count();
+        })->count();
     }
 
     /**

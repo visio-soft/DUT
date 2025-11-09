@@ -12,6 +12,23 @@ class SuggestionObserver
         if (Auth::check()) {
             $suggestion->created_by_id = Auth::id();
         }
+
+        // Automatically set category_id from the related project
+        if ($suggestion->project_id && !$suggestion->category_id) {
+            $project = \App\Models\Project::find($suggestion->project_id);
+            if ($project) {
+                // First try to get category_id directly from the project
+                if ($project->category_id) {
+                    $suggestion->category_id = $project->category_id;
+                } else {
+                    // Otherwise, try to get it from the project's first project group
+                    $firstGroup = $project->projectGroups()->first();
+                    if ($firstGroup) {
+                        $suggestion->category_id = $firstGroup->category_id;
+                    }
+                }
+            }
+        }
     }
 
     public function updating(Suggestion $suggestion): void
