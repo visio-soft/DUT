@@ -105,17 +105,17 @@ class ProjectGroupResource extends Resource
                     ->relationship('category', 'name')
                     ->preload(),
                 Filter::make('empty_groups')
-                    ->label('Boş Gruplar')
+                    ->label(__('common.empty_groups'))
                     ->query(fn ($query) => $query->doesntHave('projects')),
                 Filter::make('active_groups')
-                    ->label('Aktif Gruplar')
+                    ->label(__('common.active_groups'))
                     ->query(fn ($query) => $query->has('projects')),
                 Filter::make('has_suggestions')
-                    ->label('Önerisi Olan')
+                    ->label(__('common.has_suggestions'))
                     ->query(fn ($query) => $query->has('suggestions')),
             ])
-            ->emptyStateHeading('Henüz proje grubu yok')
-            ->emptyStateDescription('Yeni bir proje grubu oluşturarak başlayın.')
+            ->emptyStateHeading(__('common.no_groups_yet'))
+            ->emptyStateDescription(__('common.no_groups_description'))
             ->emptyStateActions([
                 Tables\Actions\CreateAction::make(),
             ])
