@@ -21,61 +21,81 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Kullanıcı Yönetimi';
+    protected static ?string $navigationGroup = null;
 
-    protected static ?string $pluralModelLabel = 'Kullanıcılar';
+    protected static ?string $pluralModelLabel = null;
 
-    protected static ?string $modelLabel = 'Kullanıcı';
+    protected static ?string $modelLabel = null;
 
-    protected static ?string $navigationLabel = 'Kullanıcılar';
+    protected static ?string $navigationLabel = null;
 
     protected static ?int $navigationSort = 10;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('common.user_management');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('common.users');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('common.users');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('common.user');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Kullanıcı Bilgileri')
-                    ->description('Kullanıcı temel bilgilerini girin')
+                Forms\Components\Section::make(__('common.user_information'))
+                    ->description(__('common.user_information_description'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
-                            ->label('Ad Soyad')
+                            ->label(__('common.full_name_label'))
                             ->required()
                             ->maxLength(255)
-                            ->placeholder('Kullanıcı adını girin'),
+                            ->placeholder(__('common.enter_user_name')),
 
                         Forms\Components\TextInput::make('email')
-                            ->label('E-posta')
+                            ->label(__('common.email_label'))
                             ->email()
                             ->required()
                             ->maxLength(255)
                             ->unique(ignoreRecord: true)
-                            ->placeholder('E-posta adresini girin'),
+                            ->placeholder(__('common.enter_email')),
 
                         Forms\Components\TextInput::make('password')
-                            ->label('Şifre')
+                            ->label(__('common.password_label'))
                             ->password()
                             ->required(fn (string $context): bool => $context === 'create')
                             ->minLength(8)
                             ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                             ->dehydrated(fn ($state) => filled($state))
-                            ->placeholder('Şifre girin (minimum 8 karakter)')
-                            ->helperText('Şifrenizi güçlü tutun. Minimum 8 karakter olmalıdır.'),
+                            ->placeholder(__('common.enter_password'))
+                            ->helperText(__('common.password_helper')),
                     ])
                     ->columns(2),
 
-                Forms\Components\Section::make('Roller ve Yetkiler')
-                    ->description('Kullanıcı rollerini ve yetkilerini ayarlayın')
+                Forms\Components\Section::make(__('common.roles_and_permissions'))
+                    ->description(__('common.roles_and_permissions_description'))
                     ->schema([
                         Forms\Components\Select::make('roles')
-                            ->label('Roller')
+                            ->label(__('common.roles'))
                             ->multiple()
                             ->relationship('roles', 'name')
                             ->options(Role::all()->pluck('name', 'id'))
                             ->preload()
                             ->searchable()
-                            ->placeholder('Kullanıcı rollerini seçin')
-                            ->helperText('Kullanıcının sahip olacağı rolleri seçin'),
+                            ->placeholder(__('common.select_user_roles'))
+                            ->helperText(__('common.select_roles_helper')),
                     ])
                     ->columns(2),
             ]);
@@ -86,39 +106,39 @@ class UserResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
+                    ->label(__('common.id_label'))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('name')
-                    ->label('Ad Soyad')
+                    ->label(__('common.name_label'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
 
                 Tables\Columns\TextColumn::make('email')
-                    ->label('E-posta')
+                    ->label(__('common.email_label'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->copyMessage('E-posta kopyalandı')
+                    ->copyMessage(__('common.email_copied'))
                     ->copyMessageDuration(1500),
 
                 Tables\Columns\TextColumn::make('roles.name')
-                    ->label('Roller')
+                    ->label(__('common.roles'))
                     ->badge()
                     ->color('primary')
                     ->separator(',')
                     ->searchable(),
 
                 Tables\Columns\TextColumn::make('created_at')
-                    ->label('Oluşturma Tarihi')
+                    ->label(__('common.created_date_label'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label('Son Güncelleme')
+                    ->label(__('common.updated_date_label'))
                     ->dateTime('d.m.Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -127,18 +147,18 @@ class UserResource extends Resource
                 TrashedFilter::make(),
 
                 Tables\Filters\SelectFilter::make('roles')
-                    ->label('Rol')
+                    ->label(__('common.role_label'))
                     ->relationship('roles', 'name')
                     ->multiple()
-                    ->placeholder('Rolü filtrele'),
+                    ->placeholder(__('common.filter_by_role')),
 
                 Tables\Filters\Filter::make('created_from')
-                    ->label('Oluşturma Tarihi')
+                    ->label(__('common.creation_date_filter'))
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label('Başlangıç Tarihi'),
+                            ->label(__('common.start_date')),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label('Bitiş Tarihi'),
+                            ->label(__('common.end_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -157,37 +177,37 @@ class UserResource extends Resource
 
                 Tables\Actions\DeleteAction::make()
                     ->requiresConfirmation()
-                    ->modalHeading('Kullanıcıyı Sil')
-                    ->modalDescription('Bu kullanıcıyı silmek istediğinizden emin misiniz?')
-                    ->modalSubmitActionLabel('Evet, Sil'),
+                    ->modalHeading(__('common.delete_user'))
+                    ->modalDescription(__('common.delete_user_description'))
+                    ->modalSubmitActionLabel(__('common.yes_delete_user')),
 
                 Tables\Actions\RestoreAction::make()
-                    ->label('Geri Getir')
+                    ->label(__('common.restore'))
                     ->icon('heroicon-o-arrow-path')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->modalHeading('Kullanıcıyı Geri Getir')
-                    ->modalDescription('Bu kullanıcıyı geri getirmek istediğinizden emin misiniz?')
-                    ->modalSubmitActionLabel('Evet, Geri Getir')
-                    ->successNotificationTitle('Kullanıcı başarıyla geri getirildi'),
+                    ->modalHeading(__('common.restore_user'))
+                    ->modalDescription(__('common.restore_user_description'))
+                    ->modalSubmitActionLabel(__('common.yes_restore_user'))
+                    ->successNotificationTitle(__('common.user_restored')),
 
                 Tables\Actions\ForceDeleteAction::make()
-                    ->label('Kalıcı Sil')
+                    ->label(__('common.permanently_delete'))
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
-                    ->modalHeading('Kullanıcıyı Kalıcı Olarak Sil')
-                    ->modalDescription('Bu kullanıcıyı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
-                    ->successNotificationTitle('Kullanıcı kalıcı olarak silindi'),
+                    ->modalHeading(__('common.force_delete_user'))
+                    ->modalDescription(__('common.force_delete_user_description'))
+                    ->modalSubmitActionLabel(__('common.yes_force_delete_user'))
+                    ->successNotificationTitle(__('common.user_force_deleted')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
                         ->requiresConfirmation()
-                        ->modalHeading('Kullanıcıları Sil')
-                        ->modalDescription('Seçilen kullanıcıları silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                        ->modalSubmitActionLabel('Evet, Sil'),
+                        ->modalHeading(__('common.delete_users'))
+                        ->modalDescription(__('common.delete_users_description'))
+                        ->modalSubmitActionLabel(__('common.yes_delete')),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
