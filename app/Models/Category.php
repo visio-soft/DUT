@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -23,15 +24,16 @@ class Category extends Model implements HasMedia
         parent::boot();
 
         static::deleting(function ($category) {
-            // When soft deleting a category, also soft delete its related suggestions
+            // When soft deleting a category, cascade through the hierarchy
             if (! $category->isForceDeleting()) {
-                $category->suggestions()->delete();
+                // Delete project groups (which will cascade to projects via DB constraint)
+                $category->projectGroups()->delete();
             }
         });
 
         static::restoring(function ($category) {
-            // When restoring a category, also restore its related suggestions
-            $category->suggestions()->withTrashed()->restore();
+            // When restoring a category, also restore its project groups
+            $category->projectGroups()->withTrashed()->restore();
         });
     }
 
@@ -52,20 +54,37 @@ class Category extends Model implements HasMedia
      */
     protected $attributes = [];
 
-    public function suggestions(): HasMany
-    {
-        return $this->hasMany(Suggestion::class, 'category_id');
-    }
-
     public function projectGroups(): HasMany
     {
         return $this->hasMany(ProjectGroup::class, 'category_id');
     }
 
-    // Keep old projects() method for backward compatibility
+    /**
+     * Get all projects through project groups.
+     * This provides convenient access to projects in the hierarchy.
+     */
     public function projects(): HasMany
     {
-        return $this->suggestions();
+        return $this->hasManyThrough(
+            Project::class,
+            ProjectGroup::class,
+            'category_id',      // Foreign key on project_groups table
+            'project_group_id', // Foreign key on suggestions table (projects use this)
+            'id',               // Local key on categories table
+            'id'                // Local key on project_groups table
+        )->whereNull('project_id'); // Only get projects, not suggestions
+    }
+
+    /**
+     * Get all suggestions through projects.
+     * Note: This is an indirect relationship through the hierarchy.
+     */
+    public function suggestions(): HasMany
+    {
+        // This returns suggestions that are associated with projects in this category
+        // For direct suggestions on a category (if any remain), use the direct relationship
+        return $this->hasMany(Suggestion::class, 'category_id')
+            ->whereNotNull('project_id'); // Only suggestions, not projects
     }
 
     /**

@@ -60,12 +60,11 @@ class ProjectResource extends Resource
                 Forms\Components\Section::make(__('common.basic_information'))
                     ->icon('heroicon-o-information-circle')
                     ->schema([
-                        Forms\Components\Select::make('projectGroups')
+                        Forms\Components\Select::make('project_group_id')
                             ->label(__('common.project_group'))
-                            ->relationship('projectGroups', 'name')
+                            ->relationship('projectGroup', 'name')
                             ->searchable()
                             ->preload()
-                            ->multiple()
                             ->required()
                             ->placeholder(__('common.select_project_group'))
                             ->helperText(__('common.category_is_inferred_from_group'))
@@ -158,7 +157,7 @@ class ProjectResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('projectGroups.category.name')
+                Tables\Columns\TextColumn::make('projectGroup.category.name')
                     ->label(__('common.project_category'))
                     ->searchable()
                     ->sortable()
@@ -193,7 +192,7 @@ class ProjectResource extends Resource
 
                 SelectFilter::make('category')
                     ->label(__('common.project_category'))
-                    ->relationship('projectGroups.category', 'name')
+                    ->relationship('projectGroup.category', 'name')
                     ->searchable()
                     ->preload(),
 
@@ -331,10 +330,10 @@ class ProjectResource extends Resource
                 ]),
             ])
             ->groups([
-                Group::make('projectGroups.category.name')
+                Group::make('projectGroup.category.name')
                     ->label(__('common.project_category'))
                     ->getDescriptionFromRecordUsing(function ($record): string {
-                        $category = $record->projectGroups->first()?->category;
+                        $category = $record->projectGroup?->category;
                         $end = __('common.not_specified');
 
                         if ($category && $category->end_datetime) {
@@ -345,7 +344,7 @@ class ProjectResource extends Resource
                     }),
 
             ])
-            ->defaultGroup('projectGroups.category.name');
+            ->defaultGroup('projectGroup.category.name');
 
     }
 
