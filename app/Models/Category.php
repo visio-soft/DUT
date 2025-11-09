@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -61,18 +60,14 @@ class Category extends Model implements HasMedia
 
     /**
      * Get all projects through project groups.
-     * This provides convenient access to projects in the hierarchy.
+     * Since projects can belong to multiple groups, we can't use hasManyThrough.
+     * This is a convenience method to get distinct projects.
      */
-    public function projects(): HasManyThrough
+    public function projects()
     {
-        return $this->hasManyThrough(
-            Project::class,
-            ProjectGroup::class,
-            'category_id',      // Foreign key on project_groups table
-            'project_group_id', // Foreign key on suggestions table (projects use this)
-            'id',               // Local key on categories table
-            'id'                // Local key on project_groups table
-        )->whereNull('project_id'); // Only get projects, not suggestions
+        return Project::whereHas('projectGroups', function ($query) {
+            $query->where('project_groups.category_id', $this->id);
+        })->whereNull('project_id');
     }
 
     /**

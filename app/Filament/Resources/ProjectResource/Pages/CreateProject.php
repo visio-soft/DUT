@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ProjectResource\Pages;
 
 use App\Filament\Resources\ProjectResource;
+use App\Models\ProjectGroup;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateProject extends CreateRecord
@@ -11,10 +12,8 @@ class CreateProject extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        // With the new hierarchy, project_group_id is required and is a single value, not multiple
-        // The form already handles the requirement, so we don't need additional validation here
-        // Category is inferred from the project group
-        
+        // Projects can belong to multiple project groups (like tags)
+        // No need for validation - Filament handles the many-to-many relationship
         return $data;
     }
 }

@@ -26,7 +26,7 @@ class HierarchyTest extends TestCase
         // Create test user
         $this->user = User::factory()->create();
         
-        // Create the hierarchy: Category > ProjectGroup > Project
+        // Create the hierarchy: Category > ProjectGroup > Project (many-to-many)
         $this->category = Category::create(['name' => 'Test Category']);
         $this->projectGroup = ProjectGroup::create([
             'name' => 'Test Project Group',
@@ -34,9 +34,12 @@ class HierarchyTest extends TestCase
         ]);
         $this->project = Project::create([
             'title' => 'Test Project',
-            'project_group_id' => $this->projectGroup->id,
+            'category_id' => $this->category->id,
             'created_by_id' => $this->user->id,
         ]);
+        
+        // Attach project to project group
+        $this->project->projectGroups()->attach($this->projectGroup->id);
     }
 
     public function test_category_to_project_group_relationship(): void
@@ -55,23 +58,40 @@ class HierarchyTest extends TestCase
 
     public function test_project_group_to_project_relationship(): void
     {
-        // ProjectGroup should have projects
+        // ProjectGroup should have projects (many-to-many)
         $this->assertCount(1, $this->projectGroup->projects);
         $this->assertEquals($this->project->id, $this->projectGroup->projects->first()->id);
     }
 
-    public function test_project_to_project_group_relationship(): void
+    public function test_project_to_project_groups_relationship(): void
     {
-        // Project should belong to project group
-        $this->assertEquals($this->projectGroup->id, $this->project->projectGroup->id);
-        $this->assertEquals('Test Project Group', $this->project->projectGroup->name);
+        // Project can belong to multiple project groups
+        $this->assertCount(1, $this->project->projectGroups);
+        $this->assertEquals($this->projectGroup->id, $this->project->projectGroups->first()->id);
+    }
+
+    public function test_project_can_belong_to_multiple_groups(): void
+    {
+        // Create another project group
+        $projectGroup2 = ProjectGroup::create([
+            'name' => 'Test Project Group 2',
+            'category_id' => $this->category->id,
+        ]);
+        
+        // Attach project to second group
+        $this->project->projectGroups()->attach($projectGroup2->id);
+        
+        // Project should belong to 2 groups
+        $this->assertCount(2, $this->project->projectGroups);
+        $this->assertTrue($this->project->projectGroups->contains($this->projectGroup));
+        $this->assertTrue($this->project->projectGroups->contains($projectGroup2));
     }
 
     public function test_project_gets_category_through_project_group(): void
     {
-        // Project should get category through project group
-        $this->assertEquals($this->category->id, $this->project->projectGroup->category->id);
-        $this->assertEquals('Test Category', $this->project->projectGroup->category->name);
+        // Project should get category through first project group
+        $this->assertEquals($this->category->id, $this->project->projectGroups->first()->category->id);
+        $this->assertEquals('Test Category', $this->project->projectGroups->first()->category->name);
     }
 
     public function test_project_to_suggestion_relationship(): void
@@ -79,6 +99,7 @@ class HierarchyTest extends TestCase
         // Create a suggestion for the project
         $suggestion = Suggestion::create([
             'title' => 'Test Suggestion',
+            'category_id' => $this->category->id,
             'project_id' => $this->project->id,
             'created_by_id' => $this->user->id,
         ]);
@@ -93,6 +114,7 @@ class HierarchyTest extends TestCase
         // Create a suggestion
         $suggestion = Suggestion::create([
             'title' => 'Test Suggestion',
+            'category_id' => $this->category->id,
             'project_id' => $this->project->id,
             'created_by_id' => $this->user->id,
         ]);
@@ -102,18 +124,19 @@ class HierarchyTest extends TestCase
         $this->assertEquals('Test Project', $suggestion->project->title);
     }
 
-    public function test_suggestion_gets_project_group_through_project(): void
+    public function test_suggestion_gets_project_groups_through_project(): void
     {
         // Create a suggestion
         $suggestion = Suggestion::create([
             'title' => 'Test Suggestion',
+            'category_id' => $this->category->id,
             'project_id' => $this->project->id,
             'created_by_id' => $this->user->id,
         ]);
 
-        // Suggestion should get project group through project
-        $this->assertEquals($this->projectGroup->id, $suggestion->project->projectGroup->id);
-        $this->assertEquals('Test Project Group', $suggestion->project->projectGroup->name);
+        // Suggestion should get project groups through project
+        $this->assertCount(1, $suggestion->project->projectGroups);
+        $this->assertEquals($this->projectGroup->id, $suggestion->project->projectGroups->first()->id);
     }
 
     public function test_suggestion_gets_category_through_project_and_project_group(): void
@@ -121,36 +144,22 @@ class HierarchyTest extends TestCase
         // Create a suggestion
         $suggestion = Suggestion::create([
             'title' => 'Test Suggestion',
+            'category_id' => $this->category->id,
             'project_id' => $this->project->id,
             'created_by_id' => $this->user->id,
         ]);
 
         // Suggestion should get category through project > project group
-        $this->assertEquals($this->category->id, $suggestion->project->projectGroup->category->id);
-        $this->assertEquals('Test Category', $suggestion->project->projectGroup->category->name);
+        $firstGroup = $suggestion->project->projectGroups->first();
+        $this->assertEquals($this->category->id, $firstGroup->category->id);
+        $this->assertEquals('Test Category', $firstGroup->category->name);
     }
 
-    public function test_category_has_many_through_to_projects(): void
+    public function test_project_has_no_project_group_id_fillable(): void
     {
-        // Create another project in a different group
-        $projectGroup2 = ProjectGroup::create([
-            'name' => 'Test Project Group 2',
-            'category_id' => $this->category->id,
-        ]);
-        $project2 = Project::create([
-            'title' => 'Test Project 2',
-            'project_group_id' => $projectGroup2->id,
-            'created_by_id' => $this->user->id,
-        ]);
-
-        // Category should have access to all projects through project groups
-        $this->assertCount(2, $this->category->projects);
-    }
-
-    public function test_project_has_project_group_id_fillable(): void
-    {
+        // Projects use many-to-many, not direct foreign key
         $project = new Project();
-        $this->assertTrue(in_array('project_group_id', $project->getFillable()));
+        $this->assertFalse(in_array('project_group_id', $project->getFillable()));
     }
 
     public function test_suggestion_has_project_id_fillable(): void
@@ -159,17 +168,19 @@ class HierarchyTest extends TestCase
         $this->assertTrue(in_array('project_id', $suggestion->getFillable()));
     }
 
-    public function test_project_does_not_have_category_id_fillable(): void
+    public function test_project_has_category_id_fillable(): void
     {
-        // Project gets category through project group, so category_id shouldn't be fillable
+        // Project needs category_id to be set directly (for backward compatibility)
+        // Category can be inferred from project groups too
         $project = new Project();
-        $this->assertFalse(in_array('category_id', $project->getFillable()));
+        $this->assertTrue(in_array('category_id', $project->getFillable()));
     }
 
-    public function test_suggestion_does_not_have_category_id_fillable(): void
+    public function test_suggestion_has_category_id_fillable(): void
     {
-        // Suggestion gets category through project, so category_id shouldn't be fillable
+        // Suggestion needs category_id for direct assignment  
+        // Category can also be accessed through project > project groups
         $suggestion = new Suggestion();
-        $this->assertFalse(in_array('category_id', $suggestion->getFillable()));
+        $this->assertTrue(in_array('category_id', $suggestion->getFillable()));
     }
 }

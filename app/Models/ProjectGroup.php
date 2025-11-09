@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProjectGroup extends Model
 {
@@ -18,14 +18,16 @@ class ProjectGroup extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
-    public function projects(): HasMany
+    public function projects(): BelongsToMany
     {
-        return $this->hasMany(Project::class, 'project_group_id');
+        return $this->belongsToMany(Project::class, 'project_group_suggestion', 'project_group_id', 'suggestion_id')
+            ->withTimestamps();
     }
 
     // Keep suggestions() as alias for backward compatibility
-    public function suggestions(): HasMany
+    public function suggestions(): BelongsToMany
     {
-        return $this->projects();
+        return $this->belongsToMany(Suggestion::class, 'project_group_suggestion', 'project_group_id', 'suggestion_id')
+            ->withTimestamps();
     }
 }

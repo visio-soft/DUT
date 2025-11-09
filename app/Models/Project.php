@@ -6,6 +6,7 @@ use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -21,7 +22,7 @@ class Project extends Model implements HasMedia
     protected $table = 'suggestions';
 
     protected $fillable = [
-        'project_group_id',
+        'category_id',
         'created_by_id',
         'updated_by_id',
         'title',
@@ -50,18 +51,20 @@ class Project extends Model implements HasMedia
         'longitude' => 'decimal:8',
     ];
 
-    public function projectGroup(): BelongsTo
+    public function projectGroups(): BelongsToMany
     {
-        return $this->belongsTo(ProjectGroup::class, 'project_group_id');
+        return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
+            ->withTimestamps();
     }
 
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id')
             ->withDefault(function ($category, $project) {
-                // Get category through project group
-                if ($project->projectGroup) {
-                    return $project->projectGroup->category;
+                // Get category through first project group
+                $firstGroup = $project->projectGroups->first();
+                if ($firstGroup) {
+                    return $firstGroup->category;
                 }
                 return $category;
             });

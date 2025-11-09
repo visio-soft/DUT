@@ -6,6 +6,7 @@ use App\Observers\SuggestionObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -20,6 +21,7 @@ class Suggestion extends Model implements HasMedia
     protected $table = 'suggestions';
 
     protected $fillable = [
+        'category_id',
         'project_id',
         'created_by_id',
         'updated_by_id',
@@ -58,27 +60,24 @@ class Suggestion extends Model implements HasMedia
     {
         return $this->belongsTo(Category::class, 'category_id')
             ->withDefault(function ($category, $suggestion) {
-                // Get category through project
-                if ($suggestion->project && $suggestion->project->projectGroup) {
-                    return $suggestion->project->projectGroup->category;
+                // Get category through project's first project group
+                if ($suggestion->project) {
+                    $firstGroup = $suggestion->project->projectGroups->first();
+                    if ($firstGroup) {
+                        return $firstGroup->category;
+                    }
                 }
                 return $category;
             });
     }
 
     /**
-     * Get the project group through the project relationship.
+     * Get the project groups through the project relationship.
      */
-    public function projectGroup(): BelongsTo
+    public function projectGroups(): BelongsToMany
     {
-        return $this->belongsTo(ProjectGroup::class, 'project_group_id')
-            ->withDefault(function ($projectGroup, $suggestion) {
-                // Get project group through project
-                if ($suggestion->project) {
-                    return $suggestion->project->projectGroup;
-                }
-                return $projectGroup;
-            });
+        return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')
+            ->withTimestamps();
     }
 
     public function project(): BelongsTo

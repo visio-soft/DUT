@@ -80,18 +80,18 @@ class CategoryProjectGroupTest extends TestCase
     public function test_project_group_id_is_in_fillable_attributes(): void
     {
         // After refactoring, the hierarchy is: Category > ProjectGroup > Project > Suggestion
-        // Project has a belongsTo relationship with ProjectGroup (not many-to-many)
-        // Suggestion gets ProjectGroup through Project
+        // Project has a many-to-many relationship with ProjectGroup (like tags)
+        // Suggestion gets ProjectGroups through Project
         $project = new Project;
         $suggestion = new Suggestion;
 
-        // Verify that Project has projectGroup relationship (belongsTo)
-        $this->assertTrue(method_exists($project, 'projectGroup'));
-        // Verify that Suggestion has projectGroup relationship (through project)
-        $this->assertTrue(method_exists($suggestion, 'projectGroup'));
+        // Verify that Project has projectGroups relationship (belongsToMany)
+        $this->assertTrue(method_exists($project, 'projectGroups'));
+        // Verify that Suggestion has projectGroups relationship (many-to-many)
+        $this->assertTrue(method_exists($suggestion, 'projectGroups'));
         
-        // Verify project_group_id is in Project's fillable attributes
-        $this->assertTrue(in_array('project_group_id', $project->getFillable()));
+        // Verify project_group_id is NOT in Project's fillable (uses pivot table)
+        $this->assertFalse(in_array('project_group_id', $project->getFillable()));
         // Verify project_id is in Suggestion's fillable attributes
         $this->assertTrue(in_array('project_id', $suggestion->getFillable()));
     }

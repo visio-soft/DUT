@@ -10,47 +10,19 @@ return new class extends Migration
     /**
      * Run the migrations.
      * 
-     * This migration refactors the database to implement the correct hierarchy:
+     * This migration ensures the correct hierarchy is in place:
      * Category > ProjectGroup > Project > Suggestion
+     * 
+     * Projects can belong to multiple ProjectGroups (many-to-many, like tags)
+     * The pivot table project_group_suggestion already exists from migration 2025_11_08_211305
+     * 
+     * No database changes needed - this migration just documents the structure.
      */
     public function up(): void
     {
-        // Step 1: Add project_group_id back to suggestions table
-        // This is for rows that are Projects (where project_id is NULL)
-        if (!Schema::hasColumn('suggestions', 'project_group_id')) {
-            Schema::table('suggestions', function (Blueprint $table) {
-                $table->foreignId('project_group_id')
-                    ->nullable()
-                    ->after('category_id')
-                    ->constrained('project_groups')
-                    ->onDelete('cascade');
-            });
-        }
-
-        // Step 2: Migrate data from pivot table to project_group_id column
-        // Only for Projects (rows where project_id is NULL)
-        if (Schema::hasTable('project_group_suggestion')) {
-            $pivotData = DB::table('project_group_suggestion')
-                ->join('suggestions', 'project_group_suggestion.suggestion_id', '=', 'suggestions.id')
-                ->whereNull('suggestions.project_id')
-                ->select('project_group_suggestion.suggestion_id', 'project_group_suggestion.project_group_id')
-                ->get();
-
-            foreach ($pivotData as $data) {
-                DB::table('suggestions')
-                    ->where('id', $data->suggestion_id)
-                    ->update(['project_group_id' => $data->project_group_id]);
-            }
-        }
-
-        // Step 3: Make category_id nullable for suggestions
-        // Suggestions will get category through Project > ProjectGroup > Category
-        Schema::table('suggestions', function (Blueprint $table) {
-            $table->foreignId('category_id')->nullable()->change();
-        });
-
-        // Step 4: Drop the pivot table - no longer needed
-        Schema::dropIfExists('project_group_suggestion');
+        // No changes needed - the database structure is already correct
+        // Projects use the project_group_suggestion pivot table for many-to-many relationships
+        // Suggestions can optionally have category_id for backward compatibility
     }
 
     /**
@@ -58,38 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // Recreate the pivot table
-        Schema::create('project_group_suggestion', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('project_group_id')->constrained('project_groups')->onDelete('cascade');
-            $table->foreignId('suggestion_id')->constrained('suggestions')->onDelete('cascade');
-            $table->timestamps();
-            $table->unique(['project_group_id', 'suggestion_id']);
-        });
-
-        // Migrate data back to pivot table
-        $projects = DB::table('suggestions')
-            ->whereNotNull('project_group_id')
-            ->whereNull('project_id')
-            ->get();
-
-        foreach ($projects as $project) {
-            DB::table('project_group_suggestion')->insert([
-                'project_group_id' => $project->project_group_id,
-                'suggestion_id' => $project->id,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // Make category_id NOT nullable again
-        Schema::table('suggestions', function (Blueprint $table) {
-            $table->foreignId('category_id')->nullable(false)->change();
-        });
-
-        // Remove project_group_id column
-        Schema::table('suggestions', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('project_group_id');
-        });
+        // No changes to reverse
     }
 };
