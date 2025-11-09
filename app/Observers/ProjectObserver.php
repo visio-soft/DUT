@@ -23,9 +23,19 @@ class ProjectObserver
 
     public function saving(Project $project): void
     {
-        // In the new hierarchy (Category > ProjectGroup > Project > Suggestion),
-        // Project gets category through ProjectGroup, so we don't need to set category_id
-        // The category_id field is only used for backward compatibility or direct suggestions
+        // Do not override if category_id is already set (e.g., inferred by form hooks)
+        if (! empty($project->category_id)) {
+            return;
+        }
+
+        // If project groups are attached and at least one has a category
+        $firstGroupWithCategory = $project->projectGroups()
+            ->with('category')
+            ->first();
+
+        if ($firstGroupWithCategory && $firstGroupWithCategory->category_id) {
+            $project->category_id = $firstGroupWithCategory->category_id;
+        }
     }
 
     /**
