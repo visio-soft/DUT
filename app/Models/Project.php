@@ -65,6 +65,10 @@ class Project extends Model implements HasMedia
         'status' => \App\Enums\ProjectStatusEnum::class,
     ];
 
+    protected $attributes = [
+        'status' => 'draft',
+    ];
+
     public function projectGroups(): BelongsToMany
     {
         return $this->belongsToMany(ProjectGroup::class, 'project_group_suggestion', 'suggestion_id', 'project_group_id')

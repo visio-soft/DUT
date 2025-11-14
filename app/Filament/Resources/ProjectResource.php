@@ -2,16 +2,15 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Helpers\CommonFilters;
 use App\Filament\Resources\ProjectResource\Pages;
 use App\Models\Project;
-use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Grouping\Group;
@@ -235,109 +234,9 @@ class ProjectResource extends Resource
                         }
                     }),
 
-                Filter::make('location')
-                    ->label(__('common.location'))
-                    ->form([
-                        Forms\Components\Select::make('district')
-                            ->label(__('common.district'))
-                            ->options(function () {
-                                $keys = array_keys(config('istanbul_neighborhoods', []));
-
-                                return array_combine($keys, $keys);
-                            })
-                            ->searchable(),
-
-                        Forms\Components\Select::make('neighborhood')
-                            ->label(__('common.neighborhood'))
-                            ->options(function (callable $get) {
-                                $district = $get('district');
-                                $map = config('istanbul_neighborhoods', []);
-
-                                return $map[$district] ?? [];
-                            })
-                            ->searchable(),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (! empty($data['district'])) {
-                            $query->where('district', $data['district']);
-                        }
-
-                        if (! empty($data['neighborhood'])) {
-                            $query->where('neighborhood', $data['neighborhood']);
-                        }
-                    }),
-
-                Filter::make('date_range')
-                    ->label(__('common.date_range'))
-                    ->form([
-                        Forms\Components\DatePicker::make('start_date')
-                            ->label(__('common.start_date'))
-                            ->placeholder(__('common.select_start_date')),
-                        Forms\Components\DatePicker::make('end_date')
-                            ->label(__('common.end_date'))
-                            ->placeholder(__('common.select_end_date')),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (! empty($data['start_date'])) {
-                            $query->where('start_date', '>=', $data['start_date']);
-                        }
-
-                        if (! empty($data['end_date'])) {
-                            $query->where('end_date', '<=', $data['end_date']);
-                        }
-                    })
-                    ->indicateUsing(function (array $data): array {
-                        $indicators = [];
-
-                        if ($data['start_date'] ?? null) {
-                            $indicators[] = 'Başlangıç: ' . Carbon::parse($data['start_date'])->format('d.m.Y');
-                        }
-
-                        if ($data['end_date'] ?? null) {
-                            $indicators[] = 'Bitiş: ' . Carbon::parse($data['end_date'])->format('d.m.Y');
-                        }
-
-                        return $indicators;
-                    }),
-
-                Filter::make('budget_filter')
-                    ->label(__('common.budget'))
-                    ->form([
-                        Forms\Components\Grid::make()
-                            ->schema([
-                                Forms\Components\TextInput::make('min_budget')
-                                    ->label(__('common.min_budget'))
-                                    ->numeric()
-                                    ->placeholder(__('common.min_budget_example')),
-                                Forms\Components\TextInput::make('max_budget')
-                                    ->label(__('common.max_budget'))
-                                    ->numeric()
-                                    ->placeholder(__('common.max_budget_example')),
-                            ])
-                            ->columns(2),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (! empty($data['min_budget'])) {
-                            $query->where('min_budget', '>=', $data['min_budget']);
-                        }
-
-                        if (! empty($data['max_budget'])) {
-                            $query->where('max_budget', '<=', $data['max_budget']);
-                        }
-                    })
-                    ->indicateUsing(function (array $data): array {
-                        $indicators = [];
-
-                        if ($data['min_budget'] ?? null) {
-                            $indicators[] = 'Min: ₺' . number_format($data['min_budget'], 2);
-                        }
-
-                        if ($data['max_budget'] ?? null) {
-                            $indicators[] = 'Max: ₺' . number_format($data['max_budget'], 2);
-                        }
-
-                        return $indicators;
-                    }),
+                CommonFilters::locationFilter(),
+                CommonFilters::dateRangeFilter(),
+                CommonFilters::budgetRangeFilter(),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([

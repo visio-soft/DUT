@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('suggestions', function (Blueprint $table) {
-            $table->string('status')->default('pending')->after('description')->index();
+            // No default value - will be set by model based on type (Project vs Suggestion)
+            $table->string('status')->nullable()->after('description')->index();
         });
     }
 

@@ -63,6 +63,10 @@ class Suggestion extends Model implements HasMedia
         'status' => \App\Enums\SuggestionStatusEnum::class,
     ];
 
+    protected $attributes = [
+        'status' => 'pending',
+    ];
+
     // Remove design-related appends since design functionality is removed
     protected $appends = [];
 

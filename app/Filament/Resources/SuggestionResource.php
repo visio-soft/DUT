@@ -2,11 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Helpers\CommonFilters;
 use App\Filament\Resources\SuggestionResource\Pages;
 use App\Filament\Resources\SuggestionResource\RelationManagers;
 use App\Models\Project;
 use App\Models\Suggestion;
-use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Form;
@@ -228,38 +228,7 @@ class SuggestionResource extends Resource
                         }
                     }),
 
-                // Location filter: District and Neighborhood dropdowns
-                Filter::make('location')
-                    ->label(__('common.location'))
-                    ->form([
-                        Forms\Components\Select::make('district')
-                            ->label(__('common.district'))
-                            ->options(function () {
-                                $keys = array_keys(config('istanbul_neighborhoods', []));
-
-                                return array_combine($keys, $keys);
-                            })
-                            ->searchable(),
-
-                        Forms\Components\Select::make('neighborhood')
-                            ->label(__('common.neighborhood'))
-                            ->options(function (callable $get) {
-                                $district = $get('district');
-                                $map = config('istanbul_neighborhoods', []);
-
-                                return $map[$district] ?? [];
-                            })
-                            ->searchable(),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        if (! empty($data['district'])) {
-                            $query->where('district', $data['district']);
-                        }
-
-                        if (! empty($data['neighborhood'])) {
-                            $query->where('neighborhood', $data['neighborhood']);
-                        }
-                    }),
+                CommonFilters::locationFilter(),
 
                 // Budget filter: amount + more/less toggle
                 Filter::make('budget_filter')
