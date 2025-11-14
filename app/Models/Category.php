@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -13,7 +14,7 @@ class Category extends Model implements HasMedia
     use InteractsWithMedia;
     use SoftDeletes;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'parent_id'];
 
     /**
      * Automatically cascade deletes to related models when soft deleting
@@ -25,13 +26,17 @@ class Category extends Model implements HasMedia
         static::deleting(function ($category) {
             // When soft deleting a category, cascade through the hierarchy
             if (! $category->isForceDeleting()) {
+                // Delete child categories
+                $category->children()->delete();
+                
                 // Delete project groups (which will cascade to projects via DB constraint)
                 $category->projectGroups()->delete();
             }
         });
 
         static::restoring(function ($category) {
-            // When restoring a category, also restore its project groups
+            // When restoring a category, also restore its children and project groups
+            $category->children()->withTrashed()->restore();
             $category->projectGroups()->withTrashed()->restore();
         });
     }
@@ -56,6 +61,46 @@ class Category extends Model implements HasMedia
     public function projectGroups(): HasMany
     {
         return $this->hasMany(ProjectGroup::class, 'category_id');
+    }
+
+    /**
+     * Get the parent category
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    /**
+     * Get child categories
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    /**
+     * Get all descendants (recursive)
+     */
+    public function descendants()
+    {
+        return $this->children()->with('descendants');
+    }
+
+    /**
+     * Get all ancestors
+     */
+    public function ancestors()
+    {
+        $ancestors = collect();
+        $category = $this->parent;
+
+        while ($category) {
+            $ancestors->push($category);
+            $category = $category->parent;
+        }
+
+        return $ancestors;
     }
 
     /**
