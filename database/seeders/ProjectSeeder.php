@@ -13,7 +13,7 @@ class ProjectSeeder extends Seeder
     {
         // Get admin user and project groups
         $adminUser = User::role(['admin', 'super_admin'])->first();
-        
+
         if (!$adminUser) {
             $this->command->warn('No admin user found. Please run AdminUserSeeder first.');
             return;
@@ -107,11 +107,11 @@ class ProjectSeeder extends Seeder
 
         foreach ($projects as $projectData) {
             $project = Project::create($projectData);
-            
+
             // Randomly attach 1-2 project groups
             $randomGroups = $projectGroups->random(rand(1, min(2, $projectGroups->count())));
             $project->projectGroups()->attach($randomGroups->pluck('id'));
-            
+
             $this->command->info("Project created: {$project->title}");
         }
 

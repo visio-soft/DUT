@@ -153,13 +153,13 @@ class SuggestionSeeder extends Seeder
         foreach ($suggestions as $suggestionData) {
             // Assign random user as creator
             $suggestionData['created_by_id'] = $users->random()->id;
-            
+
             // Assign random project
             $project = $projects->random();
             $suggestionData['project_id'] = $project->id;
-            
+
             $suggestion = Suggestion::create($suggestionData);
-            
+
             $this->command->info("Suggestion created: {$suggestion->title}");
         }
 
