@@ -17,6 +17,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
 
 class ProjectResource extends Resource
 {
@@ -238,6 +239,15 @@ class ProjectResource extends Resource
                 CommonFilters::dateRangeFilter(),
                 CommonFilters::budgetRangeFilter(),
             ])
+            ->filtersTriggerAction(fn (Tables\Actions\Action $action) => $action
+                ->label(__('common.filters_button'))
+                ->icon('heroicon-o-funnel')
+                ->color('gray')
+                ->size('sm')
+                ->button()
+                ->tooltip(__('common.filters_button_description')))
+            ->filtersFormColumns(2)
+            ->filtersFormWidth('3xl')
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()

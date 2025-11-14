@@ -21,5 +21,13 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             NormalAdminUserSeeder::class,
         ]);
+
+        // Kategoriler, proje grupları, projeler ve öneriler
+        $this->call([
+            CategorySeeder::class,
+            ProjectGroupSeeder::class,
+            ProjectSeeder::class,
+            SuggestionSeeder::class,
+        ]);
     }
 }

@@ -18,46 +18,48 @@ class ListUsers extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Yeni Kullanıcı')
-                ->icon('heroicon-o-plus'),
+                ->label(__('common.create_user'))
+                ->icon('heroicon-o-plus')
+                ->color('primary')
+                ->button(),
 
             Actions\Action::make('create_multiple')
-                ->label('Toplu Kullanıcı Oluştur')
+                ->label(__('common.bulk_create_users'))
                 ->icon('heroicon-o-users')
                 ->color('success')
                 ->form([
-                    Forms\Components\Section::make('Toplu Kullanıcı Ayarları')
-                        ->description('Toplu kullanıcı oluşturma ayarlarını yapın')
+                    Forms\Components\Section::make(__('common.bulk_user_settings'))
+                        ->description(__('common.bulk_user_settings_description'))
                         ->schema([
                             Forms\Components\TextInput::make('user_count')
-                                ->label('Kullanıcı Sayısı')
+                                ->label(__('common.user_count'))
                                 ->required()
                                 ->numeric()
                                 ->minValue(1)
                                 ->maxValue(100)
                                 ->default(1)
-                                ->helperText('1-100 arası kullanıcı oluşturabilirsiniz'),
+                                ->helperText(__('common.user_count_helper')),
 
                             Forms\Components\TextInput::make('email_domain')
-                                ->label('E-posta Domain')
+                                ->label(__('common.email_domain'))
                                 ->required()
                                 ->default('basaksehir.bel.tr')
-                                ->placeholder('örnek: basaksehir.bel.tr')
-                                ->helperText('E-posta formatı: X@[domain] şeklinde olacak'),
+                                ->placeholder(__('common.email_domain_placeholder'))
+                                ->helperText(__('common.email_domain_helper')),
 
                             Forms\Components\TextInput::make('password')
-                                ->label('Ortak Şifre')
+                                ->label(__('common.shared_password'))
                                 ->password()
                                 ->required()
-                                ->helperText('Tüm kullanıcılar için aynı şifre kullanılacak'),
+                                ->helperText(__('common.shared_password_helper')),
 
                             Forms\Components\Select::make('roles')
-                                ->label('Roller')
+                                ->label(__('common.roles'))
                                 ->multiple()
                                 ->options(Role::all()->pluck('name', 'id'))
                                 ->preload()
                                 ->searchable()
-                                ->helperText('Tüm kullanıcılara atanacak roller'),
+                                ->helperText(__('common.roles_helper')),
                         ])
                         ->columns(2),
                 ])
@@ -73,11 +75,11 @@ class ListUsers extends ListRecords
                     for ($i = 1; $i <= $userCount; $i++) {
                         try {
                             $email = "{$i}@{$emailDomain}";
-                            $name = "Kullanıcı {$i}";
+                            $name = __('common.bulk_user_name', ['number' => $i]);
 
                             // E-posta benzersizliği kontrolü
                             if (User::where('email', $email)->exists()) {
-                                $errors[] = "{$email} - Bu e-posta adresi zaten kullanılıyor";
+                                $errors[] = __('common.bulk_user_exists', ['email' => $email]);
 
                                 continue;
                             }
@@ -97,14 +99,20 @@ class ListUsers extends ListRecords
 
                             $createdCount++;
                         } catch (\Exception $e) {
-                            $errors[] = "{$i}@{$emailDomain} - Hata: ".$e->getMessage();
+                            $errors[] = __('common.bulk_user_error', [
+                                'email' => "{$i}@{$emailDomain}",
+                                'message' => $e->getMessage(),
+                            ]);
                         }
                     }
 
                     if ($createdCount > 0) {
                         \Filament\Notifications\Notification::make()
-                            ->title("{$createdCount} kullanıcı başarıyla oluşturuldu")
-                            ->body("E-posta formatı: X@{$emailDomain} (X = 1'den {$userCount}'e kadar)")
+                            ->title(__('common.bulk_users_created', ['count' => $createdCount]))
+                            ->body(__('common.bulk_users_created_body', [
+                                'domain' => $emailDomain,
+                                'total' => $userCount,
+                            ]))
                             ->success()
                             ->persistent()
                             ->send();
@@ -112,16 +120,16 @@ class ListUsers extends ListRecords
 
                     if (! empty($errors)) {
                         \Filament\Notifications\Notification::make()
-                            ->title('Bazı kullanıcılar oluşturulamadı')
+                            ->title(__('common.bulk_users_failed'))
                             ->body(implode("\n", $errors))
                             ->warning()
                             ->persistent()
                             ->send();
                     }
                 })
-                ->modalHeading('Toplu Kullanıcı Oluştur')
-                ->modalDescription('Belirtilen sayıda kullanıcıyı X@[domain] formatında oluşturur. (X = 1, 2, 3, ...)')
-                ->modalSubmitActionLabel('Kullanıcıları Oluştur')
+                ->modalHeading(__('common.bulk_create_users'))
+                ->modalDescription(__('common.bulk_create_description'))
+                ->modalSubmitActionLabel(__('common.create_users'))
                 ->modalWidth('2xl'),
         ];
     }

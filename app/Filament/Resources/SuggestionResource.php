@@ -20,6 +20,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Carbon;
 
 class SuggestionResource extends Resource
 {
@@ -230,38 +231,44 @@ class SuggestionResource extends Resource
 
                 CommonFilters::locationFilter(),
 
-                // Budget filter: amount + more/less toggle
+                // Budget filter: between min/max amounts similar to projects
                 Filter::make('budget_filter')
                     ->label(__('common.budget'))
                     ->form([
                         Forms\Components\Grid::make()
                             ->schema([
-                                Forms\Components\TextInput::make('amount')
-                                    ->label(__('common.budget'))
+                                Forms\Components\TextInput::make('min_budget')
+                                    ->label(__('common.min_budget'))
                                     ->numeric()
-                                    ->default(0),
-
-                                Forms\Components\Toggle::make('is_more')
-                                    ->label(function (callable $get) {
-                                        $amount = $get('amount');
-
-                                        return $amount ? ($amount."₺'dan fazla?") : 'Bütçe Belirleyin';
-                                    })
-                                    ->inline(false),
+                                    ->placeholder(__('common.min_budget_example')),
+                                Forms\Components\TextInput::make('max_budget')
+                                    ->label(__('common.max_budget'))
+                                    ->numeric()
+                                    ->placeholder(__('common.max_budget_example')),
                             ])
                             ->columns(2),
                     ])
                     ->query(function (Builder $query, array $data) {
-                        if (empty($data['amount'])) {
-                            return;
+                        if (! empty($data['min_budget'])) {
+                            $query->where('budget', '>=', $data['min_budget']);
                         }
 
-                        $amount = $data['amount'];
-                        if (! empty($data['is_more'])) {
-                            $query->where('budget', '>=', $amount);
-                        } else {
-                            $query->where('budget', '<=', $amount);
+                        if (! empty($data['max_budget'])) {
+                            $query->where('budget', '<=', $data['max_budget']);
                         }
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['min_budget'] ?? null) {
+                            $indicators[] = 'Min: ₺' . number_format($data['min_budget'], 2);
+                        }
+
+                        if ($data['max_budget'] ?? null) {
+                            $indicators[] = 'Max: ₺' . number_format($data['max_budget'], 2);
+                        }
+
+                        return $indicators;
                     }),
 
                 // Like filter
@@ -293,6 +300,15 @@ class SuggestionResource extends Resource
                         }
                     }),
             ])
+            ->filtersTriggerAction(fn (Tables\Actions\Action $action) => $action
+                ->label(__('common.filters_button'))
+                ->icon('heroicon-o-funnel')
+                ->color('gray')
+                ->size('sm')
+                ->button()
+                ->tooltip(__('common.filters_button_description')))
+            ->filtersFormColumns(2)
+            ->filtersFormWidth('3xl')
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make()

@@ -14,7 +14,10 @@ class ListProjects extends ListRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Yeni Proje'),
+                ->label(__('common.create_project'))
+                ->icon('heroicon-o-plus')
+                ->color('success')
+                ->button(),
         ];
     }
 }

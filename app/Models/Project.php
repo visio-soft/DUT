@@ -6,6 +6,7 @@ use App\Observers\ProjectObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -62,7 +63,6 @@ class Project extends Model implements HasMedia
         'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
-        'status' => \App\Enums\ProjectStatusEnum::class,
     ];
 
     protected $attributes = [
@@ -150,5 +150,26 @@ class Project extends Model implements HasMedia
     public function getNameAttribute()
     {
         return $this->title;
+    }
+
+    /**
+     * Gracefully handle legacy statuses like "pending" that belong to suggestions.
+     */
+    protected function status(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                return \App\Enums\ProjectStatusEnum::tryFrom($value ?? '')
+                    ?? \App\Enums\ProjectStatusEnum::DRAFT;
+            },
+            set: function ($value) {
+                if ($value instanceof \App\Enums\ProjectStatusEnum) {
+                    return $value->value;
+                }
+
+                return \App\Enums\ProjectStatusEnum::tryFrom((string) $value)?->value
+                    ?? \App\Enums\ProjectStatusEnum::DRAFT->value;
+            }
+        );
     }
 }
