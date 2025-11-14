@@ -39,6 +39,7 @@ class Project extends Model implements HasMedia
         'updated_by_id',
         'title',
         'description',
+        'status',
         'start_date',
         'end_date',
         'min_budget',
@@ -61,6 +62,7 @@ class Project extends Model implements HasMedia
         'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'status' => \App\Enums\ProjectStatusEnum::class,
     ];
 
     public function projectGroups(): BelongsToMany

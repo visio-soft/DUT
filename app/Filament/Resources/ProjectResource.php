@@ -96,6 +96,12 @@ class ProjectResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
 
+                        Forms\Components\Select::make('status')
+                            ->label(__('common.status'))
+                            ->options(\App\Enums\ProjectStatusEnum::class)
+                            ->default(\App\Enums\ProjectStatusEnum::DRAFT)
+                            ->required(),
+
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\DatePicker::make('start_date')
@@ -158,6 +164,11 @@ class ProjectResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->label(__('common.status'))
+                    ->badge()
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('projectGroups.name')
                     ->label(__('common.project_groups'))
                     ->badge()
@@ -196,6 +207,12 @@ class ProjectResource extends Resource
             ])
             ->filters([
                 TrashedFilter::make(),
+
+                SelectFilter::make('status')
+                    ->label(__('common.status'))
+                    ->options(\App\Enums\ProjectStatusEnum::class)
+                    ->searchable()
+                    ->preload(),
 
                 SelectFilter::make('category')
                     ->label(__('common.project_category'))
@@ -250,6 +267,39 @@ class ProjectResource extends Resource
                         }
                     }),
 
+                Filter::make('date_range')
+                    ->label(__('common.date_range'))
+                    ->form([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label(__('common.start_date'))
+                            ->placeholder(__('common.select_start_date')),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->label(__('common.end_date'))
+                            ->placeholder(__('common.select_end_date')),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (! empty($data['start_date'])) {
+                            $query->where('start_date', '>=', $data['start_date']);
+                        }
+
+                        if (! empty($data['end_date'])) {
+                            $query->where('end_date', '<=', $data['end_date']);
+                        }
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['start_date'] ?? null) {
+                            $indicators[] = 'Başlangıç: ' . Carbon::parse($data['start_date'])->format('d.m.Y');
+                        }
+
+                        if ($data['end_date'] ?? null) {
+                            $indicators[] = 'Bitiş: ' . Carbon::parse($data['end_date'])->format('d.m.Y');
+                        }
+
+                        return $indicators;
+                    }),
+
                 Filter::make('budget_filter')
                     ->label(__('common.budget'))
                     ->form([
@@ -274,6 +324,19 @@ class ProjectResource extends Resource
                         if (! empty($data['max_budget'])) {
                             $query->where('max_budget', '<=', $data['max_budget']);
                         }
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+
+                        if ($data['min_budget'] ?? null) {
+                            $indicators[] = 'Min: ₺' . number_format($data['min_budget'], 2);
+                        }
+
+                        if ($data['max_budget'] ?? null) {
+                            $indicators[] = 'Max: ₺' . number_format($data['max_budget'], 2);
+                        }
+
+                        return $indicators;
                     }),
             ])
             ->actions([

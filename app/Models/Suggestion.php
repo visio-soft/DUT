@@ -39,6 +39,7 @@ class Suggestion extends Model implements HasMedia
         'updated_by_id',
         'title',
         'description',
+        'status',
         'estimated_duration',
         'min_budget',
         'max_budget',
@@ -59,6 +60,7 @@ class Suggestion extends Model implements HasMedia
         'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'status' => \App\Enums\SuggestionStatusEnum::class,
     ];
 
     // Remove design-related appends since design functionality is removed
