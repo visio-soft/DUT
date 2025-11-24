@@ -1,5 +1,9 @@
 <?php
 
+use App\Filament\Pages\UserPanel\ProjectSuggestions;
+use App\Filament\Pages\UserPanel\SuggestionDetail;
+use App\Filament\Pages\UserPanel\UserDashboard;
+use App\Filament\Pages\UserPanel\UserProjects;
 use App\Http\Controllers\Auth\UserAuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\HandleFileUploadLimits;
@@ -36,12 +40,12 @@ Route::get('/debug-upload', function () {
     ]);
 })->name('debug.upload');
 
-// User Panel Routes - Require Authentication
+// User Panel Routes - Handled by Filament Pages in app/Filament/Pages/UserPanel/
 Route::middleware('auth')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('user.index');
-    Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
-    Route::get('/projects/{id}/suggestions', [UserController::class, 'projectSuggestions'])->name('user.project.suggestions');
-    Route::get('/suggestions/{id}', [UserController::class, 'suggestionDetail'])->name('user.suggestion.detail');
+    Route::get('/', [UserDashboard::class, 'index'])->name('user.index');
+    Route::get('/projects', [UserProjects::class, 'index'])->name('user.projects');
+    Route::get('/projects/{id}/suggestions', [ProjectSuggestions::class, 'show'])->name('user.project.suggestions');
+    Route::get('/suggestions/{id}', [SuggestionDetail::class, 'show'])->name('user.suggestion.detail');
 });
 
 // User Authentication Routes

@@ -1,4 +1,4 @@
-@extends('user.layout')
+@extends('filament.pages.user-panel.layout')
 
 @section('title', $suggestion->title . ' - DUT Vote')
 

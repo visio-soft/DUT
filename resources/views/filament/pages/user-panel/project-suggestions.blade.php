@@ -1,10 +1,10 @@
-@extends('user.layout')
+@extends('filament.pages.user-panel.layout')
 
 @section('title', $project->name . ' ' . __('common.suggestions_title_suffix') . ' - DUT Vote')
 
 @section('content')
 <!-- CSS Styles -->
-@include('user._shared-colors')
+@include('filament.pages.user-panel._shared-colors')
 <style>
     /* Header Styles */
     .page-header {
@@ -279,6 +279,146 @@
         align-items: start;
     }
 
+    .filters-card {
+        background: #ffffff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-xl);
+        padding: 1.25rem;
+        margin: 0 0 1rem;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        width: 100%;
+    }
+
+    .filters-card.collapsed .filter-grid,
+    .filters-card.collapsed .filters-actions,
+    .filters-card.collapsed .filter-badges {
+        display: none;
+    }
+
+    .filters-card.collapsed {
+        padding-bottom: 0.75rem;
+    }
+
+    .filters-collapse-btn {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 0.35rem 0.65rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .filters-collapse-btn:hover {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+    }
+
+    .filter-grid label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
+    .filter-grid input,
+    .filter-grid select {
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid var(--gray-200);
+        padding: 0.65rem 0.85rem;
+        font-size: 0.9rem;
+        color: var(--gray-800);
+        background: var(--gray-50);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .filter-grid input:focus,
+    .filter-grid select:focus {
+        border-color: var(--green-400);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        outline: none;
+        background: #fff;
+    }
+
+    .filters-actions {
+        display: flex;
+        align-items: stretch;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .filters-actions button,
+    .filters-actions a {
+        border-radius: var(--radius-lg);
+        padding: 0.75rem 1.25rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .filters-actions button.apply-btn {
+        background: linear-gradient(135deg, var(--green-500), var(--green-600));
+        color: white;
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+    }
+
+    .filters-actions button.apply-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(34, 197, 94, 0.35);
+    }
+
+    .filters-actions a.reset-btn {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        text-decoration: none;
+    }
+
+    .filters-actions a.reset-btn:hover {
+        background: var(--gray-200);
+        color: var(--gray-900);
+    }
+
+    .filter-badges {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.65rem;
+        border-radius: 999px;
+        background: var(--green-50);
+        color: var(--green-700);
+        font-size: 0.8rem;
+        border: 1px solid var(--green-200);
+    }
+
+    .tree-suggestion.active {
+        background: var(--green-50);
+        border-radius: var(--radius-md);
+    }
+
     @media (min-width: 1024px) {
         .content-grid {
             grid-template-columns: 320px 1fr;
@@ -303,15 +443,34 @@
         background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
         border: 1px solid var(--green-200);
         border-radius: var(--radius-lg);
-        padding: 1rem;
+        padding: 1rem 1rem 4rem 1rem;
         box-shadow: 0 2px 8px rgba(26, 191, 107, 0.06);
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         /* Smooth scrolling for sidebar */
         scroll-behavior: smooth;
         /* Webkit scrollbar styling */
         scrollbar-width: thin;
         scrollbar-color: var(--green-300) transparent;
         width: 100%;
+        position: relative;
+    }
+
+    .sidebar.collapsed {
+        width: 60px;
+        min-width: 60px;
+        padding: 0.5rem 0.5rem 4rem 0.5rem;
+    }
+
+    .sidebar.collapsed .sidebar-content {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+    .sidebar-content {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
     }
 
     @media (min-width: 1024px) {
@@ -353,6 +512,48 @@
     .sidebar::-webkit-scrollbar-thumb:hover {
         background: linear-gradient(180deg, var(--green-400) 0%, var(--green-500) 100%);
         border-color: var(--green-100);
+    }
+
+    /* Toggle Button Styles */
+    .sidebar-toggle-btn {
+        position: absolute;
+        bottom: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--green-600), var(--green-700));
+        border: 2px solid var(--green-400);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 12px rgba(26, 191, 107, 0.3);
+        z-index: 10;
+    }
+
+    .sidebar-toggle-btn:hover {
+        transform: translateX(-50%) translateY(-2px);
+        box-shadow: 0 6px 20px rgba(26, 191, 107, 0.4);
+        background: linear-gradient(135deg, var(--green-700), var(--green-800));
+    }
+
+    .sidebar-toggle-btn:active {
+        transform: translateX(-50%) translateY(0);
+        box-shadow: 0 2px 8px rgba(26, 191, 107, 0.3);
+    }
+
+    .sidebar-toggle-icon {
+        width: 20px;
+        height: 20px;
+        color: white;
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.collapsed .sidebar-toggle-icon {
+        transform: rotate(180deg);
     }
 
     .sidebar-header {
@@ -1098,6 +1299,18 @@
             margin-bottom: 1.5rem;
             top: 0;
         }
+
+        .sidebar-toggle-btn {
+            position: relative;
+            bottom: auto;
+            left: auto;
+            transform: none;
+            margin: 1rem auto 0;
+        }
+
+        .sidebar-toggle-btn:hover {
+            transform: translateY(-2px);
+        }
     }
 
     @media (max-width: 768px) {
@@ -1169,6 +1382,11 @@
             border-radius: var(--radius-md);
         }
 
+        .sidebar.collapsed {
+            width: 100%;
+            padding: 1rem;
+        }
+
         .sidebar-header {
             margin-bottom: 0.875rem;
             padding-bottom: 0.75rem;
@@ -1176,6 +1394,11 @@
 
         .suggestions-list {
             max-height: 40vh;
+        }
+
+        .sidebar-toggle-btn {
+            position: relative;
+            margin: 1rem auto 0;
         }
 
         .card-content {
@@ -1450,12 +1673,16 @@
                         </svg>
                         {{ __('common.statistics') }}
                     </h2>
-                    <a href="{{ route('user.projects') }}" class="stats-back-btn">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        {{ __('common.back_to_projects') }}
-                    </a>
+                    <div class="project-list-actions" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <a href="{{ route('user.projects') }}"
+                           class="btn btn-primary"
+                           style="justify-content: center;">
+                            <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z"/>
+                            </svg>
+                            {{ __('common.all_projects_button') }}
+                        </a>
+                    </div>
                 </div>
 
                 <div class="stats-container">
@@ -1537,235 +1764,438 @@
     </div>
 </section><!-- Main Content Section -->
 <div class="section-padding">
-    <div class="user-container">
-        @if($project->suggestions->count() > 0)
-        <div class="content-grid">
-            <!-- Sol Taraf: Suggestion Tree View (Sidebar) -->
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                    </svg>
-                    <h3 class="sidebar-title">{{ __('common.suggestion_list') }}</h3>
-                </div>
+    <div class="projects-wide-container">
+        @php
+            $selectedDistrict = $filterValues['district'] ?? null;
+            $neighborhoodOptions = $selectedDistrict ? (config('istanbul_neighborhoods')[$selectedDistrict] ?? []) : [];
+            $activeFilters = collect($filterValues)->filter(fn ($value) => filled($value));
+            $activeFilterCount = $activeFilters->count();
+            $filterLabelMap = [
+                'search' => __('common.search'),
+                'status' => __('common.status'),
+                'category_id' => __('common.project_category'),
+                'creator_type' => __('common.creator_type'),
+                'district' => __('common.district'),
+                'neighborhood' => __('common.neighborhood'),
+                'start_date' => __('common.start_date'),
+                'end_date' => __('common.end_date'),
+                'min_budget' => __('common.min_budget'),
+                'max_budget' => __('common.max_budget'),
+            ];
+            $queryString = request()->getQueryString();
+        @endphp
 
-                <div class="input-with-icon" style="margin-bottom: 0.75rem;">
-                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
-                    </svg>
-                    <input type="text" id="suggestion-search" placeholder="{{ __('common.search') }}">
-                </div>
-
-                <!-- Info about voting system -->
-                <div style="background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 0.625rem; margin-bottom: 0.875rem;">
-                    <div style="display: flex; align-items: start; gap: 0.375rem;">
-                        <svg style="width: 0.875rem; height: 0.875rem; color: var(--green-600); margin-top: 0.125rem; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+        <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
+            <div>
+                <div id="user-filter-panel" class="filters-card">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <svg style="width: 1rem; height: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M4.5 8.25h15L13.5 15v5.25l-3-1.5V15L4.5 8.25z"/>
                         </svg>
-                        <div>
-                            <p style="font-size: 0.6875rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
-                                {{ __('common.voting_system_info') }}
-                            </p>
-                            <p style="font-size: 0.625rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
-                                {{ __('common.voting_system_change_info') }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="suggestions-list">
-                    <!-- Project Node -->
-                    <div class="table-header">
-                        <div class="suggestion-title">{{ $project->name }}</div>
-                        <div class="suggestion-likes" style="text-align: center;">
-                            <svg style="width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                            </svg>
-                            <span style="font-size: 0.625rem;">Beğeni</span>
-                        </div>
-                        <div class="suggestion-comments" style="text-align: center;">
-                            <svg style="width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-                            </svg>
-                            <span style="font-size: 0.625rem;">Yorum</span>
-                        </div>
-                    </div>
-
-                    <!-- Suggestions -->
-                    @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
-                    <div class="suggestion-item" data-title="{{ Str::lower($suggestion->title) }}" onclick="scrollToSuggestion({{ $suggestion->id }})">
-                        <div class="suggestion-info">
-                            <div class="suggestion-title">{{ Str::limit($suggestion->title, 35) }}</div>
-                            @if($suggestion->createdBy)
-                            <div class="suggestion-author">{{ $suggestion->createdBy->name }}</div>
-                            @endif
-                        </div>
-                        <div class="suggestion-stat">
-                            <span class="sidebar-like-count">{{ $suggestion->likes->count() }}</span>
-                        </div>
-                        <div class="suggestion-stat">
-                            {{ $suggestion->comments->count() }}
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- Sağ Taraf: Suggestion Cards (Suggestions Container) -->
-            <div class="suggestions-container">
-                <div class="d-flex" style="flex-direction: column; gap: 2rem;">
-                    @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
-                    <div id="suggestion-{{ $suggestion->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
-                        <!-- Suggestion Background Image -->
-                        @php
-                            $suggestionImage = null;
-                            // 1. Önce media library'den dene
-                            $mediaUrl = $suggestion->getFirstMediaUrl('images');
-
-                        @endphp
-
-                        <!-- Suggestion Background Image -->
-                        @if($suggestion->getFirstMediaUrl('images'))
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
-                            <img src="{{ $suggestion->getFirstMediaUrl('images') }}"
-                                 alt="{{ $suggestion->title }}"
-                                 style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3);"
-                                 onerror="this.style.display='none';">
-                        </div>
-                        @else
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; background: linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 100%); opacity: 0.8;"></div>
+                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0;">
+                            {{ __('common.filters_button') }}
+                        </h3>
+                        @if($activeFilterCount)
+                            <span class="filter-badge">{{ $activeFilterCount }}</span>
                         @endif
-
-                        <!-- Suggestion Overlay -->
-                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 2;"></div>
-
-                        <!-- Suggestion Content -->
-                        <div style="position: relative; z-index: 3; padding: 2rem; color: white;">
-                            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                                <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.75rem; color: rgba(255,255,255,0.9);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                                </svg>
-                                <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $suggestion->title }}</h2>
+                        <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
+                            <span class="collapse-text">{{ __('common.clear') }}</span>
+                            <svg class="collapse-icon" style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <form method="GET" action="{{ route('user.project.suggestions', $project->id) }}">
+                        <div class="filter-grid">
+                            <div class="filter-field">
+                                <label for="search">{{ __('common.title') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                                    </svg>
+                                    <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
+                                </div>
                             </div>
-
-                            @if($suggestion->createdBy)
-                            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                                <!-- profile/user icon (matching projects) -->
-                                <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                                </svg>
-                                <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                    Öneren: {{ $suggestion->createdBy->name }}
+                            <div class="filter-field">
+                                <label for="status">{{ __('common.status') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
+                                    </svg>
+                                    <select id="status" name="status">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($statusOptions as $value => $label)
+                                            <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="category_id">{{ __('common.project_category') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
+                                    </svg>
+                                    <select id="category_id" name="category_id">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($filterCategories as $category)
+                                            <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="creator_type">{{ __('common.creator_type') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0"/>
+                                    </svg>
+                                    <select id="creator_type" name="creator_type">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        <option value="with_user" @selected(($filterValues['creator_type'] ?? '') === 'with_user')>{{ __('common.user_assigned') }}</option>
+                                        <option value="not_assigned" @selected(($filterValues['creator_type'] ?? '') === 'not_assigned')>{{ __('common.not_assigned') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="district-filter">{{ __('common.district') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
+                                        <circle cx="12" cy="10.2" r="2.4"/>
+                                    </svg>
+                                    <select id="district-filter" name="district">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($districts as $district)
+                                            <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
+                                    </svg>
+                                    <select id="neighborhood-filter" name="neighborhood">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($neighborhoodOptions as $neighborhood)
+                                            <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="start_date">{{ __('common.start_date') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
+                                    </svg>
+                                    <input type="date" id="start_date" name="start_date" value="{{ $filterValues['start_date'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="end_date">{{ __('common.end_date') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
+                                    </svg>
+                                    <input type="date" id="end_date" name="end_date" value="{{ $filterValues['end_date'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="min_budget">{{ __('common.min_budget') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                                    </svg>
+                                    <input type="number" step="0.01" id="min_budget" name="min_budget" value="{{ $filterValues['min_budget'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="max_budget">{{ __('common.max_budget') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                                    </svg>
+                                    <input type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filters-actions">
+                            <button type="submit" class="apply-btn" style="width: 100%; text-align: center;">{{ __('common.filters_button') }}</button>
+                            @if($activeFilters->isNotEmpty())
+                                <a href="{{ route('user.project.suggestions', $project->id) }}" class="reset-btn" style="width: 100%; text-align: center;">{{ __('common.clear') }}</a>
+                            @endif
+                        </div>
+                    </form>
+                    @if($activeFilters->isNotEmpty())
+                        <div class="filter-badges">
+                            @foreach($activeFilters as $key => $value)
+                                <span class="filter-badge">
+                                    {{ $filterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}
                                 </span>
-                            </div>
-                            @endif
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
 
-                            @if($suggestion->description)
-                            <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.5;">
-                                <!-- info-circle icon used in projects for descriptions -->
-                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
-                                    <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"></circle>
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25h.008v.008H12V8.25zm0 2.25v4.5" />
-                                </svg>
-                                {{ $suggestion->description }}
-                            </p>
-                            @endif
+                <div class="tree-view">
+                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                        <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                        </svg>
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.project_list') }}</h3>
+                    </div>
 
-                            <!-- Suggestion Meta -->
-                            <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem;">
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
-                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                    </svg>
-                                    {{ $suggestion->likes->count() }} {{ __('common.likes') }}
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
-                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-                                    </svg>
-                                    {{ $suggestion->comments->count() }} Yorum
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
-                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
-                                    </svg>
-                                    {{ $suggestion->created_at->format('d.m.Y') }}
-                                </div>
-                            </div>
-
-                            <!-- Action Buttons (aligned with projects page) -->
-                            <div style="display: flex; gap: 1rem; align-items: center;">
-                                <!-- Like Button -->
-                                @php
-                                    $isProjectExpired = $project->isExpired();
-                                @endphp
-                                <button onclick="{{ $isProjectExpired ? 'showExpiredMessage()' : 'toggleLike(' . $suggestion->id . ')' }}"
-                                        class="btn-like btn-like-large {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }} {{ $isProjectExpired ? 'expired' : '' }}"
-                                        data-suggestion-id="{{ $suggestion->id }}"
-                                        data-project-id="{{ $project->id }}"
-                                        data-category="{{ $suggestion->category_id ?? 'default' }}"
-                                        data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
-                                        title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)' }}"
-                                        {{ $isProjectExpired ? 'disabled' : '' }}
-                                    <svg class="like-icon like-icon-large" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                    </svg>
-                                    <span class="like-count">{{ $suggestion->likes->count() }}</span>
-                                </button>
-
-                                <!-- Detail Button -->
-                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" class="detail-button">
-                                    <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                    </svg>
-                                    <span style="font-weight:600;">Detay</span>
-                                </a>
+                    <div style="background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: start; gap: 0.5rem;">
+                            <svg style="width: 1rem; height: 1rem; color: var(--green-600); margin-top: 0.125rem; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                            </svg>
+                            <div>
+                                <p style="font-size: 0.75rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
+                                    <strong>{{ __('common.voting_system') }}:</strong> {{ __('common.voting_system_description') }}
+                                </p>
+                                <p style="font-size: 0.7rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
+                                    {{ __('common.voting_system_help') }}
+                                </p>
                             </div>
                         </div>
                     </div>
-                    @endforeach
+
+                    <div class="input-with-icon" style="margin-bottom: 1rem;">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                        </svg>
+                        <input type="text" id="project-tree-search" placeholder="{{ __('common.search') }}">
+                    </div>
+
+                    <div style="space-y: 0.5rem;">
+                        @forelse($projects as $projectItem)
+                            <div class="tree-project-wrapper" data-title="{{ Str::lower($projectItem->name) }}" style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
+                                <a href="{{ route('user.project.suggestions', $projectItem->id) }}{{ $queryString ? ('?' . $queryString) : '' }}"
+                                   class="tree-project"
+                                   style="display: flex; align-items: center; padding: 0.5rem; border-radius: 0.5rem; transition: background-color 0.2s; text-decoration: none; background: {{ $projectItem->id === $project->id ? 'var(--green-50)' : 'transparent' }};">
+                                    <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                                    </svg>
+                                    <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($projectItem->name, 25) }}</span>
+                                    <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $projectItem->suggestions->count() }})</span>
+                                </a>
+
+                                @if($projectItem->id === $project->id && $projectItem->suggestions->count() > 0)
+                                    <div class="tree-suggestions">
+                                        @foreach($projectItem->suggestions as $treeSuggestion)
+                                            <div class="tree-suggestion"
+                                                 onclick="scrollToSuggestion({{ $treeSuggestion->id }})">
+                                                <svg style="width: 0.75rem; height: 0.75rem; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                                                </svg>
+                                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($treeSuggestion->title, 20) }}</span>
+                                                <span style="margin-left: auto; display: flex; align-items: center;">
+                                                    <svg style="width: 0.75rem; height: 0.75rem; color: var(--green-600); margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                                    </svg>
+                                                    {{ $treeSuggestion->likes->count() }}
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                        @empty
+                            <p style="font-size: 0.9rem; color: var(--gray-500); text-align: center;">{{ __('common.no_projects_yet') }}</p>
+                        @endforelse
+                    </div>
                 </div>
             </div>
-        </div>
-        @else
-        <!-- Empty State -->
-        <div class="text-center section-padding-lg">
-            <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
-                <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 003 5.25v13.5A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                </svg>
-                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                    <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                    </svg>
-                    <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Bu proje için henüz öneri bulunmuyor</h3>
-                </div>
-                <p style="color: var(--gray-500);">
-                    <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
-                    </svg>
-                    {{ __('common.waiting_for_first_projects') }}
-                </p>
+
+            <div class="project-cards-container">
+                @if($project->suggestions->count() > 0)
+                    <div class="suggestions-container">
+                        <div class="d-flex" style="flex-direction: column; gap: 2rem;">
+                            @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
+                                <div id="suggestion-{{ $suggestion->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
+                                    @php
+                                        $suggestionImage = null;
+                                        $mediaUrl = $suggestion->getFirstMediaUrl('images');
+                                    @endphp
+
+                                    @if($suggestion->getFirstMediaUrl('images'))
+                                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
+                                            <img src="{{ $suggestion->getFirstMediaUrl('images') }}"
+                                                 alt="{{ $suggestion->title }}"
+                                                 style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3);"
+                                                 onerror="this.style.display='none';">
+                                        </div>
+                                    @else
+                                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; background: linear-gradient(135deg, var(--green-600) 0%, var(--green-700) 100%); opacity: 0.8;"></div>
+                                    @endif
+
+                                    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 2;"></div>
+
+                                    <div style="position: relative; z-index: 3; padding: 2rem; color: white;">
+                                        <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                            <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.75rem; color: rgba(255,255,255,0.9);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                            </svg>
+                                            <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $suggestion->title }}</h2>
+                                        </div>
+
+                                        @if($suggestion->createdBy)
+                                            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                                <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                                </svg>
+                                                <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+                                                    Öneren: {{ $suggestion->createdBy->name }}
+                                                </span>
+                                            </div>
+                                        @endif
+
+                                        @if($suggestion->description)
+                                            <p style="font-size: 1rem; color: rgba(255,255,255,0.9); margin-bottom: 1.5rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); line-height: 1.5;">
+                                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                                    <circle cx="12" cy="12" r="9" stroke-linecap="round" stroke-linejoin="round"></circle>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.25h.008v .008H12V8.25zm0 2.25v4.5" />
+                                                </svg>
+                                                {{ $suggestion->description }}
+                                            </p>
+                                        @endif
+
+                                        <div style="display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
+                                                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                                </svg>
+                                                {{ $suggestion->likes->count() }} {{ __('common.likes') }}
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
+                                                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+                                                </svg>
+                                                {{ $suggestion->comments->count() }} Yorum
+                                            </div>
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
+                                                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
+                                                </svg>
+                                                {{ $suggestion->created_at->format('d.m.Y') }}
+                                            </div>
+                                        </div>
+
+                                        <div style="display: flex; gap: 1rem; align-items: center;">
+                                            @php
+                                                $isProjectExpired = $project->isExpired();
+                                            @endphp
+                                            <button onclick="{{ $isProjectExpired ? 'showExpiredMessage()' : 'toggleLike(' . $suggestion->id . ')' }}"
+                                                    class="btn-like btn-like-large {{ Auth::check() && $suggestion->likes->where('user_id', Auth::id())->count() > 0 ? 'liked' : '' }} {{ $isProjectExpired ? 'expired' : '' }}"
+                                                    data-suggestion-id="{{ $suggestion->id }}"
+                                                    data-project-id="{{ $project->id }}"
+                                                    data-category="{{ $suggestion->category_id ?? 'default' }}"
+                                                    data-expired="{{ $isProjectExpired ? 'true' : 'false' }}"
+                                                    title="{{ $isProjectExpired ? 'Proje süresi dolmuş - Beğeni yapılamaz' : 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)' }}"
+                                                    {{ $isProjectExpired ? 'disabled' : '' }}>
+                                                <svg class="like-icon like-icon-large" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                                                </svg>
+                                                <span class="like-count">{{ $suggestion->likes->count() }}</span>
+                                            </button>
+
+                                            <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" class="detail-button">
+                                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                                </svg>
+                                                <span style="font-weight:600;">Detay</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @else
+                    <div class="text-center section-padding-lg">
+                        <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
+                            <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                            </svg>
+                            <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                                <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                                </svg>
+                                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Bu proje için henüz öneri bulunmuyor</h3>
+                            </div>
+                            <p style="color: var(--gray-500);">
+                                <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                                </svg>
+                                {{ __('common.waiting_for_first_projects') }}
+                            </p>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
-        @endif
     </div>
 </div>
-    </div>
-</div>
+
 
 <!-- JavaScript for interactions -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    const suggestionSearchInput = document.getElementById('suggestion-search');
-    const sidebarSuggestions = document.querySelectorAll('.suggestion-item');
+    const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
+    const districtSelect = document.getElementById('district-filter');
+    const neighborhoodSelect = document.getElementById('neighborhood-filter');
+    const projectTreeSearch = document.getElementById('project-tree-search');
+    const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
+    const filterCard = document.getElementById('user-filter-panel');
+    const collapseBtn = document.getElementById('filters-collapse-btn');
 
-    if (suggestionSearchInput && sidebarSuggestions.length) {
-        suggestionSearchInput.addEventListener('input', function () {
+    if (districtSelect && neighborhoodSelect) {
+        districtSelect.addEventListener('change', function () {
+            const value = this.value;
+            const options = neighborhoodsMap[value] || [];
+            neighborhoodSelect.innerHTML = "<option value=\"\">{{ __('common.select_option') }}</option>";
+
+            options.forEach(option => {
+                const opt = document.createElement('option');
+                opt.value = option;
+                opt.textContent = option;
+                neighborhoodSelect.appendChild(opt);
+            });
+        });
+    }
+
+    if (filterCard && collapseBtn) {
+        const collapseIcon = collapseBtn.querySelector('.collapse-icon');
+        const collapseText = collapseBtn.querySelector('.collapse-text');
+
+        const setCollapsedState = (collapsed) => {
+            filterCard.classList.toggle('collapsed', collapsed);
+            if (collapsed) {
+                collapseText.textContent = '{{ __('common.filters_button') }}';
+                collapseIcon.style.transform = 'rotate(180deg)';
+            } else {
+                collapseText.textContent = '{{ __('common.clear') }}';
+                collapseIcon.style.transform = 'rotate(0deg)';
+            }
+        };
+
+        collapseBtn.addEventListener('click', () => {
+            const collapsed = !filterCard.classList.contains('collapsed');
+            setCollapsedState(collapsed);
+        });
+    }
+
+    if (projectTreeSearch && projectWrappers.length) {
+        projectTreeSearch.addEventListener('input', function () {
             const term = this.value.toLowerCase();
-            sidebarSuggestions.forEach(item => {
-                const title = item.dataset.title || '';
-                item.style.display = !term || title.includes(term) ? '' : 'none';
+            projectWrappers.forEach(wrapper => {
+                const title = wrapper.dataset.title || '';
+                wrapper.style.display = !term || title.includes(term) ? '' : 'none';
             });
         });
     }
@@ -1801,8 +2231,8 @@ function scrollToSuggestion(suggestionId) {
 
 // Update sidebar active state
 function updateSidebarActiveState(suggestionId) {
-    // Remove active class from all suggestion items
-    const allSidebarItems = document.querySelectorAll('.suggestion-item');
+    // Remove active class from all tree suggestion items
+    const allSidebarItems = document.querySelectorAll('.tree-suggestion');
     allSidebarItems.forEach(item => item.classList.remove('active'));
 
     // Add active class to current item
@@ -2166,8 +2596,30 @@ if (!document.getElementById('message-styles')) {
     document.head.appendChild(style);
 }
 
+// Toggle sidebar function
+function toggleSidebar() {
+    const sidebar = document.getElementById('suggestionSidebar');
+    if (!sidebar) {
+        return;
+    }
+    sidebar.classList.toggle('collapsed');
+
+    // Save state to localStorage
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    localStorage.setItem('sidebarCollapsed', isCollapsed);
+}
+
 // Initialize page functionality
 document.addEventListener('DOMContentLoaded', function() {
+    // Restore sidebar state from localStorage
+    const sidebar = document.getElementById('suggestionSidebar');
+    if (sidebar) {
+        const savedState = localStorage.getItem('sidebarCollapsed');
+        if (savedState === 'true') {
+            sidebar.classList.add('collapsed');
+        }
+    }
+
     // Initialize suggestion list interactions
     const suggestionItems = document.querySelectorAll('.suggestion-item');
     suggestionItems.forEach(item => {
@@ -2217,25 +2669,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Responsive grid adjustment for mobile (projects.blade.php format)
 function adjustLayout() {
-    const container = document.querySelector('[style*="grid-template-columns: 1fr 3fr"]');
+    const container = document.querySelector('.main-content-grid');
     if (container && window.innerWidth < 1024) {
         container.style.gridTemplateColumns = '1fr';
         container.style.gap = '1rem';
     } else if (container) {
-        container.style.gridTemplateColumns = '1fr 3fr';
+        container.style.gridTemplateColumns = '300px 1fr';
         container.style.gap = '2rem';
-    }
-
-    // Adjust stats cards for mobile
-    const statsContainer = document.querySelector('[style*="display: flex; justify-content: center; gap: 2rem"]');
-    if (statsContainer && window.innerWidth < 768) {
-        statsContainer.style.flexDirection = 'column';
-        statsContainer.style.gap = '1rem';
-        statsContainer.style.maxWidth = '400px';
-    } else if (statsContainer) {
-        statsContainer.style.flexDirection = 'row';
-        statsContainer.style.gap = '2rem';
-        statsContainer.style.maxWidth = '800px';
     }
 }// Call on load and resize
 window.addEventListener('load', adjustLayout);

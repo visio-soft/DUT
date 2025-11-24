@@ -1,4 +1,4 @@
-@extends('user.layout')
+@extends('filament.pages.user-panel.layout')
 
 @section('title', __('common.projects') . ' - DUT Vote')
 
@@ -6,7 +6,7 @@
 <!-- Header Section -->
 <section class="section-padding" style="padding: 3rem 0; background: #f8fafc;">
     {{-- shared colors/vars --}}
-    @include('user._shared-colors')
+    @include('filament.pages.user-panel._shared-colors')
 
 <style>
     /* Header Styles */
@@ -321,17 +321,48 @@
         background: #ffffff;
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-xl);
-        padding: 1.5rem;
-        margin: 2rem auto 0;
-        max-width: 1400px;
+        padding: 1.25rem;
+        margin: 0 0 1rem;
         box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        width: 100%;
+    }
+
+    .filters-card.collapsed .filter-grid,
+    .filters-card.collapsed .filters-actions,
+    .filters-card.collapsed .filter-badges {
+        display: none;
+    }
+
+    .filters-card.collapsed {
+        padding-bottom: 0.75rem;
+    }
+
+    .filters-collapse-btn {
+        margin-left: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        padding: 0.35rem 0.65rem;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: background 0.2s, border-color 0.2s;
+    }
+
+    .filters-collapse-btn:hover {
+        background: var(--gray-200);
+        border-color: var(--gray-300);
     }
 
     .filter-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        margin-top: 0.75rem;
     }
 
     .filter-grid label {
@@ -364,9 +395,9 @@
 
     .filters-actions {
         display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-top: 1.5rem;
+        align-items: stretch;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
         flex-wrap: wrap;
     }
 
@@ -525,164 +556,163 @@
             ];
         @endphp
 
-        <div class="filters-toggle">
-            <button type="button"
-                    class="filters-toggle-button {{ $activeFilterCount ? 'active' : '' }}"
-                    data-target="user-filter-panel">
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M4.5 8.25h15L13.5 15v5.25l-3-1.5V15L4.5 8.25z"/>
-                </svg>
-                <span>{{ __('common.filters_button') }}</span>
-                @if($activeFilterCount)
-                    <span class="filter-badge">{{ $activeFilterCount }}</span>
-                @endif
-                <svg class="toggle-arrow" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
-                </svg>
-            </button>
-        </div>
-
-        <div id="user-filter-panel" class="filters-card {{ $activeFilterCount ? '' : 'hidden' }}">
-            <form method="GET" action="{{ route('user.projects') }}">
-                <div class="filter-grid">
-                    <div class="filter-field">
-                        <label for="search">{{ __('common.title') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
-                            </svg>
-                            <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="status">{{ __('common.status') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
-                            </svg>
-                            <select id="status" name="status">
-                                <option value="">{{ __('common.select_option') }}</option>
-                                @foreach($statusOptions as $value => $label)
-                                    <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="category_id">{{ __('common.project_category') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
-                            </svg>
-                            <select id="category_id" name="category_id">
-                                <option value="">{{ __('common.select_option') }}</option>
-                                @foreach($filterCategories as $category)
-                                    <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="creator_type">{{ __('common.creator_type') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0"/>
-                            </svg>
-                            <select id="creator_type" name="creator_type">
-                                <option value="">{{ __('common.select_option') }}</option>
-                                <option value="with_user" @selected(($filterValues['creator_type'] ?? '') === 'with_user')>{{ __('common.user_assigned') }}</option>
-                                <option value="not_assigned" @selected(($filterValues['creator_type'] ?? '') === 'not_assigned')>{{ __('common.not_assigned') }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="district-filter">{{ __('common.district') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
-                                <circle cx="12" cy="10.2" r="2.4"/>
-                            </svg>
-                            <select id="district-filter" name="district">
-                                <option value="">{{ __('common.select_option') }}</option>
-                                @foreach($districts as $district)
-                                    <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
-                            </svg>
-                            <select id="neighborhood-filter" name="neighborhood">
-                                <option value="">{{ __('common.select_option') }}</option>
-                                @foreach($neighborhoodOptions as $neighborhood)
-                                    <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="start_date">{{ __('common.start_date') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
-                            </svg>
-                            <input type="date" id="start_date" name="start_date" value="{{ $filterValues['start_date'] ?? '' }}">
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="end_date">{{ __('common.end_date') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
-                            </svg>
-                            <input type="date" id="end_date" name="end_date" value="{{ $filterValues['end_date'] ?? '' }}">
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="min_budget">{{ __('common.min_budget') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
-                            </svg>
-                            <input type="number" step="0.01" id="min_budget" name="min_budget" value="{{ $filterValues['min_budget'] ?? '' }}">
-                        </div>
-                    </div>
-                    <div class="filter-field">
-                        <label for="max_budget">{{ __('common.max_budget') }}</label>
-                        <div class="input-with-icon">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
-                            </svg>
-                            <input type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="filters-actions">
-                    <button type="submit" class="apply-btn">{{ __('common.filters_button') }}</button>
-                    @if($activeFilters->isNotEmpty())
-                        <a href="{{ route('user.projects') }}" class="reset-btn">{{ __('common.clear') }}</a>
-                    @endif
-                </div>
-            </form>
-            @if($activeFilters->isNotEmpty())
-                <div class="filter-badges">
-                    @foreach($activeFilters as $key => $value)
-                        <span class="filter-badge">
-                            {{ $filterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}
-                        </span>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-
-        @if($projects->count() > 0)
         <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
             <!-- Sol Taraf: Tree View -->
             <div>
+                <div id="user-filter-panel" class="filters-card">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <svg style="width: 1rem; height: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M4.5 8.25h15L13.5 15v5.25l-3-1.5V15L4.5 8.25z"/>
+                        </svg>
+                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0;">
+                            {{ __('common.filters_button') }}
+                        </h3>
+                        @if($activeFilterCount)
+                            <span class="filter-badge">{{ $activeFilterCount }}</span>
+                        @endif
+                        <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
+                            <span class="collapse-text">{{ __('common.clear') }}</span>
+                            <svg class="collapse-icon" style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <form method="GET" action="{{ route('user.projects') }}">
+                        <div class="filter-grid">
+                            <div class="filter-field">
+                                <label for="search">{{ __('common.title') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                                    </svg>
+                                    <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="status">{{ __('common.status') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
+                                    </svg>
+                                    <select id="status" name="status">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($statusOptions as $value => $label)
+                                            <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="category_id">{{ __('common.project_category') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
+                                    </svg>
+                                    <select id="category_id" name="category_id">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($filterCategories as $category)
+                                            <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="creator_type">{{ __('common.creator_type') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0"/>
+                                    </svg>
+                                    <select id="creator_type" name="creator_type">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        <option value="with_user" @selected(($filterValues['creator_type'] ?? '') === 'with_user')>{{ __('common.user_assigned') }}</option>
+                                        <option value="not_assigned" @selected(($filterValues['creator_type'] ?? '') === 'not_assigned')>{{ __('common.not_assigned') }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="district-filter">{{ __('common.district') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
+                                        <circle cx="12" cy="10.2" r="2.4"/>
+                                    </svg>
+                                    <select id="district-filter" name="district">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($districts as $district)
+                                            <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
+                                    </svg>
+                                    <select id="neighborhood-filter" name="neighborhood">
+                                        <option value="">{{ __('common.select_option') }}</option>
+                                        @foreach($neighborhoodOptions as $neighborhood)
+                                            <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="start_date">{{ __('common.start_date') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
+                                    </svg>
+                                    <input type="date" id="start_date" name="start_date" value="{{ $filterValues['start_date'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="end_date">{{ __('common.end_date') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
+                                    </svg>
+                                    <input type="date" id="end_date" name="end_date" value="{{ $filterValues['end_date'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="min_budget">{{ __('common.min_budget') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                                    </svg>
+                                    <input type="number" step="0.01" id="min_budget" name="min_budget" value="{{ $filterValues['min_budget'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filter-field">
+                                <label for="max_budget">{{ __('common.max_budget') }}</label>
+                                <div class="input-with-icon">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                                    </svg>
+                                    <input type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filters-actions">
+                            <button type="submit" class="apply-btn" style="width: 100%; text-align: center;">{{ __('common.filters_button') }}</button>
+                            @if($activeFilters->isNotEmpty())
+                                <a href="{{ route('user.projects') }}" class="reset-btn" style="width: 100%; text-align: center;">{{ __('common.clear') }}</a>
+                            @endif
+                        </div>
+                    </form>
+                    @if($activeFilters->isNotEmpty())
+                        <div class="filter-badges">
+                            @foreach($activeFilters as $key => $value)
+                                <span class="filter-badge">
+                                    {{ $filterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}
+                                </span>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
                 <div class="tree-view">
                     <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                         <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -757,7 +787,8 @@
 
             <!-- Sağ Taraf: Project Cards -->
             <div class="project-cards-container">
-                <div class="d-flex" style="flex-direction: column; gap: 2rem; width: 100%;"">
+                @if($projects->count() > 0)
+                <div class="d-flex" style="flex-direction: column; gap: 2rem; width: 100%;">
                     @foreach($projects as $project)
                     <div id="project-{{ $project->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
                         <!-- Project Background Image -->
@@ -995,30 +1026,29 @@
                     </div>
                     @endforeach
                 </div>
-            </div>
-        </div>
-        @else
-        <!-- Empty State -->
-        <div class="text-center section-padding-lg">
-            <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
-                <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
-                </svg>
-                <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-                    <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
-                    </svg>
-                    <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Henüz proje bulunmuyor</h3>
+                @else
+                <div class="text-center section-padding-lg">
+                    <div class="user-card" style="max-width: 400px; margin: 0 auto; padding: 3rem;">
+                        <svg style="width: 4rem; height: 4rem; margin: 0 auto 1rem; color: var(--green-400);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                        </svg>
+                        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+                            <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                            </svg>
+                            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Henüz proje bulunmuyor</h3>
+                        </div>
+                        <p style="color: var(--gray-500);">
+                            <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
+                            </svg>
+                            İlk projelerin eklenmesi bekleniyor.
+                        </p>
+                    </div>
                 </div>
-                <p style="color: var(--gray-500);">
-                    <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
-                    </svg>
-                    İlk projelerin eklenmesi bekleniyor.
-                </p>
+                @endif
             </div>
         </div>
-        @endif
 </div>
 </div>
 
@@ -1030,11 +1060,10 @@
         const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
         const districtSelect = document.getElementById('district-filter');
         const neighborhoodSelect = document.getElementById('neighborhood-filter');
-        const toggleButton = document.querySelector('.filters-toggle-button');
-        const toggleTargetId = toggleButton ? toggleButton.dataset.target : null;
-        const toggleTarget = toggleTargetId ? document.getElementById(toggleTargetId) : null;
         const projectTreeSearch = document.getElementById('project-tree-search');
         const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
+        const filterCard = document.getElementById('user-filter-panel');
+        const collapseBtn = document.getElementById('filters-collapse-btn');
 
         if (districtSelect && neighborhoodSelect) {
             districtSelect.addEventListener('change', function () {
@@ -1051,10 +1080,24 @@
             });
         }
 
-        if (toggleButton && toggleTarget) {
-            toggleButton.addEventListener('click', function () {
-                toggleTarget.classList.toggle('hidden');
-                this.classList.toggle('active');
+        if (filterCard && collapseBtn) {
+            const collapseIcon = collapseBtn.querySelector('.collapse-icon');
+            const collapseText = collapseBtn.querySelector('.collapse-text');
+
+            const setCollapsedState = (collapsed) => {
+                filterCard.classList.toggle('collapsed', collapsed);
+                if (collapsed) {
+                    collapseText.textContent = '{{ __('common.filters_button') }}';
+                    collapseIcon.style.transform = 'rotate(180deg)';
+                } else {
+                    collapseText.textContent = '{{ __('common.clear') }}';
+                    collapseIcon.style.transform = 'rotate(0deg)';
+                }
+            };
+
+            collapseBtn.addEventListener('click', () => {
+                const collapsed = !filterCard.classList.contains('collapsed');
+                setCollapsedState(collapsed);
             });
         }
 
