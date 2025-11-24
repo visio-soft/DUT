@@ -22,6 +22,8 @@ class LocationImporter extends Importer
 
     protected ?string $targetName = null;
 
+    protected bool $hierarchyPrepared = false;
+
     /**
      * @return array<ImportColumn>
      */
@@ -49,9 +51,22 @@ class LocationImporter extends Importer
 
     public function resolveRecord(): ?Location
     {
+        $this->resetHierarchy();
         $this->prepareHierarchy();
 
-        return Location::firstOrNew(['slug' => Str::slug($this->targetName)]);
+        $parent = $this->ensureParents();
+        $slug = Str::slug($this->targetName);
+
+        // Parent ile birlikte slug kontrolü yap
+        $query = Location::where('slug', $slug)->where('type', $this->targetType);
+
+        if ($parent) {
+            $query->where('parent_id', $parent->id);
+        } else {
+            $query->whereNull('parent_id');
+        }
+
+        return $query->first() ?? new Location(['slug' => $slug]);
     }
 
     /**
@@ -59,12 +74,17 @@ class LocationImporter extends Importer
      */
     public function fillRecord(): void
     {
-        $this->prepareHierarchy();
+        // prepareHierarchy zaten resolveRecord'da çağrıldı
+        if (!$this->hierarchyPrepared) {
+            $this->resetHierarchy();
+            $this->prepareHierarchy();
+        }
 
         $parent = $this->ensureParents();
 
         $this->record->name = $this->targetName;
         $this->record->type = $this->targetType;
+        $this->record->slug = Str::slug($this->targetName);
         $this->record->parent()->associate($parent);
     }
 
@@ -90,11 +110,22 @@ class LocationImporter extends Importer
     }
 
     /**
+     * Her satır için hierarchy bilgilerini sıfırla
+     */
+    protected function resetHierarchy(): void
+    {
+        $this->hierarchyNames = [];
+        $this->targetType = null;
+        $this->targetName = null;
+        $this->hierarchyPrepared = false;
+    }
+
+    /**
      * @throws ValidationException
      */
     protected function prepareHierarchy(): void
     {
-        if ($this->hierarchyNames !== []) {
+        if ($this->hierarchyPrepared) {
             return;
         }
 
@@ -115,6 +146,7 @@ class LocationImporter extends Importer
         }
 
         $this->validateHierarchy();
+        $this->hierarchyPrepared = true;
     }
 
     /**
@@ -170,28 +202,25 @@ class LocationImporter extends Importer
     {
         $slug = Str::slug($name);
 
-        $location = Location::firstOrNew(['slug' => $slug]);
+        // Parent ile birlikte lokasyonu bul
+        $query = Location::where('slug', $slug)->where('type', $type);
 
-        if ($location->exists) {
-            if ($location->type !== $type) {
-                throw ValidationException::withMessages([
-                    $this->getColumnNameForType($type) => __('common.location_import_type_mismatch', [
-                        'name' => $name,
-                        'existing' => __('common.' . $location->type),
-                        'expected' => __('common.' . $type),
-                    ]),
-                ]);
-            }
+        if ($parent) {
+            $query->where('parent_id', $parent->id);
+        } else {
+            $query->whereNull('parent_id');
+        }
 
-            if ($parent && $location->parent_id !== $parent->id) {
-                $location->parent()->associate($parent);
-                $location->save();
-            }
+        $location = $query->first();
 
+        if ($location) {
             return $location;
         }
 
+        // Yeni lokasyon oluştur
+        $location = new Location();
         $location->name = $name;
+        $location->slug = $slug;
         $location->type = $type;
         $location->parent()->associate($parent);
         $location->save();

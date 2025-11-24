@@ -89,8 +89,60 @@ class LocationResource extends Resource
                     ->placeholder('-')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('parent.parent.name')
+                    ->label(__('common.country'))
+                    ->placeholder('-')
+                    ->sortable()
+                    ->searchable()
+                    ->visible(fn ($record) => $record && $record->type === Location::TYPE_DISTRICT),
             ])
             ->defaultSort('type')
+            ->groups([
+                Tables\Grouping\Group::make('country')
+                    ->label(__('common.country'))
+                    ->getTitleFromRecordUsing(function (Location $record): string {
+                        // Ülke ise kendi adı
+                        if ($record->type === Location::TYPE_COUNTRY) {
+                            return $record->name;
+                        }
+                        // Şehir ise parent'ı (ülke)
+                        if ($record->type === Location::TYPE_CITY && $record->parent) {
+                            return $record->parent->name;
+                        }
+                        // İlçe ise parent.parent (ülke)
+                        if ($record->type === Location::TYPE_DISTRICT && $record->parent?->parent) {
+                            return $record->parent->parent->name;
+                        }
+                        // Mahalle ise parent.parent.parent (ülke)
+                        if ($record->type === Location::TYPE_NEIGHBORHOOD && $record->parent?->parent?->parent) {
+                            return $record->parent->parent->parent->name;
+                        }
+                        return '-';
+                    })
+                    ->collapsible(),
+                Tables\Grouping\Group::make('city')
+                    ->label(__('common.city'))
+                    ->getTitleFromRecordUsing(function (Location $record): string {
+                        // Şehir ise kendi adı
+                        if ($record->type === Location::TYPE_CITY) {
+                            return $record->name;
+                        }
+                        // İlçe ise parent'ı (şehir)
+                        if ($record->type === Location::TYPE_DISTRICT && $record->parent) {
+                            return $record->parent->name;
+                        }
+                        // Mahalle ise parent.parent (şehir)
+                        if ($record->type === Location::TYPE_NEIGHBORHOOD && $record->parent?->parent) {
+                            return $record->parent->parent->name;
+                        }
+                        return '-';
+                    })
+                    ->collapsible(),
+                Tables\Grouping\Group::make('type')
+                    ->label(__('common.location_type'))
+                    ->getTitleFromRecordUsing(fn (Location $record): string => Location::typeLabels()[$record->type] ?? $record->type)
+                    ->collapsible(),
+            ])
             ->filters([
                 SelectFilter::make('type')
                     ->label(__('common.location_type'))
@@ -122,7 +174,7 @@ class LocationResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with('parent');
+        return parent::getEloquentQuery()->with(['parent.parent.parent', 'parent.parent', 'parent']);
     }
 
     protected static function getParentOptions(?string $type): array
