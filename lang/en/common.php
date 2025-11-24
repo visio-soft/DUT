@@ -235,7 +235,7 @@ return [
     'select_parent_category' => 'Select Parent Category',
     'enter_category_name' => 'Enter Category Name',
     'import_locations' => 'Import Locations',
-    'location_import_description' => '',
+    'location_import_description' => 'Upload the CSV template as-is: columns must be named country, city, district, neighborhood (in that order). Leave cells blank only when their parent column is filled.',
     'parent_location_required_for_type' => 'Parent location is required for this type. Please provide the parent slug or name.',
     'parent_location_not_found' => 'Parent location could not be found. Please make sure it exists or import it first.',
     'location_import_result' => 'Import completed: :success rows succeeded, :failed rows failed.',

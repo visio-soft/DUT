@@ -22,6 +22,7 @@ class ListLocations extends ListRecords
                 ->modalDescription(__('common.location_import_description'))
                 ->modalContent(fn (): View => view('filament.components.location-import-hint'))
                 ->icon('heroicon-o-arrow-up-tray')
+
                 ->color('info')
                 ->importer(LocationImporter::class),
             Actions\CreateAction::make()

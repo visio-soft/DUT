@@ -40,21 +40,33 @@
                 </tr>
                 <tr class="divide-x divide-gray-100 bg-gray-50 dark:bg-gray-950 dark:divide-gray-800">
                     <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Türkiye</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Ankara</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Altındağ</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Örnek Mahallesi</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">İstanbul</td>
+                    <td class="px-3 py-2 text-gray-400 dark:text-gray-500">—</td>
+                    <td class="px-3 py-2 text-gray-400 dark:text-gray-500">—</td>
                 </tr>
                 <tr class="bg-white divide-x divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
                     <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Türkiye</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Eskişehir</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Odunpazarı</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Akarbaşı Mahallesi</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">İstanbul</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Gaziosmanpaşa</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Barbaros Hayrettin Paşa Mahallesi</td>
+                </tr>
+                <tr class="divide-x divide-gray-100 bg-gray-50 dark:bg-gray-950 dark:divide-gray-800">
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Türkiye</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Ankara</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Çankaya</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Kızılay Mahallesi</td>
+                </tr>
+                <tr class="bg-white divide-x divide-gray-100 dark:bg-gray-900 dark:divide-gray-800">
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Türkiye</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">İzmir</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Konak</td>
+                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Alsancak Mahallesi</td>
                 </tr>
                 <tr class="divide-x divide-gray-100 bg-gray-50 dark:bg-gray-950 dark:divide-gray-800">
                     <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Türkiye</td>
                     <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Antalya</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Muratpaşa</td>
-                    <td class="px-3 py-2 text-gray-900 dark:text-gray-100">Lara Mahallesi</td>
+                    <td class="px-3 py-2 text-gray-400 dark:text-gray-500">—</td>
+                    <td class="px-3 py-2 text-gray-400 dark:text-gray-500">—</td>
                 </tr>
             </tbody>
         </table>

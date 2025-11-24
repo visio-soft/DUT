@@ -235,7 +235,7 @@ return [
     'select_parent_category' => 'Üst kategori seçin',
     'enter_category_name' => 'Kategori adını girin',
     'import_locations' => 'Konumları İçe Aktar',
-    'location_import_description' => '',
+    'location_import_description' => 'CSV şablonunu aynen yükleyin: sütun adları sırasıyla country, city, district, neighborhood olmalıdır. Sadece solundaki sütun doluysa boş bırakabilirsiniz.',
     'parent_location_required_for_type' => 'Bu tür için üst konum zorunludur. Lütfen üst konum kısa ismini veya adını girin.',
     'parent_location_not_found' => 'Üst konum bulunamadı. Lütfen önce üst konumu eklediğinizden emin olun.',
     'location_import_result' => 'İçe aktarma tamamlandı: :success satır başarılı, :failed satır başarısız.',
