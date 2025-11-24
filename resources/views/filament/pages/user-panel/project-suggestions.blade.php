@@ -1965,13 +1965,6 @@
                         </div>
                     </div>
 
-                    <div class="input-with-icon" style="margin-bottom: 1rem;">
-                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
-                        </svg>
-                        <input type="text" id="project-tree-search" placeholder="{{ __('common.search') }}">
-                    </div>
-
                     <div style="space-y: 0.5rem;">
                         @forelse($projects as $projectItem)
                             <div class="tree-project-wrapper" data-title="{{ Str::lower($projectItem->name) }}" style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
@@ -2149,8 +2142,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
     const districtSelect = document.getElementById('district-filter');
     const neighborhoodSelect = document.getElementById('neighborhood-filter');
-    const projectTreeSearch = document.getElementById('project-tree-search');
-    const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
     const filterCard = document.getElementById('user-filter-panel');
     const collapseBtn = document.getElementById('filters-collapse-btn');
 
@@ -2187,16 +2178,6 @@ document.addEventListener('DOMContentLoaded', () => {
         collapseBtn.addEventListener('click', () => {
             const collapsed = !filterCard.classList.contains('collapsed');
             setCollapsedState(collapsed);
-        });
-    }
-
-    if (projectTreeSearch && projectWrappers.length) {
-        projectTreeSearch.addEventListener('input', function () {
-            const term = this.value.toLowerCase();
-            projectWrappers.forEach(wrapper => {
-                const title = wrapper.dataset.title || '';
-                wrapper.style.display = !term || title.includes(term) ? '' : 'none';
-            });
         });
     }
 });
@@ -2548,9 +2529,9 @@ if (!document.getElementById('message-styles')) {
 
         /* Mobile responsiveness */
         @media (max-width: 1024px) {
-            .d-grid[style*="grid-template-columns: 1fr 3fr"] {
-                grid-template-columns: 1fr;
-                gap: 1rem;
+            .main-content-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
             }
         }
 

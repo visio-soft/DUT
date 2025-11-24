@@ -738,13 +738,6 @@
                         </div>
                     </div>
 
-                    <div class="input-with-icon" style="margin-bottom: 1rem;">
-                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
-                        </svg>
-                        <input type="text" id="project-tree-search" placeholder="{{ __('common.search') }}">
-                    </div>
-
                     <div style="space-y: 0.5rem;">
                         @foreach($projects as $project)
                         <div class="tree-project-wrapper" data-title="{{ Str::lower($project->name) }}" style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
@@ -1060,7 +1053,6 @@
         const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
         const districtSelect = document.getElementById('district-filter');
         const neighborhoodSelect = document.getElementById('neighborhood-filter');
-        const projectTreeSearch = document.getElementById('project-tree-search');
         const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
         const filterCard = document.getElementById('user-filter-panel');
         const collapseBtn = document.getElementById('filters-collapse-btn');
@@ -1101,16 +1093,6 @@
             });
         }
 
-        if (projectTreeSearch && projectWrappers.length) {
-            projectTreeSearch.addEventListener('input', function () {
-                const term = this.value.toLowerCase();
-                projectWrappers.forEach(wrapper => {
-                    const title = wrapper.dataset.title || '';
-                    const shouldShow = !term || title.includes(term);
-                    wrapper.style.display = shouldShow ? '' : 'none';
-                });
-            });
-        }
     });
 </script>
 

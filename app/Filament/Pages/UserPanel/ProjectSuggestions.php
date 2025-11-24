@@ -7,6 +7,7 @@ use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class ProjectSuggestions
 {
@@ -16,6 +17,7 @@ class ProjectSuggestions
     public function show($id)
     {
         $request = request();
+        $search = Str::lower($request->string('search')->toString());
 
         $project = Project::with([
             'suggestions.likes',
@@ -30,10 +32,19 @@ class ProjectSuggestions
                 'projectGroups.category',
             ]);
 
-        if ($search = $request->string('search')->toString()) {
+        if ($search) {
             $projectsQuery->where(function (Builder $query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $likeTerm = "%{$search}%";
+                $query->whereRaw('LOWER(title) like ?', [$likeTerm])
+                    ->orWhereRaw('LOWER(description) like ?', [$likeTerm])
+                    ->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm) {
+                        $suggestionQuery->where(function (Builder $inner) use ($likeTerm) {
+                            $inner->whereRaw('LOWER(title) like ?', [$likeTerm])
+                                ->orWhereHas('createdBy', function (Builder $creatorQuery) use ($likeTerm) {
+                                    $creatorQuery->whereRaw('LOWER(name) like ?', [$likeTerm]);
+                                });
+                        });
+                    });
             });
         }
 
@@ -82,6 +93,17 @@ class ProjectSuggestions
         $projects = $projectsQuery
             ->orderByDesc('start_date')
             ->get();
+
+        if ($search) {
+            $filteredSuggestions = $project->suggestions->filter(function ($suggestion) use ($search) {
+                $titleMatches = Str::contains(Str::lower($suggestion->title), $search);
+                $creatorMatches = $suggestion->createdBy
+                    ? Str::contains(Str::lower($suggestion->createdBy->name), $search)
+                    : false;
+                return $titleMatches || $creatorMatches;
+            })->values();
+            $project->setRelation('suggestions', $filteredSuggestions);
+        }
 
         $statusOptions = collect(ProjectStatusEnum::cases())
             ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])

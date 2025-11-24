@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class UserProjects
 {
@@ -25,10 +26,19 @@ class UserProjects
                 'projectGroups.category',
             ]);
 
-        if ($search = $request->string('search')->toString()) {
+        if ($search = Str::lower($request->string('search')->toString())) {
             $projectsQuery->where(function (Builder $query) use ($search) {
-                $query->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                $likeTerm = "%{$search}%";
+                $query->whereRaw('LOWER(title) like ?', [$likeTerm])
+                    ->orWhereRaw('LOWER(description) like ?', [$likeTerm])
+                    ->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm) {
+                        $suggestionQuery->where(function (Builder $inner) use ($likeTerm) {
+                            $inner->whereRaw('LOWER(title) like ?', [$likeTerm])
+                                ->orWhereHas('createdBy', function (Builder $creatorQuery) use ($likeTerm) {
+                                    $creatorQuery->whereRaw('LOWER(name) like ?', [$likeTerm]);
+                                });
+                        });
+                    });
             });
         }
 
