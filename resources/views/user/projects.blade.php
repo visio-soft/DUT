@@ -316,6 +316,110 @@
             font-size: 0.8rem;
         }
     }
+
+    .filters-card {
+        background: #ffffff;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-xl);
+        padding: 1.5rem;
+        margin: 2rem auto 0;
+        max-width: 1400px;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .filter-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .filter-grid label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        margin-bottom: 0.35rem;
+        display: block;
+    }
+
+    .filter-grid input,
+    .filter-grid select {
+        width: 100%;
+        border-radius: 0.75rem;
+        border: 1px solid var(--gray-200);
+        padding: 0.65rem 0.85rem;
+        font-size: 0.9rem;
+        color: var(--gray-800);
+        background: var(--gray-50);
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .filter-grid input:focus,
+    .filter-grid select:focus {
+        border-color: var(--green-400);
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+        outline: none;
+        background: #fff;
+    }
+
+    .filters-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filters-actions button,
+    .filters-actions a {
+        border-radius: var(--radius-lg);
+        padding: 0.75rem 1.25rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .filters-actions button.apply-btn {
+        background: linear-gradient(135deg, var(--green-500), var(--green-600));
+        color: white;
+        box-shadow: 0 8px 24px rgba(34, 197, 94, 0.25);
+    }
+
+    .filters-actions button.apply-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 30px rgba(34, 197, 94, 0.35);
+    }
+
+    .filters-actions a.reset-btn {
+        background: var(--gray-100);
+        color: var(--gray-700);
+        text-decoration: none;
+    }
+
+    .filters-actions a.reset-btn:hover {
+        background: var(--gray-200);
+        color: var(--gray-900);
+    }
+
+    .filter-badges {
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.65rem;
+        border-radius: 999px;
+        background: var(--green-50);
+        color: var(--green-700);
+        font-size: 0.8rem;
+        border: 1px solid var(--green-200);
+    }
 </style>
 
     <div class="user-container">
@@ -399,8 +503,181 @@
     </div>
 </section>
 
+
 <div class="section-padding">
     <div class="projects-wide-container">
+        @php
+            $selectedDistrict = $filterValues['district'] ?? null;
+            $neighborhoodOptions = $selectedDistrict ? (config('istanbul_neighborhoods')[$selectedDistrict] ?? []) : [];
+            $activeFilters = collect($filterValues)->filter(fn ($value) => filled($value));
+            $activeFilterCount = $activeFilters->count();
+            $filterLabelMap = [
+                'search' => __('common.search'),
+                'status' => __('common.status'),
+                'category_id' => __('common.project_category'),
+                'creator_type' => __('common.creator_type'),
+                'district' => __('common.district'),
+                'neighborhood' => __('common.neighborhood'),
+                'start_date' => __('common.start_date'),
+                'end_date' => __('common.end_date'),
+                'min_budget' => __('common.min_budget'),
+                'max_budget' => __('common.max_budget'),
+            ];
+        @endphp
+
+        <div class="filters-toggle">
+            <button type="button"
+                    class="filters-toggle-button {{ $activeFilterCount ? 'active' : '' }}"
+                    data-target="user-filter-panel">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M4.5 8.25h15L13.5 15v5.25l-3-1.5V15L4.5 8.25z"/>
+                </svg>
+                <span>{{ __('common.filters_button') }}</span>
+                @if($activeFilterCount)
+                    <span class="filter-badge">{{ $activeFilterCount }}</span>
+                @endif
+                <svg class="toggle-arrow" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="user-filter-panel" class="filters-card {{ $activeFilterCount ? '' : 'hidden' }}">
+            <form method="GET" action="{{ route('user.projects') }}">
+                <div class="filter-grid">
+                    <div class="filter-field">
+                        <label for="search">{{ __('common.title') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                            </svg>
+                            <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="status">{{ __('common.status') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
+                            </svg>
+                            <select id="status" name="status">
+                                <option value="">{{ __('common.select_option') }}</option>
+                                @foreach($statusOptions as $value => $label)
+                                    <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="category_id">{{ __('common.project_category') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
+                            </svg>
+                            <select id="category_id" name="category_id">
+                                <option value="">{{ __('common.select_option') }}</option>
+                                @foreach($filterCategories as $category)
+                                    <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="creator_type">{{ __('common.creator_type') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0"/>
+                            </svg>
+                            <select id="creator_type" name="creator_type">
+                                <option value="">{{ __('common.select_option') }}</option>
+                                <option value="with_user" @selected(($filterValues['creator_type'] ?? '') === 'with_user')>{{ __('common.user_assigned') }}</option>
+                                <option value="not_assigned" @selected(($filterValues['creator_type'] ?? '') === 'not_assigned')>{{ __('common.not_assigned') }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="district-filter">{{ __('common.district') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
+                                <circle cx="12" cy="10.2" r="2.4"/>
+                            </svg>
+                            <select id="district-filter" name="district">
+                                <option value="">{{ __('common.select_option') }}</option>
+                                @foreach($districts as $district)
+                                    <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
+                            </svg>
+                            <select id="neighborhood-filter" name="neighborhood">
+                                <option value="">{{ __('common.select_option') }}</option>
+                                @foreach($neighborhoodOptions as $neighborhood)
+                                    <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="start_date">{{ __('common.start_date') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
+                            </svg>
+                            <input type="date" id="start_date" name="start_date" value="{{ $filterValues['start_date'] ?? '' }}">
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="end_date">{{ __('common.end_date') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
+                            </svg>
+                            <input type="date" id="end_date" name="end_date" value="{{ $filterValues['end_date'] ?? '' }}">
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="min_budget">{{ __('common.min_budget') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                            </svg>
+                            <input type="number" step="0.01" id="min_budget" name="min_budget" value="{{ $filterValues['min_budget'] ?? '' }}">
+                        </div>
+                    </div>
+                    <div class="filter-field">
+                        <label for="max_budget">{{ __('common.max_budget') }}</label>
+                        <div class="input-with-icon">
+                            <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
+                            </svg>
+                            <input type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="filters-actions">
+                    <button type="submit" class="apply-btn">{{ __('common.filters_button') }}</button>
+                    @if($activeFilters->isNotEmpty())
+                        <a href="{{ route('user.projects') }}" class="reset-btn">{{ __('common.clear') }}</a>
+                    @endif
+                </div>
+            </form>
+            @if($activeFilters->isNotEmpty())
+                <div class="filter-badges">
+                    @foreach($activeFilters as $key => $value)
+                        <span class="filter-badge">
+                            {{ $filterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}
+                        </span>
+                    @endforeach
+                </div>
+            @endif
+        </div>
 
         @if($projects->count() > 0)
         <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
@@ -431,9 +708,16 @@
                         </div>
                     </div>
 
+                    <div class="input-with-icon" style="margin-bottom: 1rem;">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                        </svg>
+                        <input type="text" id="project-tree-search" placeholder="{{ __('common.search') }}">
+                    </div>
+
                     <div style="space-y: 0.5rem;">
                         @foreach($projects as $project)
-                        <div style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
+                        <div class="tree-project-wrapper" data-title="{{ Str::lower($project->name) }}" style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
                             <!-- Project Node -->
                             <a href="{{ route('user.project.suggestions', $project->id) }}" class="tree-project"
                                  data-project-id="{{ $project->id }}"
@@ -477,9 +761,9 @@
                     @foreach($projects as $project)
                     <div id="project-{{ $project->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
                         <!-- Project Background Image -->
-                        @if($project->getFirstMediaUrl('project_files'))
+                        @if($project->getFirstMediaUrl('images'))
                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
-                            <img src="{{ $project->getFirstMediaUrl('project_files') }}"
+                            <img src="{{ $project->getFirstMediaUrl('images') }}"
                                  alt="{{ $project->name }}"
                                  style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.3);"
                                  onerror="this.style.display='none';">
@@ -556,16 +840,16 @@
                                     {{ $project->suggestions->count() }} {{ __('common.suggestion') }}
                                 </div>
 
-                                @if($project->end_datetime)
+                                @if($project->formatted_end_date)
                                 <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
                                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                     </svg>
-                                    {{ __('common.project_end') }}: {{ $project->end_datetime->format('d.m.Y H:i') }}
+                                    {{ __('common.project_end') }}: {{ $project->formatted_end_date }}
                                 </div>
                                 @endif
 
-                                @if($project->end_datetime)
+                                @if($project->getRemainingTime())
                                     @php
                                         $remainingTime = $project->getRemainingTime();
                                         $isExpired = $project->isExpired();
@@ -735,12 +1019,58 @@
             </div>
         </div>
         @endif
-    </div>
+</div>
 </div>
 
 
 
 <!-- JavaScript for interactions -->
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
+        const districtSelect = document.getElementById('district-filter');
+        const neighborhoodSelect = document.getElementById('neighborhood-filter');
+        const toggleButton = document.querySelector('.filters-toggle-button');
+        const toggleTargetId = toggleButton ? toggleButton.dataset.target : null;
+        const toggleTarget = toggleTargetId ? document.getElementById(toggleTargetId) : null;
+        const projectTreeSearch = document.getElementById('project-tree-search');
+        const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
+
+        if (districtSelect && neighborhoodSelect) {
+            districtSelect.addEventListener('change', function () {
+                const value = this.value;
+                const options = neighborhoodsMap[value] || [];
+                neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+
+                options.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option;
+                    opt.textContent = option;
+                    neighborhoodSelect.appendChild(opt);
+                });
+            });
+        }
+
+        if (toggleButton && toggleTarget) {
+            toggleButton.addEventListener('click', function () {
+                toggleTarget.classList.toggle('hidden');
+                this.classList.toggle('active');
+            });
+        }
+
+        if (projectTreeSearch && projectWrappers.length) {
+            projectTreeSearch.addEventListener('input', function () {
+                const term = this.value.toLowerCase();
+                projectWrappers.forEach(wrapper => {
+                    const title = wrapper.dataset.title || '';
+                    const shouldShow = !term || title.includes(term);
+                    wrapper.style.display = shouldShow ? '' : 'none';
+                });
+            });
+        }
+    });
+</script>
+
 <script>
 // Set up CSRF token for AJAX requests
 $.ajaxSetup({

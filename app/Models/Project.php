@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -171,5 +172,60 @@ class Project extends Model implements HasMedia
                     ?? \App\Enums\ProjectStatusEnum::DRAFT->value;
             }
         );
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->end_date instanceof Carbon
+            ? $this->end_date->isPast()
+            : false;
+    }
+
+    public function isUpcoming(): bool
+    {
+        return $this->start_date instanceof Carbon
+            ? $this->start_date->isFuture()
+            : false;
+    }
+
+    public function getRemainingTime(): ?array
+    {
+        if (! ($this->end_date instanceof Carbon) || $this->isExpired()) {
+            return null;
+        }
+
+        $diff = Carbon::now()->diff($this->end_date);
+
+        return [
+            'days' => $diff->days,
+            'hours' => $diff->h,
+            'minutes' => $diff->i,
+            'seconds' => $diff->s,
+            'formatted' => $this->formatRemainingTime($diff),
+        ];
+    }
+
+    protected function formatRemainingTime(\DateInterval $diff): string
+    {
+        if ($diff->days > 0) {
+            return "{$diff->days} gün {$diff->h} saat";
+        }
+
+        if ($diff->h > 0) {
+            return "{$diff->h} saat {$diff->i} dakika";
+        }
+
+        if ($diff->i > 0) {
+            return "{$diff->i} dakika";
+        }
+
+        return "{$diff->s} saniye";
+    }
+
+    public function getFormattedEndDateAttribute(): ?string
+    {
+        return $this->end_date instanceof Carbon
+            ? $this->end_date->format('d.m.Y H:i')
+            : null;
     }
 }

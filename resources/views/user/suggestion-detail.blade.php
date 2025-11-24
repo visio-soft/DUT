@@ -21,11 +21,11 @@
     <div class="user-container">
         <!-- Breadcrumb -->
         <nav class="breadcrumb" style="position: relative; z-index: 3;">
-            <a href="{{ route('user.index') }}">Ana Sayfa</a>
+            <a href="{{ route('user.index') }}">{{ __('common.home') }}</a>
             <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
             </svg>
-            <a href="{{ route('user.projects') }}">Projeler</a>
+            <a href="{{ route('user.projects') }}">{{ __('common.projects') }}</a>
             <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
             </svg>
@@ -71,7 +71,7 @@
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                 </svg>
-                                {{ $suggestion->estimated_duration }} gün
+                                {{ $suggestion->estimated_duration }} {{ __('common.days') }}
                             </div>
                             @endif
 
@@ -117,7 +117,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/>
                         </svg>
                         <div>
-                            <h4 style="font-weight: 500; color: var(--gray-900); margin-bottom: 0.25rem;">Konum</h4>
+                            <h4 style="font-weight: 500; color: var(--gray-900); margin-bottom: 0.25rem;">{{ __('common.location') }}</h4>
                             <p style="font-size: 0.875rem; color: var(--gray-600);">
                                 @if($suggestion->district)
                                     {{ $suggestion->district }}
@@ -146,7 +146,7 @@
                             <img id="suggestion-image" src="{{ $suggestion->getFirstMediaUrl('images') }}"
                                  alt="{{ $suggestion->title }}"
                                  style="width: 100%; height: 24rem; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: transform 0.3s ease;"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 24rem; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg);&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 4rem; height: 4rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 1rem;&quot;>Öneri Görseli</p></div></div>';"
+                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 24rem; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg);&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 4rem; height: 4rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 1rem;&quot;>{{ __('common.suggestion_image') }}</p></div></div>';"
                                  onmouseover="this.style.transform='scale(1.05)'; document.getElementById('zoom-overlay').style.opacity='1';"
                                  onmouseout="this.style.transform='scale(1)'; document.getElementById('zoom-overlay').style.opacity='0';">
 
@@ -229,7 +229,7 @@
                         @if($suggestion->approvedComments->count() > 0 || $userPendingComments->count() > 0)
                             <div class="d-flex" style="flex-direction: column; gap: 1.5rem;">
 
-                                {{-- Kullanıcının onaylanmamış yorumları --}}
+                                {{-- Pending user comments --}}
                                 @if($userPendingComments->count() > 0)
                                     @foreach($userPendingComments as $comment)
                                     <div class="comment-card" style="background: var(--yellow-50); border: 1px solid var(--yellow-200); position: relative;">
@@ -278,7 +278,7 @@
                                     @endforeach
                                 @endif
 
-                                {{-- Onaylanmış yorumlar --}}
+                                {{-- Approved comments --}}
                                 @foreach($suggestion->approvedComments as $comment)
                                 <div class="comment-card">
                                     <div class="comment-header">
@@ -355,7 +355,7 @@
                                                 </textarea>
                                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                                                     <small style="color: var(--gray-500); font-size: 0.75rem;">
-                                                        <span id="reply-char-count-{{ $comment->id }}">0</span>/1000 karakter
+                                                        <span id="reply-char-count-{{ $comment->id }}">0</span>/1000 {{ __('common.characters_label') }}
                                                     </small>
                                                 </div>
                                             </div>
@@ -456,17 +456,17 @@
                                         <textarea
                                             name="comment"
                                             id="comment-text"
-                                            placeholder="Öneriniz hakkındaki düşüncelerinizi buraya yazın..."
+                                            placeholder="{{ __('common.comment_placeholder') }}"
                                             required
                                             maxlength="1000"
                                             style="width: 100%; min-height: 120px; padding: 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md); font-family: inherit; font-size: 0.95rem; line-height: 1.5; resize: vertical; background: white;">
                                         </textarea>
                                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                                             <small style="color: var(--gray-500); font-size: 0.8rem;">
-                                                <span id="char-count">0</span>/1000 karakter
+                                                <span id="char-count">0</span>/1000 {{ __('common.characters_label') }}
                                             </small>
                                             <small style="color: var(--gray-500); font-size: 0.8rem;">
-                                                * Yorumlar onaylandıktan sonra görüntülenir
+                                                * {{ __('common.comments_visible_after_approval') }}
                                             </small>
                                         </div>
                                     </div>
@@ -565,7 +565,7 @@
 
                     <!-- Actions -->
                     <div class="d-flex" style="flex-direction: column; gap: 0.75rem;">
-                        <a href="{{ route('user.project.suggestions', $suggestion->category_id) }}"
+                        <a href="{{ route('user.project.suggestions', $suggestion->project_id ?? $suggestion->category_id) }}"
                            class="btn btn-secondary" style="justify-content: center;">
                             <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"/>
@@ -588,6 +588,9 @@
 </div>
 
 <script>
+const voteSwitchedMessageTemplate = @json(__('common.vote_switched_message'));
+const genericErrorMessage = @json(__('common.generic_error'));
+
 // Show expired message for expired projects
 function showExpiredMessage() {
     showMessage('{{ __('common.project_expired_no_like') }}', 'error');
@@ -665,7 +668,10 @@ function toggleLike(suggestionId) {
                 }
 
                 if (response.switched_from) {
-                    showMessage(`✓ Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`, 'success');
+                    const switchedMessage = voteSwitchedMessageTemplate
+                        .replace(':from', response.switched_from)
+                        .replace(':to', response.current_title);
+                    showMessage(switchedMessage, 'success');
                 } else {
                     showMessage('{{ __('common.suggestion_liked_success') }}', 'success');
                 }
@@ -682,7 +688,7 @@ function toggleLike(suggestionId) {
             }
         },
         error: function(xhr) {
-            let message = 'Bir hata oluştu.';
+            let message = genericErrorMessage;
             if (xhr.responseJSON && xhr.responseJSON.error) {
                 message = xhr.responseJSON.error;
             }
@@ -978,7 +984,7 @@ function handleImageClick(e) {
                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
-                    <span>Fareyi hareket ettir • Sürükle • Çık</span>
+                    <span>{{ __('common.drag_instruction') }}</span>
                 </div>
             `;
         }
@@ -993,7 +999,7 @@ function handleImageClick(e) {
                     <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"/>
                     </svg>
-                    <span>Yakınlaştırmak için resme tıklayın</span>
+                    <span>{{ __('common.zoom_instruction') }}</span>
                 </div>
             `;
         }
@@ -1506,13 +1512,13 @@ function toggleCommentLike(commentId) {
                 <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"/>
                 </svg>
-                <span>Yakınlaştırmak için resme tıklayın</span>
+                <span>{{ __('common.zoom_instruction') }}</span>
             </div>
         </div>
 
         <!-- Image Container -->
         <div id="image-container" style="width: 100%; height: 85%; display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: zoom-in; position: relative;">
-            <img id="modal-image" src="" alt="{{ $suggestion->title ?? 'Öneri Görseli' }}" style="max-width: 95%; max-height: 95%; width: auto; height: auto; object-fit: contain; border-radius: var(--radius-xl); box-shadow: 0 25px 80px rgba(0,0,0,0.7); transform: scale(0.95); transition: transform 0.4s ease; cursor: zoom-in;">
+            <img id="modal-image" src="" alt="{{ $suggestion->title ?? __('common.suggestion_image') }}" style="max-width: 95%; max-height: 95%; width: auto; height: auto; object-fit: contain; border-radius: var(--radius-xl); box-shadow: 0 25px 80px rgba(0,0,0,0.7); transform: scale(0.95); transition: transform 0.4s ease; cursor: zoom-in;">
         </div>
 
         <!-- Image Title -->
@@ -1521,7 +1527,7 @@ function toggleCommentLike(commentId) {
                 <svg style="width: 1.5rem; height: 1.5rem; color: #60a5fa;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.847a4.5 4.5 0 003.09 3.09L15.75 12l-2.847.813a4.5 4.5 0 00-3.09 3.09z"/>
                 </svg>
-                {{ $suggestion->title ?? 'Öneri Görseli' }}
+                {{ $suggestion->title ?? __('common.suggestion_image') }}
             </h3>
             @if($suggestion->category)
             <p style="color: rgba(255,255,255,0.8); font-size: 1rem; margin: 0.75rem 0 0 0; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">

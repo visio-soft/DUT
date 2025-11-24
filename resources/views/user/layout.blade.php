@@ -40,7 +40,8 @@
     <header class="user-header">
         <nav class="user-container">
             <div class="user-nav">
-                <div class="flex items-center">
+                <!-- Logo container -->
+                <div class="flex items-center flex-shrink-0">
                     <a href="{{ route('user.index') }}" class="user-logo-svg">
                         <svg class="logo" viewBox="0 0 191 44" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#DutLogo_clip0_1357_1541)">
@@ -91,9 +92,9 @@
                 </div>
 
                 <!-- Desktop navigation -->
-                <div class="hidden user-nav-links md:flex" style="justify-content: space-between; width: 100%;">
+                <div class="hidden user-nav-links md:flex">
                     <!-- Left navigation items -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
                         <a href="{{ route('user.index') }}"
                            class="user-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -111,7 +112,7 @@
                     </div>
 
                     <!-- Right side items -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
                         @auth
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 mr-2" style="color: #1ABF6B;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

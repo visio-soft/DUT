@@ -274,27 +274,62 @@
 
     .content-grid {
         display: grid;
-        grid-template-columns: 1fr 3fr;
-        gap: 2rem;
+        grid-template-columns: 280px 1fr;
+        gap: 1.5rem;
+        align-items: start;
+    }
+
+    @media (min-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 320px 1fr;
+            gap: 2rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .content-grid {
+            grid-template-columns: 340px 1fr;
+            gap: 2.5rem;
+        }
     }
 
     /* Sidebar Styles */
     .sidebar {
         position: sticky;
-        top: 2rem;
-        height: calc(100vh - 4rem);
+        top: 5.5rem;
+        height: calc(100vh - 7rem);
         overflow-y: auto;
         overflow-x: hidden;
-        background: white;
-        border: 1px solid var(--gray-200);
+        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        border: 1px solid var(--green-200);
         border-radius: var(--radius-lg);
-        padding: 1.5rem;
-        box-shadow: var(--shadow-sm);
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(26, 191, 107, 0.06);
+        transition: all 0.3s ease;
         /* Smooth scrolling for sidebar */
         scroll-behavior: smooth;
         /* Webkit scrollbar styling */
         scrollbar-width: thin;
-        scrollbar-color: var(--gray-300) transparent;
+        scrollbar-color: var(--green-300) transparent;
+        width: 100%;
+    }
+
+    @media (min-width: 1024px) {
+        .sidebar {
+            padding: 1.25rem;
+            border-radius: var(--radius-xl);
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .sidebar {
+            padding: 1.5rem;
+        }
+    }
+
+    .sidebar:hover {
+        box-shadow: 0 4px 12px rgba(26, 191, 107, 0.1);
+        border-color: var(--green-300);
     }
 
     /* Custom scrollbar for webkit browsers */
@@ -303,18 +338,21 @@
     }
 
     .sidebar::-webkit-scrollbar-track {
-        background: transparent;
+        background: var(--green-50);
         border-radius: 3px;
+        margin: 2px 0;
     }
 
     .sidebar::-webkit-scrollbar-thumb {
-        background: var(--gray-300);
+        background: linear-gradient(180deg, var(--green-300) 0%, var(--green-400) 100%);
         border-radius: 3px;
-        transition: background 0.2s;
+        transition: all 0.3s ease;
+        border: 1px solid var(--green-50);
     }
 
     .sidebar::-webkit-scrollbar-thumb:hover {
-        background: var(--gray-400);
+        background: linear-gradient(180deg, var(--green-400) 0%, var(--green-500) 100%);
+        border-color: var(--green-100);
     }
 
     .sidebar-header {
@@ -322,27 +360,63 @@
         align-items: center;
         margin-bottom: 1rem;
         gap: 0.5rem;
+        padding-bottom: 0.875rem;
+        border-bottom: 2px solid var(--green-100);
     }
 
     .sidebar-icon {
         width: 1.25rem;
         height: 1.25rem;
-        color: var(--blue-600);
+        color: var(--green-600);
+        flex-shrink: 0;
+    }
+
+    @media (min-width: 1280px) {
+        .sidebar-icon {
+            width: 1.375rem;
+            height: 1.375rem;
+        }
     }
 
     .sidebar-title {
-        font-size: 1.125rem;
-        font-weight: 600;
+        font-size: 0.9375rem;
+        font-weight: 700;
         color: var(--gray-900);
         margin: 0;
+        letter-spacing: -0.01em;
+    }
+
+    @media (min-width: 1024px) {
+        .sidebar-title {
+            font-size: 1rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .sidebar-title {
+            font-size: 1.0625rem;
+        }
     }
 
     .voting-info {
-        background: var(--green-50);
-        border: 1px solid var(--green-200);
+        background: linear-gradient(135deg, var(--green-50) 0%, var(--green-100) 100%);
+        border: 1px solid var(--green-300);
         border-radius: var(--radius-md);
         padding: 0.75rem;
         margin-bottom: 1rem;
+        box-shadow: 0 1px 4px rgba(26, 191, 107, 0.08);
+        transition: all 0.3s ease;
+    }
+
+    .voting-info:hover {
+        border-color: var(--green-400);
+        box-shadow: 0 2px 8px rgba(26, 191, 107, 0.12);
+    }
+
+    @media (min-width: 1280px) {
+        .voting-info {
+            padding: 0.875rem;
+        }
     }
 
     .voting-info-content {
@@ -359,91 +433,217 @@
         flex-shrink: 0;
     }
 
+    @media (min-width: 1280px) {
+        .voting-info-icon {
+            width: 1.125rem;
+            height: 1.125rem;
+        }
+    }
+
     .voting-info-text {
         font-size: 0.75rem;
-        color: var(--green-700);
+        color: var(--green-800);
         margin: 0;
-        line-height: 1.4;
+        line-height: 1.5;
         font-weight: 500;
+    }
+
+    @media (min-width: 1024px) {
+        .voting-info-text {
+            font-size: 0.8125rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .voting-info-text {
+            font-size: 0.875rem;
+        }
     }
 
     /* Table Header */
     .table-header {
         display: grid;
-        grid-template-columns: 2fr 80px 80px;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        background: var(--gray-100);
+        grid-template-columns: 1fr 50px 50px;
+        gap: 0.375rem;
+        padding: 0.625rem 0.75rem;
+        background: linear-gradient(135deg, var(--green-100) 0%, var(--green-50) 100%);
+        border: 1px solid var(--green-200);
         border-radius: var(--radius-md);
         margin-bottom: 0.5rem;
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: var(--gray-700);
+        font-size: 0.6875rem;
+        font-weight: 700;
+        color: var(--green-800);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+
+    @media (min-width: 1024px) {
+        .table-header {
+            grid-template-columns: 1fr 55px 55px;
+            padding: 0.75rem 0.875rem;
+            font-size: 0.75rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .table-header {
+            grid-template-columns: 1fr 60px 60px;
+            font-size: 0.8125rem;
+        }
     }
 
     .table-header-cell {
         text-align: left;
+        display: flex;
+        align-items: center;
     }
 
     .table-header-cell.center {
         text-align: center;
+        justify-content: center;
     }
 
     /* Suggestions List */
     .suggestions-list {
         overflow-y: visible;
-        border: 1px solid var(--gray-200);
+        border: 1px solid var(--green-200);
         border-radius: var(--radius-md);
+        background: white;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
     }
 
     .suggestion-item {
         display: grid;
-        grid-template-columns: 2fr 80px 80px;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        border-bottom: 1px solid var(--gray-200);
+        grid-template-columns: 1fr 50px 50px;
+        gap: 0.375rem;
+        padding: 0.625rem 0.75rem;
+        border-bottom: 1px solid var(--gray-100);
         background: white;
-        transition: all 0.2s;
+        transition: all 0.25s ease;
         cursor: pointer;
+        position: relative;
+    }
+
+    @media (min-width: 1024px) {
+        .suggestion-item {
+            grid-template-columns: 1fr 55px 55px;
+            padding: 0.75rem 0.875rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .suggestion-item {
+            grid-template-columns: 1fr 60px 60px;
+            padding: 0.75rem 0.875rem;
+        }
+    }
+
+    .suggestion-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 0;
+        background: linear-gradient(180deg, var(--green-500) 0%, var(--green-600) 100%);
+        transition: width 0.25s ease;
+        border-radius: var(--radius-md) 0 0 var(--radius-md);
     }
 
     .suggestion-item:hover {
-        background: var(--blue-50);
-        border-left: 3px solid var(--blue-500);
-        padding-left: calc(0.75rem - 3px);
+        background: linear-gradient(90deg, var(--green-50) 0%, white 100%);
+        transform: translateX(1px);
+    }
+
+    .suggestion-item:hover::before {
+        width: 3px;
     }
 
     .suggestion-item.active {
-        background: var(--blue-50);
-        border-left: 3px solid var(--blue-600);
-        padding-left: calc(0.75rem - 3px);
+        background: linear-gradient(90deg, var(--green-100) 0%, var(--green-50) 100%);
+        border-color: var(--green-200);
+    }
+
+    .suggestion-item.active::before {
+        width: 3px;
     }
 
     .suggestion-item:last-child {
         border-bottom: none;
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+    }
+
+    .suggestion-item:first-child {
+        border-radius: var(--radius-md) var(--radius-md) 0 0;
     }
 
     .suggestion-name {
         min-width: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .suggestion-info {
+        min-width: 0;
+        position: relative;
+        z-index: 1;
     }
 
     .suggestion-title {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         font-weight: 600;
         color: var(--gray-900);
         margin-bottom: 0.25rem;
-        line-height: 1.2;
+        line-height: 1.3;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        transition: color 0.2s ease;
+    }
+
+    @media (min-width: 1024px) {
+        .suggestion-title {
+            font-size: 0.8125rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .suggestion-title {
+            font-size: 0.875rem;
+        }
+    }
+
+    .suggestion-item:hover .suggestion-title,
+    .suggestion-item.active .suggestion-title {
+        color: var(--green-700);
     }
 
     .suggestion-author {
-        font-size: 0.75rem;
+        font-size: 0.625rem;
         color: var(--gray-500);
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    @media (min-width: 1024px) {
+        .suggestion-author {
+            font-size: 0.6875rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .suggestion-author {
+            font-size: 0.75rem;
+        }
+    }
+
+    .suggestion-author::before {
+        content: '👤';
+        font-size: 0.7em;
     }
 
     .suggestion-stat {
@@ -451,44 +651,92 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 0.25rem;
+        gap: 0.125rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    @media (min-width: 1024px) {
+        .suggestion-stat {
+            font-size: 0.8125rem;
+            gap: 0.25rem;
+        }
+    }
+
+    @media (min-width: 1280px) {
+        .suggestion-stat {
+            font-size: 0.875rem;
+        }
     }
 
     .suggestion-stat.liked {
         color: var(--red-500);
-        font-weight: 600;
+    }
+
+    .suggestion-stat.liked:hover {
+        color: var(--red-600);
     }
 
     .suggestion-stat.normal {
         color: var(--gray-600);
-        font-weight: 500;
     }
 
     .suggestion-stat.comments {
         color: var(--blue-600);
-        font-weight: 500;
+    }
+
+    .suggestion-stat.comments:hover {
+        color: var(--blue-700);
     }
 
     /* Suggestion Cards */
     .suggestions-container {
         display: flex;
         flex-direction: column;
-        gap: 2rem;
+        gap: 1.75rem;
+    }
+
+    @media (min-width: 768px) {
+        .suggestions-container {
+            gap: 2rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .suggestions-container {
+            gap: 2.5rem;
+        }
     }
 
     .suggestion-card {
         overflow: hidden;
         position: relative;
-        min-height: 400px;
+        min-height: 350px;
         border-radius: var(--radius-xl);
-        box-shadow: var(--shadow-lg);
-        background: var(--gray-100);
-        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        background: var(--gray-50);
+        transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        border: 1px solid var(--gray-200);
+    }
+
+    @media (min-width: 768px) {
+        .suggestion-card {
+            min-height: 380px;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .suggestion-card {
+            min-height: 400px;
+        }
     }
 
     .suggestion-card:hover {
-        transform: translateY(-4px);
-        box-shadow: var(--shadow-xl);
+        transform: translateY(-6px) scale(1.01);
+        box-shadow: 0 12px 28px rgba(26, 191, 107, 0.15);
+        border-color: var(--green-200);
     }
 
     /* Card Background */
@@ -837,11 +1085,18 @@
 
     /* Responsive Design */
     @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 260px 1fr;
+            gap: 1.25rem;
+        }
+
         .sidebar {
             position: static;
             height: auto;
             max-height: 60vh;
             overflow-y: auto;
+            margin-bottom: 1.5rem;
+            top: 0;
         }
     }
 
@@ -851,7 +1106,11 @@
         }
 
         .project-title {
-            font-size: 2rem;
+            font-size: 1.75rem;
+        }
+
+        .project-subtitle {
+            font-size: 1rem;
         }
 
         .header-title-wrapper {
@@ -870,27 +1129,28 @@
         }
 
         .stats-title {
-            font-size: 1.25rem;
+            font-size: 1.125rem;
         }
 
         .stats-back-btn {
             align-self: center;
-            padding: 0.625rem 1rem;
-            font-size: 0.8rem;
+            padding: 0.625rem 1.125rem;
+            font-size: 0.8125rem;
         }
 
         .stats-container {
             grid-template-columns: 1fr;
             gap: 1rem;
-            max-width: 400px;
+            max-width: 420px;
+            margin: 0 auto;
         }
 
         .stat-card {
-            padding: 1.5rem 1rem;
+            padding: 1.5rem 1.25rem;
         }
 
         .stat-number {
-            font-size: 2.25rem;
+            font-size: 2rem;
         }
 
         .stat-label {
@@ -898,42 +1158,28 @@
         }
 
         .content-grid {
-            grid-template-columns: 280px 1fr;
-            gap: 1rem;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
         }
 
         .sidebar {
             position: static;
             max-height: 50vh;
+            padding: 1rem;
+            border-radius: var(--radius-md);
         }
 
-        .sidebar-title {
-            font-size: 1rem;
+        .sidebar-header {
+            margin-bottom: 0.875rem;
+            padding-bottom: 0.75rem;
         }
 
         .suggestions-list {
-            max-height: 50vh;
-        }
-
-        .table-header {
-            font-size: 0.7rem;
-            padding: 0.5rem;
-        }
-
-        .suggestion-item {
-            padding: 0.5rem;
-        }
-
-        .suggestion-title {
-            font-size: 0.8rem;
-        }
-
-        .suggestion-author {
-            font-size: 0.7rem;
+            max-height: 40vh;
         }
 
         .card-content {
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
 
         .card-title {
@@ -955,7 +1201,7 @@
 
     @media (max-width: 640px) {
         .user-container {
-            padding: 0 1rem !important;
+            padding: 0 0.875rem !important;
         }
 
         .stats-section {
@@ -964,11 +1210,11 @@
 
         .stats-header {
             padding: 0 0.5rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .stats-title {
-            font-size: 1.125rem;
+            font-size: 1rem;
         }
 
         .stats-back-btn {
@@ -977,43 +1223,65 @@
         }
 
         .stats-back-btn svg {
-            width: 1rem;
-            height: 1rem;
+            width: 0.875rem;
+            height: 0.875rem;
         }
 
         .stats-container {
             padding: 0 0.5rem;
+            gap: 0.875rem;
         }
 
         .stat-card {
-            padding: 1.25rem 1rem;
+            padding: 1.125rem 0.875rem;
+            border-radius: var(--radius-lg);
         }
 
         .stat-icon {
-            padding: 0.875rem;
+            padding: 0.75rem;
         }
 
         .stat-icon svg {
-            width: 2rem;
-            height: 2rem;
+            width: 1.75rem;
+            height: 1.75rem;
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 1.75rem;
         }
 
         .stat-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .content-grid {
             grid-template-columns: 1fr !important;
-            gap: 1rem !important;
+            gap: 1.25rem !important;
         }
 
         .sidebar {
             position: static;
             order: 2;
+            max-height: 45vh;
+            padding: 0.875rem;
+        }
+
+        .sidebar-header {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.625rem;
+        }
+
+        .sidebar-title {
+            font-size: 0.875rem;
+        }
+
+        .voting-info {
+            padding: 0.625rem;
+            margin-bottom: 0.875rem;
+        }
+
+        .voting-info-text {
+            font-size: 0.6875rem;
         }
 
         .suggestions-container {
@@ -1021,12 +1289,70 @@
         }
 
         .suggestion-item {
-            grid-template-columns: 1fr 60px 60px;
-            font-size: 0.8rem;
+            grid-template-columns: 1fr 45px 45px;
+            padding: 0.5rem 0.625rem;
         }
 
         .table-header {
-            grid-template-columns: 1fr 60px 60px;
+            grid-template-columns: 1fr 45px 45px;
+            padding: 0.5rem 0.625rem;
+            font-size: 0.625rem;
+        }
+
+        .suggestion-title {
+            font-size: 0.6875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .suggestion-author {
+            font-size: 0.5625rem;
+        }
+
+        .suggestion-stat {
+            font-size: 0.6875rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .project-title {
+            font-size: 1.5rem;
+        }
+
+        .project-subtitle {
+            font-size: 0.9375rem;
+        }
+
+        .sidebar {
+            padding: 0.75rem;
+            max-height: 40vh;
+        }
+
+        .sidebar-header {
+            margin-bottom: 0.625rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .suggestion-item {
+            grid-template-columns: 1fr 40px 40px;
+            padding: 0.5rem;
+        }
+
+        .table-header {
+            grid-template-columns: 1fr 40px 40px;
+            padding: 0.5rem;
+            font-size: 0.5625rem;
+        }
+
+        .suggestion-title {
+            font-size: 0.625rem;
+        }
+
+        .suggestion-author {
+            font-size: 0.5rem;
+        }
+
+        .suggestion-stat {
+            font-size: 0.625rem;
         }
     }
 
@@ -1176,7 +1502,7 @@
             @endif
 
             <!-- Project Timing Info -->
-            @if($project->end_datetime)
+            @if($project->formatted_end_date || $project->getRemainingTime())
                 @php
                     $remainingTime = $project->getRemainingTime();
                     $isExpired = $project->isExpired();
@@ -1188,9 +1514,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                             </svg>
                             <div style="text-align: left;">
-                                <div style="font-size: 0.875rem; color: {{ $isExpired ? 'var(--red-700)' : 'var(--green-700)' }}; font-weight: 500;">
-                                    {{ __('common.project_end') }}: {{ $project->end_datetime->format('d.m.Y H:i') }}
-                                </div>
+                                @if($project->formatted_end_date)
+                                    <div style="font-size: 0.875rem; color: {{ $isExpired ? 'var(--red-700)' : 'var(--green-700)' }}; font-weight: 500;">
+                                        {{ __('common.project_end') }}: {{ $project->formatted_end_date }}
+                                    </div>
+                                @endif
                                 <div style="font-size: 1rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }}; font-weight: 700;">
                                     @if($isExpired)
                                         {{ __('common.expired_voting_disabled') }}
@@ -1211,70 +1539,80 @@
 <div class="section-padding">
     <div class="user-container">
         @if($project->suggestions->count() > 0)
-        <div class="d-grid" style="grid-template-columns: 1fr 3fr; gap: 2rem;">
-            <!-- Sol Taraf: Suggestion Tree View -->
-            <div>
-                <div class="tree-view">
-                    <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                        <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+        <div class="content-grid">
+            <!-- Sol Taraf: Suggestion Tree View (Sidebar) -->
+            <div class="sidebar">
+                <div class="sidebar-header">
+                    <svg class="sidebar-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                    </svg>
+                    <h3 class="sidebar-title">{{ __('common.suggestion_list') }}</h3>
+                </div>
+
+                <div class="input-with-icon" style="margin-bottom: 0.75rem;">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                    </svg>
+                    <input type="text" id="suggestion-search" placeholder="{{ __('common.search') }}">
+                </div>
+
+                <!-- Info about voting system -->
+                <div style="background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 0.625rem; margin-bottom: 0.875rem;">
+                    <div style="display: flex; align-items: start; gap: 0.375rem;">
+                        <svg style="width: 0.875rem; height: 0.875rem; color: var(--green-600); margin-top: 0.125rem; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
                         </svg>
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.suggestion_list') }}</h3>
-                    </div>
-
-                    <!-- Info about voting system -->
-                    <div style="background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
-                        <div style="display: flex; align-items: start; gap: 0.5rem;">
-                            <svg style="width: 1rem; height: 1rem; color: var(--green-600); margin-top: 0.125rem; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>
-                            </svg>
-                            <div>
-                                <p style="font-size: 0.75rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
-                                    {{ __('common.voting_system_info') }}
-                                </p>
-                                <p style="font-size: 0.7rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
-                                    {{ __('common.voting_system_change_info') }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="space-y: 0.5rem;">
-                        <!-- Project Node -->
-                        <div style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
-                            <div class="tree-project" style="display: flex; align-items: center; padding: 0.5rem; cursor: pointer; border-radius: var(--radius-md); transition: all 0.2s;">
-                                <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
-                                </svg>
-                                <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900);">{{ $project->name }}</span>
-                                <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $project->suggestions->count() }})</span>
-                            </div>
-
-                            <!-- Suggestions -->
-                            <div class="tree-suggestions" style="margin-left: 1rem; margin-top: 0.5rem;">
-                                @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
-                                <div class="tree-suggestion" style="display: flex; align-items: center; padding: 0.375rem 0.5rem; margin-bottom: 0.25rem; cursor: pointer; border-radius: var(--radius-sm); transition: all 0.2s; font-size: 0.8rem;"
-                                     onclick="scrollToSuggestion({{ $suggestion->id }})">
-                                    <svg style="width: 0.75rem; height: 0.75rem; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                                    </svg>
-                                    <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($suggestion->title, 20) }}</span>
-                                    <span style="margin-left: auto; display: flex; align-items: center; gap: 0.25rem;">
-                                        <svg style="width: 0.75rem; height: 0.75rem; color: var(--red-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                        </svg>
-                                        <span class="sidebar-like-count">{{ $suggestion->likes->count() }}</span>
-                                    </span>
-                                </div>
-                                @endforeach
-                            </div>
+                        <div>
+                            <p style="font-size: 0.6875rem; color: var(--green-700); margin: 0; line-height: 1.4; font-weight: 500;">
+                                {{ __('common.voting_system_info') }}
+                            </p>
+                            <p style="font-size: 0.625rem; color: var(--green-600); margin: 0.25rem 0 0; line-height: 1.3;">
+                                {{ __('common.voting_system_change_info') }}
+                            </p>
                         </div>
                     </div>
                 </div>
+
+                <div class="suggestions-list">
+                    <!-- Project Node -->
+                    <div class="table-header">
+                        <div class="suggestion-title">{{ $project->name }}</div>
+                        <div class="suggestion-likes" style="text-align: center;">
+                            <svg style="width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
+                            </svg>
+                            <span style="font-size: 0.625rem;">Beğeni</span>
+                        </div>
+                        <div class="suggestion-comments" style="text-align: center;">
+                            <svg style="width: 0.875rem; height: 0.875rem; display: inline-block; vertical-align: middle; margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
+                            </svg>
+                            <span style="font-size: 0.625rem;">Yorum</span>
+                        </div>
+                    </div>
+
+                    <!-- Suggestions -->
+                    @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
+                    <div class="suggestion-item" data-title="{{ Str::lower($suggestion->title) }}" onclick="scrollToSuggestion({{ $suggestion->id }})">
+                        <div class="suggestion-info">
+                            <div class="suggestion-title">{{ Str::limit($suggestion->title, 35) }}</div>
+                            @if($suggestion->createdBy)
+                            <div class="suggestion-author">{{ $suggestion->createdBy->name }}</div>
+                            @endif
+                        </div>
+                        <div class="suggestion-stat">
+                            <span class="sidebar-like-count">{{ $suggestion->likes->count() }}</span>
+                        </div>
+                        <div class="suggestion-stat">
+                            {{ $suggestion->comments->count() }}
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             </div>
 
-            <!-- Sağ Taraf: Suggestion Cards -->
-            <div>
+            <!-- Sağ Taraf: Suggestion Cards (Suggestions Container) -->
+            <div class="suggestions-container">
                 <div class="d-flex" style="flex-direction: column; gap: 2rem;">
                     @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
                     <div id="suggestion-{{ $suggestion->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
@@ -1388,7 +1726,6 @@
                     @endforeach
                 </div>
             </div>
-            </div>
         </div>
         @else
         <!-- Empty State -->
@@ -1419,6 +1756,21 @@
 
 <!-- JavaScript for interactions -->
 <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const suggestionSearchInput = document.getElementById('suggestion-search');
+    const sidebarSuggestions = document.querySelectorAll('.suggestion-item');
+
+    if (suggestionSearchInput && sidebarSuggestions.length) {
+        suggestionSearchInput.addEventListener('input', function () {
+            const term = this.value.toLowerCase();
+            sidebarSuggestions.forEach(item => {
+                const title = item.dataset.title || '';
+                item.style.display = !term || title.includes(term) ? '' : 'none';
+            });
+        });
+    }
+});
+
 // Set up CSRF token for AJAX requests
 $.ajaxSetup({
     headers: {

@@ -20,11 +20,11 @@
                         {{ $suggestion->title }}
                     </h1>
                     <p class="text-gray-600 mt-1">
-                        <a href="{{ route('public.projects.index') }}" class="hover:text-blue-600">Proje Kategorileri</a>
+                        <a href="{{ route('public.projects.index') }}" class="hover:text-blue-600">{{ __('common.project_categories') }}</a>
                         <span class="mx-2">/</span>
-                        <span class="text-blue-600">{{ $suggestion->category->name ?? 'Kategorisiz' }}</span>
+                        <span class="text-blue-600">{{ $suggestion->category->name ?? __('common.uncategorized') }}</span>
                         <span class="mx-2">/</span>
-                        <span class="text-green-600">Öneri</span>
+                        <span class="text-green-600">{{ __('common.suggestion') }}</span>
                     </p>
                 </div>
             </div>
@@ -62,8 +62,8 @@
                                 <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                <span class="text-sm text-gray-600">Tahmini Süre:</span>
-                                <span class="font-medium">{{ $suggestion->estimated_duration }} gün</span>
+                                <span class="text-sm text-gray-600">{{ __('common.estimated_duration') }}:</span>
+                                <span class="font-medium">{{ $suggestion->estimated_duration }} {{ __('common.days') }}</span>
                             </div>
                         @endif
 
@@ -73,7 +73,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                 </svg>
-                                <span class="text-sm text-gray-600">Konum:</span>
+                                <span class="text-sm text-gray-600">{{ __('common.location') }}:</span>
                                 <span class="font-medium">
                                     {{ $suggestion->city }}
                                     @if($suggestion->district), {{ $suggestion->district }}@endif
@@ -99,7 +99,7 @@
                             <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            Bağlı Proje
+                            {{ __('common.related_project') }}
                         </h3>
 
                         <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
@@ -158,7 +158,7 @@
                         <svg class="w-6 h-6 mr-2 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
-                        Yorum Ekle
+                        {{ __('common.add_comment') }}
                     </h3>
 
                     <!-- Success/Error Messages -->
@@ -193,14 +193,14 @@
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label for="user_name" class="block text-sm font-medium text-gray-700 mb-2">
-                                        İsminiz <span class="text-red-500">*</span>
+                                        {{ __('common.your_name') }} <span class="text-red-500">*</span>
                                     </label>
                                     <input type="text"
                                            id="user_name"
                                            name="user_name"
                                            value="{{ old('user_name') }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('user_name') border-red-500 @enderror"
-                                           placeholder="Adınız ve soyadınız"
+                                           placeholder="{{ __('common.name_surname_placeholder') }}"
                                            required>
                                     @error('user_name')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -209,14 +209,14 @@
 
                                 <div>
                                     <label for="user_email" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Email Adresiniz
+                                        {{ __('common.your_email') }}
                                     </label>
                                     <input type="email"
                                            id="user_email"
                                            name="user_email"
                                            value="{{ old('user_email') }}"
                                            class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('user_email') border-red-500 @enderror"
-                                           placeholder="email@example.com (isteğe bağlı)">
+                                           placeholder="{{ __('common.email_optional_placeholder') }}">
                                     @error('user_email')
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
@@ -230,7 +230,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                                     </svg>
                                     <span class="text-sm text-blue-800">
-                                        <strong>{{ Auth::user()->name }}</strong> olarak yorum yapıyorsunuz
+                                        {!! __('common.commenting_as', ['name' => '<strong>' . e(Auth::user()->name) . '</strong>']) !!}
                                     </span>
                                 </div>
                             </div>
@@ -239,19 +239,19 @@
                         <!-- Comment Textarea -->
                         <div>
                             <label for="comment" class="block text-sm font-medium text-gray-700 mb-2">
-                                Yorumunuz <span class="text-red-500">*</span>
+                                {{ __('common.your_comment') }} <span class="text-red-500">*</span>
                             </label>
                             <textarea id="comment"
                                       name="comment"
                                       rows="4"
                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent @error('comment') border-red-500 @enderror"
-                                      placeholder="Öneriniz hakkındaki düşüncelerinizi paylaşın..."
+                                      placeholder="{{ __('common.comment_placeholder') }}"
                                       required>{{ old('comment') }}</textarea>
                             @error('comment')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                             <p class="mt-1 text-xs text-gray-500">
-                                Yorumunuz moderasyon sonrası yayınlanacaktır.
+                                {{ __('common.comment_moderation_notice') }}
                             </p>
                         </div>
 
@@ -261,14 +261,14 @@
                                 <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                Tüm yorumlar onaylandıktan sonra görünür olur
+                                {{ __('common.comments_visible_after_approval') }}
                             </div>
                             <button type="submit"
                                     class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                                 </svg>
-                                Yorum Gönder
+                                {{ __('common.submit_comment') }}
                             </button>
                         </div>
                     </form>
@@ -279,19 +279,19 @@
             <div class="lg:col-span-1">
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-4">
                     <!-- Suggestion Info -->
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Öneri Bilgileri</h3>
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ __('common.suggestion_information') }}</h3>
 
                     <div class="space-y-4">
                         <!-- Category -->
                         <div>
-                            <span class="text-sm font-medium text-gray-500">Kategori</span>
-                            <p class="text-sm text-gray-900 mt-1">{{ $suggestion->category->name ?? 'Kategorisiz' }}</p>
+                            <span class="text-sm font-medium text-gray-500">{{ __('common.category') }}</span>
+                            <p class="text-sm text-gray-900 mt-1">{{ $suggestion->category->name ?? __('common.uncategorized') }}</p>
                         </div>
 
                         <!-- Creator -->
                         @if($suggestion->createdBy)
                         <div>
-                            <span class="text-sm font-medium text-gray-500">Öneren Kişi</span>
+                            <span class="text-sm font-medium text-gray-500">{{ __('common.suggestion_creator') }}</span>
                             <p class="text-sm text-gray-900 mt-1">{{ $suggestion->createdBy->name }}</p>
                         </div>
                         @endif
@@ -299,7 +299,7 @@
                         @if($suggestion->project)
                             <!-- Related Project -->
                             <div>
-                                <span class="text-sm font-medium text-gray-500">Bağlı Proje</span>
+                                <span class="text-sm font-medium text-gray-500">{{ __('common.related_project') }}</span>
                                 <p class="text-sm text-gray-900 mt-1">
                                     <a href="{{ route('public.projects.show', $suggestion->project->id) }}"
                                        class="text-blue-600 hover:text-blue-800">
@@ -311,27 +311,27 @@
 
                         <!-- Stats -->
                         <div class="pt-4 border-t border-gray-200">
-                            <span class="text-sm font-medium text-gray-500">İstatistikler</span>
+                            <span class="text-sm font-medium text-gray-500">{{ __('common.statistics') }}</span>
                             <div class="text-sm text-gray-900 mt-2 space-y-1">
-                                <p>{{ $suggestion->likes_count }} beğeni</p>
-                                <p>{{ $suggestion->approvedComments->count() }} yorum</p>
-                                <p>{{ $suggestion->created_at->diffForHumans() }} oluşturuldu</p>
+                                <p>{{ $suggestion->likes_count }} {{ __('common.likes') }}</p>
+                                <p>{{ $suggestion->approvedComments->count() }} {{ __('common.comments') }}</p>
+                                <p>{{ __('common.created_time_ago', ['time' => $suggestion->created_at->diffForHumans()]) }}</p>
                             </div>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="pt-4 border-t border-gray-200 space-y-2">
                             <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
-                                Öneriyi Beğen
+                                {{ __('common.like_suggestion') }}
                             </button>
                             <button onclick="document.getElementById('comment').focus(); document.getElementById('comment').scrollIntoView({behavior: 'smooth'});"
                                     class="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 transition-colors">
-                                Yorum Yap
+                                {{ __('common.write_your_comment') }}
                             </button>
                             @if($suggestion->project)
                                 <a href="{{ route('public.projects.show', $suggestion->project->id) }}"
                                    class="block w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors text-center">
-                                    Projeyi Görüntüle
+                                    {{ __('common.view_project') }}
                                 </a>
                             @endif
                         </div>
@@ -347,22 +347,22 @@
 document.addEventListener('DOMContentLoaded', function() {
     const commentTextarea = document.getElementById('comment');
     const form = commentTextarea?.closest('form');
+    const maxCharacters = 1000;
+    const charactersLabel = @json(__('common.characters_label'));
 
     if (commentTextarea) {
-        // Add character counter
         const characterCounter = document.createElement('div');
         characterCounter.className = 'text-xs text-gray-500 mt-1';
-        characterCounter.textContent = '0/1000 karakter';
+        characterCounter.textContent = `0/${maxCharacters} ${charactersLabel}`;
         commentTextarea.parentNode.insertBefore(characterCounter, commentTextarea.nextSibling.nextSibling);
 
-        // Update character counter
         commentTextarea.addEventListener('input', function() {
             const length = this.value.length;
-            characterCounter.textContent = `${length}/1000 karakter`;
+            characterCounter.textContent = `${length}/${maxCharacters} ${charactersLabel}`;
 
-            if (length > 1000) {
+            if (length > maxCharacters) {
                 characterCounter.className = 'text-xs text-red-500 mt-1';
-            } else if (length > 900) {
+            } else if (length > maxCharacters * 0.9) {
                 characterCounter.className = 'text-xs text-yellow-500 mt-1';
             } else {
                 characterCounter.className = 'text-xs text-gray-500 mt-1';
@@ -370,22 +370,19 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Form submission handling
     if (form) {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function() {
             const submitButton = form.querySelector('button[type="submit"]');
             const originalText = submitButton.innerHTML;
 
-            // Disable button and show loading
             submitButton.disabled = true;
             submitButton.innerHTML = `
                 <svg class="w-4 h-4 inline mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                 </svg>
-                Gönderiliyor...
+                {{ __('common.sending') }}
             `;
 
-            // Re-enable after 3 seconds in case of issues
             setTimeout(() => {
                 submitButton.disabled = false;
                 submitButton.innerHTML = originalText;

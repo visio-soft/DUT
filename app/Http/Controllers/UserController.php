@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProjectStatusEnum;
 use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
+use App\Models\Project;
 use App\Models\Suggestion;
 use App\Models\SuggestionComment;
 use App\Models\SuggestionCommentLike;
 use App\Models\SuggestionLike;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -18,11 +21,11 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Get random categories (projects)
-        $randomProjects = Category::with(['suggestions' => function ($query) {
-            $query->limit(3); // Max 3 suggestions per category
-        }])
-            ->has('suggestions') // Only categories with suggestions
+        $randomProjects = Project::query()
+            ->with(['suggestions' => function ($query) {
+                $query->with('likes')->latest()->limit(3);
+            }])
+            ->withCount('suggestions')
             ->inRandomOrder()
             ->limit(3)
             ->get();
@@ -35,19 +38,93 @@ class UserController extends Controller
     /**
      * Projeler sayfası - Tüm projeler ve öneriler
      */
-    public function projects()
+    public function projects(Request $request)
     {
-        // Get all categories (projects) with their suggestions
-        $projects = Category::with([
-            'suggestions.likes',
-            'suggestions.createdBy',
-        ])
-            ->has('suggestions') // Only categories with suggestions
+        $projectsQuery = Project::query()
+            ->with([
+                'suggestions.likes',
+                'suggestions.createdBy',
+                'projectGroups.category',
+            ]);
+
+        if ($search = $request->string('search')->toString()) {
+            $projectsQuery->where(function (Builder $query) use ($search) {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status = $request->input('status')) {
+            $projectsQuery->where('status', $status);
+        }
+
+        if ($categoryId = $request->input('category_id')) {
+            $projectsQuery->whereHas('projectGroups', function (Builder $query) use ($categoryId) {
+                $query->where('category_id', $categoryId);
+            });
+        }
+
+        if ($creatorType = $request->input('creator_type')) {
+            if ($creatorType === 'with_user') {
+                $projectsQuery->whereNotNull('created_by_id');
+            } elseif ($creatorType === 'not_assigned') {
+                $projectsQuery->whereNull('created_by_id');
+            }
+        }
+
+        if ($district = $request->input('district')) {
+            $projectsQuery->where('district', $district);
+        }
+
+        if ($neighborhood = $request->input('neighborhood')) {
+            $projectsQuery->where('neighborhood', $neighborhood);
+        }
+
+        if ($startDate = $request->input('start_date')) {
+            $projectsQuery->whereDate('start_date', '>=', $startDate);
+        }
+
+        if ($endDate = $request->input('end_date')) {
+            $projectsQuery->whereDate('end_date', '<=', $endDate);
+        }
+
+        if ($minBudget = $request->input('min_budget')) {
+            $projectsQuery->where('min_budget', '>=', $minBudget);
+        }
+
+        if ($maxBudget = $request->input('max_budget')) {
+            $projectsQuery->where('max_budget', '<=', $maxBudget);
+        }
+
+        $projects = $projectsQuery
+            ->orderByDesc('start_date')
             ->get();
+
+        $statusOptions = collect(ProjectStatusEnum::cases())
+            ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])
+            ->toArray();
+
+        $filterCategories = Category::orderBy('name')->get();
+        $districts = array_keys(config('istanbul_neighborhoods', []));
+        $filterValues = $request->only([
+            'search',
+            'status',
+            'category_id',
+            'creator_type',
+            'district',
+            'neighborhood',
+            'start_date',
+            'end_date',
+            'min_budget',
+            'max_budget',
+        ]);
 
         $backgroundData = $this->getBackgroundImageData();
 
-        return view('user.projects', array_merge(compact('projects'), $backgroundData));
+        return view('user.projects', array_merge(
+            compact('projects', 'statusOptions', 'filterCategories', 'districts', 'filterValues'),
+            $backgroundData
+        ));
     }
 
     /**
@@ -55,13 +132,11 @@ class UserController extends Controller
      */
     public function projectSuggestions($id)
     {
-        // Get the project (category) with its suggestions
-        $project = Category::with([
+        $project = Project::with([
             'suggestions.likes',
             'suggestions.comments',
             'suggestions.createdBy',
-        ])
-            ->findOrFail($id);
+        ])->findOrFail($id);
 
         $backgroundData = $this->getBackgroundImageData();
 
@@ -112,12 +187,18 @@ class UserController extends Controller
             return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
         }
 
-        $suggestion = Suggestion::with('category')->findOrFail($suggestionId);
+        $suggestion = Suggestion::with(['category', 'project'])->findOrFail($suggestionId);
         $user = Auth::user();
-        $categoryId = $suggestion->category_id;
+        $projectId = $suggestion->project_id ?? null;
 
-        // Proje süresi kontrol et
-        if ($suggestion->category && $suggestion->category->isExpired()) {
+        if ($suggestion->project && $suggestion->project->isExpired()) {
+            return response()->json([
+                'error' => 'Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.',
+                'expired' => true,
+            ], 403);
+        }
+
+        if (! $suggestion->project && $suggestion->category && $suggestion->category->isExpired()) {
             return response()->json([
                 'error' => 'Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.',
                 'expired' => true,
@@ -125,10 +206,15 @@ class UserController extends Controller
         }
 
         // Check other likes in the same category (project)
-        $existingLike = SuggestionLike::whereHas('suggestion', function ($query) use ($categoryId) {
-            $query->where('category_id', $categoryId);
-        })
+        $existingLike = SuggestionLike::query()
             ->where('user_id', $user->id)
+            ->whereHas('suggestion', function (Builder $query) use ($projectId, $suggestion) {
+                if ($projectId) {
+                    $query->where('project_id', $projectId);
+                } else {
+                    $query->where('category_id', $suggestion->category_id);
+                }
+            })
             ->with('suggestion')
             ->first();
 
@@ -165,7 +251,12 @@ class UserController extends Controller
         $likesCount = $suggestion->fresh()->likes()->count();
 
         // Get updated like counts for all suggestions in this category
-        $allSuggestionsInCategory = Suggestion::where('category_id', $categoryId)
+        $allSuggestionsInCategory = Suggestion::query()
+            ->when(
+                $projectId,
+                fn ($query) => $query->where('project_id', $projectId),
+                fn ($query) => $query->where('category_id', $suggestion->category_id)
+            )
             ->withCount('likes')
             ->get()
             ->pluck('likes_count', 'id')

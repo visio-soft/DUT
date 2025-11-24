@@ -58,11 +58,11 @@
                     <div class="project-card">
                         <!-- Project Image -->
                         <div class="project-image-container">
-                            @if($project->getFirstMediaUrl('project_files'))
+                            @if($project->getFirstMediaUrl('images'))
                                 <div class="project-background-with-blur">
-                                    <div class="project-background-blur-left" style="background-image: url('{{ $project->getFirstMediaUrl('project_files') }}');"></div>
-                                    <div class="project-background-blur-right" style="background-image: url('{{ $project->getFirstMediaUrl('project_files') }}');"></div>
-                                    <img src="{{ $project->getFirstMediaUrl('project_files') }}"
+                                    <div class="project-background-blur-left" style="background-image: url('{{ $project->getFirstMediaUrl('images') }}');"></div>
+                                    <div class="project-background-blur-right" style="background-image: url('{{ $project->getFirstMediaUrl('images') }}');"></div>
+                                    <img src="{{ $project->getFirstMediaUrl('images') }}"
                                          alt="{{ $project->name }}"
                                          class="project-center-image"
                                          onerror="this.onerror=null; this.parentElement.innerHTML='<div class=&quot;project-placeholder&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 3rem; height: 3rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 0.875rem;&quot;>{{ __("common.project_image") }}</p></div></div>';">
@@ -92,7 +92,7 @@
                                     </svg>
                                     {{ $project->suggestions->count() }} {{ __('common.suggestion') }}
                                 </div>
-                                @if($project->end_datetime)
+                                @if($project->formatted_end_date || $project->getRemainingTime())
                                     @php
                                         $remainingTime = $project->getRemainingTime();
                                         $isExpired = $project->isExpired();
@@ -109,12 +109,12 @@
                                             {{ __('common.unlimited') }}
                                         @endif
                                     </div>
-                                @elseif($project->start_datetime)
+                                @elseif($project->start_date)
                                 <div class="project-stat">
                                     <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>
                                     </svg>
-                                    {{ $project->start_datetime->format('d.m.Y') }}
+                                    {{ optional($project->start_date)->format('d.m.Y') }}
                                 </div>
                                 @endif
                             </div>
