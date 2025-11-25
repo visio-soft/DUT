@@ -387,4 +387,24 @@ return [
     'project_number' => 'Proje #:number',
     'general_overview' => 'Genel Bakış',
     'search' => 'Ara',
+
+    // Suggestion form actions
+    'create_suggestion' => 'Öneri Oluştur',
+    'update' => 'Güncelle',
+    'suggestion_created_title' => 'Öneri Oluşturuldu!',
+    'suggestion_created_body' => 'Öneri başarıyla oluşturuldu.',
+    'suggestion_updated_title' => 'Öneri Güncellendi!',
+    'suggestion_updated_body' => 'Öneri başarıyla güncellendi.',
+
+    // Error handling
+    'file_size_error_title' => 'Dosya Boyutu Hatası!',
+    'file_size_error_body' => 'Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.',
+    'validation_error_title' => 'Validasyon Hatası!',
+    'validation_error_body' => 'Lütfen gerekli alanları kontrol edin: :message',
+    'error_title' => 'Hata!',
+    'suggestion_create_error' => 'Öneri oluşturulurken bir hata oluştu: :message',
+    'suggestion_update_error' => 'Öneri güncellenirken bir hata oluştu: :message',
+
+    // Common delete action
+    'delete' => 'Sil',
 ];

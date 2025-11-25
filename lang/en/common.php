@@ -387,4 +387,24 @@ return [
     'project_number' => 'Project #:number',
     'general_overview' => 'Overview',
     'search' => 'Search',
+
+    // Suggestion form actions
+    'create_suggestion' => 'Create Suggestion',
+    'update' => 'Update',
+    'suggestion_created_title' => 'Suggestion Created!',
+    'suggestion_created_body' => 'The suggestion was created successfully.',
+    'suggestion_updated_title' => 'Suggestion Updated!',
+    'suggestion_updated_body' => 'The suggestion was updated successfully.',
+
+    // Error handling
+    'file_size_error_title' => 'File Size Error!',
+    'file_size_error_body' => 'The uploaded image is too large. Please upload an image of maximum 10MB.',
+    'validation_error_title' => 'Validation Error!',
+    'validation_error_body' => 'Please check the required fields: :message',
+    'error_title' => 'Error!',
+    'suggestion_create_error' => 'An error occurred while creating the suggestion: :message',
+    'suggestion_update_error' => 'An error occurred while updating the suggestion: :message',
+
+    // Common delete action
+    'delete' => 'Delete',
 ];
