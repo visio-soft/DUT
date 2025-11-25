@@ -14,7 +14,9 @@ class DecisionResultNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public Suggestion $suggestion;
+
     public SuggestionStatusEnum $decision;
+
     public ?string $reason;
 
     /**
@@ -43,17 +45,17 @@ class DecisionResultNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $message = (new MailMessage)
-            ->subject('Öneri Sonucu: ' . $this->decision->getLabel())
-            ->greeting('Merhaba ' . $notifiable->name . ',')
-            ->line('Öneriniz hakkında bir karar verildi: "' . $this->suggestion->title . '"');
+            ->subject('Öneri Sonucu: '.$this->decision->getLabel())
+            ->greeting('Merhaba '.$notifiable->name.',')
+            ->line('Öneriniz hakkında bir karar verildi: "'.$this->suggestion->title.'"');
 
-        $message->line('Durum: ' . $this->decision->getLabel());
+        $message->line('Durum: '.$this->decision->getLabel());
 
         if ($this->reason) {
-            $message->line('Açıklama: ' . $this->reason);
+            $message->line('Açıklama: '.$this->reason);
         }
 
-        $message->action('Öneriyi Görüntüle', url('/suggestions/' . $this->suggestion->id));
+        $message->action('Öneriyi Görüntüle', url('/suggestions/'.$this->suggestion->id));
 
         if ($this->decision === SuggestionStatusEnum::APPROVED || $this->decision === SuggestionStatusEnum::IMPLEMENTED) {
             $message->line('Değerli katkınız için teşekkür ederiz!');
@@ -77,7 +79,7 @@ class DecisionResultNotification extends Notification implements ShouldQueue
             'decision' => $this->decision->value,
             'decision_label' => $this->decision->getLabel(),
             'reason' => $this->reason,
-            'message' => 'Öneriniz hakkında karar verildi: ' . $this->decision->getLabel(),
+            'message' => 'Öneriniz hakkında karar verildi: '.$this->decision->getLabel(),
         ];
     }
 }

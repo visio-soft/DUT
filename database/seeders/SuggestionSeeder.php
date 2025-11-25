@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Enums\SuggestionStatusEnum;
 use App\Models\Project;
 use App\Models\Suggestion;
 use App\Models\User;
-use App\Enums\SuggestionStatusEnum;
 use Illuminate\Database\Seeder;
 
 class SuggestionSeeder extends Seeder
@@ -18,11 +18,13 @@ class SuggestionSeeder extends Seeder
 
         if ($users->isEmpty()) {
             $this->command->warn('No users found. Please run UserSeeder first.');
+
             return;
         }
 
         if ($projects->isEmpty()) {
             $this->command->warn('No projects found. Please run ProjectSeeder first.');
+
             return;
         }
 

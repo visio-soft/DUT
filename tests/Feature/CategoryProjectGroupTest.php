@@ -89,7 +89,7 @@ class CategoryProjectGroupTest extends TestCase
         $this->assertTrue(method_exists($project, 'projectGroups'));
         // Verify that Suggestion has projectGroups relationship (many-to-many)
         $this->assertTrue(method_exists($suggestion, 'projectGroups'));
-        
+
         // Verify project_group_id is NOT in Project's fillable (uses pivot table)
         $this->assertFalse(in_array('project_group_id', $project->getFillable()));
         // Verify project_id is in Suggestion's fillable attributes

@@ -15,17 +15,20 @@ class HierarchyTest extends TestCase
     use RefreshDatabase;
 
     protected User $user;
+
     protected Category $category;
+
     protected ProjectGroup $projectGroup;
+
     protected Project $project;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Create test user
         $this->user = User::factory()->create();
-        
+
         // Create the hierarchy: Category > ProjectGroup > Project (many-to-many)
         $this->category = Category::create(['name' => 'Test Category']);
         $this->projectGroup = ProjectGroup::create([
@@ -37,7 +40,7 @@ class HierarchyTest extends TestCase
             'category_id' => $this->category->id,
             'created_by_id' => $this->user->id,
         ]);
-        
+
         // Attach project to project group
         $this->project->projectGroups()->attach($this->projectGroup->id);
     }
@@ -77,10 +80,10 @@ class HierarchyTest extends TestCase
             'name' => 'Test Project Group 2',
             'category_id' => $this->category->id,
         ]);
-        
+
         // Attach project to second group
         $this->project->projectGroups()->attach($projectGroup2->id);
-        
+
         // Project should belong to 2 groups
         $this->assertCount(2, $this->project->projectGroups);
         $this->assertTrue($this->project->projectGroups->contains($this->projectGroup));
@@ -158,13 +161,13 @@ class HierarchyTest extends TestCase
     public function test_project_has_no_project_group_id_fillable(): void
     {
         // Projects use many-to-many, not direct foreign key
-        $project = new Project();
+        $project = new Project;
         $this->assertFalse(in_array('project_group_id', $project->getFillable()));
     }
 
     public function test_suggestion_has_project_id_fillable(): void
     {
-        $suggestion = new Suggestion();
+        $suggestion = new Suggestion;
         $this->assertTrue(in_array('project_id', $suggestion->getFillable()));
     }
 
@@ -172,15 +175,15 @@ class HierarchyTest extends TestCase
     {
         // Project needs category_id to be set directly (for backward compatibility)
         // Category can be inferred from project groups too
-        $project = new Project();
+        $project = new Project;
         $this->assertTrue(in_array('category_id', $project->getFillable()));
     }
 
     public function test_suggestion_has_category_id_fillable(): void
     {
-        // Suggestion needs category_id for direct assignment  
+        // Suggestion needs category_id for direct assignment
         // Category can also be accessed through project > project groups
-        $suggestion = new Suggestion();
+        $suggestion = new Suggestion;
         $this->assertTrue(in_array('category_id', $suggestion->getFillable()));
     }
 }

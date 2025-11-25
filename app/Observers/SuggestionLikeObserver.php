@@ -14,12 +14,12 @@ class SuggestionLikeObserver
     {
         // Send notification to suggestion creator when someone likes their suggestion
         $suggestion = $suggestionLike->suggestion;
-        
+
         // Check if suggestion exists and has a creator
-        if (!$suggestion) {
+        if (! $suggestion) {
             return;
         }
-        
+
         // Only send notification if the liker is not the suggestion creator
         if ($suggestion->createdBy && $suggestionLike->user_id !== $suggestion->created_by_id) {
             $suggestion->createdBy->notify(

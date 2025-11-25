@@ -8,7 +8,6 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -60,7 +59,7 @@ class CategoryResource extends Resource
                     ->preload()
                     ->nullable()
                     ->placeholder(__('common.select_parent_category')),
-                    
+
                 Forms\Components\TextInput::make('name')
                     ->label(__('common.project_category'))
                     ->required()
@@ -76,7 +75,7 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('id')
                     ->sortable()
                     ->label('ID'),
-                    
+
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label(__('common.parent_category'))
                     ->searchable()
@@ -84,7 +83,7 @@ class CategoryResource extends Resource
                     ->placeholder('-')
                     ->badge()
                     ->color('success'),
-                    
+
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('common.project_category'))
                     ->searchable()

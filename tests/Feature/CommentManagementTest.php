@@ -23,7 +23,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',
@@ -52,7 +52,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',
@@ -78,7 +78,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',
@@ -112,7 +112,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',
@@ -146,7 +146,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',
@@ -179,7 +179,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',
@@ -221,7 +221,7 @@ class CommentManagementTest extends TestCase
         $projectGroup = ProjectGroup::create(['name' => 'Test Group', 'category_id' => $category->id]);
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
-        
+
         $suggestion = Suggestion::create([
             'project_id' => $project->id,
             'title' => 'Test Suggestion',

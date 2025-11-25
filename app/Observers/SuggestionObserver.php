@@ -14,7 +14,7 @@ class SuggestionObserver
         }
 
         // Automatically set category_id from the related project
-        if ($suggestion->project_id && !$suggestion->category_id) {
+        if ($suggestion->project_id && ! $suggestion->category_id) {
             $project = \App\Models\Project::find($suggestion->project_id);
             if ($project) {
                 // First try to get category_id directly from the project

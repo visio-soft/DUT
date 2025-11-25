@@ -11,8 +11,11 @@ use Illuminate\Support\Str;
 class Location extends Model
 {
     public const TYPE_COUNTRY = 'country';
+
     public const TYPE_CITY = 'city';
+
     public const TYPE_DISTRICT = 'district';
+
     public const TYPE_NEIGHBORHOOD = 'neighborhood';
 
     public const TYPES = [

@@ -28,7 +28,7 @@ class HierarchicalCategoryTest extends TestCase
         $child2 = Category::create(['name' => 'Child Category 2', 'parent_id' => $parent->id]);
 
         $children = $parent->children;
-        
+
         $this->assertCount(2, $children);
         $this->assertTrue($children->contains($child1));
         $this->assertTrue($children->contains($child2));
@@ -72,8 +72,8 @@ class HierarchicalCategoryTest extends TestCase
     /** @test */
     public function parent_id_is_in_fillable_attributes()
     {
-        $category = new Category();
-        
+        $category = new Category;
+
         $this->assertContains('parent_id', $category->getFillable());
     }
 

@@ -100,6 +100,7 @@ class ProjectSuggestions
                 $creatorMatches = $suggestion->createdBy
                     ? Str::contains(Str::lower($suggestion->createdBy->name), $search)
                     : false;
+
                 return $titleMatches || $creatorMatches;
             })->values();
             $project->setRelation('suggestions', $filteredSuggestions);

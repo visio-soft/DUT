@@ -24,7 +24,7 @@ class Dashboard extends BaseDashboard
         return __('common.general_overview');
     }
 
-    public function getTitle(): string | Htmlable
+    public function getTitle(): string|Htmlable
     {
         return __('common.general_overview');
     }

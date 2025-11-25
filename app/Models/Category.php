@@ -28,7 +28,7 @@ class Category extends Model implements HasMedia
             if (! $category->isForceDeleting()) {
                 // Delete child categories
                 $category->children()->delete();
-                
+
                 // Delete project groups (which will cascade to projects via DB constraint)
                 $category->projectGroups()->delete();
             }

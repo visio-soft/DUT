@@ -25,7 +25,7 @@ return new class extends Migration
 
     protected function sqliteView(): string
     {
-        return <<<SQL
+        return <<<'SQL'
             CREATE VIEW location_view AS
             SELECT
                 'country-' || c.id AS uid,
@@ -97,7 +97,7 @@ return new class extends Migration
 
     protected function defaultView(): string
     {
-        return <<<SQL
+        return <<<'SQL'
             CREATE VIEW location_view AS
             SELECT
                 CONCAT('country-', c.id) AS uid,

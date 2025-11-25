@@ -85,6 +85,7 @@ class Suggestion extends Model implements HasMedia
                         return $firstGroup->category;
                     }
                 }
+
                 return $category;
             });
     }

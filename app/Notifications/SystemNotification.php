@@ -12,9 +12,13 @@ class SystemNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public string $title;
+
     public string $message;
+
     public ?string $actionUrl;
+
     public ?string $actionLabel;
+
     public string $type; // success, info, warning, danger
 
     /**
@@ -51,7 +55,7 @@ class SystemNotification extends Notification implements ShouldQueue
     {
         $message = (new MailMessage)
             ->subject($this->title)
-            ->greeting(__('common.hello') . ' ' . $notifiable->name . ',')
+            ->greeting(__('common.hello').' '.$notifiable->name.',')
             ->line($this->message);
 
         if ($this->actionUrl && $this->actionLabel) {

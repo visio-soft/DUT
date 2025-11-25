@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Helpers\CommonFilters;
+use App\Filament\Helpers\CommonTableActions;
 use App\Filament\Resources\ProjectResource\Pages;
 use App\Models\Project;
 use Filament\Forms;
@@ -220,93 +221,19 @@ class ProjectResource extends Resource
                     ->searchable()
                     ->preload(),
 
-                SelectFilter::make('creator_type')
-                    ->label(__('common.creator_type'))
-                    ->options([
-                        'with_user' => __('common.user_assigned'),
-                        'not_assigned' => __('common.not_assigned'),
-                    ])
-                    ->query(function (Builder $query, array $data) {
-                        $value = $data['value'] ?? null;
-                        if ($value === 'with_user') {
-                            $query->whereNotNull('created_by_id');
-                        } elseif ($value === 'not_assigned') {
-                            $query->whereNull('created_by_id');
-                        }
-                    }),
-
+                CommonFilters::creatorTypeFilter(),
                 CommonFilters::locationFilter(),
                 CommonFilters::dateRangeFilter(),
                 CommonFilters::budgetRangeFilter(),
             ])
-            ->filtersTriggerAction(fn (Tables\Actions\Action $action) => $action
-                ->label(__('common.filters_button'))
-                ->icon('heroicon-o-funnel')
-                ->color('gray')
-                ->size('sm')
-                ->button()
-                ->tooltip(__('common.filters_button_description')))
+            ->filtersTriggerAction(CommonTableActions::filtersTriggerAction())
             ->filtersFormColumns(2)
             ->filtersFormWidth('3xl')
             ->actions([
-                Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make()
-                        ->visible(fn ($record) => ! $record->trashed()),
-
-                    Tables\Actions\DeleteAction::make()
-                        ->visible(fn ($record) => ! $record->trashed())
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.delete_project'))
-                        ->modalDescription(__('common.delete_project_description'))
-                        ->modalSubmitActionLabel(__('common.yes_delete'))
-                        ->successNotificationTitle(__('common.project_deleted')),
-
-                    Tables\Actions\RestoreAction::make()
-                        ->icon('heroicon-o-arrow-path')
-                        ->color('success')
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.restore_project'))
-                        ->modalDescription(__('common.restore_project_description'))
-                        ->modalSubmitActionLabel(__('common.yes_restore'))
-                        ->successNotificationTitle(__('common.project_restored')),
-
-                    Tables\Actions\ForceDeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.force_delete_project'))
-                        ->modalDescription(__('common.force_delete_project_description'))
-                        ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                        ->successNotificationTitle(__('common.project_force_deleted')),
-                ])
-                    ->label(__('common.actions'))
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->size('sm')
-                    ->color('gray'),
+                CommonTableActions::softDeleteActionGroup('project'),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.delete_selected_projects'))
-                        ->modalDescription(__('common.delete_selected_projects_description'))
-                        ->modalSubmitActionLabel(__('common.yes_delete'))
-                        ->successNotificationTitle(__('common.selected_projects_deleted')),
-
-                    Tables\Actions\RestoreBulkAction::make()
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.restore_selected_projects'))
-                        ->modalDescription(__('common.restore_selected_projects_description'))
-                        ->modalSubmitActionLabel(__('common.yes_restore'))
-                        ->successNotificationTitle(__('common.selected_projects_restored')),
-
-                    Tables\Actions\ForceDeleteBulkAction::make()
-                        ->requiresConfirmation()
-                        ->modalHeading(__('common.force_delete_selected_projects'))
-                        ->modalDescription(__('common.force_delete_selected_projects_description'))
-                        ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                        ->successNotificationTitle(__('common.selected_projects_force_deleted')),
-                ]),
+                CommonTableActions::softDeleteBulkActionGroup('project'),
             ])
             ->groups([
                 Group::make('projectGroups.category.name')

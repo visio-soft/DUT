@@ -5,6 +5,7 @@ namespace App\Filament\Helpers;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 
 class CommonFilters
@@ -21,6 +22,7 @@ class CommonFilters
                     ->label(__('common.district'))
                     ->options(function () {
                         $keys = array_keys(config('istanbul_neighborhoods', []));
+
                         return array_combine($keys, $keys);
                     })
                     ->searchable(),
@@ -30,6 +32,7 @@ class CommonFilters
                     ->options(function (callable $get) {
                         $district = $get('district');
                         $map = config('istanbul_neighborhoods', []);
+
                         return $map[$district] ?? [];
                     })
                     ->searchable(),
@@ -73,11 +76,11 @@ class CommonFilters
                 $indicators = [];
 
                 if ($data['start_date'] ?? null) {
-                    $indicators[] = 'Başlangıç: ' . Carbon::parse($data['start_date'])->format('d.m.Y');
+                    $indicators[] = 'Başlangıç: '.Carbon::parse($data['start_date'])->format('d.m.Y');
                 }
 
                 if ($data['end_date'] ?? null) {
-                    $indicators[] = 'Bitiş: ' . Carbon::parse($data['end_date'])->format('d.m.Y');
+                    $indicators[] = 'Bitiş: '.Carbon::parse($data['end_date'])->format('d.m.Y');
                 }
 
                 return $indicators;
@@ -118,14 +121,71 @@ class CommonFilters
                 $indicators = [];
 
                 if ($data['min_budget'] ?? null) {
-                    $indicators[] = 'Min: ₺' . number_format($data['min_budget'], 2);
+                    $indicators[] = 'Min: ₺'.number_format($data['min_budget'], 2);
                 }
 
                 if ($data['max_budget'] ?? null) {
-                    $indicators[] = 'Max: ₺' . number_format($data['max_budget'], 2);
+                    $indicators[] = 'Max: ₺'.number_format($data['max_budget'], 2);
                 }
 
                 return $indicators;
+            });
+    }
+
+    /**
+     * Create a creator type filter (user assigned vs not assigned/anonymous)
+     *
+     * @param  string  $anonymousLabel  Translation key for anonymous/not assigned option
+     */
+    public static function creatorTypeFilter(string $anonymousLabel = 'common.not_assigned'): SelectFilter
+    {
+        return SelectFilter::make('creator_type')
+            ->label(__('common.creator_type'))
+            ->options([
+                'with_user' => __('common.user_assigned'),
+                'anonymous' => __($anonymousLabel),
+            ])
+            ->query(function (Builder $query, array $data) {
+                $value = $data['value'] ?? null;
+                if ($value === 'with_user') {
+                    $query->whereNotNull('created_by_id');
+                } elseif ($value === 'anonymous') {
+                    $query->whereNull('created_by_id');
+                }
+            });
+    }
+
+    /**
+     * Create a likes count filter for models with likes
+     */
+    public static function likesFilter(): Filter
+    {
+        return Filter::make('likes_filter')
+            ->label(__('common.like_count'))
+            ->form([
+                Forms\Components\Grid::make()
+                    ->schema([
+                        Forms\Components\TextInput::make('min_likes')
+                            ->label(__('common.min_likes'))
+                            ->numeric()
+                            ->default(0),
+
+                        Forms\Components\TextInput::make('max_likes')
+                            ->label(__('common.max_likes'))
+                            ->numeric(),
+                    ])
+                    ->columns(2),
+            ])
+            ->query(function (Builder $query, array $data) {
+                $query->withCount('likes');
+
+                if (! empty($data['min_likes'])) {
+                    $query->having('likes_count', '>=', $data['min_likes']);
+                }
+
+                if (! empty($data['max_likes'])) {
+                    $query->having('likes_count', '<=', $data['max_likes']);
+                }
             });
     }
 }

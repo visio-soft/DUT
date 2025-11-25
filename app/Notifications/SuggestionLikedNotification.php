@@ -14,6 +14,7 @@ class SuggestionLikedNotification extends Notification implements ShouldQueue
     use Queueable;
 
     public Suggestion $suggestion;
+
     public User $liker;
 
     /**
@@ -42,9 +43,9 @@ class SuggestionLikedNotification extends Notification implements ShouldQueue
     {
         return (new MailMessage)
             ->subject('Öneriniz Beğenildi!')
-            ->greeting('Merhaba ' . $notifiable->name . ',')
-            ->line($this->liker->name . ' önerinizi beğendi: "' . $this->suggestion->title . '"')
-            ->action('Öneriyi Görüntüle', url('/suggestions/' . $this->suggestion->id))
+            ->greeting('Merhaba '.$notifiable->name.',')
+            ->line($this->liker->name.' önerinizi beğendi: "'.$this->suggestion->title.'"')
+            ->action('Öneriyi Görüntüle', url('/suggestions/'.$this->suggestion->id))
             ->line('Desteğiniz için teşekkür ederiz!');
     }
 
@@ -60,7 +61,7 @@ class SuggestionLikedNotification extends Notification implements ShouldQueue
             'suggestion_title' => $this->suggestion->title,
             'liker_id' => $this->liker->id,
             'liker_name' => $this->liker->name,
-            'message' => $this->liker->name . ' önerinizi beğendi: "' . $this->suggestion->title . '"',
+            'message' => $this->liker->name.' önerinizi beğendi: "'.$this->suggestion->title.'"',
         ];
     }
 }

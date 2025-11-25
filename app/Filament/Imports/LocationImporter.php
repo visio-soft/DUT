@@ -207,8 +207,8 @@ class LocationImporter extends Importer
 
         throw ValidationException::withMessages([
             $childColumn => __('common.location_import_missing_parent', [
-                'child' => __('common.' . $childColumn),
-                'parent' => __('common.' . $parentColumn),
+                'child' => __('common.'.$childColumn),
+                'parent' => __('common.'.$parentColumn),
             ]),
         ]);
     }

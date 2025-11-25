@@ -14,8 +14,9 @@ class ProjectSeeder extends Seeder
         // Get admin user and project groups
         $adminUser = User::role(['admin', 'super_admin'])->first();
 
-        if (!$adminUser) {
+        if (! $adminUser) {
             $this->command->warn('No admin user found. Please run AdminUserSeeder first.');
+
             return;
         }
 
@@ -23,6 +24,7 @@ class ProjectSeeder extends Seeder
 
         if ($projectGroups->isEmpty()) {
             $this->command->warn('No project groups found. Please run ProjectGroupSeeder first.');
+
             return;
         }
 

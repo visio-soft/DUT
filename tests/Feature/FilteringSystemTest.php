@@ -8,7 +8,6 @@ use App\Models\Category;
 use App\Models\Project;
 use App\Models\ProjectGroup;
 use App\Models\Suggestion;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -195,8 +194,8 @@ class FilteringSystemTest extends TestCase
     /** @test */
     public function status_field_is_in_fillable_attributes()
     {
-        $project = new Project();
-        $suggestion = new Suggestion();
+        $project = new Project;
+        $suggestion = new Suggestion;
 
         $this->assertContains('status', $project->getFillable());
         $this->assertContains('status', $suggestion->getFillable());

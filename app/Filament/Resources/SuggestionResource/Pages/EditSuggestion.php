@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SuggestionResource\Pages;
 
+use App\Filament\Helpers\NotificationHelper;
 use App\Filament\Resources\SuggestionResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
@@ -29,45 +30,23 @@ class EditSuggestion extends EditRecord
     {
         return [
             $this->getSaveFormAction()
-                ->label('Güncelle')
+                ->label(__('common.update'))
                 ->action(function () {
                     try {
-                        // Form validation ve kayıt
                         $this->save();
 
-                        \Filament\Notifications\Notification::make()
-                            ->title('Öneri Güncellendi!')
-                            ->body('Öneri başarıyla güncellendi.')
-                            ->success()
-                            ->send();
+                        NotificationHelper::success(
+                            __('common.suggestion_updated_title'),
+                            __('common.suggestion_updated_body')
+                        );
 
                         return redirect($this->getRedirectUrl());
                     } catch (\Illuminate\Validation\ValidationException $e) {
-                        // Validasyon hatalarını göster
-                        $errors = $e->errors();
-                        if ((isset($errors['images']) && str_contains(json_encode($errors['images']), 'max')) ||
-                            (isset($errors['image']) && str_contains(json_encode($errors['image']), 'max'))) {
-                            \Filament\Notifications\Notification::make()
-                                ->title('Dosya Boyutu Hatası!')
-                                ->body('Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.')
-                                ->danger()
-                                ->duration(10000)
-                                ->send();
-                        } else {
-                            \Filament\Notifications\Notification::make()
-                                ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: '.$e->getMessage())
-                                ->danger()
-                                ->send();
-                        }
+                        NotificationHelper::handleValidationException($e);
 
                         return;
                     } catch (\Exception $e) {
-                        \Filament\Notifications\Notification::make()
-                            ->title('Hata!')
-                            ->body('Öneri güncellenirken bir hata oluştu: '.$e->getMessage())
-                            ->danger()
-                            ->send();
+                        NotificationHelper::handleException($e, 'suggestion_update');
 
                         return;
                     }

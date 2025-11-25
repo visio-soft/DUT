@@ -15,6 +15,7 @@ class ProjectGroupSeeder extends Seeder
 
         if ($categories->isEmpty()) {
             $this->command->warn('No categories found. Please run CategorySeeder first.');
+
             return;
         }
 

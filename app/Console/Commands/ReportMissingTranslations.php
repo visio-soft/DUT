@@ -60,7 +60,7 @@ class ReportMissingTranslations extends Command
                 continue;
             }
 
-            $this->warn(sprintf("[%s] Missing %d keys:", $locale, count($missing)));
+            $this->warn(sprintf('[%s] Missing %d keys:', $locale, count($missing)));
 
             foreach ($missing as $key) {
                 $this->line("  - {$group}.{$key}");
@@ -73,15 +73,13 @@ class ReportMissingTranslations extends Command
     /**
      * Collect the translation keys that are referenced in the given paths.
      *
-     * @param  string  $group
-     * @param  array  $paths
      * @return array<int, string>
      */
     protected function collectUsedKeys(string $group, array $paths): array
     {
         $pattern = "/(?:__|@lang|trans|trans_choice)\\(\\s*['\"]"
-            . preg_quote($group, '/')
-            . "\\.([\\w\\-]+)['\"]/u";
+            .preg_quote($group, '/')
+            ."\\.([\\w\\-]+)['\"]/u";
 
         $found = [];
 
@@ -103,6 +101,7 @@ class ReportMissingTranslations extends Command
                     $contents = File::get($pathName);
                 } catch (Throwable $exception) {
                     $this->warn("Unable to read {$pathName}: {$exception->getMessage()}");
+
                     continue;
                 }
 
@@ -142,8 +141,6 @@ class ReportMissingTranslations extends Command
     /**
      * Determine which keys are missing for a locale.
      *
-     * @param  string  $locale
-     * @param  string  $group
      * @param  array<int, string>  $keys
      * @return array<int, string>
      */

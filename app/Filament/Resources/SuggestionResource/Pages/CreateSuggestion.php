@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SuggestionResource\Pages;
 
+use App\Filament\Helpers\NotificationHelper;
 use App\Filament\Resources\SuggestionResource;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
@@ -27,58 +28,33 @@ class CreateSuggestion extends CreateRecord
             }
         }
 
-        // Design functionality removed
         return $data;
     }
 
     protected function getFormActions(): array
     {
         return [
-            // Öneri Oluştur butonu
             $this->getCreateFormAction()
-                ->label('Öneri Oluştur')
+                ->label(__('common.create_suggestion'))
                 ->icon('heroicon-o-folder-plus')
                 ->color('primary')
                 ->size('lg')
                 ->action(function () {
                     try {
-                        // Form validation ve kayıt
                         $this->create();
 
-                        \Filament\Notifications\Notification::make()
-                            ->title('Öneri Oluşturuldu!')
-                            ->body('Öneri başarıyla oluşturuldu.')
-                            ->success()
-                            ->send();
+                        NotificationHelper::success(
+                            __('common.suggestion_created_title'),
+                            __('common.suggestion_created_body')
+                        );
 
-                        // Öneriler listesine yönlendir
                         return redirect($this->getResource()::getUrl('index'));
                     } catch (\Illuminate\Validation\ValidationException $e) {
-                        // Validasyon hatalarını göster
-                        $errors = $e->errors();
-                        if ((isset($errors['images']) && str_contains(json_encode($errors['images']), 'max')) ||
-                            (isset($errors['image']) && str_contains(json_encode($errors['image']), 'max'))) {
-                            \Filament\Notifications\Notification::make()
-                                ->title('Dosya Boyutu Hatası!')
-                                ->body('Yüklediğiniz resim dosyası çok büyük. Maksimum 10MB boyutunda bir resim yükleyiniz.')
-                                ->danger()
-                                ->duration(10000)
-                                ->send();
-                        } else {
-                            \Filament\Notifications\Notification::make()
-                                ->title('Validasyon Hatası!')
-                                ->body('Lütfen gerekli alanları kontrol edin: '.$e->getMessage())
-                                ->danger()
-                                ->send();
-                        }
+                        NotificationHelper::handleValidationException($e);
 
                         return;
                     } catch (\Exception $e) {
-                        \Filament\Notifications\Notification::make()
-                            ->title('Hata!')
-                            ->body('Öneri oluşturulurken bir hata oluştu: '.$e->getMessage())
-                            ->danger()
-                            ->send();
+                        NotificationHelper::handleException($e, 'suggestion_create');
 
                         return;
                     }
@@ -87,9 +63,8 @@ class CreateSuggestion extends CreateRecord
                     'class' => 'w-full justify-center mb-2',
                 ]),
 
-            // İptal butonu
             $this->getCancelFormAction()
-                ->label('İptal')
+                ->label(__('common.cancel'))
                 ->color('gray')
                 ->size('lg')
                 ->extraAttributes([
