@@ -2,27 +2,52 @@
 
 namespace App\Filament\Imports;
 
-use App\Models\Location;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\District;
+use App\Models\Neighborhood;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LocationImporter extends Importer
 {
-    protected static ?string $model = Location::class;
+    protected static ?string $model = Neighborhood::class;
+
+    protected ?Country $country = null;
+
+    protected ?City $city = null;
+
+    protected ?District $district = null;
+
+    protected ?Neighborhood $neighborhood = null;
+
+    protected ?string $targetLevel = null;
+
+    protected bool $rowPrepared = false;
 
     /**
-     * @var array<string, ?string>
+     * @var array<string, Country>
      */
-    protected array $hierarchyNames = [];
+    protected array $countryCache = [];
 
-    protected ?string $targetType = null;
+    /**
+     * @var array<string, City>
+     */
+    protected array $cityCache = [];
 
-    protected ?string $targetName = null;
+    /**
+     * @var array<string, District>
+     */
+    protected array $districtCache = [];
 
-    protected bool $hierarchyPrepared = false;
+    /**
+     * @var array<string, Neighborhood>
+     */
+    protected array $neighborhoodCache = [];
 
     /**
      * @return array<ImportColumn>
@@ -32,60 +57,85 @@ class LocationImporter extends Importer
         return [
             ImportColumn::make('country')
                 ->label(__('common.location_import_column_country'))
-                ->example('türkiye')
+                ->example('Türkiye')
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('city')
                 ->label(__('common.location_import_column_city'))
-                ->example('istanbul')
+                ->example('İstanbul')
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('district')
                 ->label(__('common.location_import_column_district'))
-                ->example('sultnagazi')
+                ->example('Sultangazi')
                 ->rules(['nullable', 'string', 'max:255']),
             ImportColumn::make('neighborhood')
                 ->label(__('common.location_import_column_neighborhood'))
-                ->example('50.mahallesi')
+                ->example('50. Yıl Mahallesi')
                 ->rules(['nullable', 'string', 'max:255']),
         ];
     }
 
-    public function resolveRecord(): ?Location
+    public function resolveRecord(): ?Model
     {
-        $this->resetHierarchy();
-        $this->prepareHierarchy();
+        $this->resetRowContext();
+        $this->prepareRow();
 
-        $parent = $this->ensureParents();
-        $slug = Str::slug($this->targetName);
+        $this->country = $this->ensureCountry($this->data['country']);
 
-        // Parent ile birlikte slug kontrolü yap
-        $query = Location::where('slug', $slug)->where('type', $this->targetType);
-
-        if ($parent) {
-            $query->where('parent_id', $parent->id);
-        } else {
-            $query->whereNull('parent_id');
+        if (filled($this->data['city'])) {
+            $this->city = $this->ensureCity($this->country, $this->data['city']);
         }
 
-        return $query->first() ?? new Location(['slug' => $slug]);
+        if (filled($this->data['district'])) {
+            $this->district = $this->ensureDistrict($this->city, $this->data['district']);
+        }
+
+        if ($this->targetLevel === 'country') {
+            return $this->country;
+        }
+
+        if ($this->targetLevel === 'city') {
+            return $this->city;
+        }
+
+        if ($this->targetLevel === 'district') {
+            return $this->district;
+        }
+
+        $this->neighborhood = $this->ensureNeighborhood($this->district, $this->data['neighborhood']);
+
+        return $this->neighborhood;
     }
 
-    /**
-     * @throws ValidationException
-     */
     public function fillRecord(): void
     {
-        // prepareHierarchy zaten resolveRecord'da çağrıldı
-        if (!$this->hierarchyPrepared) {
-            $this->resetHierarchy();
-            $this->prepareHierarchy();
+        if (! $this->rowPrepared) {
+            $this->prepareRow();
         }
 
-        $parent = $this->ensureParents();
+        if ($this->record instanceof Country) {
+            $this->record->name = $this->data['country'];
 
-        $this->record->name = $this->targetName;
-        $this->record->type = $this->targetType;
-        $this->record->slug = Str::slug($this->targetName);
-        $this->record->parent()->associate($parent);
+            return;
+        }
+
+        if ($this->record instanceof City) {
+            $this->record->name = $this->data['city'];
+            $this->record->country()->associate($this->country);
+
+            return;
+        }
+
+        if ($this->record instanceof District) {
+            $this->record->name = $this->data['district'];
+            $this->record->city()->associate($this->city);
+
+            return;
+        }
+
+        if ($this->record instanceof Neighborhood) {
+            $this->record->name = $this->data['neighborhood'];
+            $this->record->district()->associate($this->district);
+        }
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -99,54 +149,40 @@ class LocationImporter extends Importer
         ]);
     }
 
-    protected function getRequiredParentType(string $type): ?string
+    public static function getCompletedNotificationTitle(Import $import): string
     {
-        return match ($type) {
-            Location::TYPE_CITY => Location::TYPE_COUNTRY,
-            Location::TYPE_DISTRICT => Location::TYPE_CITY,
-            Location::TYPE_NEIGHBORHOOD => Location::TYPE_DISTRICT,
-            default => null,
-        };
-    }
+        $failedRows = $import->getFailedRowsCount();
 
-    /**
-     * Her satır için hierarchy bilgilerini sıfırla
-     */
-    protected function resetHierarchy(): void
-    {
-        $this->hierarchyNames = [];
-        $this->targetType = null;
-        $this->targetName = null;
-        $this->hierarchyPrepared = false;
+        if ($failedRows > 0) {
+            return __('common.location_import_completed_with_errors');
+        }
+
+        return __('common.location_import_completed');
     }
 
     /**
      * @throws ValidationException
      */
-    protected function prepareHierarchy(): void
+    protected function prepareRow(): void
     {
-        if ($this->hierarchyPrepared) {
+        if ($this->rowPrepared) {
             return;
         }
 
-        foreach ($this->getHierarchyOrder() as $type => $column) {
-            $value = $this->normalizeValue($this->data[$column] ?? null);
-            $this->hierarchyNames[$type] = $value;
+        $this->data['country'] = $this->normalizeValue($this->data['country'] ?? null);
+        $this->data['city'] = $this->normalizeValue($this->data['city'] ?? null);
+        $this->data['district'] = $this->normalizeValue($this->data['district'] ?? null);
+        $this->data['neighborhood'] = $this->normalizeValue($this->data['neighborhood'] ?? null);
 
-            if (filled($value)) {
-                $this->targetType = $type;
-                $this->targetName = $value;
-            }
-        }
-
-        if (! $this->targetType || ! $this->targetName) {
+        if ($this->allFieldsBlank()) {
             throw ValidationException::withMessages([
                 'country' => __('common.location_import_row_empty'),
             ]);
         }
 
         $this->validateHierarchy();
-        $this->hierarchyPrepared = true;
+        $this->targetLevel = $this->determineTargetLevel();
+        $this->rowPrepared = true;
     }
 
     /**
@@ -154,78 +190,143 @@ class LocationImporter extends Importer
      */
     protected function validateHierarchy(): void
     {
-        foreach ($this->getHierarchyOrder() as $type => $column) {
-            $value = $this->hierarchyNames[$type];
-
-            if (blank($value)) {
-                continue;
-            }
-
-            $parentType = $this->getRequiredParentType($type);
-
-            if ($parentType && blank($this->hierarchyNames[$parentType])) {
-                throw ValidationException::withMessages([
-                    $column => __('common.location_import_missing_parent', [
-                        'child' => __('common.' . $type),
-                        'parent' => __('common.' . $parentType),
-                    ]),
-                ]);
-            }
-        }
-    }
-
-    protected function ensureParents(): ?Location
-    {
-        $parent = null;
-
-        foreach ($this->getHierarchyOrder() as $type => $column) {
-            if ($type === $this->targetType) {
-                break;
-            }
-
-            $name = $this->hierarchyNames[$type];
-
-            if (blank($name)) {
-                continue;
-            }
-
-            $parent = $this->findOrCreateLocation($type, $name, $parent);
-        }
-
-        return $parent;
+        $this->assertParentPresence('city', 'country');
+        $this->assertParentPresence('district', 'city');
+        $this->assertParentPresence('neighborhood', 'district');
     }
 
     /**
      * @throws ValidationException
      */
-    protected function findOrCreateLocation(string $type, string $name, ?Location $parent): Location
+    protected function assertParentPresence(string $childColumn, string $parentColumn): void
     {
-        $slug = Str::slug($name);
-
-        // Parent ile birlikte lokasyonu bul
-        $query = Location::where('slug', $slug)->where('type', $type);
-
-        if ($parent) {
-            $query->where('parent_id', $parent->id);
-        } else {
-            $query->whereNull('parent_id');
+        if (blank($this->data[$childColumn] ?? null) || filled($this->data[$parentColumn] ?? null)) {
+            return;
         }
 
-        $location = $query->first();
+        throw ValidationException::withMessages([
+            $childColumn => __('common.location_import_missing_parent', [
+                'child' => __('common.' . $childColumn),
+                'parent' => __('common.' . $parentColumn),
+            ]),
+        ]);
+    }
 
-        if ($location) {
-            return $location;
+    protected function determineTargetLevel(): string
+    {
+        foreach (['neighborhood', 'district', 'city', 'country'] as $column) {
+            if (filled($this->data[$column] ?? null)) {
+                return $column;
+            }
         }
 
-        // Yeni lokasyon oluştur
-        $location = new Location();
-        $location->name = $name;
-        $location->slug = $slug;
-        $location->type = $type;
-        $location->parent()->associate($parent);
-        $location->save();
+        return 'country';
+    }
 
-        return $location;
+    protected function ensureCountry(string $name): Country
+    {
+        $key = $this->cacheKey($name);
+
+        if (isset($this->countryCache[$key])) {
+            return $this->countryCache[$key];
+        }
+
+        $country = Country::query()
+            ->withTrashed()
+            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->first();
+
+        if ($country?->trashed()) {
+            $country->restore();
+        }
+
+        if (! $country) {
+            $country = new Country(['name' => $name]);
+            $country->save();
+        }
+
+        return $this->countryCache[$key] = $country;
+    }
+
+    protected function ensureCity(Country $country, string $name): City
+    {
+        $key = $this->cacheKey($name, $country->id);
+
+        if (isset($this->cityCache[$key])) {
+            return $this->cityCache[$key];
+        }
+
+        $city = City::query()
+            ->withTrashed()
+            ->where('country_id', $country->id)
+            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->first();
+
+        if ($city?->trashed()) {
+            $city->restore();
+        }
+
+        if (! $city) {
+            $city = new City(['name' => $name]);
+            $city->country()->associate($country);
+            $city->save();
+        }
+
+        return $this->cityCache[$key] = $city;
+    }
+
+    protected function ensureDistrict(City $city, string $name): District
+    {
+        $key = $this->cacheKey($name, $city->id);
+
+        if (isset($this->districtCache[$key])) {
+            return $this->districtCache[$key];
+        }
+
+        $district = District::query()
+            ->withTrashed()
+            ->where('city_id', $city->id)
+            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->first();
+
+        if ($district?->trashed()) {
+            $district->restore();
+        }
+
+        if (! $district) {
+            $district = new District(['name' => $name]);
+            $district->city()->associate($city);
+            $district->save();
+        }
+
+        return $this->districtCache[$key] = $district;
+    }
+
+    protected function ensureNeighborhood(District $district, string $name): Neighborhood
+    {
+        $key = $this->cacheKey($name, $district->id);
+
+        if (isset($this->neighborhoodCache[$key])) {
+            return $this->neighborhoodCache[$key];
+        }
+
+        $neighborhood = Neighborhood::query()
+            ->withTrashed()
+            ->where('district_id', $district->id)
+            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->first();
+
+        if ($neighborhood?->trashed()) {
+            $neighborhood->restore();
+        }
+
+        if (! $neighborhood) {
+            $neighborhood = new Neighborhood(['name' => $name]);
+            $neighborhood->district()->associate($district);
+            $neighborhood->save();
+        }
+
+        return $this->neighborhoodCache[$key] = $neighborhood;
     }
 
     protected function normalizeValue(mixed $value): ?string
@@ -239,22 +340,34 @@ class LocationImporter extends Importer
         return $value === '' ? null : $value;
     }
 
-    /**
-     * @return array<string, string>
-     */
-    protected function getHierarchyOrder(): array
+    protected function allFieldsBlank(): bool
     {
-        return [
-            Location::TYPE_COUNTRY => 'country',
-            Location::TYPE_CITY => 'city',
-            Location::TYPE_DISTRICT => 'district',
-            Location::TYPE_NEIGHBORHOOD => 'neighborhood',
-        ];
+        return blank($this->data['country'])
+            && blank($this->data['city'])
+            && blank($this->data['district'])
+            && blank($this->data['neighborhood']);
     }
 
-    protected function getColumnNameForType(string $type): string
+    protected function cacheKey(string $name, ?int $parentId = null): string
     {
-        return $this->getHierarchyOrder()[$type] ?? 'country';
+        $normalized = $this->lower($name);
+
+        return $parentId ? "{$parentId}:{$normalized}" : $normalized;
+    }
+
+    protected function lower(string $value): string
+    {
+        return (string) Str::of($value)->lower();
+    }
+
+    protected function resetRowContext(): void
+    {
+        $this->country = null;
+        $this->city = null;
+        $this->district = null;
+        $this->neighborhood = null;
+        $this->targetLevel = null;
+        $this->rowPrepared = false;
     }
 
     public static function getHeading(): string
@@ -271,17 +384,17 @@ class LocationImporter extends Importer
     {
         return [
             [
-                'country' => 'türkiye',
+                'country' => 'Türkiye',
             ],
             [
-                'country' => 'türkiye',
-                'city' => 'istanbul',
+                'country' => 'Türkiye',
+                'city' => 'İstanbul',
             ],
             [
-                'country' => 'türkiye',
-                'city' => 'istanbul',
-                'district' => 'sultnagazi',
-                'neighborhood' => '50.mahallesi',
+                'country' => 'Türkiye',
+                'city' => 'İstanbul',
+                'district' => 'Sultangazi',
+                'neighborhood' => '50. Yıl Mahallesi',
             ],
         ];
     }
