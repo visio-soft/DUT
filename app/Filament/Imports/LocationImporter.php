@@ -10,6 +10,7 @@ use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
@@ -233,7 +234,7 @@ class LocationImporter extends Importer
 
         $country = Country::query()
             ->withTrashed()
-            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->where('name', $name)
             ->first();
 
         if ($country?->trashed()) {
@@ -241,8 +242,15 @@ class LocationImporter extends Importer
         }
 
         if (! $country) {
-            $country = new Country(['name' => $name]);
-            $country->save();
+            try {
+                $country = Country::query()->create(['name' => $name]);
+            } catch (QueryException $e) {
+                $country = Country::query()->where('name', $name)->first();
+
+                if (! $country) {
+                    throw $e;
+                }
+            }
         }
 
         return $this->countryCache[$key] = $country;
@@ -259,7 +267,7 @@ class LocationImporter extends Importer
         $city = City::query()
             ->withTrashed()
             ->where('country_id', $country->id)
-            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->where('name', $name)
             ->first();
 
         if ($city?->trashed()) {
@@ -267,9 +275,21 @@ class LocationImporter extends Importer
         }
 
         if (! $city) {
-            $city = new City(['name' => $name]);
-            $city->country()->associate($country);
-            $city->save();
+            try {
+                $city = City::query()->create([
+                    'name' => $name,
+                    'country_id' => $country->id,
+                ]);
+            } catch (QueryException $e) {
+                $city = City::query()
+                    ->where('country_id', $country->id)
+                    ->where('name', $name)
+                    ->first();
+
+                if (! $city) {
+                    throw $e;
+                }
+            }
         }
 
         return $this->cityCache[$key] = $city;
@@ -286,7 +306,7 @@ class LocationImporter extends Importer
         $district = District::query()
             ->withTrashed()
             ->where('city_id', $city->id)
-            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->where('name', $name)
             ->first();
 
         if ($district?->trashed()) {
@@ -294,9 +314,21 @@ class LocationImporter extends Importer
         }
 
         if (! $district) {
-            $district = new District(['name' => $name]);
-            $district->city()->associate($city);
-            $district->save();
+            try {
+                $district = District::query()->create([
+                    'name' => $name,
+                    'city_id' => $city->id,
+                ]);
+            } catch (QueryException $e) {
+                $district = District::query()
+                    ->where('city_id', $city->id)
+                    ->where('name', $name)
+                    ->first();
+
+                if (! $district) {
+                    throw $e;
+                }
+            }
         }
 
         return $this->districtCache[$key] = $district;
@@ -313,7 +345,7 @@ class LocationImporter extends Importer
         $neighborhood = Neighborhood::query()
             ->withTrashed()
             ->where('district_id', $district->id)
-            ->whereRaw('LOWER(name) = ?', [$this->lower($name)])
+            ->where('name', $name)
             ->first();
 
         if ($neighborhood?->trashed()) {
@@ -321,9 +353,21 @@ class LocationImporter extends Importer
         }
 
         if (! $neighborhood) {
-            $neighborhood = new Neighborhood(['name' => $name]);
-            $neighborhood->district()->associate($district);
-            $neighborhood->save();
+            try {
+                $neighborhood = Neighborhood::query()->create([
+                    'name' => $name,
+                    'district_id' => $district->id,
+                ]);
+            } catch (QueryException $e) {
+                $neighborhood = Neighborhood::query()
+                    ->where('district_id', $district->id)
+                    ->where('name', $name)
+                    ->first();
+
+                if (! $neighborhood) {
+                    throw $e;
+                }
+            }
         }
 
         return $this->neighborhoodCache[$key] = $neighborhood;
