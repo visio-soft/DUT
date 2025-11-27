@@ -4,7 +4,6 @@ namespace App\Filament\Pages\UserPanel;
 
 use App\Enums\SuggestionStatusEnum;
 use App\Helpers\BackgroundImageHelper;
-use App\Models\Category;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -63,12 +62,6 @@ class UserProjects
             });
         }
 
-        if ($categoryId = $request->input('category_id')) {
-            $projectsQuery->whereHas('projectGroups', function (Builder $query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
-            });
-        }
-
         if ($district = $request->input('district')) {
             $projectsQuery->where('district', $district);
         }
@@ -101,12 +94,10 @@ class UserProjects
             ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])
             ->toArray();
 
-        $filterCategories = Category::orderBy('name')->get();
         $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
             'status',
-            'category_id',
             'district',
             'neighborhood',
             'start_date',
@@ -119,7 +110,7 @@ class UserProjects
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.user-projects', array_merge(
-            compact('projects', 'statusOptions', 'filterCategories', 'districts', 'filterValues'),
+            compact('projects', 'statusOptions', 'districts', 'filterValues'),
             $backgroundData
         ));
     }

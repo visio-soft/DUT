@@ -637,7 +637,6 @@
             $filterLabelMap = [
                 'search' => __('common.search'),
                 'status' => __('common.status'),
-                'category_id' => __('common.project_category'),
                 'district' => __('common.district'),
                 'neighborhood' => __('common.neighborhood'),
                 'start_date' => __('common.start_date'),
@@ -690,20 +689,6 @@
                                             <option value="">{{ __('common.select_option') }}</option>
                                             @foreach($statusOptions as $value => $label)
                                                 <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="filter-field">
-                                    <label for="category_id">{{ __('common.project_category') }}</label>
-                                    <div class="input-with-icon">
-                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
-                                        </svg>
-                                        <select id="category_id" name="category_id">
-                                            <option value="">{{ __('common.select_option') }}</option>
-                                            @foreach($filterCategories as $category)
-                                                <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -1533,14 +1518,16 @@ function toggleLike(suggestionId) {
 
     const likeCount = clickedButton.querySelector('.like-count');
 
-    // Get current suggestion's category from the data attributes
+    // Group buttons by project (fallback to category if project id is missing)
+    const suggestionProjectId = clickedButton.getAttribute('data-project-id');
     const suggestionCategory = clickedButton.getAttribute('data-category') || 'default';
+    const groupSelector = suggestionProjectId
+        ? `[data-project-id="${suggestionProjectId}"]`
+        : `[data-category="${suggestionCategory}"]`;
+    const groupedButtons = document.querySelectorAll(groupSelector);
 
-    // Find all buttons in the same category (radio button behavior - across all projects)
-    const allButtonsInCategory = document.querySelectorAll(`[data-category="${suggestionCategory}"]`);
-
-    // Disable all buttons in this category during request
-    allButtonsInCategory.forEach(btn => {
+    // Disable all buttons in this project/category during request
+    groupedButtons.forEach(btn => {
         // Don't disable expired buttons - just leave them as is
         if (btn.getAttribute('data-expired') !== 'true') {
             btn.disabled = true;
@@ -1556,17 +1543,25 @@ function toggleLike(suggestionId) {
             category: suggestionCategory
         },
         success: function(response) {
-            // Reset all buttons in the same category to default state (radio button logic)
-            allButtonsInCategory.forEach(btn => {
+            // Reset all buttons in the same project/category to default state (radio button logic)
+            groupedButtons.forEach(btn => {
                 // Skip expired buttons
                 if (btn.getAttribute('data-expired') === 'true') {
+                    // Still update like counters for expired buttons
+                    const expiredSuggestionId = btn.getAttribute('data-suggestion-id');
+                    if (response.all_likes && response.all_likes[expiredSuggestionId] !== undefined) {
+                        const expiredLikeCount = btn.querySelector('.like-count');
+                        if (expiredLikeCount) {
+                            expiredLikeCount.textContent = response.all_likes[expiredSuggestionId];
+                        }
+                    }
                     return;
                 }
 
                 btn.classList.remove('liked');
                 const btnSuggestionId = btn.getAttribute('data-suggestion-id');
 
-                // Reset heart icon to outline for all buttons in category
+                // Reset heart icon to outline for all buttons in group
                 const heartIcon = btn.querySelector('.like-icon');
                 if (heartIcon) {
                     heartIcon.style.fill = 'none';
@@ -1629,8 +1624,8 @@ function toggleLike(suggestionId) {
             showMessage(message, 'error');
         },
         complete: function() {
-            // Re-enable all non-expired buttons in the category
-            allButtonsInCategory.forEach(btn => {
+            // Re-enable all non-expired buttons in the group
+            groupedButtons.forEach(btn => {
                 if (btn.getAttribute('data-expired') !== 'true') {
                     btn.disabled = false;
                     btn.style.opacity = '1';

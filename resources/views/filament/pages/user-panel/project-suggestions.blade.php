@@ -1864,7 +1864,6 @@
             $activeFilterCount = $activeFilters->count();
             $filterLabelMap = [
                 'search' => __('common.search'),
-                'category_id' => __('common.project_category'),
                 'district' => __('common.district'),
                 'neighborhood' => __('common.neighborhood'),
                 'start_date' => __('common.start_date'),
@@ -1905,20 +1904,6 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
                                         </svg>
                                         <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
-                                    </div>
-                                </div>
-                                <div class="filter-field">
-                                    <label for="category_id">{{ __('common.project_category') }}</label>
-                                    <div class="input-with-icon">
-                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
-                                        </svg>
-                                        <select id="category_id" name="category_id">
-                                            <option value="">{{ __('common.select_option') }}</option>
-                                            @foreach($filterCategories as $category)
-                                                <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
-                                            @endforeach
-                                        </select>
                                     </div>
                                 </div>
                                 <div class="filter-field">

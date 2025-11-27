@@ -3,7 +3,6 @@
 namespace App\Filament\Pages\UserPanel;
 
 use App\Helpers\BackgroundImageHelper;
-use App\Models\Category;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -55,12 +54,6 @@ class ProjectSuggestions
             });
         }
 
-        if ($categoryId = $request->input('category_id')) {
-            $projectsQuery->whereHas('projectGroups', function (Builder $query) use ($categoryId) {
-                $query->where('category_id', $categoryId);
-            });
-        }
-
         if ($district = $request->input('district')) {
             $projectsQuery->where('district', $district);
         }
@@ -101,11 +94,9 @@ class ProjectSuggestions
             $project->setRelation('suggestions', $filteredSuggestions);
         }
 
-        $filterCategories = Category::orderBy('name')->get();
         $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
-            'category_id',
             'district',
             'neighborhood',
             'start_date',
@@ -117,7 +108,7 @@ class ProjectSuggestions
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.project-suggestions', array_merge(
-            compact('project', 'projects', 'filterCategories', 'districts', 'filterValues'),
+            compact('project', 'projects', 'districts', 'filterValues'),
             $backgroundData
         ));
     }
