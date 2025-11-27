@@ -57,7 +57,7 @@ class DecisionResultNotification extends Notification implements ShouldQueue
 
         $message->action('Öneriyi Görüntüle', url('/suggestions/'.$this->suggestion->id));
 
-        if ($this->decision === SuggestionStatusEnum::APPROVED || $this->decision === SuggestionStatusEnum::IMPLEMENTED) {
+        if ($this->decision === SuggestionStatusEnum::OPEN) {
             $message->line('Değerli katkınız için teşekkür ederiz!');
         } else {
             $message->line('İlginiz için teşekkür ederiz. Başka önerileriniz için bizi bekleriz.');

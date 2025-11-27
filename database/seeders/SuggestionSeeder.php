@@ -33,7 +33,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Park Alanına Yeni Ağaç Türleri Eklensin',
                 'description' => 'Parkta sadece çam ağacı var. Çeşitlilik için meşe ve ıhlamur ağaçları da eklenebilir. Bu hem görsellik hem de ekolojik çeşitlilik açısından faydalı olacaktır.',
-                'status' => SuggestionStatusEnum::PENDING,
+                'status' => SuggestionStatusEnum::OPEN,
                 'estimated_duration' => 30,
                 'min_budget' => 5000.00,
                 'max_budget' => 8000.00,
@@ -45,7 +45,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Sahile Bisiklet Yolu Yapılsın',
                 'description' => 'Sahil şeridinde yürüyüş yolu var ancak bisiklet yolu yok. Bisiklet severler için ayrı bir şerit oluşturulmalı.',
-                'status' => SuggestionStatusEnum::UNDER_REVIEW,
+                'status' => SuggestionStatusEnum::OPEN,
                 'estimated_duration' => 60,
                 'min_budget' => 50000.00,
                 'max_budget' => 80000.00,
@@ -57,7 +57,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Parkta Gölgelik Alanlar Artırılsın',
                 'description' => 'Yaz aylarında park çok sıcak oluyor. Daha fazla gölgelik alan ve oturma yerleri yapılmalı.',
-                'status' => SuggestionStatusEnum::APPROVED,
+                'status' => SuggestionStatusEnum::CLOSED,
                 'estimated_duration' => 45,
                 'min_budget' => 15000.00,
                 'max_budget' => 25000.00,
@@ -69,7 +69,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Çocuk Parkına Engelli Oyun Alanı',
                 'description' => 'Engelli çocuklar için özel tasarlanmış oyun ekipmanları eklenebilir. Bu sosyal içerme açısından önemli.',
-                'status' => SuggestionStatusEnum::PENDING,
+                'status' => SuggestionStatusEnum::OPEN,
                 'estimated_duration' => 30,
                 'min_budget' => 20000.00,
                 'max_budget' => 35000.00,
@@ -81,7 +81,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Otopark Aydınlatması Yetersiz',
                 'description' => 'Akşam saatlerinde otopark çok karanlık kalıyor. Güvenlik ve görüş için daha fazla aydınlatma gerekli.',
-                'status' => SuggestionStatusEnum::IMPLEMENTED,
+                'status' => SuggestionStatusEnum::CLOSED,
                 'estimated_duration' => 15,
                 'min_budget' => 10000.00,
                 'max_budget' => 15000.00,
@@ -93,7 +93,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Sahilde Yürüyüş Yolu Genişletilsin',
                 'description' => 'Hafta sonları çok kalabalık oluyor. Yürüyüş yolu daha geniş yapılabilir.',
-                'status' => SuggestionStatusEnum::UNDER_REVIEW,
+                'status' => SuggestionStatusEnum::OPEN,
                 'estimated_duration' => 90,
                 'min_budget' => 100000.00,
                 'max_budget' => 150000.00,
@@ -105,7 +105,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Parkta Wi-Fi Erişimi Olsun',
                 'description' => 'Parkta çalışmak veya internete erişmek isteyenler için ücretsiz Wi-Fi hizmeti verilebilir.',
-                'status' => SuggestionStatusEnum::REJECTED,
+                'status' => SuggestionStatusEnum::CLOSED,
                 'estimated_duration' => 20,
                 'min_budget' => 3000.00,
                 'max_budget' => 5000.00,
@@ -117,7 +117,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Çocuk Parkında Güvenlik Kamerası',
                 'description' => 'Çocukların güvenliği için park alanına kamera sistemi kurulmalı.',
-                'status' => SuggestionStatusEnum::APPROVED,
+                'status' => SuggestionStatusEnum::CLOSED,
                 'estimated_duration' => 10,
                 'min_budget' => 8000.00,
                 'max_budget' => 12000.00,
@@ -129,7 +129,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Caddeye Daha Fazla Bank Konulsun',
                 'description' => 'Yaşlılar için cadde boyunca dinlenme bankları artırılabilir.',
-                'status' => SuggestionStatusEnum::PENDING,
+                'status' => SuggestionStatusEnum::OPEN,
                 'estimated_duration' => 7,
                 'min_budget' => 5000.00,
                 'max_budget' => 8000.00,
@@ -141,7 +141,7 @@ class SuggestionSeeder extends Seeder
             [
                 'title' => 'Otoparkta EV Şarj İstasyonu',
                 'description' => 'Elektrikli araç sahipleri için şarj istasyonları kurulmalı.',
-                'status' => SuggestionStatusEnum::UNDER_REVIEW,
+                'status' => SuggestionStatusEnum::OPEN,
                 'estimated_duration' => 30,
                 'min_budget' => 50000.00,
                 'max_budget' => 75000.00,

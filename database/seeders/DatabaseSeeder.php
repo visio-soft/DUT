@@ -11,6 +11,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (env('DUT_SEED_WITH_LIVE', false)) {
+            $this->call([
+                DutLiveSeeder::class,
+            ]);
+
+            return;
+        }
+
         // Create roles first
         $this->call([
             RoleSeeder::class,

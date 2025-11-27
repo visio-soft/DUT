@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\SuggestionStatusEnum;
 use App\Filament\Helpers\CommonFilters;
 use App\Filament\Helpers\CommonTableActions;
 use App\Filament\Resources\SuggestionResource\Pages;
@@ -85,12 +86,6 @@ class SuggestionResource extends Resource
                             ->rows(3)
                             ->columnSpanFull(),
 
-                        Forms\Components\Select::make('status')
-                            ->label(__('common.status'))
-                            ->options(\App\Enums\SuggestionStatusEnum::class)
-                            ->default(\App\Enums\SuggestionStatusEnum::PENDING)
-                            ->required(),
-
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('min_budget')
@@ -157,11 +152,6 @@ class SuggestionResource extends Resource
                     ->height(50)
                     ->width(50),
                 Tables\Columns\TextColumn::make('title')->label(__('common.title'))->limit(40)->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->label(__('common.status'))
-                    ->badge()
-                    ->sortable()
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('createdBy.name')
                     ->label(__('common.creator'))
                     ->searchable()
@@ -203,17 +193,16 @@ class SuggestionResource extends Resource
             ->filters([
                 TrashedFilter::make(),
 
-                SelectFilter::make('status')
-                    ->label(__('common.status'))
-                    ->options(\App\Enums\SuggestionStatusEnum::class)
-                    ->searchable()
-                    ->preload(),
-
                 SelectFilter::make('project')
                     ->label(__('common.project'))
                     ->relationship('project', 'title'),
 
-                CommonFilters::creatorTypeFilter('common.anonymous'),
+                SelectFilter::make('status')
+                    ->label(__('common.status'))
+                    ->options(SuggestionStatusEnum::class)
+                    ->searchable()
+                    ->preload(),
+
                 CommonFilters::locationFilter(),
                 CommonFilters::budgetRangeFilter(),
                 CommonFilters::likesFilter(),

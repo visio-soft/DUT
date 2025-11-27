@@ -49,24 +49,24 @@ class FilteringSystemTest extends TestCase
         $project = Project::create(['title' => 'Test Project']);
         $project->projectGroups()->attach($projectGroup->id);
 
-        $pendingSuggestion = Suggestion::create([
+        $openSuggestion = Suggestion::create([
             'project_id' => $project->id,
-            'title' => 'Pending Suggestion',
-            'status' => SuggestionStatusEnum::PENDING,
+            'title' => 'Open Suggestion',
+            'status' => SuggestionStatusEnum::OPEN,
         ]);
 
-        $approvedSuggestion = Suggestion::create([
+        $closedSuggestion = Suggestion::create([
             'project_id' => $project->id,
-            'title' => 'Approved Suggestion',
-            'status' => SuggestionStatusEnum::APPROVED,
+            'title' => 'Closed Suggestion',
+            'status' => SuggestionStatusEnum::CLOSED,
         ]);
 
-        $pendingSuggestions = Suggestion::where('status', SuggestionStatusEnum::PENDING)->get();
-        $approvedSuggestions = Suggestion::where('status', SuggestionStatusEnum::APPROVED)->get();
+        $openSuggestions = Suggestion::where('status', SuggestionStatusEnum::OPEN)->get();
+        $closedSuggestions = Suggestion::where('status', SuggestionStatusEnum::CLOSED)->get();
 
-        $this->assertCount(1, $pendingSuggestions);
-        $this->assertCount(1, $approvedSuggestions);
-        $this->assertEquals('Pending Suggestion', $pendingSuggestions->first()->title);
+        $this->assertCount(1, $openSuggestions);
+        $this->assertCount(1, $closedSuggestions);
+        $this->assertEquals('Open Suggestion', $openSuggestions->first()->title);
     }
 
     /** @test */

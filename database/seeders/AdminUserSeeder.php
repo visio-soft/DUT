@@ -41,16 +41,19 @@ class AdminUserSeeder extends Seeder
             $superAdminRole->syncPermissions($permissions);
         }
 
-        // Create admin user
-        $admin = User::where('email', 'admin@admin.com')->first();
+        // Create admin user (check including soft-deleted)
+        $admin = User::withTrashed()->where('email', 'admin@admin.com')->first();
 
         if (! $admin) {
-            $admin = new User;
-            $admin->name = 'Super Admin';
-            $admin->email = 'admin@admin.com';
-            $admin->password = Hash::make('password');
-            $admin->email_verified_at = now();
-            $admin->save();
+            $admin = User::create([
+                'name' => 'Super Admin',
+                'email' => 'admin@admin.com',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]);
+        } elseif ($admin->trashed()) {
+            // Restore if soft-deleted
+            $admin->restore();
         }
 
         // Assign Super Admin role to user

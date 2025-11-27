@@ -42,7 +42,15 @@
             <div class="detail-header">
                 <div class="content-spacing-lg">
                     <div style="flex: 1;">
-                        <h1 class="detail-title">{{ $suggestion->title }}</h1>
+                        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 0.5rem;">
+                            <h1 class="detail-title" style="margin-bottom: 0;">{{ $suggestion->title }}</h1>
+                            @if($suggestion->status)
+                                <span style="padding: 0.5rem 1rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.025em;
+                                    {{ $suggestion->status->value === 'open' ? 'background: var(--green-100); color: var(--green-800); border: 1px solid var(--green-300);' : 'background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5;' }}">
+                                    {{ $suggestion->status->getLabel() }}
+                                </span>
+                            @endif
+                        </div>
 
                         <!-- Project Info -->
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">

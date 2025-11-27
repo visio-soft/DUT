@@ -37,17 +37,13 @@ class SuggestionObserver
             $suggestion->updated_by_id = Auth::id();
         }
 
-        // Check if status has changed to a decision status
+        // Check if status has changed to closed status
         if ($suggestion->isDirty('status')) {
             $newStatus = $suggestion->status;
             $oldStatus = $suggestion->getOriginal('status');
 
-            // Send notification if status changed to a decision status
-            if (in_array($newStatus, [
-                \App\Enums\SuggestionStatusEnum::APPROVED,
-                \App\Enums\SuggestionStatusEnum::REJECTED,
-                \App\Enums\SuggestionStatusEnum::IMPLEMENTED,
-            ])) {
+            // Send notification if status changed to closed
+            if ($newStatus === \App\Enums\SuggestionStatusEnum::CLOSED) {
                 // Send notification after the model is saved
                 $suggestion->registerModelEvent('saved', function ($model) use ($newStatus) {
                     if ($model->createdBy) {

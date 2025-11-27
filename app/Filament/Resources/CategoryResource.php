@@ -54,7 +54,18 @@ class CategoryResource extends Resource
             ->schema([
                 Forms\Components\Select::make('parent_id')
                     ->label(__('common.parent_category'))
-                    ->relationship('parent', 'name')
+                    ->relationship(
+                        'parent',
+                        'name',
+                        fn ($query, $record) => $query->when(
+                            $record,
+                            fn ($q) => $q->whereNull('parent_id')
+                                ->where('id', '!=', $record->id)
+                        )->when(
+                            ! $record,
+                            fn ($q) => $q->whereNull('parent_id')
+                        )
+                    )
                     ->searchable()
                     ->preload()
                     ->nullable()
