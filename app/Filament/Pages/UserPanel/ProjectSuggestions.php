@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages\UserPanel;
 
-use App\Enums\ProjectStatusEnum;
 use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
 use App\Models\Project;
@@ -20,15 +19,23 @@ class ProjectSuggestions
         $search = Str::lower($request->string('search')->toString());
 
         $project = Project::with([
-            'suggestions.likes',
-            'suggestions.comments',
-            'suggestions.createdBy',
+            'suggestions' => function ($query) {
+                $query->with([
+                    'likes',
+                    'comments',
+                    'createdBy',
+                ]);
+            },
         ])->findOrFail($id);
 
         $projectsQuery = Project::query()
             ->with([
-                'suggestions.likes',
-                'suggestions.createdBy',
+                'suggestions' => function ($query) {
+                    $query->with([
+                        'likes',
+                        'createdBy',
+                    ]);
+                },
                 'projectGroups.category',
             ]);
 
@@ -48,22 +55,10 @@ class ProjectSuggestions
             });
         }
 
-        if ($status = $request->input('status')) {
-            $projectsQuery->where('status', $status);
-        }
-
         if ($categoryId = $request->input('category_id')) {
             $projectsQuery->whereHas('projectGroups', function (Builder $query) use ($categoryId) {
                 $query->where('category_id', $categoryId);
             });
-        }
-
-        if ($creatorType = $request->input('creator_type')) {
-            if ($creatorType === 'with_user') {
-                $projectsQuery->whereNotNull('created_by_id');
-            } elseif ($creatorType === 'not_assigned') {
-                $projectsQuery->whereNull('created_by_id');
-            }
         }
 
         if ($district = $request->input('district')) {
@@ -106,17 +101,11 @@ class ProjectSuggestions
             $project->setRelation('suggestions', $filteredSuggestions);
         }
 
-        $statusOptions = collect(ProjectStatusEnum::cases())
-            ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])
-            ->toArray();
-
         $filterCategories = Category::orderBy('name')->get();
         $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
-            'status',
             'category_id',
-            'creator_type',
             'district',
             'neighborhood',
             'start_date',
@@ -128,7 +117,7 @@ class ProjectSuggestions
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.project-suggestions', array_merge(
-            compact('project', 'projects', 'statusOptions', 'filterCategories', 'districts', 'filterValues'),
+            compact('project', 'projects', 'filterCategories', 'districts', 'filterValues'),
             $backgroundData
         ));
     }

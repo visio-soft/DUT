@@ -2,7 +2,7 @@
 
 namespace App\Filament\Pages\UserPanel;
 
-use App\Enums\ProjectStatusEnum;
+use App\Enums\SuggestionStatusEnum;
 use App\Helpers\BackgroundImageHelper;
 use App\Models\Category;
 use App\Models\Project;
@@ -18,20 +18,35 @@ class UserProjects
     public function index(Request $request)
     {
         $request = request();
+        $statusFilter = $request->string('status')->toString();
+        if ($statusFilter && ! SuggestionStatusEnum::tryFrom($statusFilter)) {
+            $statusFilter = null;
+        }
 
-        $projectsQuery = Project::query()
-            ->with([
-                'suggestions.likes',
-                'suggestions.createdBy',
-                'projectGroups.category',
-            ]);
+        $projectsQuery = Project::query()->with([
+            'suggestions' => function ($query) use ($statusFilter) {
+                if ($statusFilter) {
+                    $query->where('status', $statusFilter);
+                }
+
+                $query->with([
+                    'likes',
+                    'createdBy',
+                ]);
+            },
+            'projectGroups.category',
+        ]);
 
         if ($search = Str::lower($request->string('search')->toString())) {
-            $projectsQuery->where(function (Builder $query) use ($search) {
+            $projectsQuery->where(function (Builder $query) use ($search, $statusFilter) {
                 $likeTerm = "%{$search}%";
                 $query->whereRaw('LOWER(title) like ?', [$likeTerm])
                     ->orWhereRaw('LOWER(description) like ?', [$likeTerm])
-                    ->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm) {
+                    ->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm, $statusFilter) {
+                        if ($statusFilter) {
+                            $suggestionQuery->where('status', $statusFilter);
+                        }
+
                         $suggestionQuery->where(function (Builder $inner) use ($likeTerm) {
                             $inner->whereRaw('LOWER(title) like ?', [$likeTerm])
                                 ->orWhereHas('createdBy', function (Builder $creatorQuery) use ($likeTerm) {
@@ -42,22 +57,16 @@ class UserProjects
             });
         }
 
-        if ($status = $request->input('status')) {
-            $projectsQuery->where('status', $status);
+        if ($statusFilter) {
+            $projectsQuery->whereHas('suggestions', function (Builder $query) use ($statusFilter) {
+                $query->where('status', $statusFilter);
+            });
         }
 
         if ($categoryId = $request->input('category_id')) {
             $projectsQuery->whereHas('projectGroups', function (Builder $query) use ($categoryId) {
                 $query->where('category_id', $categoryId);
             });
-        }
-
-        if ($creatorType = $request->input('creator_type')) {
-            if ($creatorType === 'with_user') {
-                $projectsQuery->whereNotNull('created_by_id');
-            } elseif ($creatorType === 'not_assigned') {
-                $projectsQuery->whereNull('created_by_id');
-            }
         }
 
         if ($district = $request->input('district')) {
@@ -88,7 +97,7 @@ class UserProjects
             ->orderByDesc('start_date')
             ->get();
 
-        $statusOptions = collect(ProjectStatusEnum::cases())
+        $statusOptions = collect(SuggestionStatusEnum::cases())
             ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])
             ->toArray();
 
@@ -98,7 +107,6 @@ class UserProjects
             'search',
             'status',
             'category_id',
-            'creator_type',
             'district',
             'neighborhood',
             'start_date',
@@ -106,6 +114,7 @@ class UserProjects
             'min_budget',
             'max_budget',
         ]);
+        $filterValues['status'] = $statusFilter;
 
         $backgroundData = $this->getBackgroundImageData();
 

@@ -321,16 +321,12 @@
         background: #ffffff;
         border: 1px solid var(--gray-200);
         border-radius: var(--radius-xl);
-        padding: 1.25rem;
+        padding: 1rem;
         margin: 0 0 1rem;
         box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
         width: 100%;
-    }
-
-    .filters-card.collapsed .filter-grid,
-    .filters-card.collapsed .filters-actions,
-    .filters-card.collapsed .filter-badges {
-        display: none;
+        overflow: hidden;
+        transition: padding 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     }
 
     .filters-card.collapsed {
@@ -338,35 +334,107 @@
     }
 
     .filters-collapse-btn {
-        margin-left: auto;
-        display: inline-flex;
+        display: flex;
         align-items: center;
-        gap: 0.35rem;
-        background: var(--gray-100);
-        color: var(--gray-700);
-        border: 1px solid var(--gray-200);
+        gap: 0.5rem;
+        width: 100%;
+        background: transparent;
+        color: var(--gray-900);
+        border: none;
         border-radius: var(--radius-lg);
-        padding: 0.35rem 0.65rem;
-        font-weight: 600;
-        font-size: 0.85rem;
+        padding: 0.35rem 0;
+        font-weight: 700;
+        font-size: 1rem;
         cursor: pointer;
-        transition: background 0.2s, border-color 0.2s;
+        transition: color 0.2s ease;
+        text-align: left;
     }
 
     .filters-collapse-btn:hover {
+        color: var(--gray-800);
+    }
+
+    .filters-header-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filters-header-info h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        margin: 0;
+    }
+
+    .collapse-icon-circle {
+        margin-left: auto;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 999px;
+        background: var(--gray-100);
+        color: var(--gray-700);
+        border: 1px solid var(--gray-200);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, border-color 0.2s, transform 0.3s ease;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    }
+
+    .filters-collapse-btn:hover .collapse-icon-circle {
         background: var(--gray-200);
         border-color: var(--gray-300);
+    }
+
+    .filters-card.collapsed .collapse-icon-circle {
+        transform: rotate(180deg);
+    }
+
+    .collapse-icon {
+        width: 0.9rem;
+        height: 0.9rem;
+    }
+
+    .filters-content {
+        overflow: hidden;
+        max-height: 2000px;
+        opacity: 1;
+        transform: translateY(0);
+        transition: max-height 0.35s ease, opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .filters-card.collapsed .filters-content {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
     }
 
     .filter-grid {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 0.75rem;
+        gap: 0.6rem;
         margin-top: 0.75rem;
     }
 
+    .filter-row {
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .filter-row.two-cols {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @media (max-width: 640px) {
+        .filter-row.two-cols {
+            grid-template-columns: 1fr;
+        }
+    }
+
     .filter-grid label {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
         color: var(--gray-600);
         margin-bottom: 0.35rem;
@@ -378,11 +446,34 @@
         width: 100%;
         border-radius: 0.75rem;
         border: 1px solid var(--gray-200);
-        padding: 0.65rem 0.85rem;
-        font-size: 0.9rem;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.85rem;
         color: var(--gray-800);
         background: var(--gray-50);
         transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .compact-filter-input {
+        padding: 0.4rem 0.65rem;
+        font-size: 0.8rem;
+        line-height: 1.2;
+    }
+
+    .filters-card .input-with-icon {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .filters-card .input-with-icon svg {
+        width: 0.95rem;
+        height: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    .filters-card .input-with-icon input,
+    .filters-card .input-with-icon select {
+        flex: 1;
     }
 
     .filter-grid input:focus,
@@ -404,9 +495,10 @@
     .filters-actions button,
     .filters-actions a {
         border-radius: var(--radius-lg);
-        padding: 0.75rem 1.25rem;
+        padding: 0.65rem 1rem;
         border: none;
         font-weight: 600;
+        font-size: 0.9rem;
         cursor: pointer;
         transition: transform 0.2s, box-shadow 0.2s;
     }
@@ -546,7 +638,6 @@
                 'search' => __('common.search'),
                 'status' => __('common.status'),
                 'category_id' => __('common.project_category'),
-                'creator_type' => __('common.creator_type'),
                 'district' => __('common.district'),
                 'neighborhood' => __('common.neighborhood'),
                 'start_date' => __('common.start_date'),
@@ -554,163 +645,129 @@
                 'min_budget' => __('common.min_budget'),
                 'max_budget' => __('common.max_budget'),
             ];
+            $startCollapsed = $activeFilters->isEmpty();
         @endphp
 
         <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
             <!-- Sol Taraf: Tree View -->
             <div>
-                <div id="user-filter-panel" class="filters-card">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <svg style="width: 1rem; height: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M4.5 8.25h15L13.5 15v5.25l-3-1.5V15L4.5 8.25z"/>
-                        </svg>
-                        <h3 style="font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0;">
-                            {{ __('common.filters_button') }}
-                        </h3>
-                        @if($activeFilterCount)
-                            <span class="filter-badge">{{ $activeFilterCount }}</span>
-                        @endif
-                        <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
-                            <span class="collapse-text">{{ __('common.clear') }}</span>
-                            <svg class="collapse-icon" style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                <div id="user-filter-panel" class="filters-card {{ $startCollapsed ? 'collapsed' : '' }}">
+                    <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
+                        <div class="filters-header-info">
+                            <svg style="width: 1rem; height: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4.5h18M4.5 8.25h15L13.5 15v5.25l-3-1.5V15L4.5 8.25z"/>
                             </svg>
-                        </button>
-                    </div>
-                    <form method="GET" action="{{ route('user.projects') }}">
-                        <div class="filter-grid">
-                            <div class="filter-field">
-                                <label for="search">{{ __('common.title') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
-                                    </svg>
-                                    <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="status">{{ __('common.status') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
-                                    </svg>
-                                    <select id="status" name="status">
-                                        <option value="">{{ __('common.select_option') }}</option>
-                                        @foreach($statusOptions as $value => $label)
-                                            <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="category_id">{{ __('common.project_category') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
-                                    </svg>
-                                    <select id="category_id" name="category_id">
-                                        <option value="">{{ __('common.select_option') }}</option>
-                                        @foreach($filterCategories as $category)
-                                            <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="creator_type">{{ __('common.creator_type') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0"/>
-                                    </svg>
-                                    <select id="creator_type" name="creator_type">
-                                        <option value="">{{ __('common.select_option') }}</option>
-                                        <option value="with_user" @selected(($filterValues['creator_type'] ?? '') === 'with_user')>{{ __('common.user_assigned') }}</option>
-                                        <option value="not_assigned" @selected(($filterValues['creator_type'] ?? '') === 'not_assigned')>{{ __('common.not_assigned') }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="district-filter">{{ __('common.district') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
-                                        <circle cx="12" cy="10.2" r="2.4"/>
-                                    </svg>
-                                    <select id="district-filter" name="district">
-                                        <option value="">{{ __('common.select_option') }}</option>
-                                        @foreach($districts as $district)
-                                            <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
-                                    </svg>
-                                    <select id="neighborhood-filter" name="neighborhood">
-                                        <option value="">{{ __('common.select_option') }}</option>
-                                        @foreach($neighborhoodOptions as $neighborhood)
-                                            <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="start_date">{{ __('common.start_date') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
-                                    </svg>
-                                    <input type="date" id="start_date" name="start_date" value="{{ $filterValues['start_date'] ?? '' }}">
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="end_date">{{ __('common.end_date') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 8.25h18M4.5 21h15a1.5 1.5 0 001.5-1.5V6.75A1.5 1.5 0 0019.5 5.25H4.5A1.5 1.5 0 003 6.75V19.5A1.5 1.5 0 004.5 21z"/>
-                                    </svg>
-                                    <input type="date" id="end_date" name="end_date" value="{{ $filterValues['end_date'] ?? '' }}">
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="min_budget">{{ __('common.min_budget') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
-                                    </svg>
-                                    <input type="number" step="0.01" id="min_budget" name="min_budget" value="{{ $filterValues['min_budget'] ?? '' }}">
-                                </div>
-                            </div>
-                            <div class="filter-field">
-                                <label for="max_budget">{{ __('common.max_budget') }}</label>
-                                <div class="input-with-icon">
-                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/>
-                                    </svg>
-                                    <input type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="filters-actions">
-                            <button type="submit" class="apply-btn" style="width: 100%; text-align: center;">{{ __('common.filters_button') }}</button>
-                            @if($activeFilters->isNotEmpty())
-                                <a href="{{ route('user.projects') }}" class="reset-btn" style="width: 100%; text-align: center;">{{ __('common.clear') }}</a>
+                            <h3>{{ __('common.filters_button') }}</h3>
+                            @if($activeFilterCount)
+                                <span class="filter-badge">{{ $activeFilterCount }}</span>
                             @endif
                         </div>
-                    </form>
-                    @if($activeFilters->isNotEmpty())
-                        <div class="filter-badges">
-                            @foreach($activeFilters as $key => $value)
-                                <span class="filter-badge">
-                                    {{ $filterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}
-                                </span>
-                            @endforeach
-                        </div>
-                    @endif
+                        <span class="collapse-icon-circle">
+                            <svg class="collapse-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
+                            </svg>
+                        </span>
+                    </button>
+                    <div class="filters-content">
+                        <form id="projects-filters-form" method="GET" action="{{ route('user.projects') }}">
+                            <div class="filter-grid">
+                                <div class="filter-field">
+                                    <label for="search">{{ __('common.title') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0a7 7 0 10-9.9-9.9 7 7 0 009.9 9.9z"/>
+                                        </svg>
+                                        <input type="text" id="search" name="search" value="{{ $filterValues['search'] ?? '' }}" placeholder="{{ __('common.search') }}">
+                                    </div>
+                                </div>
+                                <div class="filter-field">
+                                    <label for="status">{{ __('common.status') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
+                                        </svg>
+                                        <select id="status" name="status">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            @foreach($statusOptions as $value => $label)
+                                                <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-field">
+                                    <label for="category_id">{{ __('common.project_category') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5h18M3 12h18M3 16.5h18"/>
+                                        </svg>
+                                        <select id="category_id" name="category_id">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            @foreach($filterCategories as $category)
+                                                <option value="{{ $category->id }}" @selected(($filterValues['category_id'] ?? '') == $category->id)>{{ $category->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-field">
+                                    <label for="district-filter">{{ __('common.district') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
+                                            <circle cx="12" cy="10.2" r="2.4"/>
+                                        </svg>
+                                        <select id="district-filter" name="district">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            @foreach($districts as $district)
+                                                <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-field">
+                                    <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
+                                        </svg>
+                                        <select id="neighborhood-filter" name="neighborhood">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            @foreach($neighborhoodOptions as $neighborhood)
+                                                <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-field">
+                                    <label for="start_date">{{ __('common.start_date') }}</label>
+                                    <input class="compact-filter-input" type="date" id="start_date" name="start_date" value="{{ $filterValues['start_date'] ?? '' }}">
+                                </div>
+                                <div class="filter-field">
+                                    <label for="end_date">{{ __('common.end_date') }}</label>
+                                    <input class="compact-filter-input" type="date" id="end_date" name="end_date" value="{{ $filterValues['end_date'] ?? '' }}">
+                                </div>
+                                <div class="filter-field">
+                                    <label for="min_budget">{{ __('common.min_budget') }}</label>
+                                    <input class="compact-filter-input" type="number" step="0.01" id="min_budget" name="min_budget" value="{{ $filterValues['min_budget'] ?? '' }}">
+                                </div>
+                                <div class="filter-field">
+                                    <label for="max_budget">{{ __('common.max_budget') }}</label>
+                                    <input class="compact-filter-input" type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
+                                </div>
+                            </div>
+                            <div class="filters-actions">
+                                <a href="{{ route('user.projects') }}" class="reset-btn" style="width: 100%; text-align: center;">{{ __('common.clear') }}</a>
+                            </div>
+                        </form>
+                        @if($activeFilters->isNotEmpty())
+                            <div class="filter-badges">
+                                @foreach($activeFilters as $key => $value)
+                                    <span class="filter-badge">
+                                        {{ $filterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}: {{ $value }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
                 </div>
 
                 <div class="tree-view">
@@ -1048,53 +1105,95 @@
 
 
 <!-- JavaScript for interactions -->
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
-        const districtSelect = document.getElementById('district-filter');
-        const neighborhoodSelect = document.getElementById('neighborhood-filter');
-        const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
-        const filterCard = document.getElementById('user-filter-panel');
-        const collapseBtn = document.getElementById('filters-collapse-btn');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
+            const districtSelect = document.getElementById('district-filter');
+            const neighborhoodSelect = document.getElementById('neighborhood-filter');
+            const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
+            const filterCard = document.getElementById('user-filter-panel');
+            const collapseBtn = document.getElementById('filters-collapse-btn');
+            const filterContent = filterCard ? filterCard.querySelector('.filters-content') : null;
+            const filterForm = document.getElementById('projects-filters-form');
+            const startCollapsed = {{ $startCollapsed ? 'true' : 'false' }};
 
-        if (districtSelect && neighborhoodSelect) {
-            districtSelect.addEventListener('change', function () {
-                const value = this.value;
-                const options = neighborhoodsMap[value] || [];
-                neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
-
-                options.forEach(option => {
-                    const opt = document.createElement('option');
-                    opt.value = option;
-                    opt.textContent = option;
-                    neighborhoodSelect.appendChild(opt);
-                });
-            });
-        }
-
-        if (filterCard && collapseBtn) {
-            const collapseIcon = collapseBtn.querySelector('.collapse-icon');
-            const collapseText = collapseBtn.querySelector('.collapse-text');
-
-            const setCollapsedState = (collapsed) => {
-                filterCard.classList.toggle('collapsed', collapsed);
-                if (collapsed) {
-                    collapseText.textContent = '{{ __('common.filters_button') }}';
-                    collapseIcon.style.transform = 'rotate(180deg)';
-                } else {
-                    collapseText.textContent = '{{ __('common.clear') }}';
-                    collapseIcon.style.transform = 'rotate(0deg)';
-                }
+            const debounce = (fn, delay = 400) => {
+                let timeoutId;
+                return (...args) => {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => fn(...args), delay);
+                };
             };
 
-            collapseBtn.addEventListener('click', () => {
-                const collapsed = !filterCard.classList.contains('collapsed');
-                setCollapsedState(collapsed);
-            });
-        }
+            const submitFilters = filterForm ? debounce(() => filterForm.submit(), 400) : null;
 
-    });
-</script>
+            if (districtSelect && neighborhoodSelect) {
+                districtSelect.addEventListener('change', function () {
+                    const value = this.value;
+                    const options = neighborhoodsMap[value] || [];
+                    neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+
+                    options.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option;
+                        opt.textContent = option;
+                        neighborhoodSelect.appendChild(opt);
+                    });
+
+                    if (submitFilters) {
+                        submitFilters();
+                    }
+                });
+            }
+
+            if (filterCard && collapseBtn && filterContent) {
+                const syncContentHeight = () => {
+                    const isCollapsed = filterCard.classList.contains('collapsed');
+                    if (isCollapsed) {
+                        filterContent.style.maxHeight = '0px';
+                    } else {
+                        filterContent.style.maxHeight = `${filterContent.scrollHeight}px`;
+                    }
+                };
+
+                const setCollapsedState = (collapsed, { immediate = false } = {}) => {
+                    filterCard.classList.toggle('collapsed', collapsed);
+                    if (immediate) {
+                        filterContent.style.transition = 'none';
+                    }
+                    syncContentHeight();
+                    if (immediate) {
+                        requestAnimationFrame(() => {
+                            filterContent.style.transition = '';
+                        });
+                    }
+                };
+
+                setCollapsedState(startCollapsed, { immediate: true });
+                requestAnimationFrame(syncContentHeight);
+
+                collapseBtn.addEventListener('click', () => {
+                    const collapsed = !filterCard.classList.contains('collapsed');
+                    setCollapsedState(collapsed);
+                });
+
+                window.addEventListener('resize', syncContentHeight);
+            }
+
+            if (filterForm && submitFilters) {
+                const filterFields = filterForm.querySelectorAll('input, select');
+
+                filterFields.forEach((field) => {
+                    const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
+                    if (field.id === 'district-filter') {
+                        return;
+                    }
+                    field.addEventListener(eventName, submitFilters);
+                });
+            }
+
+        });
+    </script>
 
 <script>
 // Set up CSRF token for AJAX requests
