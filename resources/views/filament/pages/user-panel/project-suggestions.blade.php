@@ -2381,7 +2381,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 neighborhoodWrapper.style.transform = 'translateY(-10px)';
                 neighborhoodWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
 
-                await fetchLocations(districtId, neighborhoodSelect);
+                await fetchLocations(districtId, neighborhoodSelect, 'neighborhood');
 
                 requestAnimationFrame(() => {
                     neighborhoodWrapper.style.opacity = '1';
@@ -2440,6 +2440,8 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(filterContent, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
     }
 
+    // Auto-submit logic removed
+    /*
     if (filterForm && submitFilters) {
         const filterFields = filterForm.querySelectorAll('input, select');
 
@@ -2452,6 +2454,7 @@ document.addEventListener('DOMContentLoaded', () => {
             field.addEventListener(eventName, submitFilters);
         });
     }
+    */
 });
 
 // Set up CSRF token for AJAX requests
