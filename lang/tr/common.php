@@ -408,4 +408,30 @@ return [
 
     // Common delete action
     'delete' => 'Sil',
+
+    // Comment Resource
+    'comment_owner' => 'Yorum Sahibi',
+    'suggestion_title' => 'Öneri Başlığı',
+    'comment_content' => 'Yorum İçeriği',
+    'approval_status' => 'Onay Durumu',
+    'approved' => 'Yayında',
+    'rejected' => 'Reddedildi',
+    'waiting_approval' => 'Onay Bekliyor',
+    'approve' => 'Onayla',
+    'reject' => 'Reddet',
+    'restore' => 'Geri Al',
+    'view' => 'İncele',
+    'bulk_approve' => 'Seçilenleri Onayla',
+    'trashed' => 'Silinmiş Kayıtlar',
+    'user_info' => 'Kullanıcı Bilgileri',
+    'suggestion_info' => 'Öneri Bilgileri',
+    'date' => 'Tarih',
+    'name' => 'İsim',
+    'email' => 'E-posta',
+
+    // Time units
+    'day' => 'gün|gün',
+    'hour' => 'saat|saat',
+    'minute' => 'dakika|dakika',
+    'second' => 'saniye|saniye',
 ];

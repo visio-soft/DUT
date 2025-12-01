@@ -29,16 +29,25 @@ class CommentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
 
-    protected static ?string $navigationLabel = 'Yorumlar';
-
-   public static function getPluralModelLabel(): string
+    public static function getNavigationLabel(): string
     {
-        return __('common.suggestion');
-    }    
+        return __('common.comments');
+    }
 
-    protected static ?string $modelLabel = 'Yorum';
+    public static function getModelLabel(): string
+    {
+        return __('common.comment');
+    }
 
-    protected static ?string $pluralModelLabel = 'Yorumlar';
+    public static function getPluralModelLabel(): string
+    {
+        return __('common.comments');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('common.suggestion_management');
+    }
 
     public static function form(Form $form): Form
     {
@@ -57,54 +66,54 @@ class CommentResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Yorum Sahibi')
+                    ->label(__('common.comment_owner'))
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('suggestion.title')
-                    ->label('Öneri Başlığı')
+                    ->label(__('common.suggestion_title'))
                     ->searchable()
                     ->sortable()
                     ->limit(30),
                 TextColumn::make('comment')
-                    ->label('Yorum İçeriği')
+                    ->label(__('common.comment_content'))
                     ->wrap()
                     ->searchable(),
                 TextColumn::make('status')
-                    ->label('Durum')
+                    ->label(__('common.status'))
                     ->badge()
-                    ->getStateUsing(fn (SuggestionComment $record): string => $record->deleted_at ? 'Reddedildi' : ($record->is_approved ? 'Yayında' : 'Onay Bekliyor'))
+                    ->getStateUsing(fn (SuggestionComment $record): string => $record->deleted_at ? __('common.rejected') : ($record->is_approved ? __('common.approved') : __('common.waiting_approval')))
                     ->colors([
-                        'danger' => 'Reddedildi',
-                        'success' => 'Yayında',
-                        'warning' => 'Onay Bekliyor',
+                        'danger' => __('common.rejected'),
+                        'success' => __('common.approved'),
+                        'warning' => __('common.waiting_approval'),
                     ]),
             ])
             ->filters([
                 TrashedFilter::make(),
                 Tables\Filters\SelectFilter::make('is_approved')
-                    ->label('Onay Durumu')
+                    ->label(__('common.approval_status'))
                     ->options([
-                        '0' => 'Onay Bekliyor',
-                        '1' => 'Yayında',
+                        '0' => __('common.waiting_approval'),
+                        '1' => __('common.approved'),
                     ])
                     ->default('0'),
                 Tables\Filters\SelectFilter::make('project')
-                    ->label('Proje')
+                    ->label(__('common.project'))
                     ->relationship('suggestion.project', 'title')
                     ->searchable()
                     ->preload(),
                 Tables\Filters\SelectFilter::make('suggestion')
-                    ->label('Öneri')
+                    ->label(__('common.suggestion'))
                     ->relationship('suggestion', 'title')
                     ->searchable()
                     ->preload(),
                 Tables\Filters\Filter::make('created_at')
-                    ->label('Tarih Aralığı')
+                    ->label(__('common.date_range'))
                     ->form([
                         Forms\Components\DatePicker::make('created_from')
-                            ->label('Başlangıç Tarihi'),
+                            ->label(__('common.start_date')),
                         Forms\Components\DatePicker::make('created_until')
-                            ->label('Bitiş Tarihi'),
+                            ->label(__('common.end_date')),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
@@ -120,18 +129,18 @@ class CommentResource extends Resource
             ])
             ->actions([
                 ViewAction::make()
-                    ->label('İncele')
+                    ->label(__('common.view'))
                     ->button()
                     ->modalFooterActions(fn (SuggestionComment $record) => [
                         Tables\Actions\Action::make('approve_modal')
-                            ->label('Onayla')
+                            ->label(__('common.approve'))
                             ->icon('heroicon-o-check')
                             ->color('success')
                             ->action(fn (SuggestionComment $record) => $record->update(['is_approved' => true]))
                             ->visible(fn () => !$record->is_approved && !$record->deleted_at)
                             ->cancelParentActions(),
                         DeleteAction::make('reject_modal')
-                            ->label('Reddet')
+                            ->label(__('common.reject'))
                             ->icon('heroicon-o-x-mark')
                             ->color('danger')
                             ->record($record)
@@ -139,33 +148,33 @@ class CommentResource extends Resource
                             ->visible(fn () => !$record->deleted_at)
                             ->cancelParentActions(),
                         RestoreAction::make('restore_modal')
-                            ->label('Geri Al')
+                            ->label(__('common.restore'))
                             ->record($record)
                             ->visible(fn () => $record->deleted_at)
                             ->cancelParentActions(),
                     ]),
                 Tables\Actions\Action::make('approve')
-                    ->label('Onayla')
+                    ->label(__('common.approve'))
                     ->icon('heroicon-o-check')
                     ->color('success')
                     ->button()
                     ->action(fn (SuggestionComment $record) => $record->update(['is_approved' => true]))
                     ->visible(fn (SuggestionComment $record) => !$record->is_approved && !$record->deleted_at),
                 DeleteAction::make()
-                    ->label('Reddet')
+                    ->label(__('common.reject'))
                     ->icon('heroicon-o-x-mark')
                     ->color('danger')
                     ->before(fn (SuggestionComment $record) => $record->update(['is_approved' => false]))
                     ->visible(fn (SuggestionComment $record) => !$record->deleted_at)
                     ->button(),
                 RestoreAction::make()
-                    ->label('Geri Al')
+                    ->label(__('common.restore'))
                     ->button(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\BulkAction::make('approve')
-                        ->label('Seçilenleri Onayla')
+                        ->label(__('common.bulk_approve'))
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->action(fn (Collection $records) => $records->each->update(['is_approved' => true]))
@@ -180,22 +189,22 @@ class CommentResource extends Resource
     {
         return $infolist
             ->schema([
-                Section::make('Detaylar')
+                Section::make(__('common.details'))
                     ->schema([
                         TextEntry::make('user.name')
-                            ->label('Kullanıcı'),
+                            ->label(__('common.name')),
                         TextEntry::make('user.email')
-                            ->label('E-posta'),
+                            ->label(__('common.email')),
                         TextEntry::make('suggestion.title')
-                            ->label('Öneri Başlığı'),
+                            ->label(__('common.suggestion_title')),
                         TextEntry::make('created_at')
-                            ->label('Tarih')
+                            ->label(__('common.date'))
                             ->dateTime('d.m.Y H:i'),
                     ])->columns(2),
-                Section::make('Yorum İçeriği')
+                Section::make(__('common.comment_content'))
                     ->schema([
                         TextEntry::make('comment')
-                            ->label('İçerik')
+                            ->label(__('common.content'))
                             ->columnSpanFull(),
                     ]),
             ]);

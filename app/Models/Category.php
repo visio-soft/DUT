@@ -176,17 +176,31 @@ class Category extends Model implements HasMedia
     /**
      * Format remaining time for display
      */
-    private function formatRemainingTime($diff): string
+    private function formatRemainingTime(\DateInterval $diff): string
     {
         if ($diff->days > 0) {
-            return "{$diff->days} gün {$diff->h} saat";
-        } elseif ($diff->h > 0) {
-            return "{$diff->h} saat {$diff->i} dakika";
-        } elseif ($diff->i > 0) {
-            return "{$diff->i} dakika";
-        } else {
-            return "{$diff->s} saniye";
+            $dayLabel = trans_choice('common.day', $diff->days);
+            $hourLabel = trans_choice('common.hour', $diff->h);
+
+            return "{$diff->days} {$dayLabel} {$diff->h} {$hourLabel}";
         }
+
+        if ($diff->h > 0) {
+            $hourLabel = trans_choice('common.hour', $diff->h);
+            $minuteLabel = trans_choice('common.minute', $diff->i);
+
+            return "{$diff->h} {$hourLabel} {$diff->i} {$minuteLabel}";
+        }
+
+        if ($diff->i > 0) {
+            $minuteLabel = trans_choice('common.minute', $diff->i);
+
+            return "{$diff->i} {$minuteLabel}";
+        }
+
+        $secondLabel = trans_choice('common.second', $diff->s);
+
+        return "{$diff->s} {$secondLabel}";
     }
 
     /**

@@ -408,4 +408,30 @@ return [
 
     // Common delete action
     'delete' => 'Delete',
+
+    // Comment Resource
+    'comment_owner' => 'Comment Owner',
+    'suggestion_title' => 'Suggestion Title',
+    'comment_content' => 'Comment Content',
+    'approval_status' => 'Approval Status',
+    'approved' => 'Approved',
+    'rejected' => 'Rejected',
+    'waiting_approval' => 'Waiting Approval',
+    'approve' => 'Approve',
+    'reject' => 'Reject',
+    'restore' => 'Restore',
+    'view' => 'View',
+    'bulk_approve' => 'Approve Selected',
+    'trashed' => 'Deleted Records',
+    'user_info' => 'User Information',
+    'suggestion_info' => 'Suggestion Information',
+    'date' => 'Date',
+    'name' => 'Name',
+    'email' => 'Email',
+
+    // Time units
+    'day' => 'day|days',
+    'hour' => 'hour|hours',
+    'minute' => 'minute|minutes',
+    'second' => 'second|seconds',
 ];
