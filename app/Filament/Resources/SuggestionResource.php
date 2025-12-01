@@ -113,6 +113,7 @@ class SuggestionResource extends Resource
                 Forms\Components\Section::make(__('common.location'))
                     ->icon('heroicon-o-map-pin')
                     ->schema([
+                        ...LocationResource::getLocationFields(),
                         // Sadece detaylı tarif alanı bırakıldı
                         Forms\Components\Textarea::make('address_details')
                             ->label(__('common.detailed_address'))

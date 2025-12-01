@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
@@ -128,6 +129,7 @@ class ProjectResource extends Resource
                 Forms\Components\Section::make(__('common.location'))
                     ->icon('heroicon-o-map-pin')
                     ->schema([
+                        ...LocationResource::getLocationFields(),
                         Forms\Components\Textarea::make('address_details')
                             ->label(__('common.detailed_address'))
                             ->placeholder(__('common.detailed_address_example'))
@@ -222,7 +224,61 @@ class ProjectResource extends Resource
                     ->preload(),
 
                 CommonFilters::creatorTypeFilter(),
-                CommonFilters::locationFilter(),
+                Filter::make('location')
+                    ->label(__('common.location'))
+                    ->form([
+                        Forms\Components\Select::make('country')
+                            ->label(__('common.country'))
+                            ->options(\App\Models\Country::pluck('name', 'name'))
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Forms\Set $set) => $set('city', null)),
+                        Forms\Components\Select::make('city')
+                            ->label(__('common.city'))
+                            ->options(function (Forms\Get $get) {
+                                $countryName = $get('country');
+                                if (!$countryName) return [];
+                                return \App\Models\City::whereHas('country', fn ($q) => $q->where('name', $countryName))
+                                    ->pluck('name', 'name');
+                            })
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Forms\Set $set) => $set('district', null)),
+                        Forms\Components\Select::make('district')
+                            ->label(__('common.district'))
+                            ->options(function (Forms\Get $get) {
+                                $cityName = $get('city');
+                                if (!$cityName) return [];
+                                return \App\Models\District::whereHas('city', fn ($q) => $q->where('name', $cityName))
+                                    ->pluck('name', 'name');
+                            })
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Forms\Set $set) => $set('neighborhood', null)),
+                        Forms\Components\Select::make('neighborhood')
+                            ->label(__('common.neighborhood'))
+                            ->options(function (Forms\Get $get) {
+                                $districtName = $get('district');
+                                if (!$districtName) return [];
+                                return \App\Models\Neighborhood::whereHas('district', fn ($q) => $q->where('name', $districtName))
+                                    ->pluck('name', 'name');
+                            })
+                            ->searchable(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['country'])) {
+                            $query->where('country', $data['country']);
+                        }
+                        if (!empty($data['city'])) {
+                            $query->where('city', $data['city']);
+                        }
+                        if (!empty($data['district'])) {
+                            $query->where('district', $data['district']);
+                        }
+                        if (!empty($data['neighborhood'])) {
+                            $query->where('neighborhood', $data['neighborhood']);
+                        }
+                    }),
                 CommonFilters::dateRangeFilter(),
                 CommonFilters::budgetRangeFilter(),
             ])

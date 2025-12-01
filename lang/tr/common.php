@@ -353,6 +353,8 @@ return [
     'bulk_user_name' => 'Kullanıcı :number',
     'filters_button' => 'Filtreler',
     'filters_button_description' => 'Gelişmiş filtreleri aç',
+    'apply_filters' => 'Filtreleri Uygula',
+    'clear_filters' => 'Filtreleri Temizle',
     'project_information' => 'Proje Bilgileri',
     'project_duration' => 'Proje Süresi',
     'uncategorized' => 'Kategorisiz',

@@ -353,6 +353,8 @@ return [
     'bulk_user_name' => 'User :number',
     'filters_button' => 'Filters',
     'filters_button_description' => 'Open advanced filters',
+    'apply_filters' => 'Apply Filters',
+    'clear_filters' => 'Clear Filters',
     'project_information' => 'Project Information',
     'project_duration' => 'Project Duration',
     'uncategorized' => 'Uncategorized',

@@ -85,3 +85,6 @@ Route::post('/api/chunked-upload', [App\Http\Controllers\ChunkedUploadController
 Route::post('/api/chunked-upload/cleanup', [App\Http\Controllers\ChunkedUploadController::class, 'cleanupOldSessions'])
     ->middleware('auth')
     ->name('api.chunked-upload.cleanup');
+
+// Location API
+Route::get('/api/locations', [App\Http\Controllers\LocationController::class, 'getChildren'])->name('api.locations');

@@ -650,7 +650,7 @@
         <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
             <!-- Sol Taraf: Tree View -->
             <div>
-                <div id="user-filter-panel" class="filters-card {{ $startCollapsed ? 'collapsed' : '' }}">
+                <div id="user-filter-panel" class="filters-card">
                     <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
                         <div class="filters-header-info">
                             <svg style="width: 1rem; height: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -694,6 +694,30 @@
                                     </div>
                                 </div>
                                 <div class="filter-field">
+                                    <label for="country-filter">{{ __('common.country') }}</label>
+                                    <div class="input-with-icon">
+                                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
+                                        </svg>
+                                        <select id="country-filter" name="country">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="filter-field" id="city-wrapper" style="display: none;">
+                                    <label for="city-filter">{{ __('common.city') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
+                                        </svg>
+                                        <select id="city-filter" name="city">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="filter-field" id="district-wrapper" style="display: none;">
                                     <label for="district-filter">{{ __('common.district') }}</label>
                                     <div class="input-with-icon">
                                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -702,13 +726,11 @@
                                         </svg>
                                         <select id="district-filter" name="district">
                                             <option value="">{{ __('common.select_option') }}</option>
-                                            @foreach($districts as $district)
-                                                <option value="{{ $district }}" @selected(($filterValues['district'] ?? '') === $district)>{{ $district }}</option>
-                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                <div class="filter-field">
+
+                                <div class="filter-field" id="neighborhood-wrapper" style="display: none;">
                                     <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
                                     <div class="input-with-icon">
                                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -716,9 +738,6 @@
                                         </svg>
                                         <select id="neighborhood-filter" name="neighborhood">
                                             <option value="">{{ __('common.select_option') }}</option>
-                                            @foreach($neighborhoodOptions as $neighborhood)
-                                                <option value="{{ $neighborhood }}" @selected(($filterValues['neighborhood'] ?? '') === $neighborhood)>{{ $neighborhood }}</option>
-                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
@@ -740,7 +759,12 @@
                                 </div>
                             </div>
                             <div class="filters-actions">
-                                <a href="{{ route('user.projects') }}" class="reset-btn" style="width: 100%; text-align: center;">{{ __('common.clear') }}</a>
+                                <a href="{{ route('user.projects') }}" class="reset-btn">
+                                    {{ __('common.clear_filters') }}
+                                </a>
+                                <button type="submit" class="apply-btn">
+                                    {{ __('common.apply_filters') }}
+                                </button>
                             </div>
                         </form>
                         @if($activeFilters->isNotEmpty())
@@ -1091,46 +1115,191 @@
 
 <!-- JavaScript for interactions -->
     <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
-            const neighborhoodsMap = @json(config('istanbul_neighborhoods', []));
-            const districtSelect = document.getElementById('district-filter');
-            const neighborhoodSelect = document.getElementById('neighborhood-filter');
-            const projectWrappers = document.querySelectorAll('.tree-project-wrapper');
             const filterCard = document.getElementById('user-filter-panel');
             const collapseBtn = document.getElementById('filters-collapse-btn');
             const filterContent = filterCard ? filterCard.querySelector('.filters-content') : null;
             const filterForm = document.getElementById('projects-filters-form');
-            const startCollapsed = {{ $startCollapsed ? 'true' : 'false' }};
+            
+            // Force open by default as per request
+            // const startCollapsed = {{ $startCollapsed ? 'true' : 'false' }};
+            const startCollapsed = false; 
 
-            const debounce = (fn, delay = 400) => {
-                let timeoutId;
-                return (...args) => {
-                    clearTimeout(timeoutId);
-                    timeoutId = setTimeout(() => fn(...args), delay);
-                };
-            };
+            // Location Wizard Elements
+            const countrySelect = document.getElementById('country-filter');
+            const citySelect = document.getElementById('city-filter');
+            const districtSelect = document.getElementById('district-filter');
+            const neighborhoodSelect = document.getElementById('neighborhood-filter');
 
-            const submitFilters = filterForm ? debounce(() => filterForm.submit(), 400) : null;
+            const cityWrapper = document.getElementById('city-wrapper');
+            const districtWrapper = document.getElementById('district-wrapper');
+            const neighborhoodWrapper = document.getElementById('neighborhood-wrapper');
 
-            if (districtSelect && neighborhoodSelect) {
-                districtSelect.addEventListener('change', function () {
-                    const value = this.value;
-                    const options = neighborhoodsMap[value] || [];
-                    neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            // Initial values from server
+            const initialCountry = "{{ $filterValues['country'] ?? '' }}";
+            const initialCity = "{{ $filterValues['city'] ?? '' }}";
+            const initialDistrict = "{{ $filterValues['district'] ?? '' }}";
+            const initialNeighborhood = "{{ $filterValues['neighborhood'] ?? '' }}";
 
-                    options.forEach(option => {
-                        const opt = document.createElement('option');
-                        opt.value = option;
-                        opt.textContent = option;
-                        neighborhoodSelect.appendChild(opt);
+            // Helper to fetch locations
+            async function fetchLocations(parentId, targetSelect, type, selectedValue = null) {
+                try {
+                    const url = new URL("{{ route('api.locations') }}");
+                    if (parentId) {
+                        url.searchParams.append('parent_id', parentId);
+                    }
+                    if (type) {
+                        url.searchParams.append('type', type);
+                    }
+
+                    const response = await fetch(url);
+                    const locations = await response.json();
+
+                    // Clear options
+                    targetSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+
+                    locations.forEach(location => {
+                        const option = document.createElement('option');
+                        option.value = location.name; // We submit the name
+                        option.dataset.id = location.id; // We use ID for fetching children
+                        option.textContent = location.name;
+                        if (selectedValue && location.name === selectedValue) {
+                            option.selected = true;
+                        }
+                        targetSelect.appendChild(option);
                     });
 
-                    if (submitFilters) {
-                        submitFilters();
+                    return locations;
+                } catch (error) {
+                    console.error('Error fetching locations:', error);
+                    return [];
+                }
+            }
+
+            // Initialize Wizard
+            async function initWizard() {
+                // Load Countries
+                await fetchLocations(null, countrySelect, 'country', initialCountry);
+
+                if (initialCountry) {
+                    // Find country ID to load cities
+                    const countryOption = Array.from(countrySelect.options).find(opt => opt.value === initialCountry);
+                    if (countryOption) {
+                        cityWrapper.style.display = 'block';
+                        await fetchLocations(countryOption.dataset.id, citySelect, 'city', initialCity);
                     }
+                }
+
+                if (initialCity) {
+                     const cityOption = Array.from(citySelect.options).find(opt => opt.value === initialCity);
+                     if (cityOption) {
+                         districtWrapper.style.display = 'block';
+                         await fetchLocations(cityOption.dataset.id, districtSelect, 'district', initialDistrict);
+                     }
+                }
+
+                if (initialDistrict) {
+                    const districtOption = Array.from(districtSelect.options).find(opt => opt.value === initialDistrict);
+                    if (districtOption) {
+                        neighborhoodWrapper.style.display = 'block';
+                        await fetchLocations(districtOption.dataset.id, neighborhoodSelect, 'neighborhood', initialNeighborhood);
+                    }
+                }
+                
+                syncContentHeight();
+            }
+
+            // Event Listeners for Wizard
+            if (countrySelect) {
+                countrySelect.addEventListener('change', async function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const countryId = selectedOption.dataset.id;
+
+                    // Reset downstream
+                    citySelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+                    districtSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+                    neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+                    
+                    cityWrapper.style.display = 'none';
+                    districtWrapper.style.display = 'none';
+                    neighborhoodWrapper.style.display = 'none';
+
+                    if (countryId) {
+                        cityWrapper.style.display = 'block';
+                        // Slide down effect
+                        cityWrapper.style.opacity = '0';
+                        cityWrapper.style.transform = 'translateY(-10px)';
+                        cityWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
+                        
+                        await fetchLocations(countryId, citySelect, 'city');
+                        
+                        requestAnimationFrame(() => {
+                            cityWrapper.style.opacity = '1';
+                            cityWrapper.style.transform = 'translateY(0)';
+                        });
+                    }
+                    
+                    syncContentHeight();
                 });
             }
 
+            if (citySelect) {
+                citySelect.addEventListener('change', async function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const cityId = selectedOption.dataset.id;
+
+                    districtSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+                    neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+                    
+                    districtWrapper.style.display = 'none';
+                    neighborhoodWrapper.style.display = 'none';
+
+                    if (cityId) {
+                        districtWrapper.style.display = 'block';
+                        districtWrapper.style.opacity = '0';
+                        districtWrapper.style.transform = 'translateY(-10px)';
+                        districtWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
+
+                        await fetchLocations(cityId, districtSelect, 'district');
+
+                        requestAnimationFrame(() => {
+                            districtWrapper.style.opacity = '1';
+                            districtWrapper.style.transform = 'translateY(0)';
+                        });
+                    }
+
+                    syncContentHeight();
+                });
+            }
+
+            if (districtSelect) {
+                districtSelect.addEventListener('change', async function() {
+                    const selectedOption = this.options[this.selectedIndex];
+                    const districtId = selectedOption.dataset.id;
+
+                    neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+                    neighborhoodWrapper.style.display = 'none';
+
+                    if (districtId) {
+                        neighborhoodWrapper.style.display = 'block';
+                        neighborhoodWrapper.style.opacity = '0';
+                        neighborhoodWrapper.style.transform = 'translateY(-10px)';
+                        neighborhoodWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
+
+                        await fetchLocations(districtId, neighborhoodSelect);
+
+                        requestAnimationFrame(() => {
+                            neighborhoodWrapper.style.opacity = '1';
+                            neighborhoodWrapper.style.transform = 'translateY(0)';
+                        });
+                    }
+                    
+                    syncContentHeight();
+                });
+            }
+
+            // Collapse Logic
             if (filterCard && collapseBtn && filterContent) {
                 const syncContentHeight = () => {
                     const isCollapsed = filterCard.classList.contains('collapsed');
@@ -1154,8 +1323,11 @@
                     }
                 };
 
+                // Initialize state
                 setCollapsedState(startCollapsed, { immediate: true });
-                requestAnimationFrame(syncContentHeight);
+                
+                // Expose syncContentHeight to be used by wizard
+                window.syncContentHeight = syncContentHeight;
 
                 collapseBtn.addEventListener('click', () => {
                     const collapsed = !filterCard.classList.contains('collapsed');
@@ -1165,17 +1337,8 @@
                 window.addEventListener('resize', syncContentHeight);
             }
 
-            if (filterForm && submitFilters) {
-                const filterFields = filterForm.querySelectorAll('input, select');
-
-                filterFields.forEach((field) => {
-                    const eventName = field.tagName === 'SELECT' ? 'change' : 'input';
-                    if (field.id === 'district-filter') {
-                        return;
-                    }
-                    field.addEventListener(eventName, submitFilters);
-                });
-            }
+            // Initialize Wizard
+            initWizard();
 
         });
     </script>
@@ -1643,3 +1806,235 @@ window.addEventListener('resize', adjustLayout);
     </div>
 </div>
 @endsection
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filterCard = document.getElementById('user-filter-panel');
+    const collapseBtn = document.getElementById('filters-collapse-btn');
+    const filterContent = filterCard ? filterCard.querySelector('.filters-content') : null;
+    const filterForm = document.getElementById('projects-filters-form');
+    const startCollapsed = {{ $startCollapsed ? 'true' : 'false' }};
+
+    // Location Wizard Elements
+    const countrySelect = document.getElementById('country-filter');
+    const citySelect = document.getElementById('city-filter');
+    const districtSelect = document.getElementById('district-filter');
+    const neighborhoodSelect = document.getElementById('neighborhood-filter');
+
+    const cityWrapper = document.getElementById('city-wrapper');
+    const districtWrapper = document.getElementById('district-wrapper');
+    const neighborhoodWrapper = document.getElementById('neighborhood-wrapper');
+
+    // Initial values from server (for repopulating after search)
+    const initialCountry = "{{ $filterValues['country'] ?? '' }}";
+    const initialCity = "{{ $filterValues['city'] ?? '' }}";
+    const initialDistrict = "{{ $filterValues['district'] ?? '' }}";
+    const initialNeighborhood = "{{ $filterValues['neighborhood'] ?? '' }}";
+
+    const debounce = (fn, delay = 400) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn(...args), delay);
+        };
+    };
+
+    // Auto-submit removed as per user request
+    const submitFilters = null; // debounce(() => filterForm.submit(), 400);
+
+    // Helper to sync content height
+    const syncContentHeight = () => {
+        if (filterCard && filterContent) {
+            const isCollapsed = filterCard.classList.contains('collapsed');
+            if (isCollapsed) {
+                filterContent.style.maxHeight = '0px';
+            } else {
+                filterContent.style.maxHeight = `${filterContent.scrollHeight + 500}px`; // Add buffer for dynamic content
+            }
+        }
+    };
+
+    // Helper to fetch locations
+    async function fetchLocations(parentId, targetSelect, type, selectedValue = null) {
+        try {
+            const url = new URL("{{ route('api.locations') }}");
+            if (parentId) {
+                url.searchParams.append('parent_id', parentId);
+            }
+            if (type) {
+                url.searchParams.append('type', type);
+            }
+
+            const response = await fetch(url);
+            const locations = await response.json();
+
+            // Clear options
+            targetSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+
+            locations.forEach(location => {
+                const option = document.createElement('option');
+                option.value = location.name; // We submit the name
+                option.dataset.id = location.id; // We use ID for fetching children
+                option.textContent = location.name;
+                if (selectedValue && location.name === selectedValue) {
+                    option.selected = true;
+                }
+                targetSelect.appendChild(option);
+            });
+
+            return locations;
+        } catch (error) {
+            console.error('Error fetching locations:', error);
+            return [];
+        }
+    }
+
+    // Initialize Wizard
+    async function initWizard() {
+        // Load Countries
+        const countries = await fetchLocations(null, countrySelect, 'country', initialCountry);
+
+        if (initialCountry) {
+            // Find country ID to load cities
+            const countryOption = Array.from(countrySelect.options).find(opt => opt.value === initialCountry);
+            if (countryOption) {
+                cityWrapper.style.display = 'block';
+                const cities = await fetchLocations(countryOption.dataset.id, citySelect, 'city', initialCity);
+
+                if (initialCity) {
+                     const cityOption = Array.from(citySelect.options).find(opt => opt.value === initialCity);
+                     if (cityOption) {
+                         districtWrapper.style.display = 'block';
+                         const districts = await fetchLocations(cityOption.dataset.id, districtSelect, 'district', initialDistrict);
+
+                         if (initialDistrict) {
+                            const districtOption = Array.from(districtSelect.options).find(opt => opt.value === initialDistrict);
+                            if (districtOption) {
+                                neighborhoodWrapper.style.display = 'block';
+                                await fetchLocations(districtOption.dataset.id, neighborhoodSelect, 'neighborhood', initialNeighborhood);
+                            }
+                        }
+                     }
+                }
+            }
+        }
+        
+        syncContentHeight();
+    }
+
+    // Event Listeners
+    if (countrySelect) {
+        countrySelect.addEventListener('change', async function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const countryId = selectedOption.dataset.id;
+            
+            // Reset children
+            citySelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            districtSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            
+            // Hide children wrappers
+            cityWrapper.style.display = 'none';
+            districtWrapper.style.display = 'none';
+            neighborhoodWrapper.style.display = 'none';
+
+            if (countryId) {
+                await fetchLocations(countryId, citySelect, 'city');
+                // Animate show
+                cityWrapper.style.display = 'block';
+            }
+            
+            syncContentHeight();
+        });
+    }
+
+    if (citySelect) {
+        citySelect.addEventListener('change', async function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const cityId = selectedOption.dataset.id;
+
+            districtSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            
+            districtWrapper.style.display = 'none';
+            neighborhoodWrapper.style.display = 'none';
+
+            if (cityId) {
+                await fetchLocations(cityId, districtSelect, 'district');
+                districtWrapper.style.display = 'block';
+                requestAnimationFrame(() => {
+                    districtWrapper.style.opacity = '1';
+                    districtWrapper.style.transform = 'translateY(0)';
+                });
+            }
+
+            syncContentHeight();
+        });
+    }
+
+    if (districtSelect) {
+        districtSelect.addEventListener('change', async function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const districtId = selectedOption.dataset.id;
+
+            neighborhoodSelect.innerHTML = '<option value="">{{ __('common.select_option') }}</option>';
+            neighborhoodWrapper.style.display = 'none';
+
+            if (districtId) {
+                neighborhoodWrapper.style.display = 'block';
+                neighborhoodWrapper.style.opacity = '0';
+                neighborhoodWrapper.style.transform = 'translateY(-10px)';
+                neighborhoodWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
+
+                await fetchLocations(districtId, neighborhoodSelect, 'neighborhood');
+
+                requestAnimationFrame(() => {
+                    neighborhoodWrapper.style.opacity = '1';
+                    neighborhoodWrapper.style.transform = 'translateY(0)';
+                });
+            }
+
+            syncContentHeight();
+        });
+    }
+
+    if (neighborhoodSelect) {
+        neighborhoodSelect.addEventListener('change', function() {
+            // No action needed on change, user will click search
+        });
+    }
+
+    // Initialize Wizard
+    initWizard();
+
+    if (filterCard && collapseBtn && filterContent) {
+        const setCollapsedState = (collapsed, { immediate = false } = {}) => {
+            filterCard.classList.toggle('collapsed', collapsed);
+            if (immediate) {
+                filterContent.style.transition = 'none';
+            }
+            syncContentHeight();
+            if (immediate) {
+                requestAnimationFrame(() => {
+                    filterContent.style.transition = '';
+                });
+            }
+        };
+
+        setCollapsedState(startCollapsed, { immediate: true });
+        requestAnimationFrame(syncContentHeight);
+
+        collapseBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent default anchor behavior
+            const collapsed = !filterCard.classList.contains('collapsed');
+            setCollapsedState(collapsed);
+        });
+
+        window.addEventListener('resize', syncContentHeight);
+        
+        // Update height when wizard elements appear
+        const observer = new MutationObserver(syncContentHeight);
+        observer.observe(filterContent, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    }
+});
+</script>

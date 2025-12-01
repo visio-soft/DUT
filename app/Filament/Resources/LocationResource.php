@@ -18,6 +18,7 @@ use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -107,6 +108,61 @@ class LocationResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('common.location_type'))
                     ->options(Location::typeLabels()),
+                Filter::make('location')
+                    ->label(__('common.location'))
+                    ->form([
+                        Forms\Components\Select::make('country')
+                            ->label(__('common.country'))
+                            ->options(\App\Models\Country::pluck('name', 'name'))
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('city', null)),
+                        Forms\Components\Select::make('city')
+                            ->label(__('common.city'))
+                            ->options(function (Get $get) {
+                                $countryName = $get('country');
+                                if (!$countryName) return [];
+                                return \App\Models\City::whereHas('country', fn ($q) => $q->where('name', $countryName))
+                                    ->pluck('name', 'name');
+                            })
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('district', null)),
+                        Forms\Components\Select::make('district')
+                            ->label(__('common.district'))
+                            ->options(function (Get $get) {
+                                $cityName = $get('city');
+                                if (!$cityName) return [];
+                                return \App\Models\District::whereHas('city', fn ($q) => $q->where('name', $cityName))
+                                    ->pluck('name', 'name');
+                            })
+                            ->searchable()
+                            ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('neighborhood', null)),
+                        Forms\Components\Select::make('neighborhood')
+                            ->label(__('common.neighborhood'))
+                            ->options(function (Get $get) {
+                                $districtName = $get('district');
+                                if (!$districtName) return [];
+                                return \App\Models\Neighborhood::whereHas('district', fn ($q) => $q->where('name', $districtName))
+                                    ->pluck('name', 'name');
+                            })
+                            ->searchable(),
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!empty($data['country'])) {
+                            $query->where('country', $data['country']);
+                        }
+                        if (!empty($data['city'])) {
+                            $query->where('city', $data['city']);
+                        }
+                        if (!empty($data['district'])) {
+                            $query->where('district', $data['district']);
+                        }
+                        if (!empty($data['neighborhood'])) {
+                            $query->where('neighborhood', $data['neighborhood']);
+                        }
+                    }),
             ])
             ->actions([
                 Action::make('edit')
@@ -278,5 +334,55 @@ class LocationResource extends Resource
             Location::TYPE_NEIGHBORHOOD => Neighborhood::query()->find($record->base_id),
             default => null,
         };
+    }
+
+    public static function getLocationFields(): array
+    {
+        return [
+            Forms\Components\Grid::make(2)
+                ->schema([
+                    Forms\Components\Select::make('country')
+                        ->label(__('common.country'))
+                        ->options(\App\Models\Country::pluck('name', 'name'))
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('city', null)),
+                    Forms\Components\Select::make('city')
+                        ->label(__('common.city'))
+                        ->options(function (Get $get) {
+                            $countryName = $get('country');
+                            if (!$countryName) return [];
+                            return \App\Models\City::whereHas('country', fn ($q) => $q->where('name', $countryName))
+                                ->pluck('name', 'name');
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('district', null)),
+                    Forms\Components\Select::make('district')
+                        ->label(__('common.district'))
+                        ->options(function (Get $get) {
+                            $cityName = $get('city');
+                            if (!$cityName) return [];
+                            return \App\Models\District::whereHas('city', fn ($q) => $q->where('name', $cityName))
+                                ->pluck('name', 'name');
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('neighborhood', null)),
+                    Forms\Components\Select::make('neighborhood')
+                        ->label(__('common.neighborhood'))
+                        ->options(function (Get $get) {
+                            $districtName = $get('district');
+                            if (!$districtName) return [];
+                            return \App\Models\Neighborhood::whereHas('district', fn ($q) => $q->where('name', $districtName))
+                                ->pluck('name', 'name');
+                        })
+                        ->searchable()
+                        ->preload(),
+                ])
+        ];
     }
 }
