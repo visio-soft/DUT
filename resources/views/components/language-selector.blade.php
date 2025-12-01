@@ -1,18 +1,13 @@
 <div class="relative inline-block text-left language-selector">
-    <button type="button" id="language-selector-button" class="user-nav-link language-selector-button">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
-        </svg>
-        <span class="hidden sm:inline">{{ app()->getLocale() == 'tr' ? 'Türkçe' : 'English' }}</span>
-        <span class="sm:hidden">{{ strtoupper(app()->getLocale()) }}</span>
-        <svg class="ml-2 -mr-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+    <button type="button" id="language-selector-button" class="relative p-2 text-[#053640] hover:text-[#1ABF6B] transition-colors duration-200 focus:outline-none">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
         </svg>
     </button>
 
-    <div id="language-selector-dropdown" class="hidden language-selector-dropdown">
+    <div id="language-selector-dropdown" class="hidden absolute right-0 top-full z-50 w-48 mt-2 origin-top-right bg-white rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-100">
         <div class="py-1">
-            <a href="{{ route('language.switch', 'tr') }}" class="language-selector-item {{ app()->getLocale() == 'tr' ? 'active' : '' }}">
+            <a href="{{ route('language.switch', 'tr') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'tr' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     @if(app()->getLocale() == 'tr')
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -20,7 +15,7 @@
                 </svg>
                 Türkçe
             </a>
-            <a href="{{ route('language.switch', 'en') }}" class="language-selector-item {{ app()->getLocale() == 'en' ? 'active' : '' }}">
+            <a href="{{ route('language.switch', 'en') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'en' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     @if(app()->getLocale() == 'en')
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>

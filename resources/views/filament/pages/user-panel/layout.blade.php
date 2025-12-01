@@ -129,6 +129,9 @@
                                     {{ __('common.logout') }}
                                 </button>
                             </form>
+                            <div class="ml-2 mr-2">
+                                <x-notification-center />
+                            </div>
                         @else
                             <div class="auth-buttons-container">
                                 <a href="{{ route('user.login') }}" class="auth-btn auth-btn-login">

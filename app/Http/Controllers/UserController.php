@@ -426,4 +426,22 @@ class UserController extends Controller
 
         return compact('hasBackgroundImages', 'randomBackgroundImage');
     }
+    /**
+     * Tüm bildirimleri okundu olarak işaretle
+     */
+    public function markAsRead()
+    {
+        if (Auth::check()) {
+            Auth::user()->unreadNotifications()
+                ->where(function($query) {
+                    $query->whereNull('scheduled_at')->orWhere('scheduled_at', '<=', now());
+                })
+                ->get()
+                ->markAsRead();
+                
+            return response()->json(['success' => true]);
+        }
+        
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
 }

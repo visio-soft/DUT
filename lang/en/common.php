@@ -455,4 +455,9 @@ return [
     'add_action_button' => 'Add Action Button',
     'button_label' => 'Button Label',
     'button_url' => 'Button URL',
+    'mark_all_read' => 'Mark All as Read',
+    'view_all_notifications' => 'View All Notifications',
+    'no_notifications' => 'No new notifications',
+    'send_immediately' => 'Send Immediately',
+    'scheduled_at' => 'Scheduled At',
 ];

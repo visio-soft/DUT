@@ -58,6 +58,7 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserAuthController::class, 'logout'])->name('user.logout');
+    Route::post('/notifications/mark-read', [UserController::class, 'markAsRead'])->name('user.notifications.mark-read');
 });
 
 // AJAX Routes

@@ -52,8 +52,7 @@ class NotificationResource extends Resource
                             ])
                             ->default('specific')
                             ->live()
-                            ->required()
-                            ->dehydrated(false), // Don't save this to DB directly
+                            ->required(),
 
                         Forms\Components\Select::make('users')
                             ->label(__('common.users'))
@@ -62,8 +61,21 @@ class NotificationResource extends Resource
                             ->searchable()
                             ->preload()
                             ->visible(fn (Forms\Get $get) => $get('recipients') === 'specific')
-                            ->required(fn (Forms\Get $get) => $get('recipients') === 'specific')
-                            ->dehydrated(false), // Don't save this to DB directly
+                            ->required(fn (Forms\Get $get) => $get('recipients') === 'specific'),
+
+                        Forms\Components\Toggle::make('send_immediately')
+                            ->label(__('common.send_immediately'))
+                            ->default(true)
+                            ->live()
+                            ->columnSpanFull(),
+
+                        Forms\Components\DateTimePicker::make('scheduled_at')
+                            ->label(__('common.scheduled_at'))
+                            ->native(false)
+                            ->minDate(now())
+                            ->visible(fn (Forms\Get $get) => ! $get('send_immediately'))
+                            ->required(fn (Forms\Get $get) => ! $get('send_immediately'))
+                            ->columnSpanFull(),
 
                         Forms\Components\TextInput::make('title')
                             ->label(__('common.title'))
@@ -80,8 +92,7 @@ class NotificationResource extends Resource
                         Forms\Components\Toggle::make('add_action_button')
                             ->label(__('common.add_action_button'))
                             ->live()
-                            ->columnSpanFull()
-                            ->dehydrated(false),
+                            ->columnSpanFull(),
 
                         Forms\Components\Grid::make(2)
                             ->schema([
@@ -91,7 +102,6 @@ class NotificationResource extends Resource
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('action_url')
                                     ->label(__('common.button_url'))
-                                    ->url()
                                     ->required()
                                     ->maxLength(255),
                             ])

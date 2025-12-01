@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Header Section with Background -->
-<section class="section-padding dynamic-background {{ ($hasBackgroundImages ?? false) ? '' : 'no-background-images' }}" style="padding: 2rem 0;">
+<section class="section-padding bg-transparent" style="padding: 1rem 0 0.5rem 0;">
     @if($hasBackgroundImages ?? false)
         @if($randomBackgroundImage)
             <!-- Single Random Background Image -->
@@ -18,19 +18,39 @@
         <div class="background-image-overlay"></div>
     @endif
 
-    <div class="user-container">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb" style="position: relative; z-index: 3;">
-            <a href="{{ route('user.index') }}">{{ __('common.home') }}</a>
-            <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-            </svg>
-            <a href="{{ route('user.projects') }}">{{ __('common.projects') }}</a>
-            <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
-            </svg>
-            <span style="color: var(--gray-900);">{{ Str::limit($suggestion->title, 50) }}</span>
-        </nav>
+    <!-- Breadcrumb Pills -->
+    <div class="w-full relative z-10">
+        <div class="user-container py-1">
+            <nav class="flex items-center gap-2 text-sm font-medium">
+                <!-- Home -->
+                <a href="{{ route('user.index') }}" class="flex items-center px-3 py-1 rounded-full bg-[#f0fdf4] text-green-800 hover:bg-green-100 transition-colors group shadow-sm border border-green-50">
+                    <svg class="w-4 h-4 mr-1.5 text-green-600 group-hover:text-green-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    {{ __('common.home') }}
+                </a>
+
+                <!-- Separator -->
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+
+                <!-- Projects -->
+                <a href="{{ route('user.projects') }}" class="px-3 py-1 rounded-full bg-[#f0fdf4] text-green-800 hover:bg-green-100 transition-colors shadow-sm border border-green-50">
+                    {{ __('common.projects') }}
+                </a>
+
+                <!-- Separator -->
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+
+                <!-- Current Page -->
+                <span class="px-3 py-1 rounded-full bg-green-600 text-white font-medium shadow-sm truncate max-w-xs" title="{{ $suggestion->title }}">
+                    {{ $suggestion->title }}
+                </span>
+            </nav>
+        </div>
     </div>
 </section>
 

@@ -455,4 +455,9 @@ return [
     'add_action_button' => 'Yönlendirme Butonu Ekle',
     'button_label' => 'Buton Metni',
     'button_url' => 'Yönlendirme Linki',
+    'mark_all_read' => 'Tümünü Okundu İşaretle',
+    'view_all_notifications' => 'Tüm Bildirimleri Gör',
+    'no_notifications' => 'Yeni bildiriminiz yok',
+    'send_immediately' => 'Hemen Gönder',
+    'scheduled_at' => 'Gönderim Zamanı',
 ];
