@@ -21,8 +21,6 @@ class UserResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
 
-    protected static ?string $navigationGroup = 'Kullanıcı Yönetimi';
-
     protected static ?string $pluralModelLabel = 'Kullanıcılar';
 
     protected static ?string $modelLabel = 'Kullanıcı';
@@ -30,6 +28,11 @@ class UserResource extends Resource
     protected static ?string $navigationLabel = 'Kullanıcılar';
 
     protected static ?int $navigationSort = 10;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('common.user_management');
+    }
 
     public static function form(Form $form): Form
     {

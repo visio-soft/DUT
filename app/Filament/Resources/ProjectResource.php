@@ -96,20 +96,17 @@ class ProjectResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->label(__('common.description'))
                             ->rows(3)
+                            ->required()
                             ->columnSpanFull(),
-
-                        Forms\Components\Select::make('status')
-                            ->label(__('common.status'))
-                            ->options(\App\Enums\ProjectStatusEnum::class)
-                            ->default(\App\Enums\ProjectStatusEnum::DRAFT)
-                            ->required(),
 
                         Forms\Components\Grid::make(2)
                             ->schema([
                                 Forms\Components\DatePicker::make('start_date')
+                                    ->required()
                                     ->label(__('common.start_date')),
 
                                 Forms\Components\DatePicker::make('end_date')
+                                    ->required()
                                     ->label(__('common.end_date')),
 
                                 Forms\Components\TextInput::make('min_budget')
@@ -286,7 +283,34 @@ class ProjectResource extends Resource
             ->filtersFormColumns(2)
             ->filtersFormWidth('3xl')
             ->actions([
-                CommonTableActions::softDeleteActionGroup('project'),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => ! $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => ! $record->trashed())
+                    ->requiresConfirmation()
+                    ->modalHeading(__("common.delete_project"))
+                    ->modalDescription(__("common.delete_project_description"))
+                    ->modalSubmitActionLabel(__('common.yes_delete'))
+                    ->successNotificationTitle(__("common.project_deleted")),
+
+                Tables\Actions\RestoreAction::make()
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading(__("common.restore_project"))
+                    ->modalDescription(__("common.restore_project_description"))
+                    ->modalSubmitActionLabel(__('common.yes_restore'))
+                    ->successNotificationTitle(__("common.project_restored")),
+
+                Tables\Actions\ForceDeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading(__("common.force_delete_project"))
+                    ->modalDescription(__("common.force_delete_project_description"))
+                    ->modalSubmitActionLabel(__('common.yes_force_delete'))
+                    ->successNotificationTitle(__("common.project_force_deleted")),
             ])
             ->bulkActions([
                 CommonTableActions::softDeleteBulkActionGroup('project'),

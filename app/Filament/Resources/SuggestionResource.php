@@ -84,6 +84,7 @@ class SuggestionResource extends Resource
                         Forms\Components\Textarea::make('description')
                             ->label(__('common.description'))
                             ->rows(3)
+                            ->required()
                             ->columnSpanFull(),
 
                         Forms\Components\Grid::make(2)
@@ -212,7 +213,34 @@ class SuggestionResource extends Resource
             ->filtersFormColumns(2)
             ->filtersFormWidth('3xl')
             ->actions([
-                CommonTableActions::softDeleteActionGroup('suggestion'),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($record) => ! $record->trashed()),
+
+                Tables\Actions\DeleteAction::make()
+                    ->visible(fn ($record) => ! $record->trashed())
+                    ->requiresConfirmation()
+                    ->modalHeading(__("common.delete_suggestion"))
+                    ->modalDescription(__("common.delete_suggestion_description"))
+                    ->modalSubmitActionLabel(__('common.yes_delete'))
+                    ->successNotificationTitle(__("common.suggestion_deleted")),
+
+                Tables\Actions\RestoreAction::make()
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading(__("common.restore_suggestion"))
+                    ->modalDescription(__("common.restore_suggestion_description"))
+                    ->modalSubmitActionLabel(__('common.yes_restore'))
+                    ->successNotificationTitle(__("common.suggestion_restored")),
+
+                Tables\Actions\ForceDeleteAction::make()
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading(__("common.force_delete_suggestion"))
+                    ->modalDescription(__("common.force_delete_suggestion_description"))
+                    ->modalSubmitActionLabel(__('common.yes_force_delete'))
+                    ->successNotificationTitle(__("common.suggestion_force_deleted")),
             ])
             ->bulkActions([
                 CommonTableActions::softDeleteBulkActionGroup('suggestion'),
