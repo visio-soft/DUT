@@ -206,7 +206,7 @@
 
                                 <!-- Like Text and Count -->
                                 <span>{{ __('common.like_button') }}</span>
-                                <span class="like-count" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 0.125rem 0.5rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; min-width: 1.5rem; text-align: center;">{{ $suggestion->likes->count() }}</span>
+                                <span class="like-count" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; min-width: 1.5rem; text-align: center;">{{ $suggestion->likes->count() }}</span>
                             </button>
                         </div>
                     </div>
@@ -595,7 +595,116 @@
     </div>
 </div>
 
-<script>
+    <!-- Custom Success Modal -->
+    <div id="success-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center;">
+        <!-- Backdrop -->
+        <div id="modal-backdrop" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease;"></div>
+
+        <!-- Modal Content -->
+        <div id="modal-content" style="position: relative; background: white; border-radius: 1.5rem; padding: 2.5rem; width: 100%; max-width: 400px; margin: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transform: scale(0.95); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <!-- Animated Icon -->
+            <div style="width: 5rem; height: 5rem; margin: 0 auto 1.5rem; background: var(--green-50, #ecfdf5); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width: 3rem; height: 3rem; stroke: var(--green-600, #059669); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto;">
+                    <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+
+            <!-- Text -->
+            <h3 id="modal-title" style="font-size: 1.5rem; font-weight: 700; color: var(--gray-900, #111827); text-align: center; margin-bottom: 0.5rem; font-family: inherit;">Teşekkür Ederiz!</h3>
+            <p id="modal-message" style="font-size: 1rem; color: var(--gray-500, #6b7280); text-align: center; line-height: 1.5; margin-bottom: 2rem; font-family: inherit;">Geri bildiriminiz bizim için değerli.</p>
+
+            <!-- Button -->
+            <button onclick="closeSuccessModal()" style="width: 100%; padding: 0.875rem; background: var(--green-600, #059669); color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" onmouseover="this.style.background='var(--green-700, #047857)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)';" onmouseout="this.style.background='var(--green-600, #059669)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(0, 0, 0, 0.1)';">
+                Tamam
+            </button>
+        </div>
+    </div>
+
+    <style>
+        /* SVG Animation Styles */
+        .checkmark__circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: var(--green-600, #059669);
+            fill: none;
+            /* Animation will be triggered by JS adding a class */
+        }
+
+        .checkmark__check {
+            transform-origin: 50% 50%;
+            stroke-dasharray: 48;
+            stroke-dashoffset: 48;
+            /* Animation will be triggered by JS adding a class */
+        }
+
+        .animate-circle {
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        .animate-check {
+            animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.6s forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+
+    <script>
+    let modalTimer;
+
+    function showSuccessModal(title, message) {
+        const modal = document.getElementById('success-modal');
+        const backdrop = document.getElementById('modal-backdrop');
+        const content = document.getElementById('modal-content');
+        const circle = document.querySelector('.checkmark__circle');
+        const check = document.querySelector('.checkmark__check');
+        
+        if (title) document.getElementById('modal-title').textContent = title;
+        if (message) document.getElementById('modal-message').textContent = message;
+
+        modal.style.display = 'flex';
+        
+        // Trigger entrance animation
+        setTimeout(() => {
+            backdrop.style.opacity = '1';
+            content.style.opacity = '1';
+            content.style.transform = 'scale(1)';
+            
+            // Trigger SVG animation
+            circle.classList.remove('animate-circle');
+            check.classList.remove('animate-check');
+            void circle.offsetWidth; // trigger reflow
+            circle.classList.add('animate-circle');
+            check.classList.add('animate-check');
+        }, 10);
+
+        // Auto close
+        if (modalTimer) clearTimeout(modalTimer);
+        modalTimer = setTimeout(closeSuccessModal, 3000);
+    }
+
+    function closeSuccessModal() {
+        const modal = document.getElementById('success-modal');
+        const backdrop = document.getElementById('modal-backdrop');
+        const content = document.getElementById('modal-content');
+
+        if (!modal) return;
+
+        backdrop.style.opacity = '0';
+        content.style.opacity = '0';
+        content.style.transform = 'scale(0.95)';
+
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
 const voteSwitchedMessageTemplate = @json(__('common.vote_switched_message'));
 const genericErrorMessage = @json(__('common.generic_error'));
 
@@ -676,12 +785,15 @@ function toggleLike(suggestionId) {
                 }
 
                 if (response.switched_from) {
-                    const switchedMessage = voteSwitchedMessageTemplate
-                        .replace(':from', response.switched_from)
-                        .replace(':to', response.current_title);
-                    showMessage(switchedMessage, 'success');
+                    showSuccessModal(
+                        'Teşekkürler!',
+                        `Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`
+                    );
                 } else {
-                    showMessage('{{ __('common.suggestion_liked_success') }}', 'success');
+                    showSuccessModal(
+                        'Teşekkürler!',
+                        'Geri bildiriminiz için teşekkür ederiz.'
+                    );
                 }
             } else {
                 clickedButton.classList.remove('liked');
@@ -1479,7 +1591,10 @@ function toggleCommentLike(commentId) {
                 likeButton.style.borderColor = 'var(--red-200)';
                 heartIcon.style.fill = 'currentColor';
 
-                showMessage('{{ __('common.comment_liked') }}', 'success');
+                // showSuccessModal(
+                //     'Teşekkürler!',
+                //     'Yorumu beğendiğiniz için teşekkür ederiz.'
+                // );
             } else {
                 // Remove liked state
                 likeButton.classList.remove('liked');
