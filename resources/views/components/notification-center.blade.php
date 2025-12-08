@@ -43,7 +43,7 @@
              x-transition:leave="transition ease-in duration-150"
              x-transition:leave-start="opacity-100 translate-y-0"
              x-transition:leave-end="opacity-0 translate-y-1"
-             class="absolute right-0 top-full z-50 w-80 mt-2 origin-top-right bg-white rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-100"
+             class="absolute right-0 bottom-full md:bottom-auto md:top-full mb-2 md:mb-0 md:mt-2 z-50 w-80 max-w-[calc(100vw-2rem)] origin-bottom-right md:origin-top-right bg-white rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-100"
              style="display: none;">
             
             <div class="px-3 py-2 border-b border-gray-100 flex justify-between items-center bg-[#f9fafb] rounded-t-xl">

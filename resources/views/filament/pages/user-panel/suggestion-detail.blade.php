@@ -21,7 +21,7 @@
     <!-- Breadcrumb Pills -->
     <div class="w-full relative z-10">
         <div class="user-container py-1">
-            <nav class="flex items-center gap-2 text-sm font-medium">
+            <nav class="flex items-center gap-2 text-sm font-medium overflow-x-auto whitespace-nowrap scrollbar-hide pb-1">
                 <!-- Home -->
                 <a href="{{ route('user.index') }}" class="flex items-center px-3 py-1 rounded-full bg-[#f0fdf4] text-green-800 hover:bg-green-100 transition-colors group shadow-sm border border-green-50">
                     <svg class="w-4 h-4 mr-1.5 text-green-600 group-hover:text-green-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">

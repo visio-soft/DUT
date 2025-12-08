@@ -12,6 +12,7 @@ return [
     'turkish' => 'Türkçe',
     'english' => 'English',
     'language' => 'Dil',
+    'menu' => 'Menü',
 
     // Footer translations
     'platform' => 'Platform',
