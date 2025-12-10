@@ -316,8 +316,12 @@ class ProjectResource extends Resource
                 CommonTableActions::softDeleteBulkActionGroup('project'),
             ])
             ->groups([
-                Group::make('projectGroups.category.name')
+                Group::make('category_id')
                     ->label(__('common.project_category'))
+                    ->getTitleFromRecordUsing(fn ($record): string => 
+                        $record->projectGroups->first()?->category?->name ?? __('common.uncategorized')
+                    )
+                    ->collapsible()
                     ->getDescriptionFromRecordUsing(function ($record): string {
                         $category = $record->projectGroups->first()?->category;
                         $end = __('common.not_specified');
@@ -330,7 +334,7 @@ class ProjectResource extends Resource
                     }),
 
             ])
-            ->defaultGroup('projectGroups.category.name');
+            ->defaultGroup('category_id');
 
     }
 
