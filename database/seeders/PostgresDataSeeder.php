@@ -18,11 +18,25 @@ class PostgresDataSeeder extends Seeder
      */
     public function run(): void
     {
-        // Disable foreign key checks
+        // Try to disable foreign key checks (may fail on some hosts due to permissions)
+        $constraintsDisabled = false;
+        
         if (config('database.default') === 'sqlite') {
-            DB::statement('PRAGMA foreign_keys = OFF');
+            try {
+                DB::statement('PRAGMA foreign_keys = OFF');
+                $constraintsDisabled = true;
+            } catch (\Throwable $e) {
+                $this->command?->warn('Could not disable SQLite foreign keys: ' . $e->getMessage());
+            }
         } elseif (config('database.default') === 'pgsql') {
-            DB::statement('SET session_replication_role = replica');
+            // Note: session_replication_role requires superuser privileges
+            // We'll skip this on shared hosting / limited permission environments
+            try {
+                DB::statement('SET session_replication_role = replica');
+                $constraintsDisabled = true;
+            } catch (\Throwable $e) {
+                $this->command?->warn('Could not disable PostgreSQL constraints (requires superuser). Continuing anyway...');
+            }
         }
 
         try {
@@ -39,10 +53,20 @@ class PostgresDataSeeder extends Seeder
 
             $this->command?->info('PostgresDataSeeder completed successfully.');
         } finally {
-            if (config('database.default') === 'sqlite') {
-                DB::statement('PRAGMA foreign_keys = ON');
-            } elseif (config('database.default') === 'pgsql') {
-                DB::statement('SET session_replication_role = DEFAULT');
+            if ($constraintsDisabled) {
+                if (config('database.default') === 'sqlite') {
+                    try {
+                        DB::statement('PRAGMA foreign_keys = ON');
+                    } catch (\Throwable $e) {
+                        // Ignore
+                    }
+                } elseif (config('database.default') === 'pgsql') {
+                    try {
+                        DB::statement('SET session_replication_role = DEFAULT');
+                    } catch (\Throwable $e) {
+                        // Ignore
+                    }
+                }
             }
         }
     }
