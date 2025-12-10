@@ -122,11 +122,9 @@ class NotificationResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('data.title')
                     ->label(__('common.title'))
-                    ->searchable()
                     ->limit(30),
                 Tables\Columns\TextColumn::make('data.body')
                     ->label(__('common.message'))
-                    ->searchable()
                     ->limit(50),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label(__('common.sent_at'))
