@@ -50,6 +50,9 @@ class PostgresDataSeeder extends Seeder
             $this->seedSuggestionComments();
             $this->seedSuggestionCommentLikes();
             $this->createProjectHierarchy();
+            
+            // Fix PostgreSQL sequences after manual ID inserts
+            $this->updatePostgresSequences();
 
             $this->command?->info('PostgresDataSeeder completed successfully.');
         } finally {
@@ -456,5 +459,45 @@ class PostgresDataSeeder extends Seeder
             ]);
 
         $this->command?->info('Created project hierarchy.');
+    }
+
+    /**
+     * Update PostgreSQL sequences after manual ID inserts.
+     * This prevents "duplicate key" errors when inserting new records.
+     */
+    private function updatePostgresSequences(): void
+    {
+        if (config('database.default') !== 'pgsql') {
+            return;
+        }
+
+        $tables = [
+            'users',
+            'roles', 
+            'permissions',
+            'categories',
+            'project_groups',
+            'suggestions',
+            'suggestion_likes',
+            'suggestion_comments',
+            'suggestion_comment_likes',
+        ];
+
+        foreach ($tables as $table) {
+            try {
+                // Get the max ID from the table
+                $maxId = DB::table($table)->max('id') ?? 0;
+                
+                // Update the sequence to max + 1
+                $sequenceName = "{$table}_id_seq";
+                DB::statement("SELECT setval('{$sequenceName}', ?, true)", [$maxId]);
+                
+            } catch (\Throwable $e) {
+                // Sequence might not exist or have different name, skip silently
+                $this->command?->warn("Could not update sequence for {$table}: " . $e->getMessage());
+            }
+        }
+
+        $this->command?->info('Updated PostgreSQL sequences.');
     }
 }
