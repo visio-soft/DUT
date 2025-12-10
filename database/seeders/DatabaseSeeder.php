@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
     {
         if (env('DUT_SEED_WITH_LIVE', false)) {
             $this->call([
-                DutLiveSeeder::class,
+                PostgresDataSeeder::class, // Yeni: Daha güvenilir live data seeder
             ]);
 
             return;
