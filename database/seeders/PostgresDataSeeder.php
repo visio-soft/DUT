@@ -387,17 +387,20 @@ class PostgresDataSeeder extends Seeder
 
     private function createProjectHierarchy(): void
     {
-        // Create main "Projeler" category
+        // Create main "Projeler" category (top-level, no parent)
         $mainCategory = DB::table('categories')->where('name', 'Projeler')->first();
         if (!$mainCategory) {
             $mainCategoryId = DB::table('categories')->insertGetId([
                 'name' => 'Projeler',
                 'description' => 'Tüm projeler',
+                'parent_id' => null, // En üst kategori - parent yok
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
         } else {
             $mainCategoryId = $mainCategory->id;
+            // Ensure parent_id is null for existing category
+            DB::table('categories')->where('id', $mainCategoryId)->update(['parent_id' => null]);
         }
 
         // Create project group for Kayabaşı

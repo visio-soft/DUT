@@ -52,25 +52,6 @@ class CategoryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('parent_id')
-                    ->label(__('common.parent_category'))
-                    ->relationship(
-                        'parent',
-                        'name',
-                        fn ($query, $record) => $query->when(
-                            $record,
-                            fn ($q) => $q->whereNull('parent_id')
-                                ->where('id', '!=', $record->id)
-                        )->when(
-                            ! $record,
-                            fn ($q) => $q->whereNull('parent_id')
-                        )
-                    )
-                    ->searchable()
-                    ->preload()
-                    ->nullable()
-                    ->placeholder(__('common.select_parent_category')),
-
                 Forms\Components\TextInput::make('name')
                     ->label(__('common.project_category'))
                     ->required()
@@ -87,25 +68,10 @@ class CategoryResource extends Resource
                     ->sortable()
                     ->label('ID'),
 
-                Tables\Columns\TextColumn::make('parent.name')
-                    ->label(__('common.parent_category'))
-                    ->searchable()
-                    ->sortable()
-                    ->placeholder('-')
-                    ->badge()
-                    ->color('success'),
-
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('common.project_category'))
                     ->searchable()
                     ->sortable(),
-
-                Tables\Columns\TextColumn::make('children_count')
-                    ->label('Alt Kategori Sayısı')
-                    ->counts('children')
-                    ->sortable()
-                    ->badge()
-                    ->color('warning'),
 
                 Tables\Columns\TextColumn::make('project_groups_count')
                     ->label('Proje Grup Sayısı')
@@ -140,12 +106,6 @@ class CategoryResource extends Resource
             ->defaultSort('name')
             ->filters([
                 TrashedFilter::make(),
-                Filter::make('parent_categories')
-                    ->label('Ana Kategoriler')
-                    ->query(fn ($query) => $query->whereNull('parent_id')),
-                Filter::make('child_categories')
-                    ->label('Alt Kategoriler')
-                    ->query(fn ($query) => $query->whereNotNull('parent_id')),
                 Filter::make('empty_categories')
                     ->label('Boş Kategoriler')
                     ->query(fn ($query) => $query->doesntHave('projectGroups')),
@@ -202,6 +162,6 @@ class CategoryResource extends Resource
         // Note: 'projects' count is handled via accessor (projects_count) due to complex many-to-many relationship
         return parent::getEloquentQuery()
             ->withoutGlobalScopes([SoftDeletingScope::class])
-            ->withCount(['projectGroups', 'suggestions', 'children']);
+            ->withCount(['projectGroups', 'suggestions']);
     }
 }
