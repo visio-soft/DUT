@@ -4,7 +4,7 @@
 
 @section('content')
 <!-- Header Section with Background -->
-<section class="section-padding bg-transparent" style="padding: 1rem 0 0.5rem 0;">
+<section class="section-padding bg-transparent" style="padding: 1rem 0 0.5rem 0; position: relative; overflow: hidden; min-height: 12rem;">
     @if($hasBackgroundImages ?? false)
         @if($randomBackgroundImage)
             <!-- Single Random Background Image -->
@@ -173,9 +173,10 @@
                         <div style="position: relative; cursor: pointer; overflow: hidden; border-radius: var(--radius-lg);" onclick="openImageModal()">
                             <img id="suggestion-image" src="{{ $suggestion->getFirstMediaUrl('images') }}"
                                  alt="{{ $suggestion->title }}"
-                                 style="width: 100%; height: 24rem; object-fit: cover; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); transition: transform 0.3s ease;"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 24rem; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg);&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 4rem; height: 4rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 1rem;&quot;>{{ __('common.suggestion_image') }}</p></div></div>';"
-                                 onmouseover="this.style.transform='scale(1.05)'; document.getElementById('zoom-overlay').style.opacity='1';"
+                                 class="suggestion-preview-image"
+                                 onclick="openImageModal()"
+                                 onerror="this.onerror=null; this.src='{{ asset('images/no-image.png') }}'; this.style.display='none'; this.parentElement.innerHTML='<div style=&quot;width: 100%; height: 20rem; background: linear-gradient(135deg, var(--green-100) 0%, var(--green-200) 100%); display: flex; align-items: center; justify-content: center; border-radius: var(--radius-lg);&quot;><div style=&quot;text-align: center;&quot;><svg style=&quot;width: 4rem; height: 4rem; color: var(--green-600); margin-bottom: 0.5rem;&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 20 20&quot;><path fill-rule=&quot;evenodd&quot; d=&quot;M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z&quot; clip-rule=&quot;evenodd&quot;/></svg><p style=&quot;color: var(--green-700); font-size: 1rem;&quot;>{{ __('common.suggestion_image') }}</p></div></div>';"
+                                 onmouseover="this.style.transform='scale(1.02)'; document.getElementById('zoom-overlay').style.opacity='1';"
                                  onmouseout="this.style.transform='scale(1)'; document.getElementById('zoom-overlay').style.opacity='0';">
 
                             <!-- Zoom Overlay -->
@@ -997,53 +998,51 @@ function adjustDetailLayout() {
 window.addEventListener('load', adjustDetailLayout);
 window.addEventListener('resize', adjustDetailLayout);
 
-// Image Modal Functions with Zoom
-let isZoomed = false;
-let zoomLevel = 1;
-let panX = 0;
-let panY = 0;
-let isDragging = false;
-let lastX = 0;
-let lastY = 0;
-let isFollowingMouse = false;
-let mouseFollowTimeout = null;
+// Image Modal Functions with Zoom - Simplified Version
+let zoomState = {
+    isZoomed: false,
+    zoomLevel: 1,
+    panX: 0,
+    panY: 0,
+    isDragging: false,
+    lastX: 0,
+    lastY: 0
+};
 
 function openImageModal() {
     const modal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
     const suggestionImage = document.getElementById('suggestion-image');
 
-    if (modal && modalImage && suggestionImage) {
-        modalImage.src = suggestionImage.src;
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
+    if (!modal || !modalImage || !suggestionImage) return;
 
-        // Reset zoom state
-        resetZoom();
+    modalImage.src = suggestionImage.src;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
 
-        // Animation
-        setTimeout(() => {
-            modal.style.opacity = '1';
-            modalImage.style.transform = 'scale(1)';
-        }, 50);
+    // Reset zoom state
+    resetZoom();
 
-        // Add zoom event listeners
-        setupZoomEvents();
-    }
+    // Animation
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+        modalImage.style.transform = 'scale(1)';
+    });
+
+    // Setup event listeners
+    setupZoomEvents();
 }
 
 function resetZoom() {
-    isZoomed = false;
-    zoomLevel = 1;
-    panX = 0;
-    panY = 0;
-    isFollowingMouse = false;
-
-    // Clear mouse follow timeout
-    if (mouseFollowTimeout) {
-        clearTimeout(mouseFollowTimeout);
-        mouseFollowTimeout = null;
-    }
+    zoomState = {
+        isZoomed: false,
+        zoomLevel: 1,
+        panX: 0,
+        panY: 0,
+        isDragging: false,
+        lastX: 0,
+        lastY: 0
+    };
 
     const modalImage = document.getElementById('modal-image');
     const container = document.getElementById('image-container');
@@ -1051,8 +1050,11 @@ function resetZoom() {
     if (modalImage && container) {
         modalImage.style.cursor = 'zoom-in';
         container.style.cursor = 'zoom-in';
-        updateImageTransform();
+        modalImage.style.transform = 'scale(1) translate(0px, 0px)';
+        modalImage.style.transition = 'transform 0.3s ease';
     }
+
+    updateInstructions(false);
 }
 
 function setupZoomEvents() {
@@ -1061,256 +1063,174 @@ function setupZoomEvents() {
 
     if (!modalImage || !container) return;
 
-    // Click to zoom/unzoom
-    modalImage.addEventListener('click', handleImageClick);
+    // Remove old listeners first
+    modalImage.onclick = null;
+    container.onmousedown = null;
+    container.onmousemove = null;
+    container.onmouseup = null;
+    container.onmouseleave = null;
+    container.ontouchstart = null;
+    container.ontouchmove = null;
+    container.ontouchend = null;
 
-    // Mouse events for desktop
-    container.addEventListener('mousemove', handleMouseMove);
-    container.addEventListener('mousedown', handleMouseDown);
-    container.addEventListener('mouseup', handleMouseUp);
-    container.addEventListener('mouseleave', handleMouseLeave);
+    // Click to toggle zoom
+    modalImage.onclick = function(e) {
+        e.stopPropagation();
+        toggleZoom(e);
+    };
 
-    // Touch events for mobile
-    container.addEventListener('touchstart', handleTouchStart, { passive: false });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
-    container.addEventListener('touchend', handleTouchEnd, { passive: false });
+    // Desktop drag events
+    container.onmousedown = function(e) {
+        if (!zoomState.isZoomed) return;
+        e.preventDefault();
+        zoomState.isDragging = true;
+        zoomState.lastX = e.clientX;
+        zoomState.lastY = e.clientY;
+        container.style.cursor = 'grabbing';
+    };
+
+    container.onmousemove = function(e) {
+        if (!zoomState.isZoomed || !zoomState.isDragging) return;
+        
+        const deltaX = e.clientX - zoomState.lastX;
+        const deltaY = e.clientY - zoomState.lastY;
+        
+        zoomState.panX += deltaX;
+        zoomState.panY += deltaY;
+        zoomState.lastX = e.clientX;
+        zoomState.lastY = e.clientY;
+        
+        applyTransform(false);
+    };
+
+    container.onmouseup = function() {
+        if (zoomState.isDragging) {
+            zoomState.isDragging = false;
+            container.style.cursor = zoomState.isZoomed ? 'grab' : 'zoom-in';
+        }
+    };
+
+    container.onmouseleave = function() {
+        if (zoomState.isDragging) {
+            zoomState.isDragging = false;
+            container.style.cursor = zoomState.isZoomed ? 'grab' : 'zoom-in';
+        }
+    };
+
+    // Mobile touch events
+    container.ontouchstart = function(e) {
+        if (!zoomState.isZoomed || e.touches.length !== 1) return;
+        e.preventDefault();
+        zoomState.isDragging = true;
+        zoomState.lastX = e.touches[0].clientX;
+        zoomState.lastY = e.touches[0].clientY;
+    };
+
+    container.ontouchmove = function(e) {
+        if (!zoomState.isZoomed || !zoomState.isDragging || e.touches.length !== 1) return;
+        e.preventDefault();
+        
+        const deltaX = e.touches[0].clientX - zoomState.lastX;
+        const deltaY = e.touches[0].clientY - zoomState.lastY;
+        
+        zoomState.panX += deltaX;
+        zoomState.panY += deltaY;
+        zoomState.lastX = e.touches[0].clientX;
+        zoomState.lastY = e.touches[0].clientY;
+        
+        applyTransform(false);
+    };
+
+    container.ontouchend = function() {
+        zoomState.isDragging = false;
+    };
 
     // Prevent context menu
-    modalImage.addEventListener('contextmenu', (e) => e.preventDefault());
+    modalImage.oncontextmenu = function(e) { e.preventDefault(); };
 
-    // Auto-hide instructions after 3 seconds
+    // Hide instructions after 3 seconds
     setTimeout(() => {
         const instructions = document.getElementById('zoom-instructions');
-        if (instructions && !isZoomed) {
+        if (instructions && !zoomState.isZoomed) {
             instructions.style.opacity = '0';
-            setTimeout(() => {
-                if (instructions && !isZoomed) {
-                    instructions.style.display = 'none';
-                }
-            }, 300);
         }
     }, 3000);
 }
 
-function handleImageClick(e) {
-    e.stopPropagation();
+function toggleZoom(e) {
+    const modalImage = document.getElementById('modal-image');
+    const container = document.getElementById('image-container');
 
-    const instructions = document.getElementById('zoom-instructions');
+    if (!modalImage || !container) return;
 
-    if (!isZoomed) {
-        // Zoom in
-        zoomLevel = 2.5;
-        isZoomed = true;
+    if (!zoomState.isZoomed) {
+        // Zoom in to 2x
+        zoomState.isZoomed = true;
+        zoomState.zoomLevel = 2;
 
-        // Calculate zoom center based on click position
-        const rect = e.target.getBoundingClientRect();
-        const centerX = (e.clientX - rect.left) / rect.width;
-        const centerY = (e.clientY - rect.top) / rect.height;
+        // Calculate click position for centered zoom
+        const rect = modalImage.getBoundingClientRect();
+        const clickX = (e.clientX - rect.left) / rect.width - 0.5;
+        const clickY = (e.clientY - rect.top) / rect.height - 0.5;
 
-        // Adjust pan to center the clicked area
-        panX = (0.5 - centerX) * (zoomLevel - 1) * rect.width;
-        panY = (0.5 - centerY) * (zoomLevel - 1) * rect.height;
+        // Pan to clicked area
+        zoomState.panX = -clickX * rect.width * (zoomState.zoomLevel - 1);
+        zoomState.panY = -clickY * rect.height * (zoomState.zoomLevel - 1);
 
-        e.target.style.cursor = 'zoom-out';
-        document.getElementById('image-container').style.cursor = 'grab';
-
-        // Enable mouse following immediately after zoom
-        isFollowingMouse = true;
-
-        // Update instructions
-        if (instructions) {
-            instructions.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    <span>{{ __('common.drag_instruction') }}</span>
-                </div>
-            `;
-        }
+        modalImage.style.cursor = 'zoom-out';
+        container.style.cursor = 'grab';
     } else {
         // Zoom out
-        resetZoom();
+        zoomState.isZoomed = false;
+        zoomState.zoomLevel = 1;
+        zoomState.panX = 0;
+        zoomState.panY = 0;
 
-        // Reset instructions
-        if (instructions) {
-            instructions.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
-                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"/>
-                    </svg>
-                    <span>{{ __('common.zoom_instruction') }}</span>
-                </div>
-            `;
-        }
+        modalImage.style.cursor = 'zoom-in';
+        container.style.cursor = 'zoom-in';
     }
 
-    updateImageTransform();
+    applyTransform(true);
+    updateInstructions(zoomState.isZoomed);
 }
 
-function handleMouseMove(e) {
-    if (!isZoomed) return;
-
-    if (isDragging) {
-        // Manual dragging mode - disable mouse follow
-        isFollowingMouse = false;
-        if (mouseFollowTimeout) {
-            clearTimeout(mouseFollowTimeout);
-        }
-
-        const deltaX = e.clientX - lastX;
-        const deltaY = e.clientY - lastY;
-
-        panX += deltaX;
-        panY += deltaY;
-
-        lastX = e.clientX;
-        lastY = e.clientY;
-
-        updateImageTransform();
-        e.preventDefault();
-    } else if (isFollowingMouse) {
-        // Mouse follow mode - smooth tracking
-        followMousePosition(e);
-    }
-}
-
-function followMousePosition(e) {
-    const container = document.getElementById('image-container');
+function applyTransform(animate) {
     const modalImage = document.getElementById('modal-image');
+    if (!modalImage) return;
 
-    if (!container || !modalImage) return;
+    const translate = zoomState.zoomLevel > 1 
+        ? `translate(${zoomState.panX / zoomState.zoomLevel}px, ${zoomState.panY / zoomState.zoomLevel}px)` 
+        : 'translate(0px, 0px)';
 
-    const containerRect = container.getBoundingClientRect();
-    const imageRect = modalImage.getBoundingClientRect();
-
-    // Calculate mouse position relative to container center
-    const mouseCenterX = (e.clientX - containerRect.left) - (containerRect.width / 2);
-    const mouseCenterY = (e.clientY - containerRect.top) - (containerRect.height / 2);
-
-    // Calculate follow intensity (how much the image should move)
-    const followIntensity = 0.4; // 40% of mouse movement for more responsive feel
-    const maxPan = Math.min(containerRect.width, containerRect.height) * 0.5;
-
-    // Apply smooth following with limits
-    const targetPanX = -mouseCenterX * followIntensity;
-    const targetPanY = -mouseCenterY * followIntensity;
-
-    // Limit pan range
-    panX = Math.max(-maxPan, Math.min(maxPan, targetPanX));
-    panY = Math.max(-maxPan, Math.min(maxPan, targetPanY));
-
-    updateImageTransform(true); // Use smooth transition
+    modalImage.style.transition = animate ? 'transform 0.3s ease' : 'none';
+    modalImage.style.transform = `scale(${zoomState.zoomLevel}) ${translate}`;
 }
 
-function handleMouseDown(e) {
-    if (!isZoomed) return;
+function updateInstructions(isZoomed) {
+    const instructions = document.getElementById('zoom-instructions');
+    if (!instructions) return;
 
-    // Disable mouse following when user starts dragging
-    isFollowingMouse = false;
-    if (mouseFollowTimeout) {
-        clearTimeout(mouseFollowTimeout);
-    }
+    instructions.style.opacity = '1';
+    instructions.style.display = 'block';
 
-    isDragging = true;
-    lastX = e.clientX;
-    lastY = e.clientY;
-
-    const container = document.getElementById('image-container');
-    if (container) {
-        container.style.cursor = 'grabbing';
-    }
-    e.preventDefault();
-}
-
-function handleMouseUp(e) {
-    if (isDragging) {
-        isDragging = false;
-        const container = document.getElementById('image-container');
-        if (container && isZoomed) {
-            container.style.cursor = 'grab';
-        }
-
-        // Re-enable mouse following after dragging ends (with shorter delay)
-        if (isZoomed) {
-            mouseFollowTimeout = setTimeout(() => {
-                isFollowingMouse = true;
-            }, 300); // Wait just 300ms before re-enabling mouse follow
-        }
-    }
-}
-
-function updateImageTransform(useSmooth = false) {
-    const modalImage = document.getElementById('modal-image');
-    if (modalImage) {
-        modalImage.style.transform = `scale(${zoomLevel}) translate(${panX / zoomLevel}px, ${panY / zoomLevel}px)`;
-
-        if (isDragging) {
-            modalImage.style.transition = 'none';
-        } else if (useSmooth || isFollowingMouse) {
-            modalImage.style.transition = 'transform 0.08s ease-out'; // Even faster transition for more responsive mouse following
-        } else {
-            modalImage.style.transition = 'transform 0.4s ease';
-        }
-    }
-}
-
-// Touch event handlers for mobile
-let lastTouchX = 0;
-let lastTouchY = 0;
-
-function handleTouchStart(e) {
-    if (!isZoomed || e.touches.length !== 1) return;
-
-    isDragging = true;
-    lastTouchX = e.touches[0].clientX;
-    lastTouchY = e.touches[0].clientY;
-    e.preventDefault();
-}
-
-function handleTouchMove(e) {
-    if (!isZoomed || !isDragging || e.touches.length !== 1) return;
-
-    const deltaX = e.touches[0].clientX - lastTouchX;
-    const deltaY = e.touches[0].clientY - lastTouchY;
-
-    panX += deltaX;
-    panY += deltaY;
-
-    lastTouchX = e.touches[0].clientX;
-    lastTouchY = e.touches[0].clientY;
-
-    updateImageTransform();
-    e.preventDefault();
-}
-
-function handleTouchEnd(e) {
-    if (isDragging) {
-        isDragging = false;
-    }
-}
-
-function handleMouseLeave(e) {
-    // Stop dragging if mouse leaves container
-    if (isDragging) {
-        isDragging = false;
-        const container = document.getElementById('image-container');
-        if (container && isZoomed) {
-            container.style.cursor = 'grab';
-        }
-    }
-
-    // Temporarily disable mouse following when mouse leaves
-    if (isFollowingMouse) {
-        isFollowingMouse = false;
-        if (mouseFollowTimeout) {
-            clearTimeout(mouseFollowTimeout);
-        }
-
-        // Smoothly return to center when mouse leaves
-        panX *= 0.5;
-        panY *= 0.5;
-        updateImageTransform(true);
+    if (isZoomed) {
+        instructions.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span>{{ __('common.drag_instruction') }}</span>
+            </div>
+        `;
+    } else {
+        instructions.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6"/>
+                </svg>
+                <span>{{ __('common.zoom_instruction') }}</span>
+            </div>
+        `;
     }
 }
 
@@ -1318,27 +1238,16 @@ function closeImageModal() {
     const modal = document.getElementById('image-modal');
     const modalImage = document.getElementById('modal-image');
 
-    if (modal && modalImage) {
-        // Clean up event listeners
-        modalImage.removeEventListener('click', handleImageClick);
+    if (!modal || !modalImage) return;
 
-        const container = document.getElementById('image-container');
-        if (container) {
-            container.removeEventListener('mousemove', handleMouseMove);
-            container.removeEventListener('mousedown', handleMouseDown);
-            container.removeEventListener('mouseup', handleMouseUp);
-            container.removeEventListener('mouseleave', handleMouseLeave);
-        }
+    modal.style.opacity = '0';
+    modalImage.style.transform = 'scale(0.95)';
 
-        modal.style.opacity = '0';
-        modalImage.style.transform = 'scale(0.95)';
-
-        setTimeout(() => {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            resetZoom();
-        }, 300);
-    }
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        resetZoom();
+    }, 300);
 }
 
 // Close modal when clicking outside the image
@@ -1761,6 +1670,28 @@ function toggleCommentLike(commentId) {
     #image-modal img {
         max-width: 90% !important;
         max-height: 88% !important;
+    }
+}
+
+/* Suggestion Preview Image Responsive Height */
+.suggestion-preview-image {
+    width: 100%;
+    height: 14rem; /* Mobile default */
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease;
+}
+
+@media (min-width: 640px) {
+    .suggestion-preview-image {
+        height: 18rem; /* Tablet */
+    }
+}
+
+@media (min-width: 1024px) {
+    .suggestion-preview-image {
+        height: 20rem; /* Desktop */
     }
 }
 </style>
