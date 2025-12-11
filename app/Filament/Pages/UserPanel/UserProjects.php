@@ -62,9 +62,7 @@ class UserProjects
             });
         }
 
-        if ($country = $request->input('country')) {
-            $projectsQuery->where('country', $country);
-        }
+
 
         if ($city = $request->input('city')) {
             $projectsQuery->where('city', $city);
@@ -106,8 +104,6 @@ class UserProjects
         $filterValues = $request->only([
             'search',
             'status',
-            'status',
-            'country',
             'city',
             'district',
             'neighborhood',

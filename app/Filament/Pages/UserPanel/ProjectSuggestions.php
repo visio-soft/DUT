@@ -54,13 +54,7 @@ class ProjectSuggestions
             });
         }
 
-        if ($country = $request->input('country')) {
-            // Assuming project has country column or relation, but based on user request we add it.
-            // If project doesn't have country column, we might need to rely on city/district uniqueness or add scope.
-            // For now assuming column exists or we ignore if not present in model, but user asked for it.
-            // Let's assume column exists or we skip.
-             $projectsQuery->where('country', $country);
-        }
+
 
         if ($city = $request->input('city')) {
             $projectsQuery->where('city', $city);
@@ -109,8 +103,6 @@ class ProjectSuggestions
         $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
-            'search',
-            'country',
             'city',
             'district',
             'neighborhood',
