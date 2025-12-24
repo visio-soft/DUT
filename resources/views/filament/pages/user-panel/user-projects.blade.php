@@ -1668,24 +1668,93 @@ function showExpiredMessage() {
 }
 </script>
 
-    <!-- Custom Success Modal -->
-    <div id="success-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center;">
+    <!-- Feedback Form Modal -->
+    <div id="feedback-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center;">
         <!-- Backdrop -->
-        <div id="modal-backdrop" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease;"></div>
+        <div id="modal-backdrop" onclick="closeFeedbackModal()" style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(59, 130, 246, 0.15) 100%); backdrop-filter: blur(8px); opacity: 0; transition: opacity 0.3s ease;"></div>
 
         <!-- Modal Content -->
-        <div id="modal-content" style="position: relative; background: white; border-radius: 1.5rem; padding: 2.5rem; width: 100%; max-width: 400px; margin: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transform: scale(0.95); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+        <div id="modal-content" style="position: relative; background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 50%, #ecfeff 100%); border-radius: 1.5rem; padding: 2rem; width: 100%; max-width: 420px; margin: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25), 0 0 0 1px rgba(16, 185, 129, 0.1); transform: scale(0.95); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <!-- Close Button -->
+            <button onclick="closeFeedbackModal()" style="position: absolute; top: 1rem; right: 1rem; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(0,0,0,0.05); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                <svg style="width: 16px; height: 16px; color: #6b7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+
             <!-- Animated Icon -->
-            <div style="width: 5rem; height: 5rem; margin: 0 auto 1.5rem; background: var(--green-50, #ecfdf5); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <div style="width: 5rem; height: 5rem; margin: 0 auto 1.5rem; background: linear-gradient(135deg, var(--green-100, #dcfce7) 0%, var(--green-200, #bbf7d0) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 24px rgba(34, 197, 94, 0.2);">
                 <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width: 3rem; height: 3rem; stroke: var(--green-600, #059669); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto;">
                     <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
                     <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
                 </svg>
             </div>
 
-            <!-- Text -->
+            <!-- Title -->
             <h3 id="modal-title" style="font-size: 1.5rem; font-weight: 700; color: var(--gray-900, #111827); text-align: center; margin-bottom: 0.5rem; font-family: inherit;">Teşekkür Ederiz!</h3>
-            <p id="modal-message" style="font-size: 1rem; color: var(--gray-500, #6b7280); text-align: center; line-height: 1.5; margin-bottom: 2rem; font-family: inherit;">Geri bildiriminiz bizim için değerli.</p>
+            <p id="modal-message" style="font-size: 0.95rem; color: var(--gray-500, #6b7280); text-align: center; line-height: 1.5; margin-bottom: 1.5rem; font-family: inherit;">Oyunuz alındı! Bize biraz daha bilgi paylaşır mısınız?</p>
+
+            <!-- Feedback Form -->
+            <form id="feedback-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                <input type="hidden" id="feedback-like-id" name="like_id" value="">
+
+                <!-- Age Field -->
+                <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+                    <label for="feedback-age" style="font-size: 0.875rem; font-weight: 600; color: var(--gray-700, #374151);">Yaşınız</label>
+                    <input type="number" id="feedback-age" name="age" min="1" max="120" placeholder="Örn: 25" required style="padding: 0.75rem 1rem; border: 2px solid var(--gray-200, #e5e7eb); border-radius: 0.75rem; font-size: 1rem; transition: all 0.2s; outline: none; background: white;" onfocus="this.style.borderColor='var(--green-500, #22c55e)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.15)';" onblur="this.style.borderColor='var(--gray-200, #e5e7eb)'; this.style.boxShadow='none';">
+                </div>
+
+                <!-- Gender Field -->
+                <div style="display: flex; flex-direction: column; gap: 0.375rem;">
+                    <label for="feedback-gender" style="font-size: 0.875rem; font-weight: 600; color: var(--gray-700, #374151);">Cinsiyet</label>
+                    <select id="feedback-gender" name="gender" required style="padding: 0.75rem 1rem; border: 2px solid var(--gray-200, #e5e7eb); border-radius: 0.75rem; font-size: 1rem; transition: all 0.2s; outline: none; background: white; cursor: pointer;" onfocus="this.style.borderColor='var(--green-500, #22c55e)'; this.style.boxShadow='0 0 0 3px rgba(34, 197, 94, 0.15)';" onblur="this.style.borderColor='var(--gray-200, #e5e7eb)'; this.style.boxShadow='none';">
+                        <option value="" disabled selected>Seçiniz</option>
+                        <option value="erkek">Erkek</option>
+                        <option value="kadın">Kadın</option>
+                        <option value="diğer">Diğer</option>
+                    </select>
+                </div>
+
+                <!-- Anonymous Checkbox -->
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, var(--gray-50, #f9fafb) 0%, var(--green-50, #f0fdf4) 100%); border-radius: 0.75rem; border: 1px solid var(--gray-200, #e5e7eb);">
+                    <input type="checkbox" id="feedback-anonymous" name="is_anonymous" style="width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: var(--green-600, #059669); margin-top: 0.125rem; flex-shrink: 0;">
+                    <div>
+                        <label for="feedback-anonymous" style="font-size: 0.875rem; font-weight: 600; color: var(--gray-700, #374151); cursor: pointer; display: block;">Anonim kalmak istiyorum</label>
+                        <span style="font-size: 0.75rem; color: var(--gray-500, #6b7280); margin-top: 0.25rem; display: block;">Seçerseniz sadece yaş ve cinsiyet bilginiz kaydedilir, kullanıcı adınız paylaşılmaz.</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, var(--green-500, #22c55e) 0%, var(--green-600, #059669) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); margin-top: 0.5rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(34, 197, 94, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(34, 197, 94, 0.3)';">
+                    Gönder
+                </button>
+
+                <!-- Skip Button -->
+                <button type="button" onclick="closeFeedbackModal()" style="width: 100%; padding: 0.75rem; background: transparent; color: var(--gray-500, #6b7280); border: none; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.color='var(--gray-700, #374151)';" onmouseout="this.style.color='var(--gray-500, #6b7280)';">
+                    Atla
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Simple Success Modal (for switch messages) -->
+    <div id="success-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; align-items: center; justify-content: center;">
+        <!-- Backdrop -->
+        <div id="success-modal-backdrop" style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); opacity: 0; transition: opacity 0.3s ease;"></div>
+
+        <!-- Modal Content -->
+        <div id="success-modal-content" style="position: relative; background: white; border-radius: 1.5rem; padding: 2.5rem; width: 100%; max-width: 400px; margin: 1rem; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); transform: scale(0.95); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);">
+            <!-- Animated Icon -->
+            <div style="width: 5rem; height: 5rem; margin: 0 auto 1.5rem; background: var(--green-50, #ecfdf5); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <svg class="checkmark-success" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" style="width: 3rem; height: 3rem; stroke: var(--green-600, #059669); stroke-width: 4; fill: none; stroke-linecap: round; stroke-linejoin: round; display: block; margin: 0 auto;">
+                    <circle class="checkmark__circle-success" cx="26" cy="26" r="25" fill="none"/>
+                    <path class="checkmark__check-success" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+                </svg>
+            </div>
+
+            <!-- Text -->
+            <h3 id="success-modal-title" style="font-size: 1.5rem; font-weight: 700; color: var(--gray-900, #111827); text-align: center; margin-bottom: 0.5rem; font-family: inherit;">Teşekkür Ederiz!</h3>
+            <p id="success-modal-message" style="font-size: 1rem; color: var(--gray-500, #6b7280); text-align: center; line-height: 1.5; margin-bottom: 2rem; font-family: inherit;">Geri bildiriminiz bizim için değerli.</p>
 
             <!-- Button -->
             <button onclick="closeSuccessModal()" style="width: 100%; padding: 0.875rem; background: var(--green-600, #059669); color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" onmouseover="this.style.background='var(--green-700, #047857)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1)';" onmouseout="this.style.background='var(--green-600, #059669)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(0, 0, 0, 0.1)';">
@@ -1696,7 +1765,8 @@ function showExpiredMessage() {
 
     <style>
         /* SVG Animation Styles */
-        .checkmark__circle {
+        .checkmark__circle,
+        .checkmark__circle-success {
             stroke-dasharray: 166;
             stroke-dashoffset: 166;
             stroke-width: 2;
@@ -1706,7 +1776,8 @@ function showExpiredMessage() {
             /* Animation will be triggered by JS adding a class */
         }
 
-        .checkmark__check {
+        .checkmark__check,
+        .checkmark__check-success {
             transform-origin: 50% 50%;
             stroke-dasharray: 48;
             stroke-dashoffset: 48;
@@ -1731,15 +1802,19 @@ function showExpiredMessage() {
     <script>
     let modalTimer;
 
-    function showSuccessModal(title, message) {
-        const modal = document.getElementById('success-modal');
+    // Show feedback form modal
+    function showFeedbackModal(likeId) {
+        const modal = document.getElementById('feedback-modal');
         const backdrop = document.getElementById('modal-backdrop');
         const content = document.getElementById('modal-content');
         const circle = document.querySelector('.checkmark__circle');
         const check = document.querySelector('.checkmark__check');
         
-        if (title) document.getElementById('modal-title').textContent = title;
-        if (message) document.getElementById('modal-message').textContent = message;
+        // Set like ID
+        document.getElementById('feedback-like-id').value = likeId;
+        
+        // Reset form
+        document.getElementById('feedback-form').reset();
 
         modal.style.display = 'flex';
         
@@ -1756,14 +1831,10 @@ function showExpiredMessage() {
             circle.classList.add('animate-circle');
             check.classList.add('animate-check');
         }, 10);
-
-        // Auto close
-        if (modalTimer) clearTimeout(modalTimer);
-        modalTimer = setTimeout(closeSuccessModal, 3000);
     }
 
-    function closeSuccessModal() {
-        const modal = document.getElementById('success-modal');
+    function closeFeedbackModal() {
+        const modal = document.getElementById('feedback-modal');
         const backdrop = document.getElementById('modal-backdrop');
         const content = document.getElementById('modal-content');
 
@@ -1777,6 +1848,92 @@ function showExpiredMessage() {
             modal.style.display = 'none';
         }, 300);
     }
+
+    // Show simple success modal (for switch messages)
+    function showSuccessModal(title, message) {
+        const modal = document.getElementById('success-modal');
+        const backdrop = document.getElementById('success-modal-backdrop');
+        const content = document.getElementById('success-modal-content');
+        const circle = document.querySelector('.checkmark__circle-success');
+        const check = document.querySelector('.checkmark__check-success');
+        
+        if (title) document.getElementById('success-modal-title').textContent = title;
+        if (message) document.getElementById('success-modal-message').textContent = message;
+
+        modal.style.display = 'flex';
+        
+        // Trigger entrance animation
+        setTimeout(() => {
+            backdrop.style.opacity = '1';
+            content.style.opacity = '1';
+            content.style.transform = 'scale(1)';
+            
+            // Trigger SVG animation
+            if (circle && check) {
+                circle.classList.remove('animate-circle');
+                check.classList.remove('animate-check');
+                void circle.offsetWidth; // trigger reflow
+                circle.classList.add('animate-circle');
+                check.classList.add('animate-check');
+            }
+        }, 10);
+
+        // Auto close
+        if (modalTimer) clearTimeout(modalTimer);
+        modalTimer = setTimeout(closeSuccessModal, 3000);
+    }
+
+    function closeSuccessModal() {
+        const modal = document.getElementById('success-modal');
+        const backdrop = document.getElementById('success-modal-backdrop');
+        const content = document.getElementById('success-modal-content');
+
+        if (!modal) return;
+
+        backdrop.style.opacity = '0';
+        content.style.opacity = '0';
+        content.style.transform = 'scale(0.95)';
+
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 300);
+    }
+
+    // Handle feedback form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        const feedbackForm = document.getElementById('feedback-form');
+        if (feedbackForm) {
+            feedbackForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const likeId = document.getElementById('feedback-like-id').value;
+                const age = document.getElementById('feedback-age').value;
+                const gender = document.getElementById('feedback-gender').value;
+                const isAnonymous = document.getElementById('feedback-anonymous').checked;
+
+                $.ajax({
+                    url: `/likes/${likeId}/update-feedback`,
+                    method: 'POST',
+                    data: {
+                        age: age,
+                        gender: gender,
+                        is_anonymous: isAnonymous ? 1 : 0
+                    },
+                    success: function(response) {
+                        closeFeedbackModal();
+                        showSuccessModal('Teşekkürler!', response.message || 'Geri bildiriminiz kaydedildi.');
+                    },
+                    error: function(xhr) {
+                        let message = 'Bir hata oluştu.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        showMessage(message, 'error');
+                    }
+                });
+            });
+        }
+    });
 
 // Update the toggleLike function to handle expired projects
 function toggleLike(suggestionId) {
@@ -1873,6 +2030,9 @@ function toggleLike(suggestionId) {
                         'Teşekkürler!',
                         `Seçiminiz "${response.switched_from}" önerisinden "${response.current_title}" önerisine değiştirildi.`
                     );
+                } else if (response.need_feedback && response.like_id) {
+                    // Show feedback form for new likes
+                    showFeedbackModal(response.like_id);
                 } else {
                     showSuccessModal(
                         'Teşekkürler!',

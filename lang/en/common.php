@@ -461,4 +461,10 @@ return [
     'no_notifications' => 'No new notifications',
     'send_immediately' => 'Send Immediately',
     'scheduled_at' => 'Scheduled At',
+
+    // Demographics Chart
+    'demographics_overview' => 'Demographics Overview (Top Suggestions)',
+    'male' => 'Male',
+    'female' => 'Female',
+    'anonymous_vote' => 'Anonymous Vote',
 ];

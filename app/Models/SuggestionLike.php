@@ -13,6 +13,9 @@ class SuggestionLike extends Model
     protected $fillable = [
         'user_id',
         'suggestion_id',
+        'age',
+        'gender',
+        'is_anonymous',
     ];
 
     public function user(): BelongsTo

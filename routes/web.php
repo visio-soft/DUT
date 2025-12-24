@@ -66,6 +66,10 @@ Route::post('/suggestions/{id}/toggle-like', [UserController::class, 'toggleLike
     ->middleware('auth')
     ->name('user.suggestion.toggle-like');
 
+Route::post('/likes/{id}/update-feedback', [UserController::class, 'updateLikeFeedback'])
+    ->middleware('auth')
+    ->name('user.like.update-feedback');
+
 Route::post('/suggestions/{id}/comments', [UserController::class, 'storeComment'])
     ->middleware('auth')
     ->name('user.suggestion.store-comment');

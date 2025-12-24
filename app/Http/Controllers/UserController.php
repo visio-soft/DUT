@@ -187,6 +187,13 @@ class UserController extends Controller
             return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
         }
 
+        // Validate feedback fields if provided
+        $request->validate([
+            'age' => 'nullable|integer|min:1|max:120',
+            'gender' => 'nullable|string|in:erkek,kadın,diğer',
+            'is_anonymous' => 'nullable|boolean',
+        ]);
+
         $suggestion = Suggestion::with(['category', 'project'])->findOrFail($suggestionId);
         $user = Auth::user();
         $projectId = $suggestion->project_id ?? null;
@@ -220,6 +227,24 @@ class UserController extends Controller
 
         $switchedFrom = null;
         $liked = false;
+        $newLike = null;
+
+        // Prepare feedback data
+        $feedbackData = [
+            'user_id' => $user->id,
+            'suggestion_id' => $suggestionId,
+        ];
+
+        // Add feedback fields if provided
+        if ($request->has('age')) {
+            $feedbackData['age'] = $request->input('age');
+        }
+        if ($request->has('gender')) {
+            $feedbackData['gender'] = $request->input('gender');
+        }
+        if ($request->has('is_anonymous')) {
+            $feedbackData['is_anonymous'] = $request->boolean('is_anonymous');
+        }
 
         if ($existingLike) {
             // If there is a like for this suggestion, remove it; otherwise switch to another suggestion
@@ -232,18 +257,12 @@ class UserController extends Controller
 
                 // Eski beğeniyi sil, yeni beğeni ekle
                 $existingLike->delete();
-                SuggestionLike::create([
-                    'user_id' => $user->id,
-                    'suggestion_id' => $suggestionId,
-                ]);
+                $newLike = SuggestionLike::create($feedbackData);
                 $liked = true;
             }
         } else {
             // Yeni beğeni ekle
-            SuggestionLike::create([
-                'user_id' => $user->id,
-                'suggestion_id' => $suggestionId,
-            ]);
+            $newLike = SuggestionLike::create($feedbackData);
             $liked = true;
         }
 
@@ -262,15 +281,55 @@ class UserController extends Controller
             ->pluck('likes_count', 'id')
             ->toArray();
 
+        // Check if we need to show feedback form (new like without feedback data)
+        $needFeedback = $liked && $newLike && !$request->has('age');
+
         return response()->json([
             'liked' => $liked,
             'likes_count' => $likesCount,
             'all_likes' => $allSuggestionsInCategory,
             'switched_from' => $switchedFrom,
             'current_title' => $suggestion->title,
+            'need_feedback' => $needFeedback,
+            'like_id' => $newLike?->id,
             'message' => $liked
                 ? ($switchedFrom ? 'Seçiminiz değiştirildi!' : 'Öneri beğenildi! (Kategori başına sadece bir beğeni)')
                 : 'Beğeni kaldırıldı!',
+        ]);
+    }
+
+    /**
+     * AJAX ile beğeni geri bildirim güncelleme işlemi
+     */
+    public function updateLikeFeedback(Request $request, $likeId)
+    {
+        if (! Auth::check()) {
+            return response()->json(['error' => 'Giriş yapmanız gerekiyor'], 401);
+        }
+
+        $request->validate([
+            'age' => 'required|integer|min:1|max:120',
+            'gender' => 'required|string|in:erkek,kadın,diğer',
+            'is_anonymous' => 'required|boolean',
+        ]);
+
+        $like = SuggestionLike::where('id', $likeId)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (! $like) {
+            return response()->json(['error' => 'Beğeni bulunamadı'], 404);
+        }
+
+        $like->update([
+            'age' => $request->input('age'),
+            'gender' => $request->input('gender'),
+            'is_anonymous' => $request->boolean('is_anonymous'),
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Geri bildiriminiz için teşekkür ederiz!',
         ]);
     }
 

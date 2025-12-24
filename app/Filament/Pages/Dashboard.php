@@ -17,6 +17,7 @@ class Dashboard extends BaseDashboard
         return [
             ProjectSuggestionsOverviewChart::class,
             \App\Filament\Widgets\BestSuggestionsOfExpiredProjects::class,
+            \App\Filament\Widgets\DemographicsChart::class,
         ];
     }
 

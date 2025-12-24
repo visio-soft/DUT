@@ -461,4 +461,10 @@ return [
     'no_notifications' => 'Yeni bildiriminiz yok',
     'send_immediately' => 'Hemen Gönder',
     'scheduled_at' => 'Gönderim Zamanı',
+
+    // Demographics Chart
+    'demographics_overview' => 'Demografik Genel Bakış (En İyi Öneriler)',
+    'male' => 'Erkek',
+    'female' => 'Kadın',
+    'anonymous_vote' => 'Anonim Oy',
 ];
