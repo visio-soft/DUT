@@ -663,14 +663,7 @@
                     </select>
                 </div>
 
-                <!-- Anonymous Checkbox -->
-                <div style="display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem; background: linear-gradient(135deg, var(--gray-50, #f9fafb) 0%, var(--green-50, #f0fdf4) 100%); border-radius: 0.75rem; border: 1px solid var(--gray-200, #e5e7eb);">
-                    <input type="checkbox" id="feedback-anonymous" name="is_anonymous" style="width: 1.25rem; height: 1.25rem; cursor: pointer; accent-color: var(--green-600, #059669); margin-top: 0.125rem; flex-shrink: 0;">
-                    <div>
-                        <label for="feedback-anonymous" style="font-size: 0.875rem; font-weight: 600; color: var(--gray-700, #374151); cursor: pointer; display: block;">Anonim kalmak istiyorum</label>
-                        <span style="font-size: 0.75rem; color: var(--gray-500, #6b7280); margin-top: 0.25rem; display: block;">Seçerseniz sadece yaş ve cinsiyet bilginiz kaydedilir, kullanıcı adınız paylaşılmaz.</span>
-                    </div>
-                </div>
+
 
                 <!-- Submit Button -->
                 <button type="submit" style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, var(--green-500, #22c55e) 0%, var(--green-600, #059669) 100%); color: white; border: none; border-radius: 0.75rem; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); margin-top: 0.5rem;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(34, 197, 94, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(34, 197, 94, 0.3)';">
@@ -788,6 +781,26 @@
 
         if (!modal) return;
 
+        // Kullanıcı iptal ederse anonim olarak kaydet
+        const likeId = document.getElementById('feedback-like-id').value;
+        if (likeId) {
+            $.ajax({
+                url: `/likes/${likeId}/update-feedback`,
+                method: 'POST',
+                data: {
+                    age: null,
+                    gender: null,
+                    is_anonymous: 1
+                },
+                success: function(response) {
+                    console.log('Anonim feedback kaydedildi');
+                },
+                error: function(xhr) {
+                    console.error('Anonim feedback kaydedilemedi');
+                }
+            });
+        }
+
         backdrop.style.opacity = '0';
         content.style.opacity = '0';
         content.style.transform = 'scale(0.95)';
@@ -857,7 +870,6 @@
                 const likeId = document.getElementById('feedback-like-id').value;
                 const age = document.getElementById('feedback-age').value;
                 const gender = document.getElementById('feedback-gender').value;
-                const isAnonymous = document.getElementById('feedback-anonymous').checked;
 
                 $.ajax({
                     url: `/likes/${likeId}/update-feedback`,
@@ -865,9 +877,11 @@
                     data: {
                         age: age,
                         gender: gender,
-                        is_anonymous: isAnonymous ? 1 : 0
+                        is_anonymous: 0  // Gönder butonu = anonim değil
                     },
                     success: function(response) {
+                        // Like ID'yi temizle - closeFeedbackModal tekrar anonim kayıt göndermesin
+                        document.getElementById('feedback-like-id').value = '';
                         closeFeedbackModal();
                         showSuccessModal('Teşekkürler!', response.message || 'Geri bildiriminiz kaydedildi.');
                     },
