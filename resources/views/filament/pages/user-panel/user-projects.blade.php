@@ -221,10 +221,7 @@
         }
 
         .tree-view {
-            position: sticky;
-            top: 2rem;
-            max-height: calc(100vh - 4rem);
-            overflow-y: auto;
+            /* Tree view is now part of the scrollable sidebar, no separate scroll */
         }
     }
 
@@ -317,6 +314,30 @@
         }
     }
 
+    /* Sticky Sidebar Wrapper - single scroll area for filters + project list */
+    .filters-sidebar-wrapper {
+        position: sticky;
+        top: 5rem;
+        z-index: 50;
+        max-height: calc(100vh - 6rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gray-300) transparent;
+    }
+
+    .filters-sidebar-wrapper::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .filters-sidebar-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .filters-sidebar-wrapper::-webkit-scrollbar-thumb {
+        background-color: var(--gray-300);
+        border-radius: 4px;
+    }
+
     .filters-card {
         background: #ffffff;
         border: 1px solid var(--gray-200);
@@ -326,11 +347,138 @@
         box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
         width: 100%;
         overflow: hidden;
-        transition: padding 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        transition: padding 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease;
     }
 
     .filters-card.collapsed {
         padding-bottom: 0.75rem;
+    }
+
+    /* Scroll-aware collapsed state - when scrolled and has filters */
+    .filters-card.scroll-collapsed {
+        padding: 0.75rem 1rem;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+        border-color: var(--green-200);
+        background: linear-gradient(135deg, #ffffff 0%, var(--green-50) 100%);
+    }
+
+    .filters-card.scroll-collapsed .filters-content {
+        max-height: 0;
+        opacity: 0;
+        transform: translateY(-6px);
+        pointer-events: none;
+        margin-top: 0;
+    }
+
+    .filters-card.scroll-collapsed .collapse-icon-circle {
+        transform: rotate(180deg);
+    }
+
+    /* Sticky Filter Tags - shown when scroll-collapsed */
+    .sticky-filter-tags {
+        display: none;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 0.75rem;
+        padding-top: 0.75rem;
+        border-top: 1px solid var(--gray-100);
+    }
+
+    .filters-card.scroll-collapsed .sticky-filter-tags {
+        display: flex;
+    }
+
+    .sticky-filter-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--green-100), var(--green-50));
+        color: var(--green-800);
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid var(--green-200);
+        transition: all 0.2s ease;
+        max-width: 150px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .sticky-filter-tag:hover {
+        background: linear-gradient(135deg, var(--green-200), var(--green-100));
+        border-color: var(--green-300);
+    }
+
+    .sticky-filter-tag .tag-remove {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        background: var(--green-200);
+        color: var(--green-700);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .sticky-filter-tag .tag-remove:hover {
+        background: var(--red-100);
+        color: var(--red-600);
+    }
+
+    .sticky-filter-tag .tag-remove svg {
+        width: 0.6rem;
+        height: 0.6rem;
+    }
+
+    .sticky-clear-all {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.3rem 0.6rem;
+        border-radius: 999px;
+        background: var(--gray-100);
+        color: var(--gray-600);
+        font-size: 0.75rem;
+        font-weight: 600;
+        border: 1px solid var(--gray-200);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .sticky-clear-all:hover {
+        background: var(--red-50);
+        color: var(--red-600);
+        border-color: var(--red-200);
+    }
+
+    /* Scroll indicator badge */
+    .scroll-indicator {
+        display: none;
+        align-items: center;
+        gap: 0.35rem;
+        margin-left: auto;
+        padding: 0.25rem 0.5rem;
+        border-radius: 999px;
+        background: var(--green-100);
+        color: var(--green-700);
+        font-size: 0.7rem;
+        font-weight: 600;
+        animation: pulse-soft 2s infinite;
+    }
+
+    .filters-card.scroll-collapsed .scroll-indicator {
+        display: inline-flex;
+    }
+
+    @keyframes pulse-soft {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
     }
 
     .filters-collapse-btn {
@@ -649,8 +797,8 @@
 
         <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
             <!-- Sol Taraf: Tree View -->
-            <div>
-                <div id="filter-card" class="filters-card">
+            <div class="filters-sidebar-wrapper">
+                <div id="filter-card" class="filters-card" data-has-filters="{{ $activeFilterCount > 0 ? 'true' : 'false' }}">
                     <button type="button" id="collapse-btn" class="filters-collapse-btn">
                         <div class="filters-header-info">
                             <svg style="width: 1rem; height: 1rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -661,12 +809,41 @@
                                 <span class="filter-badge">{{ $activeFilterCount }}</span>
                             @endif
                         </div>
+                        <span class="scroll-indicator">
+                            <svg style="width: 0.6rem; height: 0.6rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"/>
+                            </svg>
+                            {{ __('common.click_to_expand') }}
+                        </span>
                         <span class="collapse-icon-circle">
                             <svg class="collapse-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m6 9 6 6 6-6"/>
                             </svg>
                         </span>
                     </button>
+
+                    <!-- Sticky Filter Tags (shown when scroll-collapsed) -->
+                    @if($activeFilters->isNotEmpty())
+                    <div class="sticky-filter-tags" id="sticky-filter-tags">
+                        @foreach($activeFilters as $key => $value)
+                            <span class="sticky-filter-tag" data-filter-key="{{ $key }}">
+                                <span class="tag-text">{{ Str::limit($value, 12) }}</span>
+                                <span class="tag-remove" onclick="removeFilter('{{ $key }}')" title="{{ __('common.remove_filter') }}">
+                                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </span>
+                            </span>
+                        @endforeach
+                        <a href="{{ route('user.projects') }}" class="sticky-clear-all" title="{{ __('common.clear_filters') }}">
+                            <svg style="width: 0.65rem; height: 0.65rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            {{ __('common.clear_all') }}
+                        </a>
+                    </div>
+                    @endif
+
                     <div id="filter-content" class="filters-content">
                         <form id="projects-filters-form" method="GET" action="{{ route('user.projects') }}">
                             <div class="filter-grid">
@@ -1345,8 +1522,13 @@
 
             // Collapse Logic
             if (filterCard && collapseBtn && filterContent) {
+                const hasFilters = filterCard.dataset.hasFilters === 'true';
+                let isManuallyExpanded = false;
+                let lastScrollY = 0;
+
                 const syncContentHeight = () => {
-                    const isCollapsed = filterCard.classList.contains('collapsed');
+                    const isCollapsed = filterCard.classList.contains('collapsed') || 
+                                       filterCard.classList.contains('scroll-collapsed');
                     if (isCollapsed) {
                         filterContent.style.maxHeight = '0px';
                     } else {
@@ -1356,6 +1538,10 @@
 
                 const setCollapsedState = (collapsed, { immediate = false } = {}) => {
                     filterCard.classList.toggle('collapsed', collapsed);
+                    // Remove scroll-collapsed when manually toggling
+                    filterCard.classList.remove('scroll-collapsed');
+                    isManuallyExpanded = !collapsed;
+                    
                     if (immediate) {
                         filterContent.style.transition = 'none';
                     }
@@ -1367,16 +1553,64 @@
                     }
                 };
 
+                // Scroll-aware auto-collapse
+                const handleScroll = () => {
+                    const scrollY = window.scrollY;
+                    const filterCardTop = filterCard.getBoundingClientRect().top;
+                    const headerHeight = 80; // Approximate header height
+                    const isAtTop = filterCardTop <= headerHeight + 10;
+                    const isScrollingDown = scrollY > lastScrollY;
+                    lastScrollY = scrollY;
+
+                    // Auto-collapse when:
+                    // 1. Has active filters
+                    // 2. User scrolled down significantly (past 200px)
+                    // 3. Filter card is at sticky position (at top)
+                    // 4. User hasn't manually expanded
+                    if (hasFilters && scrollY > 200 && isAtTop && !isManuallyExpanded) {
+                        if (!filterCard.classList.contains('scroll-collapsed') && 
+                            !filterCard.classList.contains('collapsed')) {
+                            filterCard.classList.add('scroll-collapsed');
+                            syncContentHeight();
+                        }
+                    }
+
+                    // Auto-expand when scrolled back to top
+                    if (scrollY < 100 && filterCard.classList.contains('scroll-collapsed')) {
+                        filterCard.classList.remove('scroll-collapsed');
+                        syncContentHeight();
+                    }
+                };
+
                 // Initialize state
                 setCollapsedState(startCollapsed, { immediate: true });
                 
                 // Expose syncContentHeight to be used by wizard
                 window.syncContentHeight = syncContentHeight;
 
+                // Click handler - both expand and collapse
                 collapseBtn.addEventListener('click', () => {
+                    // If scroll-collapsed, just remove it
+                    if (filterCard.classList.contains('scroll-collapsed')) {
+                        filterCard.classList.remove('scroll-collapsed');
+                        isManuallyExpanded = true;
+                        syncContentHeight();
+                        return;
+                    }
+                    
                     const collapsed = !filterCard.classList.contains('collapsed');
                     setCollapsedState(collapsed);
                 });
+
+                // Add scroll listener with throttle
+                let scrollTimeout;
+                window.addEventListener('scroll', () => {
+                    if (scrollTimeout) return;
+                    scrollTimeout = setTimeout(() => {
+                        handleScroll();
+                        scrollTimeout = null;
+                    }, 50);
+                }, { passive: true });
 
                 window.addEventListener('resize', syncContentHeight);
             }
@@ -1388,6 +1622,13 @@
     </script>
 
 <script>
+// Remove individual filter function
+function removeFilter(filterKey) {
+    const url = new URL(window.location.href);
+    url.searchParams.delete(filterKey);
+    window.location.href = url.toString();
+}
+
 // Set up CSRF token for AJAX requests
 $.ajaxSetup({
     headers: {
