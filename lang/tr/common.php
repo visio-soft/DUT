@@ -546,5 +546,15 @@ return [
     'no_mc_answers_desc' => 'Henüz çoktan seçmeli cevap yok',
     'selected_option' => 'Seçilen Şık',
     'no_answers' => 'Cevap Bulunamadı',
+
+    // Project Suggestions Page - Additional
+    'proposed_by' => 'Öneren',
+    'more_suggestions_count' => ':count Öneri Daha Var',
+    'view_all_suggestions_click' => 'Tüm önerileri görüntülemek için tıklayın',
+    'no_suggestions_for_project' => 'Bu proje için henüz öneri bulunmuyor',
+    'projects_back' => 'Projeler',
+    'return_to_list' => 'Listeye Dön',
+    'surveys_link' => 'Anketler',
+    'click_to_join' => 'Katılmak İçin Tıkla',
 ];
 

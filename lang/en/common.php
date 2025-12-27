@@ -546,5 +546,15 @@ return [
     'no_mc_answers_desc' => 'No multiple choice answers yet',
     'selected_option' => 'Selected Option',
     'no_answers' => 'No Answers Found',
+
+    // Project Suggestions Page - Additional
+    'proposed_by' => 'Proposed by',
+    'more_suggestions_count' => ':count More Suggestions',
+    'view_all_suggestions_click' => 'Click to view all suggestions',
+    'no_suggestions_for_project' => 'No suggestions for this project yet',
+    'projects_back' => 'Projects',
+    'return_to_list' => 'Return to List',
+    'surveys_link' => 'Surveys',
+    'click_to_join' => 'Click to Join',
 ];
 

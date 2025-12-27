@@ -295,6 +295,30 @@
         padding-bottom: 0.75rem;
     }
 
+    /* Sticky Sidebar Wrapper - single scroll area for filters + suggestion list */
+    .filters-sidebar-wrapper {
+        position: sticky;
+        top: 5rem;
+        z-index: 50;
+        max-height: calc(100vh - 6rem);
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gray-300) transparent;
+    }
+
+    .filters-sidebar-wrapper::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .filters-sidebar-wrapper::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .filters-sidebar-wrapper::-webkit-scrollbar-thumb {
+        background-color: var(--gray-300);
+        border-radius: 4px;
+    }
+
     .filters-collapse-btn {
         display: flex;
         align-items: center;
@@ -504,6 +528,181 @@
         color: var(--green-700);
         font-size: 0.8rem;
         border: 1px solid var(--green-200);
+    }
+
+    /* Sticky Project Header Bar */
+    .sticky-project-header {
+        position: sticky;
+        top: 4.5rem; /* Account for main navbar height */
+        z-index: 100;
+        background: transparent;
+        padding: 0.75rem 0;
+        transition: all 0.3s ease;
+    }
+
+    .sticky-project-header.is-stuck .sticky-info-box,
+    .sticky-project-header.is-stuck .sticky-filter-badge,
+    .sticky-project-header.is-stuck .sticky-divider {
+        transform: translateX(10px); /* Reduced from 15px for subtler movement */
+        background: rgba(255, 255, 255, 0.65) !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .sticky-project-header .sticky-header-content {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center; /* Default center for mobile/smaller screens */
+        gap: 0.75rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    /* On large screens where sidebar exists, shift center or justify end */
+    @media (min-width: 1024px) {
+        /* Initially center in viewport (no offset) */
+        .sticky-project-header .sticky-header-content {
+            padding-left: 0;
+            justify-content: center;
+        }
+
+        /* When stuck, Apply offset to align with content area */
+        .sticky-project-header.is-stuck .sticky-header-content {
+            padding-left: 320px; /* Offset for sidebar (approx 300px + gap) */
+        }
+    }
+
+    .sticky-project-header .sticky-info-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: var(--radius-lg);
+        font-size: 0.8125rem;
+        font-weight: 500;
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+
+    .sticky-project-header .sticky-info-box.gray {
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(107, 114, 128, 0.3);
+        color: var(--gray-700);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    .sticky-project-header .sticky-info-box.gray:hover {
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .sticky-project-header .sticky-info-box.green {
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(34, 197, 94, 0.35);
+        color: var(--green-700);
+        box-shadow: 0 2px 8px rgba(34, 197, 94, 0.12);
+    }
+
+    .sticky-project-header .sticky-info-box.red {
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(239, 68, 68, 0.35);
+        color: var(--red-700);
+        box-shadow: 0 2px 8px rgba(239, 68, 68, 0.12);
+    }
+
+    .sticky-project-header .sticky-info-box.blue {
+        background: rgba(255, 255, 255, 0.85);
+        border: 2px solid rgba(59, 130, 246, 0.35);
+        color: var(--blue-700);
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.12);
+    }
+
+    .sticky-project-header .sticky-info-box.blue:hover {
+        background: rgba(255, 255, 255, 0.95);
+    }
+
+    .sticky-project-header .sticky-info-icon {
+        width: 1rem;
+        height: 1rem;
+        flex-shrink: 0;
+    }
+
+    .sticky-project-header .sticky-divider {
+        width: 1px;
+        height: 1.5rem;
+        background: var(--gray-300);
+        margin: 0 0.25rem;
+        transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .sticky-project-header.is-stuck .sticky-divider {
+        transform: translateX(15px);
+    }
+
+    /* Sticky filter badges section */
+    .sticky-filter-badges {
+        display: flex;
+        flex-direction: column; /* Stack vertically */
+        align-items: flex-start;
+        gap: 0.35rem;
+        padding-left: 0.5rem;
+    }
+
+    .sticky-filter-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.625rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.45); /* Semi-transparent */
+        color: var(--green-700);
+        font-size: 0.6875rem;
+        font-weight: 600;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        transition: all 0.2s ease;
+    }
+    
+    .sticky-filter-badge:hover {
+        background: rgba(255, 255, 255, 0.65);
+        border-color: rgba(34, 197, 94, 0.4);
+    }
+
+    .sticky-filter-badge svg {
+        width: 0.75rem;
+        height: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    @media (max-width: 768px) {
+        .sticky-project-header .sticky-header-content {
+            padding: 0 1rem;
+            gap: 0.5rem;
+        }
+
+        .sticky-project-header .sticky-info-box {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        .sticky-project-header .sticky-divider {
+            display: none;
+        }
+
+        .sticky-filter-badges {
+            width: 100%;
+            justify-content: center;
+            border-top: 1px solid var(--gray-200);
+            padding-top: 0.5rem;
+            margin-top: 0.25rem;
+        }
     }
 
     .tree-suggestion.active {
@@ -1811,75 +2010,107 @@
                 </div>
             @endif
 
-            <!-- Project Timing Info -->
-            @if($project->formatted_end_date || $project->getRemainingTime())
-                @php
-                    $remainingTime = $project->getRemainingTime();
-                    $isExpired = $project->isExpired();
-                @endphp
-                <div class="stats-section" style="padding: 1.5rem 0; margin-bottom: 1rem;">
-                    <div style="max-width: 600px; margin: 0 auto; text-center;">
-                        <div style="display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.75rem;">
-                            <a href="{{ route('user.projects') }}"
-                               style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-xl); background: rgba(107, 114, 128, 0.1); border: 1px solid rgba(107, 114, 128, 0.3); text-decoration: none; transition: all 0.2s;">
-                                <svg style="width: 1.25rem; height: 1.25rem; color: var(--gray-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z"/>
-                                </svg>
-                                <div style="text-align: left;">
-                                    <div style="font-size: 0.75rem; color: var(--gray-700); font-weight: 500;">
-                                        Projeler
-                                    </div>
-                                    <div style="font-size: 0.875rem; color: var(--gray-600); font-weight: 700;">
-                                        Listeye Dön
-                                    </div>
-                                </div>
-                            </a>
-
-                            <div style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-xl); background: {{ $isExpired ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)' }}; border: 1px solid {{ $isExpired ? 'rgba(239, 68, 68, 0.3)' : 'rgba(34, 197, 94, 0.3)' }};">
-                                <svg style="width: 1.25rem; height: 1.25rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }};" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                                </svg>
-                                <div style="text-align: left;">
-                                    @if($project->formatted_end_date)
-                                        <div style="font-size: 0.75rem; color: {{ $isExpired ? 'var(--red-700)' : 'var(--green-700)' }}; font-weight: 500;">
-                                            {{ __('common.project_end') }}: {{ $project->formatted_end_date }}
-                                        </div>
-                                    @endif
-                                    <div style="font-size: 0.875rem; color: {{ $isExpired ? 'var(--red-600)' : 'var(--green-600)' }}; font-weight: 700;">
-                                        @if($isExpired)
-                                            {{ __('common.expired_voting_disabled') }}
-                                        @elseif($remainingTime)
-                                            {{ $remainingTime['formatted'] }} {{ __('common.time_remaining') }}
-                                        @else
-                                            {{ __('common.unlimited_time') }}
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-
-                            @if($project->surveys->where('status', true)->isNotEmpty())
-                            <a href="{{ route('user.project.surveys', $project->id) }}"
-                               style="display: inline-flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; border-radius: var(--radius-xl); background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); text-decoration: none; transition: all 0.2s;">
-                                <svg style="width: 1.25rem; height: 1.25rem; color: var(--blue-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
-                                </svg>
-                                <div style="text-align: left;">
-                                    <div style="font-size: 0.75rem; color: var(--blue-700); font-weight: 500;">
-                                        Anketler
-                                    </div>
-                                    <div style="font-size: 0.875rem; color: var(--blue-600); font-weight: 700;">
-                                        Katılmak İçin Tıkla
-                                    </div>
-                                </div>
-                            </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
-</section><!-- Main Content Section -->
+</section>
+
+<!-- Sticky Project Header Bar -->
+@php
+    $stickyRemainingTime = $project->getRemainingTime();
+    $stickyIsExpired = $project->isExpired();
+    $stickyActiveFilters = collect($filterValues)->filter(fn ($value) => filled($value));
+    $stickyFilterLabelMap = [
+        'search' => __('common.search'),
+        'district' => __('common.district'),
+        'neighborhood' => __('common.neighborhood'),
+        'country' => __('common.country'),
+        'city' => __('common.city'),
+        'start_date' => __('common.start_date'),
+        'end_date' => __('common.end_date'),
+        'min_budget' => __('common.min_budget'),
+        'max_budget' => __('common.max_budget'),
+    ];
+@endphp
+<div class="sticky-project-header" id="sticky-project-header">
+    <div class="sticky-header-content">
+        {{-- Projects / Return to List --}}
+        <a href="{{ route('user.projects') }}" class="sticky-info-box gray" style="text-decoration: none;">
+            <svg class="sticky-info-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z"/>
+            </svg>
+            <div style="text-align: left;">
+                <div style="font-size: 0.75rem; font-weight: 500;">
+                    {{ __('common.projects_back') }}
+                </div>
+                <div style="font-size: 0.875rem; font-weight: 700;">
+                    {{ __('common.return_to_list') }}
+                </div>
+            </div>
+        </a>
+
+        {{-- Project End Date & Remaining Time --}}
+        @if($project->formatted_end_date || $stickyRemainingTime)
+            <div class="sticky-info-box {{ $stickyIsExpired ? 'red' : 'green' }}">
+                <svg class="sticky-info-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+                <div style="text-align: left;">
+                    @if($project->formatted_end_date)
+                        <div style="font-size: 0.75rem; font-weight: 500;">
+                            {{ __('common.project_end') }}: {{ $project->formatted_end_date }}
+                        </div>
+                    @endif
+                    <div style="font-size: 0.875rem; font-weight: 700;">
+                        @if($stickyIsExpired)
+                            {{ __('common.expired_voting_disabled') }}
+                        @elseif($stickyRemainingTime)
+                            {{ $stickyRemainingTime['formatted'] }} {{ __('common.time_remaining') }}
+                        @else
+                            {{ __('common.unlimited_time') }}
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        {{-- Survey Link --}}
+        @if($project->surveys->where('status', true)->isNotEmpty())
+            <a href="{{ route('user.project.surveys', $project->id) }}" class="sticky-info-box blue" style="text-decoration: none;">
+                <svg class="sticky-info-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
+                </svg>
+                <div style="text-align: left;">
+                    <div style="font-size: 0.75rem; font-weight: 500;">
+                        {{ __('common.surveys_link') }}
+                    </div>
+                    <div style="font-size: 0.875rem; font-weight: 700;">
+                        {{ __('common.click_to_join') }}
+                    </div>
+                </div>
+            </a>
+        @endif
+
+        {{-- Active Filter Badges --}}
+        @if($stickyActiveFilters->isNotEmpty())
+            <div class="sticky-divider"></div>
+            <div class="sticky-info-box green" style="align-items: flex-start;">
+                <svg class="sticky-info-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin-top: 0.125rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
+                </svg>
+                <div style="display: flex; flex-direction: column; gap: 0.125rem; text-align: left;">
+                    @foreach($stickyActiveFilters as $key => $value)
+                        <div style="font-size: 0.75rem; font-weight: 500; line-height: 1.2;">
+                            <span style="opacity: 0.8;">{{ $stickyFilterLabelMap[$key] ?? ucfirst(str_replace('_', ' ', $key)) }}:</span> 
+                            <strong>{{ Str::limit($value, 15) }}</strong>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+    </div>
+</div>
+
+<!-- Main Content Section -->
 <div class="section-padding">
     <div class="projects-wide-container">
         @if($project->status === \App\Enums\ProjectStatusEnum::COMPLETED)
@@ -1903,8 +2134,8 @@
             $startCollapsed = $activeFilters->isEmpty();
         @endphp
 
-        <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem; {{ $project->status === \App\Enums\ProjectStatusEnum::COMPLETED ? 'display: none !important;' : '' }}">
-            <div>
+        <div class="d-grid main-content-grid" style="grid-template-columns: 320px 1fr; gap: 2rem; {{ $project->status === \App\Enums\ProjectStatusEnum::COMPLETED ? 'display: none !important;' : '' }}">
+            <div class="filters-sidebar-wrapper">
                 <div id="user-filter-panel" class="filters-card {{ $startCollapsed ? 'collapsed' : '' }}">
                     <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
                         <div class="filters-header-info">
@@ -2025,9 +2256,9 @@
                 <div class="tree-view">
                     <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                         <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
                         </svg>
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.project_list') }}</h3>
+                        <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.suggestion_list') }}</h3>
                     </div>
 
                     <div style="background: var(--green-50); border: 1px solid var(--green-200); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem;">
@@ -2047,40 +2278,23 @@
                     </div>
 
                     <div style="space-y: 0.5rem;">
-                        @forelse($projects as $projectItem)
-                            <div class="tree-project-wrapper" data-title="{{ Str::lower($projectItem->name) }}" style="border-bottom: 1px solid var(--green-100); padding-bottom: 0.5rem;">
-                                <a href="{{ route('user.project.suggestions', $projectItem->id) }}{{ $queryString ? ('?' . $queryString) : '' }}"
-                                   class="tree-project"
-                                   style="display: flex; align-items: center; padding: 0.5rem; border-radius: 0.5rem; transition: background-color 0.2s; text-decoration: none; background: {{ $projectItem->id === $project->id ? 'var(--green-50)' : 'transparent' }};">
-                                    <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                        @forelse($project->suggestions->sortByDesc(function($s) { return $s->likes->count(); }) as $sidebarSuggestion)
+                            <div class="tree-suggestion"
+                                 onclick="scrollToSuggestion({{ $sidebarSuggestion->id }})"
+                                 style="border-bottom: 1px solid var(--green-100); padding: 0.5rem; cursor: pointer;">
+                                <svg style="width: 0.875rem; height: 0.875rem; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                                </svg>
+                                <span style="font-size: 0.8125rem; font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1;">{{ Str::limit($sidebarSuggestion->title, 22) }}</span>
+                                <span style="margin-left: auto; display: flex; align-items: center; font-size: 0.75rem; color: var(--gray-500);">
+                                    <svg style="width: 0.75rem; height: 0.75rem; color: var(--green-600); margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
                                     </svg>
-                                    <span style="font-size: 0.875rem; font-weight: 500; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($projectItem->name, 25) }}</span>
-                                    <span style="margin-left: auto; font-size: 0.75rem; color: var(--gray-500);">({{ $projectItem->suggestions->count() }})</span>
-                                </a>
-
-                                @if($projectItem->id === $project->id && $projectItem->suggestions->count() > 0)
-                                    <div class="tree-suggestions">
-                                        @foreach($projectItem->suggestions as $treeSuggestion)
-                                            <div class="tree-suggestion"
-                                                 onclick="scrollToSuggestion({{ $treeSuggestion->id }})">
-                                                <svg style="width: 0.75rem; height: 0.75rem; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                                                </svg>
-                                                <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ Str::limit($treeSuggestion->title, 20) }}</span>
-                                                <span style="margin-left: auto; display: flex; align-items: center;">
-                                                    <svg style="width: 0.75rem; height: 0.75rem; color: var(--green-600); margin-right: 0.25rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"/>
-                                                    </svg>
-                                                    {{ $treeSuggestion->likes->count() }}
-                                                </span>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                @endif
+                                    {{ $sidebarSuggestion->likes->count() }}
+                                </span>
                             </div>
                         @empty
-                            <p style="font-size: 0.9rem; color: var(--gray-500); text-align: center;">{{ __('common.no_projects_yet') }}</p>
+                            <p style="font-size: 0.9rem; color: var(--gray-500); text-align: center;">{{ __('common.no_suggestions_for_project') }}</p>
                         @endforelse
                     </div>
                 </div>
@@ -2088,16 +2302,12 @@
 
             <div class="project-cards-container">
                 @if($project->suggestions->count() > 0)
-                    <div class="suggestions-container" x-data="{ showAll: false }">
+                    <div class="suggestions-container">
                         <div class="d-flex" style="flex-direction: column; gap: 2rem;">
                             @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $index => $suggestion)
                                 <div id="suggestion-{{ $suggestion->id }}" 
                                      class="user-card" 
-                                     style="overflow: hidden; position: relative; min-height: 200px;"
-                                     x-show="showAll || {{ $loop->index }} < 4"
-                                     x-transition:enter="transition ease-out duration-300"
-                                     x-transition:enter-start="opacity-0 transform scale-95"
-                                     x-transition:enter-end="opacity-100 transform scale-100">
+                                     style="overflow: hidden; position: relative; min-height: 200px;">
                                     @php
                                         $suggestionImage = null;
                                         $mediaUrl = $suggestion->getFirstMediaUrl('images');
@@ -2132,7 +2342,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
                                                 </svg>
                                                 <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
-                                                    Öneren: {{ $suggestion->createdBy->name }}
+                                                    {{ __('common.proposed_by') }}: {{ $suggestion->createdBy->name }}
                                                 </span>
                                             </div>
                                         @endif
@@ -2158,7 +2368,7 @@
                                                 <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.627 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
                                                 </svg>
-                                                {{ $suggestion->comments->count() }} Yorum
+                                                {{ $suggestion->comments->count() }} {{ __('common.comment') }}
                                             </div>
                                             <div style="display: flex; align-items: center; gap: 0.5rem; color: rgba(255,255,255,0.9); font-size: 0.875rem;">
                                                 <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -2194,37 +2404,12 @@
                                                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                                 </svg>
-                                                <span style="font-weight:600;">Detay</span>
+                                                <span style="font-weight:600;">{{ __('common.detail') }}</span>
                                             </a>
                                         </div>
                                     </div>
                                 </div>
                             @endforeach
-
-                            @if($project->suggestions->count() > 4)
-                                <div x-show="!showAll" 
-                                     @click="showAll = true"
-                                     class="user-card" 
-                                     style="padding: 2rem; text-align: center; cursor: pointer; background: white; border: 2px dashed var(--green-200); transition: all 0.2s;"
-                                     onmouseover="this.style.background='var(--green-50)'; this.style.borderColor='var(--green-400)';"
-                                     onmouseout="this.style.background='white'; this.style.borderColor='var(--green-200)';">
-                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
-                                        <div style="width: 3rem; height: 3rem; border-radius: 50%; background: var(--green-100); display: flex; align-items: center; justify-content: center; color: var(--green-600);">
-                                            <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-                                            </svg>
-                                        </div>
-                                        <div>
-                                            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0 0 0.5rem;">
-                                                {{ $project->suggestions->count() - 4 }} Öneri Daha Var
-                                            </h3>
-                                            <p style="color: var(--gray-600); margin: 0; font-size: 0.875rem;">
-                                                Tüm önerileri görüntülemek için tıklayın
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
                     </div>
                 @else
@@ -2237,7 +2422,7 @@
                                 <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: var(--green-600);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"/>
                                 </svg>
-                                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">Bu proje için henüz öneri bulunmuyor</h3>
+                                <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0;">{{ __('common.no_suggestions_for_project') }}</h3>
                             </div>
                             <p style="color: var(--gray-500);">
                                 <svg style="width: 1rem; height: 1rem; display: inline; margin-right: 0.5rem; color: var(--green-500);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -3314,6 +3499,42 @@ window.addEventListener('resize', adjustLayout);
             }
         `;
         document.head.appendChild(style);
+    }
+    // Sticky Header Detection (Robust Scroll Event Version)
+    const stickyHeader = document.getElementById('sticky-project-header');
+    if (stickyHeader) {
+        // Create a reference point (sentinel) in the flow
+        const sentinel = document.createElement('div');
+        sentinel.className = 'sticky-sentinel';
+        sentinel.style.height = '1px';
+        sentinel.style.width = '100%';
+        sentinel.style.marginBottom = '-1px';
+        sentinel.style.visibility = 'hidden';
+        stickyHeader.parentNode.insertBefore(sentinel, stickyHeader);
+
+        const checkSticky = () => {
+            const rect = sentinel.getBoundingClientRect();
+            // 4.5rem is approx 72px. We toggle slightly before/at that point.
+            // If the element's top position is less than or equal to the sticky offset (approx 75px to be safe),
+            // it means it has reached the "stuck" position effectively.
+            if (rect.top <= 75) { 
+                stickyHeader.classList.add('is-stuck');
+            } else {
+                stickyHeader.classList.remove('is-stuck');
+            }
+        };
+
+        // Listen to window scroll
+        window.addEventListener('scroll', checkSticky, { passive: true });
+        
+        // Also listen to main content scroll if it exists (common in some layouts)
+        const mainScroll = document.querySelector('.fi-main') || document.querySelector('main') || document.body;
+        if (mainScroll) {
+            mainScroll.addEventListener('scroll', checkSticky, { passive: true });
+        }
+
+        // Initial check
+        checkSticky();
     }
 });
 </script>

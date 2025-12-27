@@ -795,7 +795,7 @@
             $startCollapsed = $activeFilters->isEmpty();
         @endphp
 
-        <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
+        <div class="d-grid main-content-grid" style="grid-template-columns: 320px 1fr; gap: 4rem;">
             <!-- Sol Taraf: Tree View -->
             <div class="filters-sidebar-wrapper">
                 <div id="filter-card" class="filters-card" data-has-filters="{{ $activeFilterCount > 0 ? 'true' : 'false' }}">
@@ -1117,6 +1117,8 @@
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                </svg>
+                                <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
                                     {{ __('common.project_manager') }}: {{ $project->createdBy->name }}
                                 </span>
                             </div>
@@ -1188,9 +1190,9 @@
                                 </svg>
                                 <h3 style="font-size: 1.125rem; font-weight: 600; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">{{ __('common.suggestions') }} ({{ $project->suggestions->count() }})</h3>
                             </div>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                                @foreach($project->suggestions as $suggestion)
-                                <div id="suggestion-{{ $suggestion->id }}" style="position: relative; min-height: 180px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                @foreach($project->suggestions->take(4) as $suggestion)
+                                <div id="suggestion-{{ $suggestion->id }}" style="position: relative; min-height: 240px; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid rgba(255,255,255,0.2);">
                                     <!-- Suggestion Background Image -->
                                     @if($suggestion->getFirstMediaUrl('images'))
                                     <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
@@ -1292,6 +1294,23 @@
                                     </div>
                                 </div>
                                 @endforeach
+
+                                @if($project->suggestions->count() > 4)
+                                <a href="{{ route('user.project.suggestions', $project->id) }}"
+                                   style="grid-column: span 2; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; 
+                                          background: rgba(255, 255, 255, 0.2); 
+                                          border: 1px solid rgba(255, 255, 255, 0.3); padding: 1rem 2rem; 
+                                          border-radius: 2rem; color: white; font-size: 0.875rem; font-weight: 600; 
+                                          text-transform: uppercase; letter-spacing: 0.05em; 
+                                          transition: background 0.2s;"
+                                   onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
+                                   onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+                                    <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                    </svg>
+                                    {{ __('common.more_suggestions_count', ['count' => $project->suggestions->count() - 4]) }} - {{ __('common.view_all_suggestions_click') }}
+                                </a>
+                                @endif
                             </div>
                         </div>
                         @else
