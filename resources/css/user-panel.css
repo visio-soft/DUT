@@ -3117,3 +3117,81 @@ h6 {
         text-align: center;
     }
 }
+
+/* ========================================
+   SURVEY MODAL Z-INDEX & STYLING FIXES
+   ======================================== */
+
+/* Force Filament modals above sticky header (z-100) */
+[x-data*="modal"] {
+    z-index: 9999 !important;
+}
+
+.fi-modal {
+    z-index: 9999 !important;
+}
+
+.fi-modal-close-overlay,
+.fi-modal-window {
+    z-index: 9999 !important;
+}
+
+/* Backdrop overlay */
+[x-show*="isOpen"].fixed.inset-0 {
+    z-index: 9998 !important;
+}
+
+/* Survey Form Styling */
+.survey-radio-group {
+    padding: 1rem !important;
+    background-color: var(--gray-50) !important;
+    border-radius: var(--radius-xl) !important;
+    border: 1px solid var(--gray-200) !important;
+    transition: var(--transition-normal);
+}
+
+.survey-radio-group:hover {
+    border-color: var(--green-300) !important;
+    background-color: var(--green-50) !important;
+}
+
+.survey-textarea {
+    padding: 1rem !important;
+    border-radius: var(--radius-lg) !important;
+    border: 1px solid var(--gray-200) !important;
+    transition: var(--transition-normal);
+}
+
+.survey-textarea:focus-within {
+    border-color: var(--green-500) !important;
+}
+
+/* Survey Buttons */
+.survey-submit-btn {
+    background-color: var(--green-600) !important;
+    color: white !important;
+    border-radius: var(--radius-xl) !important;
+    padding: 0.75rem 2rem !important;
+    font-weight: 600 !important;
+    box-shadow: var(--green-shadow) !important;
+    transition: var(--transition-normal) !important;
+}
+
+.survey-submit-btn:hover {
+    background-color: var(--green-700) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--green-shadow-hover) !important;
+}
+
+.survey-cancel-btn {
+    background-color: var(--gray-100) !important;
+    color: var(--gray-600) !important;
+    border-radius: var(--radius-xl) !important;
+    padding: 0.75rem 1.5rem !important;
+    font-weight: 500 !important;
+}
+
+.survey-cancel-btn:hover {
+    background-color: var(--gray-200) !important;
+    color: var(--gray-800) !important;
+}

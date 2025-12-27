@@ -467,4 +467,20 @@ return [
     'male' => 'Erkek',
     'female' => 'Kadın',
     'anonymous_vote' => 'Anonim Oy',
+    
+    // Expired Projects Widget
+    'no_expired_projects' => 'Süresi Dolmuş Proje Yok',
+    'no_expired_projects_desc' => 'Henüz süresi dolmuş proje bulunmuyor.',
+
+    // Survey translations
+    'survey' => 'Anket',
+    'join_survey' => 'Ankete Katıl',
+    'survey_title' => 'Anket',
+    'please_answer_all_questions' => 'Lütfen tüm soruları yanıtlayın',
+    'this_field_required' => 'Bu alan zorunludur.',
+    'write_your_answer' => 'Yanıtınızı buraya yazın...',
+    'no_questions_in_survey' => 'Bu ankette henüz soru bulunmuyor.',
+    'submit' => 'Gönder',
+    'submitting' => 'Gönderiliyor...',
+    'survey_saved_success' => 'Anket yanıtlarınız başarıyla kaydedildi!',
 ];

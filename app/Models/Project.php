@@ -105,6 +105,11 @@ class Project extends Model implements HasMedia
         return $this->belongsTo(User::class, 'updated_by_id');
     }
 
+    public function surveys(): HasMany
+    {
+        return $this->hasMany(Survey::class, 'project_id');
+    }
+
     // Design relationship removed - no longer needed
 
     public function registerMediaCollections(): void

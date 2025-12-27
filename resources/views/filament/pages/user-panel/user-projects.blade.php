@@ -694,50 +694,48 @@
                                     </div>
                                 </div>
                                 <div class="filter-field">
+                                    <label for="category_id">{{ __('common.project_category') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6Z"/>
+                                        </svg>
+                                        <select id="category_id" name="category_id">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            @foreach($categories as $id => $name)
+                                                <option value="{{ $id }}" @selected(($filterValues['category_id'] ?? '') == $id)>{{ $name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-field">
                                     <label for="country-filter">{{ __('common.country') }}</label>
                                     <div class="input-with-icon">
                                          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
                                         </svg>
-                                        <select id="country-filter" name="country">
+                                        <select id="country-filter" name="country" onchange="this.form.submit()">
                                             <option value="">{{ __('common.select_option') }}</option>
+                                            @foreach($countries as $name)
+                                                <option value="{{ $name }}" @selected(($filterValues['country'] ?? '') === $name)>{{ $name }}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                 </div>
 
-                                <div class="filter-field" id="city-wrapper" style="display: none;">
+                                <div class="filter-field" id="city-wrapper" style="{{ !empty($cities) || !empty($filterValues['city']) ? '' : 'display: none;' }}">
                                     <label for="city-filter">{{ __('common.city') }}</label>
                                     <div class="input-with-icon">
                                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21"/>
                                         </svg>
-                                        <select id="city-filter" name="city">
+                                        <select id="city-filter" name="city" onchange="this.form.submit()">
                                             <option value="">{{ __('common.select_option') }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="filter-field" id="district-wrapper" style="display: none;">
-                                    <label for="district-filter">{{ __('common.district') }}</label>
-                                    <div class="input-with-icon">
-                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
-                                            <circle cx="12" cy="10.2" r="2.4"/>
-                                        </svg>
-                                        <select id="district-filter" name="district">
-                                            <option value="">{{ __('common.select_option') }}</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="filter-field" id="neighborhood-wrapper" style="display: none;">
-                                    <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
-                                    <div class="input-with-icon">
-                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
-                                        </svg>
-                                        <select id="neighborhood-filter" name="neighborhood">
-                                            <option value="">{{ __('common.select_option') }}</option>
+                                            @if(!empty($cities))
+                                                @foreach($cities as $name)
+                                                    <option value="{{ $name }}" @selected(($filterValues['city'] ?? '') === $name)>{{ $name }}</option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -866,48 +864,82 @@
                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 2;"></div>
 
                         <!-- Project Content -->
+                        <!-- Project Content -->
                         <div style="position: relative; z-index: 3; padding: 2rem; color: white;">
-                            <!-- Tüm Önerileri Göster Butonu - Sağ Üst -->
-                            <a href="{{ route('user.project.suggestions', $project->id) }}"
-                               style="position: absolute; top: 1rem; right: 1rem;
-                                      background: rgba(255,255,255,0.2);
-                                      border: 1px solid rgba(255,255,255,0.4);
-                                      color: white;
-                                      padding: 0.5rem 1rem;
-                                      border-radius: 0.5rem;
-                                      font-size: 0.75rem;
-                                      font-weight: 500;
-                                      text-decoration: none;
-                                      transition: all 0.3s;
-                                      backdrop-filter: blur(4px);
-                                      display: flex;
-                                      align-items: center;
-                                      gap: 0.25rem;
-                                      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-                                      box-shadow: 0 2px 4px rgba(0,0,0,0.2);"
-                               onmouseover="this.style.background='rgba(255,255,255,0.3)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.3)';"
-                               onmouseout="this.style.background='rgba(255,255,255,0.2)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.2)';">
-                                <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
-                                </svg>
-                                <span>{{ __('common.all_suggestions') }}</span>
-                            </a>
+                            <!-- Header Actions Row -->
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; gap: 1rem;">
+                                <!-- Status Badge (Left) -->
+                                <div>
+                                    @if($project->status === \App\Enums\SuggestionStatusEnum::OPEN)
+                                    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(34, 197, 94, 0.2); backdrop-filter: blur(4px); border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.35rem 0.75rem; border-radius: 9999px; color: white; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                        <span style="width: 0.5rem; height: 0.5rem; background: #4ade80; border-radius: 50%; box-shadow: 0 0 8px #4ade80;"></span>
+                                        {{ __('common.active') }}
+                                    </div>
+                                    @endif
+                                </div>
 
-                            <div style="display: flex; align-items: center; margin-bottom: 1rem;">
-                                <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.75rem; color: rgba(255,255,255,0.9);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
-                                </svg>
-                                <a href="{{ route('user.project.suggestions', $project->id) }}" style="text-decoration: none;">
-                                    <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); transition: color 0.2s;">{{ $project->name }}</h2>
-                                </a>
+                                <!-- Actions Actions (Right) -->
+                                <!-- Actions Actions (Right) -->
+                                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
+                                    @if($project->surveys->isNotEmpty())
+                                        @php
+                                            $activeSurvey = $project->surveys->first();
+                                            $hasUnansweredSurveys = $project->surveys->contains(function ($survey) {
+                                                return $survey->responses->isEmpty();
+                                            });
+                                        @endphp
+                                    <a href="#"
+                                       onclick="Livewire.dispatch('openSurveyModal', { surveyId: {{ $activeSurvey->id }} }); return false;"
+                                       class="btn-survey {{ $hasUnansweredSurveys ? 'pending' : 'completed' }}"
+                                       style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
+                                              padding: 0.4rem 0.8rem; border-radius: 2rem; 
+                                              font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; 
+                                              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                              {{ $hasUnansweredSurveys 
+                                                 ? 'background: linear-gradient(135deg, #1ABF6B 0%, #16a559 100%); border: 1px solid #16a559; color: white; box-shadow: 0 4px 12px rgba(26, 191, 107, 0.4); animation: pulse-green 2s infinite;' 
+                                                 : 'background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.9);' 
+                                              }}"
+                                       onmouseover="{{ $hasUnansweredSurveys 
+                                            ? 'this.style.transform=\'translateY(-1px) scale(1.02)\'; this.style.boxShadow=\'0 6px 16px rgba(26, 191, 107, 0.5)\';' 
+                                            : 'this.style.background=\'rgba(255, 255, 255, 0.25)\';' 
+                                       }}"
+                                       onmouseout="{{ $hasUnansweredSurveys 
+                                            ? 'this.style.transform=\'translateY(0) scale(1)\'; this.style.boxShadow=\'0 4px 12px rgba(26, 191, 107, 0.4)\';' 
+                                            : 'this.style.background=\'rgba(255, 255, 255, 0.15)\';' 
+                                       }}">
+                                        <svg style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
+                                        </svg>
+                                        {{ $hasUnansweredSurveys ? __('common.join_survey') : __('common.survey') }}
+                                    </a>
+                                    @endif
+
+                                    <a href="{{ route('user.project.suggestions', $project->id) }}"
+                                       style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
+                                              background: rgba(255, 255, 255, 0.2); 
+                                              border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.4rem 0.8rem; 
+                                              border-radius: 2rem; color: white; font-size: 0.75rem; font-weight: 600; 
+                                              text-transform: uppercase; letter-spacing: 0.05em; 
+                                              transition: background 0.2s;"
+                                       onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
+                                       onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
+                                        <svg style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.25A2.25 2.25 0 0 0 3 5.25v13.5A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V8.25A2.25 2.25 0 0 0 18.75 6H16.5a2.25 2.25 0 0 1-2.25-2.25V3.75a2.25 2.25 0 0 0-2.25-2.25Z"/>
+                                        </svg>
+                                        {{ __('common.all_suggestions') }}
+                                    </a>
+                                </div>
                             </div>
+
+                            <!-- Project Title -->
+                            <h2 style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0 0 1rem 0; text-shadow: 0 2px 4px rgba(0,0,0,0.5); line-height: 1.2;">
+                                {{ $project->name }}
+                            </h2>
 
                             @if($project->createdBy)
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1rem; height: 1rem; margin-right: 0.5rem; color: rgba(255,255,255,0.8);" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
-                                </svg>
-                                <span style="font-size: 0.875rem; color: rgba(255,255,255,0.9); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
                                     {{ __('common.project_manager') }}: {{ $project->createdBy->name }}
                                 </span>
                             </div>
@@ -1066,7 +1098,14 @@
 
                                             <!-- Details Button -->
                                             <a href="{{ route('user.suggestion.detail', $suggestion->id) }}"
-                                               style="color: rgba(255,255,255,0.9); background: var(--green-700); padding: 0.375rem 0.75rem; border-radius: var(--radius-md); font-size: 0.75rem; font-weight: 500; text-decoration: none; transition: all 0.2s; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.5); display: flex; align-items: center; gap: 0.25rem;">
+                                               style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
+                                                      background: rgba(255, 255, 255, 0.2); 
+                                                      border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.4rem 0.8rem; 
+                                                      border-radius: 2rem; color: white; font-size: 0.75rem; font-weight: 600; 
+                                                      text-transform: uppercase; letter-spacing: 0.05em; 
+                                                      transition: background 0.2s;"
+                                               onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
+                                               onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
                                                 <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                                                 </svg>
@@ -2101,5 +2140,6 @@ window.addEventListener('resize', adjustLayout);
 </script>
     </div>
 </div>
+@livewire('take-survey')
 @endsection
 

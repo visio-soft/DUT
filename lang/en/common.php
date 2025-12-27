@@ -467,4 +467,20 @@ return [
     'male' => 'Male',
     'female' => 'Female',
     'anonymous_vote' => 'Anonymous Vote',
+    
+    // Expired Projects Widget
+    'no_expired_projects' => 'No Expired Projects',
+    'no_expired_projects_desc' => 'There are no expired projects yet.',
+
+    // Survey translations
+    'survey' => 'Survey',
+    'join_survey' => 'Join Survey',
+    'survey_title' => 'Survey',
+    'please_answer_all_questions' => 'Please answer all questions',
+    'this_field_required' => 'This field is required.',
+    'write_your_answer' => 'Write your answer here...',
+    'no_questions_in_survey' => 'There are no questions in this survey yet.',
+    'submit' => 'Submit',
+    'submitting' => 'Submitting...',
+    'survey_saved_success' => 'Your survey responses have been saved successfully!',
 ];

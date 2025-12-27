@@ -25,6 +25,7 @@
             document.documentElement.classList.add('loaded');
         });
     </script>
+    @livewireStyles
 </head>
 <body class="h-full">
     @if($hasBackgroundImages ?? false)
@@ -469,5 +470,6 @@
             });
         });
     </script>
+    @livewireScripts
 </body>
 </html>

@@ -46,6 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects', [UserProjects::class, 'index'])->name('user.projects');
     Route::get('/projects/{id}/suggestions', [ProjectSuggestions::class, 'show'])->name('user.project.suggestions');
     Route::get('/suggestions/{id}', [SuggestionDetail::class, 'show'])->name('user.suggestion.detail');
+    Route::get('/projects/{id}/surveys', [\App\Filament\Pages\UserPanel\ProjectSurveys::class, 'index'])->name('user.project.surveys');
+    Route::post('/projects/{id}/surveys/{surveyId}/submit', [\App\Filament\Pages\UserPanel\ProjectSurveys::class, 'store'])->name('user.project.surveys.store');
 });
 
 // User Authentication Routes

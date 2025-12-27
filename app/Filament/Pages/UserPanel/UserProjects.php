@@ -34,6 +34,12 @@ class UserProjects
                 ]);
             },
             'projectGroups.category',
+            'surveys' => function($q) {
+                $q->where('status', true)
+                  ->with(['responses' => function($q) {
+                      $q->where('user_id', auth()->id());
+                  }]);
+            },
         ]);
 
         if ($search = Str::lower($request->string('search')->toString())) {
@@ -88,8 +94,10 @@ class UserProjects
             $projectsQuery->where('min_budget', '>=', $minBudget);
         }
 
-        if ($maxBudget = $request->input('max_budget')) {
-            $projectsQuery->where('max_budget', '<=', $maxBudget);
+        if ($categoryId = $request->input('category_id')) {
+            $projectsQuery->whereHas('projectGroups.category', function ($q) use ($categoryId) {
+                $q->where('id', $categoryId);
+            });
         }
 
         $projects = $projectsQuery
@@ -99,14 +107,22 @@ class UserProjects
         $statusOptions = collect(SuggestionStatusEnum::cases())
             ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])
             ->toArray();
+        
+        $categories = \App\Models\Category::pluck('name', 'id');
+        
+        // Location Data
+        $countries = \App\Models\Country::pluck('name', 'name');
+        $selectedCountry = $request->input('country');
+        $cities = $selectedCountry 
+            ? \App\Models\City::whereHas('country', fn($q) => $q->where('name', $selectedCountry))->pluck('name', 'name') 
+            : [];
 
-        $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
             'status',
+            'category_id',
+            'country',
             'city',
-            'district',
-            'neighborhood',
             'start_date',
             'end_date',
             'min_budget',
@@ -117,7 +133,7 @@ class UserProjects
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.user-projects', array_merge(
-            compact('projects', 'statusOptions', 'districts', 'filterValues'),
+            compact('projects', 'statusOptions', 'categories', 'countries', 'cities', 'filterValues'),
             $backgroundData
         ));
     }
