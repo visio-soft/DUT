@@ -53,7 +53,7 @@ class SuggestionResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('common.suggestion_management');
+        return __('common.project_management');
     }
 
     public static function form(Form $form): Form

@@ -46,7 +46,7 @@ class CommentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('common.suggestion_management');
+        return __('common.surveys');
     }
 
     public static function form(Form $form): Form
