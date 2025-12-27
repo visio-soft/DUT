@@ -129,8 +129,14 @@ class SurveyMCAnswerResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\DeleteAction::make(),
+                ])
+                ->label(__('common.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->link(),
             ])
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

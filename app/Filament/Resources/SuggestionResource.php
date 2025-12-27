@@ -213,35 +213,41 @@ class SuggestionResource extends Resource
             ->filtersFormColumns(2)
             ->filtersFormWidth('3xl')
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => ! $record->trashed()),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->visible(fn ($record) => ! $record->trashed()),
 
-                Tables\Actions\DeleteAction::make()
-                    ->visible(fn ($record) => ! $record->trashed())
-                    ->requiresConfirmation()
-                    ->modalHeading(__("common.delete_suggestion"))
-                    ->modalDescription(__("common.delete_suggestion_description"))
-                    ->modalSubmitActionLabel(__('common.yes_delete'))
-                    ->successNotificationTitle(__("common.suggestion_deleted")),
+                    Tables\Actions\DeleteAction::make()
+                        ->visible(fn ($record) => ! $record->trashed())
+                        ->requiresConfirmation()
+                        ->modalHeading(__("common.delete_suggestion"))
+                        ->modalDescription(__("common.delete_suggestion_description"))
+                        ->modalSubmitActionLabel(__('common.yes_delete'))
+                        ->successNotificationTitle(__("common.suggestion_deleted")),
 
-                Tables\Actions\RestoreAction::make()
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading(__("common.restore_suggestion"))
-                    ->modalDescription(__("common.restore_suggestion_description"))
-                    ->modalSubmitActionLabel(__('common.yes_restore'))
-                    ->successNotificationTitle(__("common.suggestion_restored")),
+                    Tables\Actions\RestoreAction::make()
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading(__("common.restore_suggestion"))
+                        ->modalDescription(__("common.restore_suggestion_description"))
+                        ->modalSubmitActionLabel(__('common.yes_restore'))
+                        ->successNotificationTitle(__("common.suggestion_restored")),
 
-                Tables\Actions\ForceDeleteAction::make()
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading(__("common.force_delete_suggestion"))
-                    ->modalDescription(__("common.force_delete_suggestion_description"))
-                    ->modalSubmitActionLabel(__('common.yes_force_delete'))
-                    ->successNotificationTitle(__("common.suggestion_force_deleted")),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading(__("common.force_delete_suggestion"))
+                        ->modalDescription(__("common.force_delete_suggestion_description"))
+                        ->modalSubmitActionLabel(__('common.yes_force_delete'))
+                        ->successNotificationTitle(__("common.suggestion_force_deleted")),
+                ])
+                ->label(__('common.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->link(),
             ])
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 CommonTableActions::softDeleteBulkActionGroup('suggestion'),
             ])

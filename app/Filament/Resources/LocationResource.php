@@ -165,20 +165,25 @@ class LocationResource extends Resource
                     }),
             ])
             ->actions([
-                Action::make('edit')
-                    ->label(__('common.edit_location'))
-                    ->icon('heroicon-o-pencil')
-                    ->fillForm(fn (LocationView $record): array => self::fillFormForRecord($record))
-                    ->form(self::getLocationFormSchema(disableType: true))
-                    ->action(fn (LocationView $record, array $data) => self::updateBase($record, $data)),
-                Action::make('delete')
-                    ->label(__('common.delete'))
-                    ->color('danger')
-                    ->icon('heroicon-o-trash')
-                    ->label(__('common.delete'))
-                    ->requiresConfirmation()
-                    ->action(fn (LocationView $record) => self::deleteBase($record)),
+                Tables\Actions\ActionGroup::make([
+                    Action::make('edit')
+                        ->label(__('common.edit_location'))
+                        ->icon('heroicon-o-pencil')
+                        ->fillForm(fn (LocationView $record): array => self::fillFormForRecord($record))
+                        ->form(self::getLocationFormSchema(disableType: true))
+                        ->action(fn (LocationView $record, array $data) => self::updateBase($record, $data)),
+                    Action::make('delete')
+                        ->label(__('common.delete'))
+                        ->color('danger')
+                        ->icon('heroicon-o-trash')
+                        ->requiresConfirmation()
+                        ->action(fn (LocationView $record) => self::deleteBase($record)),
+                ])
+                ->label(__('common.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->link(),
             ])
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 BulkAction::make('bulkDelete')
                     ->label(__('common.delete_selected_locations'))

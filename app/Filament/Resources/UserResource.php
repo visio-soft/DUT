@@ -156,34 +156,40 @@ class UserResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
 
-                Tables\Actions\DeleteAction::make()
-                    ->requiresConfirmation()
-                    ->modalHeading('Kullanıcıyı Sil')
-                    ->modalDescription('Bu kullanıcıyı silmek istediğinizden emin misiniz?')
-                    ->modalSubmitActionLabel('Evet, Sil'),
+                    Tables\Actions\DeleteAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Kullanıcıyı Sil')
+                        ->modalDescription('Bu kullanıcıyı silmek istediğinizden emin misiniz?')
+                        ->modalSubmitActionLabel('Evet, Sil'),
 
-                Tables\Actions\RestoreAction::make()
-                    ->label('Geri Getir')
-                    ->icon('heroicon-o-arrow-path')
-                    ->color('success')
-                    ->requiresConfirmation()
-                    ->modalHeading('Kullanıcıyı Geri Getir')
-                    ->modalDescription('Bu kullanıcıyı geri getirmek istediğinizden emin misiniz?')
-                    ->modalSubmitActionLabel('Evet, Geri Getir')
-                    ->successNotificationTitle('Kullanıcı başarıyla geri getirildi'),
+                    Tables\Actions\RestoreAction::make()
+                        ->label('Geri Getir')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->modalHeading('Kullanıcıyı Geri Getir')
+                        ->modalDescription('Bu kullanıcıyı geri getirmek istediğinizden emin misiniz?')
+                        ->modalSubmitActionLabel('Evet, Geri Getir')
+                        ->successNotificationTitle('Kullanıcı başarıyla geri getirildi'),
 
-                Tables\Actions\ForceDeleteAction::make()
-                    ->label('Kalıcı Sil')
-                    ->icon('heroicon-o-trash')
-                    ->color('danger')
-                    ->requiresConfirmation()
-                    ->modalHeading('Kullanıcıyı Kalıcı Olarak Sil')
-                    ->modalDescription('Bu kullanıcıyı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
-                    ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
-                    ->successNotificationTitle('Kullanıcı kalıcı olarak silindi'),
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label('Kalıcı Sil')
+                        ->icon('heroicon-o-trash')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->modalHeading('Kullanıcıyı Kalıcı Olarak Sil')
+                        ->modalDescription('Bu kullanıcıyı kalıcı olarak silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')
+                        ->modalSubmitActionLabel('Evet, Kalıcı Olarak Sil')
+                        ->successNotificationTitle('Kullanıcı kalıcı olarak silindi'),
+                ])
+                ->label(__('common.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->link(),
             ])
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()

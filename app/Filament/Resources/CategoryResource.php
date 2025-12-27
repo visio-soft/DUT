@@ -122,17 +122,23 @@ class CategoryResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->visible(fn ($record) => ! $record->trashed()),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make()
+                        ->visible(fn ($record) => ! $record->trashed()),
 
-                Tables\Actions\DeleteAction::make()
-                    ->visible(fn ($record) => ! $record->trashed())
-                    ->requiresConfirmation()
-                    ->modalHeading(__('common.delete_project'))
-                    ->modalDescription(__('common.delete_project_description'))
-                    ->modalSubmitActionLabel(__('common.yes_delete'))
-                    ->successNotificationTitle(__('common.project_deleted')),
+                    Tables\Actions\DeleteAction::make()
+                        ->visible(fn ($record) => ! $record->trashed())
+                        ->requiresConfirmation()
+                        ->modalHeading(__('common.delete_project'))
+                        ->modalDescription(__('common.delete_project_description'))
+                        ->modalSubmitActionLabel(__('common.yes_delete'))
+                        ->successNotificationTitle(__('common.project_deleted')),
+                ])
+                ->label(__('common.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->link(),
             ])
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

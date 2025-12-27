@@ -111,11 +111,17 @@ class SurveyTextAnswerResource extends Resource
                     ->searchable(),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()
-                    ->modalHeading(__('common.answer'))
-                    ->modalContent(fn ($record) => view('filament.resources.survey-text-answer.view', ['record' => $record])),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->modalHeading(__('common.answer'))
+                        ->modalContent(fn ($record) => view('filament.resources.survey-text-answer.view', ['record' => $record])),
+                    Tables\Actions\DeleteAction::make(),
+                ])
+                ->label(__('common.actions'))
+                ->icon('heroicon-m-ellipsis-vertical')
+                ->link(),
             ])
+            ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

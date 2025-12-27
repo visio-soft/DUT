@@ -211,7 +211,7 @@ return [
     'creator_type' => 'Oluşturan Tür',
     'min_likes' => 'Minimum Beğeni',
     'max_likes' => 'Maksimum Beğeni',
-    'actions' => 'Aksiyonlar',
+    'actions' => 'İşlemler',
     'not_specified' => 'Belirtilmemiş',
     'not_assigned' => 'Atanmamış',
     'not_set' => 'Belirlenmemiş',
