@@ -15,8 +15,9 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            ProjectSuggestionsOverviewChart::class,
             \App\Filament\Widgets\BestSuggestionsOfExpiredProjects::class,
+            ProjectSuggestionsOverviewChart::class,
+            \App\Filament\Widgets\SurveyAnswerDistributionChart::class,
         ];
     }
 

@@ -175,6 +175,43 @@ class ProjectSuggestionsOverviewChart extends ChartWidget
         return __('common.project_suggestion_chart_description');
     }
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('viewProjects')
+                ->label(__('common.project'))
+                ->icon('heroicon-o-folder')
+                ->url(\App\Filament\Resources\ProjectResource::getUrl('index'))
+                ->color('gray')
+                ->size('sm'),
+            \Filament\Actions\Action::make('viewSuggestions')
+                ->label(__('common.suggestions'))
+                ->icon('heroicon-o-light-bulb')
+                ->url(\App\Filament\Resources\SuggestionResource::getUrl('index'))
+                ->color('gray')
+                ->size('sm'),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'scales' => [
+                'x' => [
+                    'grid' => [
+                        'display' => false,
+                    ],
+                ],
+                'y' => [
+                    'beginAtZero' => true,
+                    'grid' => [
+                        'color' => 'rgba(128, 128, 128, 0.2)',
+                    ],
+                ],
+            ],
+        ];
+    }
+
     protected function getFilters(): ?array
     {
         $projects = Project::query()->pluck('title', 'id')->toArray();

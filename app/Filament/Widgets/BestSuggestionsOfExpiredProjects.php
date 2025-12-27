@@ -81,8 +81,8 @@ class BestSuggestionsOfExpiredProjects extends BaseWidget
                     })
                     ->formatStateUsing(function ($state) {
                         $colors = [
-                            1 => ['bg' => '#fbbf24', 'text' => '#000'], // Gold
-                            2 => ['bg' => '#9ca3af', 'text' => '#000'], // Silver
+                            1 => ['bg' => '#fbbf24', 'text' => '#fff'], // Gold
+                            2 => ['bg' => '#9ca3af', 'text' => '#fff'], // Silver
                             3 => ['bg' => '#d97706', 'text' => '#fff'], // Bronze
                         ];
                         $color = $colors[$state] ?? ['bg' => '#6b7280', 'text' => '#fff'];

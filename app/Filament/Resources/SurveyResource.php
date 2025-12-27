@@ -3,70 +3,104 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\SurveyResource\Pages;
+use App\Filament\Resources\SurveyResource\RelationManagers;
 use App\Models\Survey;
+use App\Models\Project;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Models\Project;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\Filter;
+use Illuminate\Database\Eloquent\Builder;
 
 class SurveyResource extends Resource
 {
     protected static ?string $model = Survey::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-chart-bar';
+    protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    
+    protected static ?string $navigationGroup = null;
+    
+    protected static ?int $navigationSort = 1;
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('common.surveys');
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return __('common.survey');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('common.survey');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('common.surveys_navigation');
+    }
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Survey Details')
+                Forms\Components\Section::make(__('common.survey_details'))
+                    ->description(__('common.survey_details_description'))
                     ->schema([
                         Forms\Components\Select::make('project_id')
-                            ->label('Proje')
+                            ->label(__('common.project'))
                             ->relationship('project', 'title')
                             ->required()
                             ->searchable()
-                            ->preload(),
+                            ->preload()
+                            ->columnSpan(1),
                         Forms\Components\TextInput::make('title')
-                            ->label('Anket Başlığı')
+                            ->label(__('common.survey_title'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->columnSpan(1),
                         Forms\Components\Textarea::make('description')
-                            ->label('Açıklama')
+                            ->label(__('common.description'))
                             ->rows(3)
                             ->maxLength(65535)
                             ->columnSpanFull(),
                         Forms\Components\Toggle::make('status')
-                            ->label('Aktif')
-                            ->default(true),
+                            ->label(__('common.active'))
+                            ->default(true)
+                            ->helperText(__('common.survey_status_help')),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Questions')
+                Forms\Components\Section::make(__('common.questions'))
+                    ->description(__('common.questions_section_description'))
                     ->schema([
                         Forms\Components\Repeater::make('questions')
                             ->relationship()
                             ->schema([
                                 Forms\Components\TextInput::make('text')
-                                    ->label('Soru Metni')
+                                    ->label(__('common.question_text'))
                                     ->required()
                                     ->columnSpanFull(),
                                 Forms\Components\Select::make('type')
-                                    ->label('Soru Tipi')
+                                    ->label(__('common.question_type'))
                                     ->options([
-                                        'text' => 'Açık Uçlu (Metin)',
-                                        'multiple_choice' => 'Çoktan Seçmeli',
+                                        'text' => __('common.open_ended'),
+                                        'multiple_choice' => __('common.multiple_choice'),
                                     ])
                                     ->required()
-                                    ->live(),
+                                    ->live()
+                                    ->default('text'),
                                 
-                                // Options Repeater for Multiple Choice (max 5: a, b, c, d, e)
                                 Forms\Components\Repeater::make('options')
-                                    ->label('Seçenekler (A, B, C, D, E)')
+                                    ->label(__('common.options'))
                                     ->schema([
                                         Forms\Components\TextInput::make('text')
-                                            ->label('Seçenek Metni')
+                                            ->label(__('common.option_text'))
                                             ->required()
                                             ->maxLength(255),
                                     ])
@@ -74,19 +108,19 @@ class SurveyResource extends Resource
                                     ->maxItems(5)
                                     ->minItems(2)
                                     ->defaultItems(2)
-                                    ->addActionLabel('Seçenek Ekle (max 5)')
-                                    ->itemLabel(fn (array $state, int $index): string => chr(65 + $index) . ') ' . ($state['text'] ?? ''))
+                                    ->addActionLabel(__('common.add_option'))
+                                    ->itemLabel(fn (array $state): string => $state['text'] ?? __('common.option_text'))
                                     ->visible(fn (Forms\Get $get) => $get('type') === 'multiple_choice'),
                                 
-                                // Hidden field to force required=true
                                 Forms\Components\Hidden::make('is_required')
                                     ->default(true),
                             ])
                             ->orderColumn('order')
                             ->defaultItems(1)
                             ->collapsible()
+                            ->cloneable()
                             ->itemLabel(fn (array $state): ?string => $state['text'] ?? null)
-                            ->label('Sorular'),
+                            ->label(''),
                     ]),
             ]);
     }
@@ -96,41 +130,109 @@ class SurveyResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('title')
-                    ->label('Başlık')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('project.title')
-                    ->label('Proje')
+                    ->label(__('common.title'))
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('bold')
+                    ->limit(40),
+                Tables\Columns\TextColumn::make('project.title')
+                    ->label(__('common.project'))
+                    ->searchable()
+                    ->sortable()
+                    ->limit(30)
+                    ->badge()
+                    ->color('info'),
                 Tables\Columns\IconColumn::make('status')
-                    ->label('Durum')
-                    ->boolean(),
+                    ->label(__('common.status'))
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
+                Tables\Columns\TextColumn::make('questions_count')
+                    ->counts('questions')
+                    ->label(__('common.question_count'))
+                    ->badge()
+                    ->color('warning'),
                 Tables\Columns\TextColumn::make('responses_count')
                     ->counts('responses')
-                    ->label('Cevaplar'),
+                    ->label(__('common.response_count'))
+                    ->badge()
+                    ->color('success'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    ->label(__('common.created_at'))
+                    ->dateTime('d M Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
-                //
+                SelectFilter::make('project_id')
+                    ->label(__('common.project'))
+                    ->relationship('project', 'title')
+                    ->searchable()
+                    ->preload(),
+                TernaryFilter::make('status')
+                    ->label(__('common.status'))
+                    ->boolean()
+                    ->trueLabel(__('common.active'))
+                    ->falseLabel(__('common.inactive'))
+                    ->placeholder(__('common.all')),
+                Filter::make('has_responses')
+                    ->label(__('common.has_responses'))
+                    ->query(fn (Builder $query): Builder => $query->has('responses')),
+                Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('from')
+                            ->label(__('common.from_date')),
+                        Forms\Components\DatePicker::make('until')
+                            ->label(__('common.to_date')),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if ($data['from'] ?? null) {
+                            $indicators[] = __('common.from_date') . ': ' . $data['from'];
+                        }
+                        if ($data['until'] ?? null) {
+                            $indicators[] = __('common.to_date') . ': ' . $data['until'];
+                        }
+                        return $indicators;
+                    }),
             ])
+            ->filtersFormColumns(2)
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->emptyStateHeading(__('common.no_surveys'))
+            ->emptyStateDescription(__('common.no_surveys_description'))
+            ->emptyStateIcon('heroicon-o-clipboard-document-list');
     }
 
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\QuestionsRelationManager::class,
+            RelationManagers\ResponsesRelationManager::class,
         ];
     }
 
@@ -139,6 +241,7 @@ class SurveyResource extends Resource
         return [
             'index' => Pages\ListSurveys::route('/'),
             'create' => Pages\CreateSurvey::route('/create'),
+            'view' => Pages\ViewSurvey::route('/{record}'),
             'edit' => Pages\EditSurvey::route('/{record}/edit'),
         ];
     }
