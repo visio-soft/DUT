@@ -19,6 +19,10 @@ class ProjectObserver
         if (Auth::check()) {
             $project->updated_by_id = Auth::id();
         }
+
+        if ($project->isDirty('status') && $project->status === \App\Enums\ProjectStatusEnum::VOTING_CLOSED) {
+            \App\Events\ProjectVotingClosed::dispatch($project);
+        }
     }
 
     public function saving(Project $project): void

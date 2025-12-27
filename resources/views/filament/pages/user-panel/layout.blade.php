@@ -153,6 +153,18 @@
 
                         <!-- Language Selector - Always at the far right -->
                         <x-language-selector />
+
+                        @auth
+                            @if(auth()->user()->hasAnyRole(['admin', 'super_admin']))
+                                <a href="{{ route('filament.admin.pages.dashboard') }}"
+                                   class="user-nav-link ml-4 !text-blue-600 hover:!text-blue-700 font-semibold">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                                    </svg>
+                                    {{ __('Admin Panel') }}
+                                </a>
+                            @endif
+                        @endauth
                     </div>
                 </div>
 
@@ -192,6 +204,17 @@
                     </svg>
                     {{ __('common.projects') }}
                 </a>
+                
+                @auth
+                    @if(auth()->user()->hasAnyRole(['admin', 'super_admin']))
+                        <a href="{{ route('filament.admin.pages.dashboard') }}" class="mobile-nav-link !text-blue-600 font-semibold">
+                            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
+                            </svg>
+                            {{ __('Admin Panel') }}
+                        </a>
+                    @endif
+                @endauth
             </div>
 
             <!-- Language Selector -->

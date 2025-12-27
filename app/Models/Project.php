@@ -16,10 +16,12 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 #[ObservedBy([ProjectObserver::class])]
 class Project extends Model implements HasMedia
 {
-    use InteractsWithMedia,SoftDeletes;
+    use InteractsWithMedia, SoftDeletes, HasFactory;
 
     // Map the legacy 'projects' model to the current 'suggestions' table
     protected $table = 'suggestions';
@@ -108,6 +110,18 @@ class Project extends Model implements HasMedia
     public function surveys(): HasMany
     {
         return $this->hasMany(Survey::class, 'project_id');
+    }
+
+    public function likes(): HasMany
+    {
+        // Projects are stored in 'suggestions' table, so we use SuggestionLike linked to suggestion_id
+        return $this->hasMany(SuggestionLike::class, 'suggestion_id');
+    }
+
+    public function comments(): HasMany
+    {
+        // Projects are stored in 'suggestions' table, so we use SuggestionComment linked to suggestion_id
+        return $this->hasMany(SuggestionComment::class, 'suggestion_id');
     }
 
     // Design relationship removed - no longer needed

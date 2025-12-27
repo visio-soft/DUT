@@ -28,6 +28,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Increase PHP limits for file uploads - Multiple approaches
         $this->setPhpLimitsMultipleWays();
+
+        // Register ProjectVotingClosed event listener
+        \Illuminate\Support\Facades\Event::listen(
+            \App\Events\ProjectVotingClosed::class,
+            \App\Listeners\SendProjectVotingClosedNotification::class
+        );
     }
 
     /**
