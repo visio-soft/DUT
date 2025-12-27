@@ -16,11 +16,11 @@ enum ProjectStatusEnum: string implements HasColor, HasLabel
     public function getLabel(): string
     {
         return match ($this) {
-            self::DRAFT => 'Draft',
-            self::ACTIVE => 'Active',
-            self::COMPLETED => 'Completed',
-            self::VOTING_CLOSED => 'Voting Closed',
-            self::ARCHIVED => 'Archived',
+            self::DRAFT => 'Taslak',
+            self::ACTIVE => 'Yayında (Oylama Aktif)',
+            self::COMPLETED => 'Sonuçlandı',
+            self::VOTING_CLOSED => 'Oylama Kapandı (Karar Bekleniyor)',
+            self::ARCHIVED => 'Arşiv',
         };
     }
 

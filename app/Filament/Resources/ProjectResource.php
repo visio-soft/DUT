@@ -169,6 +169,12 @@ class ProjectResource extends Resource
                     ->badge()
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('suggestions_count')
+                    ->counts('suggestions')
+                    ->label('Öneri Sayısı')
+                    ->badge()
+                    ->color('gray')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('projectGroups.name')
                     ->label(__('common.project_groups'))
                     ->badge()
@@ -188,8 +194,7 @@ class ProjectResource extends Resource
                     ->placeholder(__('common.not_assigned'))
                     ->badge()
                     ->color(fn ($record) => $record->createdBy ? 'success' : 'gray'),
-                Tables\Columns\TextColumn::make('district')->label(__('common.district'))->searchable()->sortable(),
-                Tables\Columns\TextColumn::make('neighborhood')->label(__('common.neighborhood'))->searchable()->limit(30),
+                Tables\Columns\TextColumn::make('city')->label(__('common.city'))->searchable()->sortable(),
                 Tables\Columns\TextColumn::make('min_budget')->label(__('common.min_budget'))
                     ->money('TRY')
                     ->sortable()
@@ -304,6 +309,55 @@ class ProjectResource extends Resource
                         ->modalSubmitActionLabel(__('common.yes_restore'))
                         ->successNotificationTitle(__("common.project_restored")),
 
+                    Tables\Actions\Action::make('finalize_voting')
+                        ->label('Oylamayı Sonlandır')
+                        ->icon('heroicon-o-check-badge')
+                        ->color('warning')
+                        ->visible(fn ($record) => ! $record->trashed() && $record->status !== \App\Enums\ProjectStatusEnum::COMPLETED)
+                        ->form([
+                            Forms\Components\Select::make('decision_type')
+                                ->label('Karar Türü')
+                                ->options(\App\Enums\ProjectDecisionEnum::class)
+                                ->required()
+                                ->live()
+                                ->afterStateUpdated(function (Forms\Set $set, $state, $record) {
+                                    if ($state === \App\Enums\ProjectDecisionEnum::MOST_VOTED->value) {
+                                        // Find top voted suggestion
+                                        $topSuggestion = $record->suggestions()->withCount('likes')->orderByDesc('likes_count')->first();
+                                        if ($topSuggestion) {
+                                            $set('selected_suggestion_id', $topSuggestion->id);
+                                        }
+                                    }
+                                }),
+                            Forms\Components\Select::make('selected_suggestion_id')
+                                ->label('Seçilen Öneri')
+                                ->options(fn ($record) => $record->suggestions->pluck('title', 'id'))
+                                ->required(fn (Forms\Get $get) => in_array($get('decision_type'), [
+                                    \App\Enums\ProjectDecisionEnum::MOST_VOTED->value,
+                                    \App\Enums\ProjectDecisionEnum::ADMIN_CHOICE->value
+                                ]))
+                                ->visible(fn (Forms\Get $get) => in_array($get('decision_type'), [
+                                    \App\Enums\ProjectDecisionEnum::MOST_VOTED->value,
+                                    \App\Enums\ProjectDecisionEnum::ADMIN_CHOICE->value
+                                ])),
+                            Forms\Components\Textarea::make('decision_rationale')
+                                ->label('Karar Açıklaması')
+                                ->required()
+                                ->visible(fn (Forms\Get $get) => $get('decision_type') !== null),
+                        ])
+                        ->action(function ($record, array $data) {
+                            $record->finalizeVoting(
+                                \App\Enums\ProjectDecisionEnum::from($data['decision_type']),
+                                $data['selected_suggestion_id'] ?? null,
+                                $data['decision_rationale']
+                            );
+                            
+                            \Filament\Notifications\Notification::make()
+                                ->title('Oylama Sonlandırıldı')
+                                ->success()
+                                ->send();
+                        }),
+
                     Tables\Actions\ForceDeleteAction::make()
                         ->icon('heroicon-o-trash')
                         ->color('danger')
@@ -320,27 +374,7 @@ class ProjectResource extends Resource
             ->actionsPosition(\Filament\Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 CommonTableActions::softDeleteBulkActionGroup('project'),
-            ])
-            ->groups([
-                Group::make('category_id')
-                    ->label(__('common.project_category'))
-                    ->getTitleFromRecordUsing(fn ($record): string => 
-                        $record->projectGroups->first()?->category?->name ?? __('common.uncategorized')
-                    )
-                    ->collapsible()
-                    ->getDescriptionFromRecordUsing(function ($record): string {
-                        $category = $record->projectGroups->first()?->category;
-                        $end = __('common.not_specified');
-
-                        if ($category && $category->end_datetime) {
-                            $end = Carbon::parse($category->end_datetime)->format('d.m.Y');
-                        }
-
-                        return __('common.end').": {$end}";
-                    }),
-
-            ])
-            ->defaultGroup('category_id');
+            ]);
 
     }
 

@@ -117,6 +117,39 @@ class ProjectSeeder extends Seeder
             $this->command->info("Project created: {$project->title}");
         }
 
+        // Add 15 Random Projects
+        $faker = \Faker\Factory::create('tr_TR');
+        $districts = array_keys(config('istanbul_neighborhoods', ['Kadıköy' => [], 'Ataşehir' => [], 'Üsküdar' => [], 'Beşiktaş' => [], 'Maltepe' => [], 'Şişli' => []]));
+
+        for ($i = 0; $i < 15; $i++) {
+            $district = $faker->randomElement($districts);
+            $startDate = $faker->dateTimeBetween('now', '+6 months');
+            
+            $project = Project::create([
+                'title' => $faker->sentence(3) . ' Projesi',
+                'description' => $faker->paragraph(3),
+                'status' => $faker->randomElement(['active', 'draft', 'completed']),
+                'start_date' => $startDate,
+                'end_date' => $faker->dateTimeBetween($startDate, '+1 year'),
+                'min_budget' => $faker->randomFloat(2, 50000, 200000),
+                'max_budget' => $faker->randomFloat(2, 250000, 1000000),
+                'city' => 'İstanbul',
+                'district' => $district,
+                'latitude' => $faker->latitude(40.8, 41.1),
+                'longitude' => $faker->longitude(28.8, 29.4),
+                'address' => $faker->address,
+                'created_by_id' => $adminUser->id,
+            ]);
+
+            // Randomly attach 1-2 project groups
+            if ($projectGroups->isNotEmpty()) {
+                $randomGroups = $projectGroups->random(rand(1, min(2, $projectGroups->count())));
+                $project->projectGroups()->attach($randomGroups->pluck('id'));
+            }
+
+            $this->command->info("Random Project created: {$project->title}");
+        }
+
         $this->command->info('Projects created successfully!');
     }
 }

@@ -1882,6 +1882,9 @@
 </section><!-- Main Content Section -->
 <div class="section-padding">
     <div class="projects-wide-container">
+        @if($project->status === \App\Enums\ProjectStatusEnum::COMPLETED)
+            @include('filament.pages.user-panel._project-decision-banner')
+        @endif
         @php
             $selectedDistrict = $filterValues['district'] ?? null;
             $neighborhoodOptions = $selectedDistrict ? (config('istanbul_neighborhoods')[$selectedDistrict] ?? []) : [];
@@ -1900,7 +1903,7 @@
             $startCollapsed = $activeFilters->isEmpty();
         @endphp
 
-        <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem;">
+        <div class="d-grid main-content-grid" style="grid-template-columns: 300px 1fr; gap: 2rem; {{ $project->status === \App\Enums\ProjectStatusEnum::COMPLETED ? 'display: none !important;' : '' }}">
             <div>
                 <div id="user-filter-panel" class="filters-card {{ $startCollapsed ? 'collapsed' : '' }}">
                     <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
@@ -2085,10 +2088,16 @@
 
             <div class="project-cards-container">
                 @if($project->suggestions->count() > 0)
-                    <div class="suggestions-container">
+                    <div class="suggestions-container" x-data="{ showAll: false }">
                         <div class="d-flex" style="flex-direction: column; gap: 2rem;">
-                            @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $suggestion)
-                                <div id="suggestion-{{ $suggestion->id }}" class="user-card" style="overflow: hidden; position: relative; min-height: 200px;">
+                            @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $index => $suggestion)
+                                <div id="suggestion-{{ $suggestion->id }}" 
+                                     class="user-card" 
+                                     style="overflow: hidden; position: relative; min-height: 200px;"
+                                     x-show="showAll || {{ $loop->index }} < 4"
+                                     x-transition:enter="transition ease-out duration-300"
+                                     x-transition:enter-start="opacity-0 transform scale-95"
+                                     x-transition:enter-end="opacity-100 transform scale-100">
                                     @php
                                         $suggestionImage = null;
                                         $mediaUrl = $suggestion->getFirstMediaUrl('images');
@@ -2191,6 +2200,31 @@
                                     </div>
                                 </div>
                             @endforeach
+
+                            @if($project->suggestions->count() > 4)
+                                <div x-show="!showAll" 
+                                     @click="showAll = true"
+                                     class="user-card" 
+                                     style="padding: 2rem; text-align: center; cursor: pointer; background: white; border: 2px dashed var(--green-200); transition: all 0.2s;"
+                                     onmouseover="this.style.background='var(--green-50)'; this.style.borderColor='var(--green-400)';"
+                                     onmouseout="this.style.background='white'; this.style.borderColor='var(--green-200)';">
+                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem;">
+                                        <div style="width: 3rem; height: 3rem; border-radius: 50%; background: var(--green-100); display: flex; align-items: center; justify-content: center; color: var(--green-600);">
+                                            <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--gray-900); margin: 0 0 0.5rem;">
+                                                {{ $project->suggestions->count() - 4 }} Öneri Daha Var
+                                            </h3>
+                                            <p style="color: var(--gray-600); margin: 0; font-size: 0.875rem;">
+                                                Tüm önerileri görüntülemek için tıklayın
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 @else

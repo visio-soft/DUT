@@ -129,6 +129,16 @@ class Suggestion extends Model implements HasMedia
         return $this->hasMany(SuggestionComment::class)->where('is_approved', true)->whereNull('parent_id');
     }
 
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(SuggestionRating::class);
+    }
+
+    public function getAverageScoreAttribute(): float
+    {
+        return round($this->ratings()->avg('score') ?? 0, 1);
+    }
+
     public function getLikesCountAttribute(): int
     {
         return $this->likes()->count();

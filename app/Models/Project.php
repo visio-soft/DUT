@@ -17,6 +17,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enums\ProjectDecisionEnum;
 
 #[ObservedBy([ProjectObserver::class])]
 class Project extends Model implements HasMedia
@@ -37,6 +38,10 @@ class Project extends Model implements HasMedia
         });
     }
 
+// ... imports
+
+// ... imports
+
     protected $fillable = [
         'category_id',
         'created_by_id',
@@ -46,6 +51,7 @@ class Project extends Model implements HasMedia
         'status',
         'start_date',
         'end_date',
+        'voting_ends_at',
         'min_budget',
         'max_budget',
         'latitude',
@@ -57,15 +63,20 @@ class Project extends Model implements HasMedia
         'neighborhood',
         'street_avenue',
         'street_road',
+        'decision_type',
+        'selected_suggestion_id',
+        'decision_rationale',
     ];
 
     protected $casts = [
         'start_date' => 'date',
         'end_date' => 'date',
+        'voting_ends_at' => 'datetime',
         'min_budget' => 'decimal:2',
         'max_budget' => 'decimal:2',
         'latitude' => 'decimal:8',
         'longitude' => 'decimal:8',
+        'decision_type' => ProjectDecisionEnum::class,
     ];
 
     protected $attributes = [
@@ -110,6 +121,22 @@ class Project extends Model implements HasMedia
     public function surveys(): HasMany
     {
         return $this->hasMany(Survey::class, 'project_id');
+    }
+
+    public function selectedSuggestion(): BelongsTo
+    {
+        return $this->belongsTo(Suggestion::class, 'selected_suggestion_id');
+    }
+
+    public function finalizeVoting(ProjectDecisionEnum $type, ?int $suggestionId = null, ?string $rationale = null): void
+    {
+        $this->update([
+            'decision_type' => $type,
+            'selected_suggestion_id' => $suggestionId,
+            'decision_rationale' => $rationale,
+            'status' => \App\Enums\ProjectStatusEnum::COMPLETED, // Or whatever status indicates finished
+            'voting_ends_at' => now(),
+        ]);
     }
 
     public function likes(): HasMany

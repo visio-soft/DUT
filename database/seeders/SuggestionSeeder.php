@@ -165,6 +165,33 @@ class SuggestionSeeder extends Seeder
             $this->command->info("Suggestion created: {$suggestion->title}");
         }
 
+        // Add 50 Random Suggestions
+        $faker = \Faker\Factory::create('tr_TR');
+        $districts = array_keys(config('istanbul_neighborhoods', ['Kadıköy' => [], 'Ataşehir' => [], 'Üsküdar' => [], 'Beşiktaş' => [], 'Maltepe' => [], 'Şişli' => []]));
+
+        for ($i = 0; $i < 50; $i++) {
+            $district = $faker->randomElement($districts);
+            $project = $projects->random();
+            $user = $users->random();
+
+            $suggestion = Suggestion::create([
+                'title' => $faker->realText(50),
+                'description' => $faker->paragraph(2),
+                'status' => $faker->randomElement([\App\Enums\SuggestionStatusEnum::OPEN, \App\Enums\SuggestionStatusEnum::CLOSED]),
+                'estimated_duration' => $faker->numberBetween(1, 90),
+                'min_budget' => $faker->randomFloat(2, 1000, 50000),
+                'max_budget' => $faker->randomFloat(2, 60000, 200000),
+                'city' => 'İstanbul',
+                'district' => $district,
+                'latitude' => $faker->latitude(40.8, 41.1),
+                'longitude' => $faker->longitude(28.8, 29.4),
+                'project_id' => $project->id,
+                'created_by_id' => $user->id,
+            ]);
+
+            $this->command->info("Random Suggestion created: {$suggestion->title}");
+        }
+
         $this->command->info('Suggestions created successfully!');
     }
 }
