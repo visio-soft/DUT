@@ -40,7 +40,8 @@
     <header class="user-header">
         <nav class="user-container">
             <div class="user-nav">
-                <div class="flex items-center">
+                <!-- Logo container -->
+                <div class="flex items-center flex-shrink-0">
                     <a href="{{ route('user.index') }}" class="user-logo-svg">
                         <svg class="logo" viewBox="0 0 191 44" xmlns="http://www.w3.org/2000/svg">
                             <g clip-path="url(#DutLogo_clip0_1357_1541)">
@@ -91,9 +92,9 @@
                 </div>
 
                 <!-- Desktop navigation -->
-                <div class="hidden user-nav-links md:flex" style="justify-content: space-between; width: 100%;">
+                <div class="hidden user-nav-links md:flex">
                     <!-- Left navigation items -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
                         <a href="{{ route('user.index') }}"
                            class="user-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -111,7 +112,7 @@
                     </div>
 
                     <!-- Right side items -->
-                    <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
                         @auth
                             <div class="flex items-center">
                                 <svg class="w-5 h-5 mr-2" style="color: #1ABF6B;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -151,78 +152,88 @@
                 </div>
 
                 <!-- Mobile navigation menu -->
-                <div id="mobile-menu" class="mobile-menu">
-                    <div class="mobile-menu-content">
-                        <a href="{{ route('user.index') }}"
-                           class="mobile-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
-                            </svg>
-                            {{ __('common.home') }}
-                        </a>
-                        <a href="{{ route('user.projects') }}"
-                           class="mobile-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
-                            </svg>
-                            {{ __('common.projects') }}
-                        </a>
-
-                        @auth
-                            <div class="mobile-auth-section">
-                                <div class="mobile-user-info">
-                                    <svg class="w-5 h-5 mr-2 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 1-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                <div class="md:hidden">
+                    <div id="mobile-menu-backdrop" class="mobile-menu-backdrop"></div>
+                    <div id="mobile-menu" class="mobile-menu-slide-over">
+                        <div class="mobile-menu-header">
+                            <span class="text-lg font-bold text-gray-900">{{ __('common.menu') }}</span>
+                            <button id="close-menu-button" class="close-menu-button">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="mobile-menu-content">
+                            <div class="mobile-nav-group">
+                                <a href="{{ route('user.index') }}"
+                                   class="mobile-nav-link {{ request()->routeIs('user.index') ? 'active' : '' }}">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
                                     </svg>
-                                    <span class="text-sm font-bold text-gray-900">{{ __('common.hello') }}, {{ Auth::user()->name }}</span>
+                                    {{ __('common.home') }}
+                                </a>
+                                <a href="{{ route('user.projects') }}"
+                                   class="mobile-nav-link {{ request()->routeIs('user.projects') ? 'active' : '' }}">
+                                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 0 1 4.5 9.75h15A2.25 2.25 0 0 1 21.75 12v.75m-8.69-6.44-2.12-2.12a1.5 1.5 0 0 0-1.061-.44H4.5A2.25 2.25 0 0 0 2.25 6v12a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9a2.25 2.25 0 0 0-2.25-2.25h-5.379a1.5 1.5 0 0 1-1.06-.44Z"/>
+                                    </svg>
+                                    {{ __('common.projects') }}
+                                </a>
+                            </div>
+
+                            @auth
+                                <div class="mobile-user-section">
+                                    <div class="mobile-user-info-card">
+                                        <div class="flex items-center mb-3">
+                                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-500">{{ __('common.hello') }}</div>
+                                                <div class="font-bold text-gray-900">{{ Auth::user()->name }}</div>
+                                            </div>
+                                        </div>
+                                        <form method="POST" action="{{ route('user.logout') }}">
+                                            @csrf
+                                            <button type="submit" class="mobile-logout-btn">
+                                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                                                </svg>
+                                                {{ __('common.logout') }}
+                                            </button>
+                                        </form>
+                                    </div>
                                 </div>
-                                <form method="POST" action="{{ route('user.logout') }}" class="w-full">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left mobile-nav-link logout-btn">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"/>
+                            @else
+                                <div class="mobile-auth-buttons">
+                                    <a href="{{ route('user.login') }}" class="mobile-auth-btn mobile-auth-btn-login">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
                                         </svg>
-                                        {{ __('common.logout') }}
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div class="mobile-auth-buttons">
-                                <a href="{{ route('user.login') }}" class="mobile-auth-btn mobile-auth-btn-login">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15M12 9l3 3m0 0-3 3m3-3H2.25"/>
-                                    </svg>
-                                    {{ __('common.login') }}
-                                </a>
-                                <a href="{{ route('user.register') }}" class="mobile-auth-btn mobile-auth-btn-register">
-                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"/>
-                                    </svg>
-                                    {{ __('common.register') }}
-                                </a>
-                            </div>
-                        @endauth
+                                        {{ __('common.login') }}
+                                    </a>
+                                    <a href="{{ route('user.register') }}" class="mobile-auth-btn mobile-auth-btn-register">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM3 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 019.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                                        </svg>
+                                        {{ __('common.register') }}
+                                    </a>
+                                </div>
+                            @endauth
 
-                        <!-- Mobile Language Selector -->
-                        <div class="mobile-language-section">
-                            <h4>{{ __('common.language') }}</h4>
-                            <div style="display: flex; gap: 0.5rem;">
-                                <a href="{{ route('language.switch', 'tr') }}" class="mobile-nav-link {{ app()->getLocale() == 'tr' ? 'active' : '' }}" style="flex: 1; text-align: center; font-size: 0.875rem;">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        @if(app()->getLocale() == 'tr')
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        @endif
-                                    </svg>
-                                    Türkçe
-                                </a>
-                                <a href="{{ route('language.switch', 'en') }}" class="mobile-nav-link {{ app()->getLocale() == 'en' ? 'active' : '' }}" style="flex: 1; text-align: center; font-size: 0.875rem;">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        @if(app()->getLocale() == 'en')
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                        @endif
-                                    </svg>
-                                    English
-                                </a>
+                            <!-- Mobile Language Selector -->
+                            <div class="mobile-language-section">
+                                <h4 class="text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">{{ __('common.language') }}</h4>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <a href="{{ route('language.switch', 'tr') }}" class="mobile-lang-btn {{ app()->getLocale() == 'tr' ? 'active' : '' }}">
+                                        <span class="mr-2">🇹🇷</span> Türkçe
+                                    </a>
+                                    <a href="{{ route('language.switch', 'en') }}" class="mobile-lang-btn {{ app()->getLocale() == 'en' ? 'active' : '' }}">
+                                        <span class="mr-2">🇬🇧</span> English
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -400,56 +411,58 @@
         // Mobile Menu Functionality
         document.addEventListener('DOMContentLoaded', function() {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const closeMenuButton = document.getElementById('close-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
             let isMenuOpen = false;
 
             function toggleMenu() {
                 isMenuOpen = !isMenuOpen;
-
-                if (isMenuOpen) {
-                    mobileMenuButton.classList.add('active');
-                    mobileMenu.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                } else {
-                    mobileMenuButton.classList.remove('active');
-                    mobileMenu.classList.remove('active');
-                    document.body.style.overflow = '';
-                }
+                updateMenuState();
             }
 
             function closeMenu() {
                 if (isMenuOpen) {
                     isMenuOpen = false;
-                    mobileMenuButton.classList.remove('active');
-                    mobileMenu.classList.remove('active');
+                    updateMenuState();
+                }
+            }
+
+            function updateMenuState() {
+                if (isMenuOpen) {
+                    mobileMenuButton?.classList.add('active');
+                    mobileMenu?.classList.add('active');
+                    mobileMenuBackdrop?.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                } else {
+                    mobileMenuButton?.classList.remove('active');
+                    mobileMenu?.classList.remove('active');
+                    mobileMenuBackdrop?.classList.remove('active');
                     document.body.style.overflow = '';
                 }
             }
 
-            // Toggle menu on button click
+            // Event Listeners
             if (mobileMenuButton) {
                 mobileMenuButton.addEventListener('click', toggleMenu);
+            }
+
+            if (closeMenuButton) {
+                closeMenuButton.addEventListener('click', closeMenu);
+            }
+
+            if (mobileMenuBackdrop) {
+                mobileMenuBackdrop.addEventListener('click', closeMenu);
             }
 
             // Close menu when clicking on mobile nav links
             const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
             mobileNavLinks.forEach(link => {
                 link.addEventListener('click', function() {
-                    // Only close for navigation links, not the logout button
-                    if (this.tagName === 'A') {
-                        closeMenu();
-                    }
-                });
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', function(event) {
-                const isClickInsideMenu = mobileMenu && mobileMenu.contains(event.target);
-                const isClickOnButton = mobileMenuButton && mobileMenuButton.contains(event.target);
-
-                if (!isClickInsideMenu && !isClickOnButton && isMenuOpen) {
+                    // Only close for navigation links, not container clicks
+                    // (though most are A tags, the logout button might be a button)
                     closeMenu();
-                }
+                });
             });
 
             // Close menu on window resize to desktop size

@@ -19,6 +19,27 @@ class ProjectObserver
         if (Auth::check()) {
             $project->updated_by_id = Auth::id();
         }
+
+        if ($project->isDirty('status') && $project->status === \App\Enums\ProjectStatusEnum::VOTING_CLOSED) {
+            \App\Events\ProjectVotingClosed::dispatch($project);
+        }
+    }
+
+    public function saving(Project $project): void
+    {
+        // Do not override if category_id is already set (e.g., inferred by form hooks)
+        if (! empty($project->category_id)) {
+            return;
+        }
+
+        // If project groups are attached and at least one has a category
+        $firstGroupWithCategory = $project->projectGroups()
+            ->with('category')
+            ->first();
+
+        if ($firstGroupWithCategory && $firstGroupWithCategory->category_id) {
+            $project->category_id = $firstGroupWithCategory->category_id;
+        }
     }
 
     /**

@@ -1,18 +1,24 @@
-<div class="relative inline-block text-left language-selector">
-    <button type="button" id="language-selector-button" class="user-nav-link language-selector-button">
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+<div x-data="{ open: false }" class="relative inline-block text-left language-selector" @click.outside="open = false" @keydown.escape.window="open = false">
+    <button @click="open = !open" type="button" class="relative p-2 text-[#053640] hover:text-[#1ABF6B] transition-colors duration-200 focus:outline-none group">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"></path>
         </svg>
-        <span class="hidden sm:inline">{{ app()->getLocale() == 'tr' ? 'Türkçe' : 'English' }}</span>
-        <span class="sm:hidden">{{ strtoupper(app()->getLocale()) }}</span>
-        <svg class="ml-2 -mr-1 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
-        </svg>
+        <span class="absolute bottom-1 right-0 text-[10px] font-bold bg-white text-[#053640] group-hover:text-[#1ABF6B] rounded-full px-1 py-0.5 border border-gray-100 shadow-sm leading-none transition-colors duration-200">
+            {{ strtoupper(app()->getLocale()) }}
+        </span>
     </button>
 
-    <div id="language-selector-dropdown" class="hidden language-selector-dropdown">
+    <div x-show="open" 
+         x-transition:enter="transition ease-out duration-100"
+         x-transition:enter-start="transform opacity-0 scale-95"
+         x-transition:enter-end="transform opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-75"
+         x-transition:leave-start="transform opacity-100 scale-100"
+         x-transition:leave-end="transform opacity-0 scale-95"
+         class="absolute left-0 md:left-auto md:right-0 top-full z-50 w-48 mt-2 origin-top-left md:origin-top-right bg-white rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-100"
+         style="display: none;">
         <div class="py-1">
-            <a href="{{ route('language.switch', 'tr') }}" class="language-selector-item {{ app()->getLocale() == 'tr' ? 'active' : '' }}">
+            <a href="{{ route('language.switch', 'tr') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'tr' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     @if(app()->getLocale() == 'tr')
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -20,7 +26,7 @@
                 </svg>
                 Türkçe
             </a>
-            <a href="{{ route('language.switch', 'en') }}" class="language-selector-item {{ app()->getLocale() == 'en' ? 'active' : '' }}">
+            <a href="{{ route('language.switch', 'en') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'en' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
                 <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     @if(app()->getLocale() == 'en')
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
@@ -31,23 +37,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    (function() {
-        const button = document.getElementById('language-selector-button');
-        const dropdown = document.getElementById('language-selector-dropdown');
-        
-        if (button && dropdown) {
-            button.addEventListener('click', function(e) {
-                e.stopPropagation();
-                dropdown.classList.toggle('hidden');
-            });
-            
-            document.addEventListener('click', function(e) {
-                if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.classList.add('hidden');
-                }
-            });
-        }
-    })();
-</script>

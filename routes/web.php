@@ -1,15 +1,20 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
+use App\Filament\Pages\UserPanel\ProjectSuggestions;
+use App\Filament\Pages\UserPanel\SuggestionDetail;
+use App\Filament\Pages\UserPanel\UserDashboard;
+use App\Filament\Pages\UserPanel\UserProjects;
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\HandleFileUploadLimits;
+use Illuminate\Support\Facades\Route;
 
 // Language switching route
 Route::get('/language/{locale}', function ($locale) {
     if (in_array($locale, ['tr', 'en'])) {
         session(['locale' => $locale]);
     }
+
     return redirect()->back();
 })->name('language.switch');
 
@@ -18,7 +23,7 @@ Route::get('/debug-upload', function () {
     return response()->json([
         'php_limits' => HandleFileUploadLimits::getCurrentLimits(),
         'media_library_max' => config('media-library.max_file_size'),
-        'media_library_max_mb' => round(config('media-library.max_file_size') / 1024 / 1024, 2) . ' MB',
+        'media_library_max_mb' => round(config('media-library.max_file_size') / 1024 / 1024, 2).' MB',
         'upload_config' => config('upload'),
         'server_info' => [
             'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
@@ -35,12 +40,14 @@ Route::get('/debug-upload', function () {
     ]);
 })->name('debug.upload');
 
-// User Panel Routes - Require Authentication
+// User Panel Routes - Handled by Filament Pages in app/Filament/Pages/UserPanel/
 Route::middleware('auth')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('user.index');
-    Route::get('/projects', [UserController::class, 'projects'])->name('user.projects');
-    Route::get('/projects/{id}/suggestions', [UserController::class, 'projectSuggestions'])->name('user.project.suggestions');
-    Route::get('/suggestions/{id}', [UserController::class, 'suggestionDetail'])->name('user.suggestion.detail');
+    Route::get('/', [UserDashboard::class, 'index'])->name('user.index');
+    Route::get('/projects', [UserProjects::class, 'index'])->name('user.projects');
+    Route::get('/projects/{id}/suggestions', [ProjectSuggestions::class, 'show'])->name('user.project.suggestions');
+    Route::get('/suggestions/{id}', [SuggestionDetail::class, 'show'])->name('user.suggestion.detail');
+    Route::get('/projects/{id}/surveys', [\App\Filament\Pages\UserPanel\ProjectSurveys::class, 'index'])->name('user.project.surveys');
+    Route::post('/projects/{id}/surveys/{surveyId}/submit', [\App\Filament\Pages\UserPanel\ProjectSurveys::class, 'store'])->name('user.project.surveys.store');
 });
 
 // User Authentication Routes
@@ -53,12 +60,17 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [UserAuthController::class, 'logout'])->name('user.logout');
+    Route::post('/notifications/mark-read', [UserController::class, 'markAsRead'])->name('user.notifications.mark-read');
 });
 
 // AJAX Routes
 Route::post('/suggestions/{id}/toggle-like', [UserController::class, 'toggleLike'])
     ->middleware('auth')
     ->name('user.suggestion.toggle-like');
+
+Route::post('/likes/{id}/update-feedback', [UserController::class, 'updateLikeFeedback'])
+    ->middleware('auth')
+    ->name('user.like.update-feedback');
 
 Route::post('/suggestions/{id}/comments', [UserController::class, 'storeComment'])
     ->middleware('auth')
@@ -80,3 +92,6 @@ Route::post('/api/chunked-upload', [App\Http\Controllers\ChunkedUploadController
 Route::post('/api/chunked-upload/cleanup', [App\Http\Controllers\ChunkedUploadController::class, 'cleanupOldSessions'])
     ->middleware('auth')
     ->name('api.chunked-upload.cleanup');
+
+// Location API
+Route::get('/api/locations', [App\Http\Controllers\LocationController::class, 'getChildren'])->name('api.locations');

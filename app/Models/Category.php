@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
@@ -10,10 +11,10 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Category extends Model implements HasMedia
 {
-    use SoftDeletes;
     use InteractsWithMedia;
+    use SoftDeletes;
 
-    protected $fillable = ['name', 'description', 'start_datetime', 'end_datetime', 'district', 'neighborhood', 'country', 'province', 'detailed_address'];
+    protected $fillable = ['name', 'parent_id'];
 
     /**
      * Automatically cascade deletes to related models when soft deleting
@@ -23,15 +24,20 @@ class Category extends Model implements HasMedia
         parent::boot();
 
         static::deleting(function ($category) {
-            // When soft deleting a category, also soft delete its related oneriler
-            if (!$category->isForceDeleting()) {
-                $category->oneriler()->delete();
+            // When soft deleting a category, cascade through the hierarchy
+            if (! $category->isForceDeleting()) {
+                // Delete child categories
+                $category->children()->delete();
+
+                // Delete project groups (which will cascade to projects via DB constraint)
+                $category->projectGroups()->delete();
             }
         });
 
         static::restoring(function ($category) {
-            // When restoring a category, also restore its related oneriler
-            $category->oneriler()->withTrashed()->restore();
+            // When restoring a category, also restore its children and project groups
+            $category->children()->withTrashed()->restore();
+            $category->projectGroups()->withTrashed()->restore();
         });
     }
 
@@ -52,15 +58,83 @@ class Category extends Model implements HasMedia
      */
     protected $attributes = [];
 
-    public function oneriler(): HasMany
+    public function projectGroups(): HasMany
     {
-        return $this->hasMany(Oneri::class, 'category_id');
+        return $this->hasMany(ProjectGroup::class, 'category_id');
     }
 
-    // eski projects() metodunu koruyoruz
-    public function projects(): HasMany
+    /**
+     * Get the parent category
+     */
+    public function parent(): BelongsTo
     {
-        return $this->oneriler();
+        return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    /**
+     * Get child categories
+     */
+    public function children(): HasMany
+    {
+        return $this->hasMany(Category::class, 'parent_id');
+    }
+
+    /**
+     * Get all descendants (recursive)
+     */
+    public function descendants()
+    {
+        return $this->children()->with('descendants');
+    }
+
+    /**
+     * Get all ancestors
+     */
+    public function ancestors()
+    {
+        $ancestors = collect();
+        $category = $this->parent;
+
+        while ($category) {
+            $ancestors->push($category);
+            $category = $category->parent;
+        }
+
+        return $ancestors;
+    }
+
+    /**
+     * Get all projects through project groups (accessor).
+     * Since projects can belong to multiple groups, this returns distinct projects.
+     * Note: This is an accessor, not a relationship. Use projects_count for counting.
+     */
+    public function getProjectsAttribute()
+    {
+        return Project::whereHas('projectGroups', function ($query) {
+            $query->where('project_groups.category_id', $this->id);
+        })->get();
+    }
+
+    /**
+     * Get projects count for this category
+     */
+    public function getProjectsCountAttribute()
+    {
+        return Project::whereHas('projectGroups', function ($query) {
+            $query->where('project_groups.category_id', $this->id);
+        })->count();
+    }
+
+    /**
+     * Get all suggestions through projects.
+     * Note: This is an indirect relationship through the hierarchy.
+     */
+    public function suggestions(): HasMany
+    {
+        // This returns suggestions that are associated with projects in this category
+        // For direct suggestions on a category (if any remain), use the direct relationship
+        return $this->hasMany(Suggestion::class, 'category_id')
+            ->whereNotNull('project_id'); // Only suggestions, not projects
     }
 
     /**
@@ -68,7 +142,7 @@ class Category extends Model implements HasMedia
      */
     public function isExpired(): bool
     {
-        if (!$this->end_datetime) {
+        if (! $this->end_datetime) {
             return false;
         }
 
@@ -80,7 +154,7 @@ class Category extends Model implements HasMedia
      */
     public function getRemainingTime(): ?array
     {
-        if (!$this->end_datetime || $this->isExpired()) {
+        if (! $this->end_datetime || $this->isExpired()) {
             return null;
         }
 
@@ -95,24 +169,38 @@ class Category extends Model implements HasMedia
             'seconds' => $diff->s,
             'total_hours' => ($diff->days * 24) + $diff->h,
             'total_minutes' => (($diff->days * 24) + $diff->h) * 60 + $diff->i,
-            'formatted' => $this->formatRemainingTime($diff)
+            'formatted' => $this->formatRemainingTime($diff),
         ];
     }
 
     /**
      * Format remaining time for display
      */
-    private function formatRemainingTime($diff): string
+    private function formatRemainingTime(\DateInterval $diff): string
     {
         if ($diff->days > 0) {
-            return "{$diff->days} gün {$diff->h} saat";
-        } elseif ($diff->h > 0) {
-            return "{$diff->h} saat {$diff->i} dakika";
-        } elseif ($diff->i > 0) {
-            return "{$diff->i} dakika";
-        } else {
-            return "{$diff->s} saniye";
+            $dayLabel = trans_choice('common.day', $diff->days);
+            $hourLabel = trans_choice('common.hour', $diff->h);
+
+            return "{$diff->days} {$dayLabel} {$diff->h} {$hourLabel}";
         }
+
+        if ($diff->h > 0) {
+            $hourLabel = trans_choice('common.hour', $diff->h);
+            $minuteLabel = trans_choice('common.minute', $diff->i);
+
+            return "{$diff->h} {$hourLabel} {$diff->i} {$minuteLabel}";
+        }
+
+        if ($diff->i > 0) {
+            $minuteLabel = trans_choice('common.minute', $diff->i);
+
+            return "{$diff->i} {$minuteLabel}";
+        }
+
+        $secondLabel = trans_choice('common.second', $diff->s);
+
+        return "{$diff->s} {$secondLabel}";
     }
 
     /**
@@ -120,7 +208,7 @@ class Category extends Model implements HasMedia
      */
     public function getFormattedEndDatetime(): ?string
     {
-        if (!$this->end_datetime) {
+        if (! $this->end_datetime) {
             return null;
         }
 
