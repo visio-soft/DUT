@@ -556,5 +556,10 @@ return [
     'return_to_list' => 'Return to List',
     'surveys_link' => 'Surveys',
     'click_to_join' => 'Click to Join',
+    'view_survey' => 'View Survey',
+    'thank_you' => 'Thank You!',
+    'feedback_received' => 'Thank you for your feedback.',
+    'yes' => 'Yes',
+    'no' => 'No',
 ];
 

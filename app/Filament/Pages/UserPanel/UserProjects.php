@@ -100,6 +100,19 @@ class UserProjects
             });
         }
 
+        // Survey filter
+        if ($hasSurvey = $request->input('has_survey')) {
+            if ($hasSurvey === 'yes') {
+                $projectsQuery->whereHas('surveys', function ($q) {
+                    $q->where('status', true);
+                });
+            } elseif ($hasSurvey === 'no') {
+                $projectsQuery->whereDoesntHave('surveys', function ($q) {
+                    $q->where('status', true);
+                });
+            }
+        }
+
         $projects = $projectsQuery
             ->orderByDesc('start_date')
             ->get();
@@ -123,6 +136,7 @@ class UserProjects
             'category_id',
             'country',
             'city',
+            'has_survey',
             'start_date',
             'end_date',
             'min_budget',

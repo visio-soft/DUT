@@ -556,5 +556,10 @@ return [
     'return_to_list' => 'Listeye Dön',
     'surveys_link' => 'Anketler',
     'click_to_join' => 'Katılmak İçin Tıkla',
+    'view_survey' => 'Anketi Görüntüle',
+    'thank_you' => 'Teşekkür Ederiz!',
+    'feedback_received' => 'Geri bildiriminiz için teşekkür ederiz.',
+    'yes' => 'Evet',
+    'no' => 'Hayır',
 ];
 

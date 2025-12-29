@@ -137,7 +137,7 @@
                 </div>
 
                 <!-- Location Info -->
-                @if($suggestion->address || $suggestion->district)
+                @if($suggestion->address || $suggestion->city || $suggestion->country)
                 <div class="detail-location">
                     <div style="display: flex; align-items: start; gap: 0.5rem;">
                         <svg style="width: 1.25rem; height: 1.25rem; color: var(--gray-400); margin-top: 0.125rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -147,12 +147,7 @@
                         <div>
                             <h4 style="font-weight: 500; color: var(--gray-900); margin-bottom: 0.25rem;">{{ __('common.location') }}</h4>
                             <p style="font-size: 0.875rem; color: var(--gray-600);">
-                                @if($suggestion->district)
-                                    {{ $suggestion->district }}
-                                    @if($suggestion->neighborhood)
-                                        , {{ $suggestion->neighborhood }}
-                                    @endif
-                                @endif
+                                {{ collect([$suggestion->neighborhood, $suggestion->district, $suggestion->city, $suggestion->country])->filter()->implode(', ') }}
                                 @if($suggestion->address)
                                     <br>{{ $suggestion->address }}
                                 @endif
@@ -1722,6 +1717,11 @@ function toggleCommentLike(commentId) {
         likeButton.style.opacity = '1';
     });
 }
+
+// Listen for survey completion
+window.addEventListener('survey-completed', event => {
+    showSuccessModal(event.detail.title, event.detail.message);
+});
 </script><!-- Image Modal -->
 <div id="image-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 9999; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.3s ease; padding: 1rem;" onclick="closeImageModal()">
     <div class="modal-content" style="position: relative; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;" onclick="event.stopPropagation()">
@@ -1872,4 +1872,5 @@ function toggleCommentLike(commentId) {
 
     </div>
 </div>
+@livewire('take-survey')
 @endsection
