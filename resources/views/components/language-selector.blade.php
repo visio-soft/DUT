@@ -34,6 +34,30 @@
                 </svg>
                 English
             </a>
+            <a href="{{ route('language.switch', 'fr') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'fr' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if(app()->getLocale() == 'fr')
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    @endif
+                </svg>
+                Français
+            </a>
+            <a href="{{ route('language.switch', 'de') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'de' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if(app()->getLocale() == 'de')
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    @endif
+                </svg>
+                Deutsch
+            </a>
+            <a href="{{ route('language.switch', 'sv') }}" class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-[#f0f9f4] hover:text-[#1ABF6B] transition-colors {{ app()->getLocale() == 'sv' ? 'bg-[#f0f9f4] text-[#1ABF6B] font-semibold' : '' }}">
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if(app()->getLocale() == 'sv')
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    @endif
+                </svg>
+                Svenska
+            </a>
         </div>
     </div>
 </div>

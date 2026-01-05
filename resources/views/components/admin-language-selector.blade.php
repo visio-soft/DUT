@@ -44,6 +44,42 @@
                 </svg>
                 English
             </a>
+            <a 
+                href="{{ route('language.switch', 'fr') }}" 
+                class="flex items-center px-4 py-2 text-sm transition-colors {{ app()->getLocale() == 'fr' ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}"
+                style="color: rgb(var(--gray-700));"
+            >
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if(app()->getLocale() == 'fr')
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    @endif
+                </svg>
+                Français
+            </a>
+            <a 
+                href="{{ route('language.switch', 'de') }}" 
+                class="flex items-center px-4 py-2 text-sm transition-colors {{ app()->getLocale() == 'de' ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}"
+                style="color: rgb(var(--gray-700));"
+            >
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if(app()->getLocale() == 'de')
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    @endif
+                </svg>
+                Deutsch
+            </a>
+            <a 
+                href="{{ route('language.switch', 'sv') }}" 
+                class="flex items-center px-4 py-2 text-sm transition-colors {{ app()->getLocale() == 'sv' ? 'bg-gray-100 dark:bg-gray-800 font-semibold' : '' }}"
+                style="color: rgb(var(--gray-700));"
+            >
+                <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    @if(app()->getLocale() == 'sv')
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    @endif
+                </svg>
+                Svenska
+            </a>
         </div>
     </div>
 </div>
