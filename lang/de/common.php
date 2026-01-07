@@ -65,6 +65,8 @@ return [
     'suggestion_liked' => '✓ Vorschlag gefällt! In dieser Kategorie kann nur ein Vorschlag geliked werden.',
     'project_expired_message' => 'Projekt abgelaufen - Keine Likes mehr möglich',
     'suggestion_like_tooltip' => 'In dieser Kategorie kann nur ein Vorschlag geliked werden (Radio-Button-Logik)',
+    'selected_proposal' => 'Ausgewählter Vorschlag',
+    'view_details' => 'Details anzeigen',
 
     // Auth pages
     'email_address' => 'E-Mail-Adresse',

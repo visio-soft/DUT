@@ -65,6 +65,8 @@ return [
     'suggestion_liked' => '✓ Suggestion aimée ! Une seule suggestion peut être aimée dans cette catégorie.',
     'project_expired_message' => 'Projet expiré - Les J\'aime ne sont plus possibles',
     'suggestion_like_tooltip' => 'Une seule suggestion peut être aimée dans cette catégorie (Logique bouton radio)',
+    'selected_proposal' => 'Proposition sélectionnée',
+    'view_details' => 'Voir les détails',
 
     // Auth pages
     'email_address' => 'Adresse E-Mail',

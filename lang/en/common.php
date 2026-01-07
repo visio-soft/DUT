@@ -65,6 +65,8 @@ return [
     'suggestion_liked' => '✓ Suggestion liked! You can like only one suggestion in this category.',
     'project_expired_message' => 'Project deadline has passed - Cannot like',
     'suggestion_like_tooltip' => 'Only one suggestion can be liked in this category (Radio button logic)',
+    'selected_proposal' => 'Selected Proposal',
+    'view_details' => 'View Details',
 
     // Auth pages
     'email_address' => 'Email Address',

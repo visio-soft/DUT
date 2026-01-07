@@ -18,11 +18,37 @@ class CommonFilters
         return Filter::make('location')
             ->label(__('common.location'))
             ->form([
+                Forms\Components\Select::make('country')
+                    ->label(__('common.country'))
+                    ->options(\App\Models\Location::query()
+                        ->where('type', \App\Models\Location::TYPE_COUNTRY)
+                        ->pluck('name', 'name'))
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (Forms\Set $set) {
+                        $set('city', null);
+                        $set('district', null);
+                        $set('neighborhood', null);
+                    }),
+
                 Forms\Components\Select::make('city')
                     ->label(__('common.city'))
-                    ->options(\App\Models\Location::query()
-                        ->where('type', \App\Models\Location::TYPE_CITY)
-                        ->pluck('name', 'name'))
+                    ->options(function (Forms\Get $get) {
+                        $countryName = $get('country');
+                        if (!$countryName) return [];
+                        
+                         // Find country by name to get its ID
+                        $country = \App\Models\Location::where('type', \App\Models\Location::TYPE_COUNTRY)
+                            ->where('name', $countryName)
+                            ->first();
+
+                        if (!$country) return [];
+
+                        return \App\Models\Location::query()
+                            ->where('type', \App\Models\Location::TYPE_CITY)
+                            ->where('parent_id', $country->id)
+                            ->pluck('name', 'name');
+                    })
                     ->searchable()
                     ->live()
                     ->afterStateUpdated(function (Forms\Set $set) {
@@ -74,6 +100,10 @@ class CommonFilters
                     ->searchable(),
             ])
             ->query(function (Builder $query, array $data) {
+                if (! empty($data['country'])) {
+                    $query->where('country', $data['country']);
+                }
+
                 if (! empty($data['city'])) {
                     $query->where('city', $data['city']);
                 }

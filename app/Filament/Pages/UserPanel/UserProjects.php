@@ -43,22 +43,27 @@ class UserProjects
         ]);
 
         if ($search = Str::lower($request->string('search')->toString())) {
-            $projectsQuery->where(function (Builder $query) use ($search, $statusFilter) {
-                $likeTerm = "%{$search}%";
+            $likeTerm = "%{$search}%";
+            
+            $projectsQuery->where(function (Builder $query) use ($likeTerm, $statusFilter) {
+                // 1. Search in Project Title and Description
                 $query->whereRaw('LOWER(title) like ?', [$likeTerm])
-                    ->orWhereRaw('LOWER(description) like ?', [$likeTerm])
-                    ->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm, $statusFilter) {
-                        if ($statusFilter) {
-                            $suggestionQuery->where('status', $statusFilter);
-                        }
+                      ->orWhereRaw('LOWER(description) like ?', [$likeTerm]);
 
-                        $suggestionQuery->where(function (Builder $inner) use ($likeTerm) {
-                            $inner->whereRaw('LOWER(title) like ?', [$likeTerm])
-                                ->orWhereHas('createdBy', function (Builder $creatorQuery) use ($likeTerm) {
-                                    $creatorQuery->whereRaw('LOWER(name) like ?', [$likeTerm]);
-                                });
-                        });
+                // 2. Search in related Suggestions (Title or Creator Name)
+                $query->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm, $statusFilter) {
+                    // Apply status filter to suggestions search if present
+                    if ($statusFilter) {
+                        $suggestionQuery->where('status', $statusFilter);
+                    }
+
+                    $suggestionQuery->where(function (Builder $inner) use ($likeTerm) {
+                        $inner->whereRaw('LOWER(title) like ?', [$likeTerm])
+                              ->orWhereHas('createdBy', function (Builder $creatorQuery) use ($likeTerm) {
+                                  $creatorQuery->whereRaw('LOWER(name) like ?', [$likeTerm]);
+                              });
                     });
+                });
             });
         }
 
@@ -124,11 +129,25 @@ class UserProjects
         $categories = \App\Models\Category::pluck('name', 'id');
         
         // Location Data
-        $countries = \App\Models\Country::pluck('name', 'name');
+        $countries = \App\Models\Location::where('type', \App\Models\Location::TYPE_COUNTRY)
+            ->select('id', 'name')
+            ->get();
+            
         $selectedCountry = $request->input('country');
-        $cities = $selectedCountry 
-            ? \App\Models\City::whereHas('country', fn($q) => $q->where('name', $selectedCountry))->pluck('name', 'name') 
-            : [];
+        
+        $cities = collect();
+        if ($selectedCountry) {
+            $country = \App\Models\Location::where('type', \App\Models\Location::TYPE_COUNTRY)
+                ->where('name', $selectedCountry)
+                ->first();
+                
+            if ($country) {
+                $cities = \App\Models\Location::where('type', \App\Models\Location::TYPE_CITY)
+                    ->where('parent_id', $country->id)
+                    ->select('id', 'name')
+                    ->get();
+            }
+        }
 
         $filterValues = $request->only([
             'search',

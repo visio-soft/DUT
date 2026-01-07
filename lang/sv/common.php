@@ -65,6 +65,8 @@ return [
     'suggestion_liked' => '✓ Förslag gillat! Endast ett förslag kan gillas i denna kategori.',
     'project_expired_message' => 'Projektet har gått ut - Inga gilla-markeringar möjliga',
     'suggestion_like_tooltip' => 'Endast ett förslag kan gillas i denna kategori (Radioknapp-logik)',
+    'selected_proposal' => 'Valt förslag',
+    'view_details' => 'Visa detaljer',
 
     // Auth pages
     'email_address' => 'E-postadress',

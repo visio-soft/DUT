@@ -914,8 +914,8 @@
                                         </svg>
                                         <select id="country-filter" name="country" onchange="this.form.submit()">
                                             <option value="">{{ __('common.select_option') }}</option>
-                                            @foreach($countries as $name)
-                                                <option value="{{ $name }}" @selected(($filterValues['country'] ?? '') === $name)>{{ $name }}</option>
+                                            @foreach($countries as $country)
+                                                <option value="{{ $country->name }}" data-id="{{ $country->id }}" @selected(($filterValues['country'] ?? '') === $country->name)>{{ $country->name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -930,10 +930,35 @@
                                         <select id="city-filter" name="city" onchange="this.form.submit()">
                                             <option value="">{{ __('common.select_option') }}</option>
                                             @if(!empty($cities))
-                                                @foreach($cities as $name)
-                                                    <option value="{{ $name }}" @selected(($filterValues['city'] ?? '') === $name)>{{ $name }}</option>
+                                                @foreach($cities as $city)
+                                                    <option value="{{ $city->name }}" data-id="{{ $city->id }}" @selected(($filterValues['city'] ?? '') === $city->name)>{{ $city->name }}</option>
                                                 @endforeach
                                             @endif
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="filter-field" id="district-wrapper" style="display: none;">
+                                    <label for="district-filter">{{ __('common.district') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 21c-4.8-3.6-7.2-7.2-7.2-10.8a7.2 7.2 0 1114.4 0c0 3.6-2.4 7.2-7.2 10.8z"/>
+                                            <circle cx="12" cy="10.2" r="2.4"/>
+                                        </svg>
+                                        <select id="district-filter" name="district" onchange="this.form.submit()">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="filter-field" id="neighborhood-wrapper" style="display: none;">
+                                    <label for="neighborhood-filter">{{ __('common.neighborhood') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 9.75l7.5-6 7.5 6v9.75A2.25 2.25 0 0117.25 21h-10.5A2.25 2.25 0 013 18.75V9.75z"/>
+                                        </svg>
+                                        <select id="neighborhood-filter" name="neighborhood" onchange="this.form.submit()">
+                                            <option value="">{{ __('common.select_option') }}</option>
                                         </select>
                                     </div>
                                 </div>
@@ -1205,7 +1230,63 @@
                         </div>
 
                         <!-- Suggestions -->
-                        @if($project->suggestions->count() > 0)
+                        @if($project->status->value === \App\Enums\ProjectStatusEnum::COMPLETED->value && $project->selected_suggestion_id)
+                             @php
+                                $selectedSuggestion = $project->suggestions->firstWhere('id', $project->selected_suggestion_id);
+                             @endphp
+                             @if($selectedSuggestion)
+                                    <div style="position: relative; z-index: 3; padding: 0 2rem 2rem 2rem;">
+                                    <div style="display: flex; align-items: center; margin-bottom: 1rem; background: linear-gradient(to right, var(--green-600), transparent); padding: 0.5rem; border-radius: var(--radius-md);">
+                                        <svg style="width: 1.5rem; height: 1.5rem; margin-right: 0.75rem; color: white;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                        </svg>
+                                        <h3 style="font-size: 1.25rem; font-weight: 700; color: white; margin: 0; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                            {{ __('common.selected_proposal') }}
+                                        </h3>
+                                    </div>
+                                    
+                                    <div style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 2px solid var(--green-400); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); position: relative; min-height: 400px;">
+                                        <!-- Suggestion Background Image -->
+                                         @if($selectedSuggestion->getFirstMediaUrl('images'))
+                                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1;">
+                                             <img src="{{ $selectedSuggestion->getFirstMediaUrl('images') }}"
+                                                  alt="{{ $selectedSuggestion->title }}"
+                                                  style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.4);"
+                                                  onerror="this.style.display='none';">
+                                         </div>
+                                         @else
+                                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; background: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%); opacity: 0.8;"></div>
+                                         @endif
+
+                                         <!-- Suggestion Overlay -->
+                                         <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: 2;"></div>
+                                            
+                                        <div style="position: relative; z-index: 3; padding: 2rem; height: 100%; display: flex; flex-direction: column; justify-content: flex-end;">
+                                            <h4 style="font-size: 1.75rem; font-weight: 700; margin-bottom: 0.5rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">{{ $selectedSuggestion->title }}</h4>
+                                            
+                                            @if($selectedSuggestion->createdBy)
+                                            <div style="display: flex; align-items: center; margin-bottom: 1rem; color: rgba(255,255,255,0.9);">
+                                                <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                                </svg>
+                                                <span style="font-size: 1rem; font-weight: 500;">{{ $selectedSuggestion->createdBy->name }}</span>
+                                            </div>
+                                            @endif
+                                            
+                                            <p style="margin-bottom: 2rem; line-height: 1.6; color: rgba(255,255,255,0.9); font-size: 1.1rem; text-shadow: 0 1px 2px rgba(0,0,0,0.5); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">{{ $selectedSuggestion->description }}</p>
+                                            
+                                            <a href="{{ route('user.suggestion.detail', ['id' => $selectedSuggestion->id]) }}" 
+                                               style="display: inline-flex; align-items: center; justify-content: center; background: var(--green-600); color: white; padding: 1rem 2rem; border-radius: 0.5rem; font-weight: 600; text-decoration: none; transition: all 0.2s; align-self: flex-start; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                                                {{ __('common.view_details') }}
+                                                <svg style="width: 1.5rem; height: 1.5rem; margin-left: 0.5rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                             @endif
+                        @elseif($project->suggestions->count() > 0)
                         <div style="position: relative; z-index: 3; padding: 0 2rem 2rem 2rem;">
                             <div style="display: flex; align-items: center; margin-bottom: 1rem;">
                                 <svg style="width: 1.25rem; height: 1.25rem; margin-right: 0.5rem; color: white;" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

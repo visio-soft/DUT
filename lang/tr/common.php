@@ -65,6 +65,8 @@ return [
     'suggestion_liked' => '✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.',
     'project_expired_message' => 'Proje süresi dolmuş - Beğeni yapılamaz',
     'suggestion_like_tooltip' => 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)',
+    'selected_proposal' => 'Seçilen Öneri',
+    'view_details' => 'Detayları İncele',
 
     // Auth pages
     'email_address' => 'E-posta Adresi',
