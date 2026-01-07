@@ -310,50 +310,87 @@ class ProjectResource extends Resource
                         ->successNotificationTitle(__("common.project_restored")),
 
                     Tables\Actions\Action::make('finalize_voting')
-                        ->label('Oylamayı Sonlandır')
+                        ->label(__('common.finalize_voting'))
                         ->icon('heroicon-o-check-badge')
                         ->color('warning')
                         ->visible(fn ($record) => ! $record->trashed() && $record->status !== \App\Enums\ProjectStatusEnum::COMPLETED)
-                        ->form([
-                            Forms\Components\Select::make('decision_type')
-                                ->label('Karar Türü')
-                                ->options(\App\Enums\ProjectDecisionEnum::class)
-                                ->required()
-                                ->live()
-                                ->afterStateUpdated(function (Forms\Set $set, $state, $record) {
-                                    if ($state === \App\Enums\ProjectDecisionEnum::MOST_VOTED->value) {
-                                        // Find top voted suggestion
-                                        $topSuggestion = $record->suggestions()->withCount('likes')->orderByDesc('likes_count')->first();
-                                        if ($topSuggestion) {
+                        ->form(function ($record) {
+                            // Find top voted suggestion
+                            $topSuggestion = $record->suggestions()->withCount('likes')->orderByDesc('likes_count')->first();
+                            
+                            return [
+                                Forms\Components\Select::make('decision_type')
+                                    ->label(__('common.decision_type'))
+                                    ->options(\App\Enums\ProjectDecisionEnum::class)
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(function (Forms\Set $set, $state) use ($topSuggestion) {
+                                        if ($state === \App\Enums\ProjectDecisionEnum::MOST_VOTED->value && $topSuggestion) {
                                             $set('selected_suggestion_id', $topSuggestion->id);
                                         }
-                                    }
-                                }),
-                            Forms\Components\Select::make('selected_suggestion_id')
-                                ->label('Seçilen Öneri')
-                                ->options(fn ($record) => $record->suggestions->pluck('title', 'id'))
-                                ->required(fn (Forms\Get $get) => in_array($get('decision_type'), [
-                                    \App\Enums\ProjectDecisionEnum::MOST_VOTED->value,
-                                    \App\Enums\ProjectDecisionEnum::ADMIN_CHOICE->value
-                                ]))
-                                ->visible(fn (Forms\Get $get) => in_array($get('decision_type'), [
-                                    \App\Enums\ProjectDecisionEnum::MOST_VOTED->value,
-                                    \App\Enums\ProjectDecisionEnum::ADMIN_CHOICE->value
-                                ])),
-                            Forms\Components\Textarea::make('decision_rationale')
-                                ->label('Karar Açıklaması')
-                                ->required()
-                                ->visible(fn (Forms\Get $get) => $get('decision_type') !== null),
-                        ])
+                                    }),
+                                
+                                // For MOST_VOTED: Show top voted suggestion as read-only info
+                                Forms\Components\Placeholder::make('top_voted_info')
+                                    ->label(__('common.selected_suggestion'))
+                                    ->content(fn () => $topSuggestion 
+                                        ? "{$topSuggestion->title} ({$topSuggestion->likes_count} " . __('common.likes') . ")" 
+                                        : __('common.no_suggestions_for_project'))
+                                    ->visible(fn (Forms\Get $get) => $get('decision_type') === \App\Enums\ProjectDecisionEnum::MOST_VOTED->value),
+                                
+                                // Hidden field to store the selected suggestion ID for MOST_VOTED
+                                Forms\Components\Hidden::make('selected_suggestion_id')
+                                    ->default($topSuggestion?->id),
+                                
+                                // For ADMIN_CHOICE: Allow selecting any suggestion
+                                Forms\Components\Select::make('admin_selected_suggestion_id')
+                                    ->label(__('common.selected_suggestion'))
+                                    ->options(fn () => $record->suggestions->pluck('title', 'id'))
+                                    ->required()
+                                    ->visible(fn (Forms\Get $get) => $get('decision_type') === \App\Enums\ProjectDecisionEnum::ADMIN_CHOICE->value),
+                                
+                                // For HYBRID: Show info about redirect
+                                Forms\Components\Placeholder::make('hybrid_info')
+                                    ->label(__('common.hybrid_proposal'))
+                                    ->content(__('common.hybrid_redirect_info'))
+                                    ->visible(fn (Forms\Get $get) => $get('decision_type') === \App\Enums\ProjectDecisionEnum::HYBRID->value),
+                                
+                                Forms\Components\Textarea::make('decision_rationale')
+                                    ->label(__('common.decision_rationale'))
+                                    ->required()
+                                    ->visible(fn (Forms\Get $get) => $get('decision_type') !== null),
+                            ];
+                        })
                         ->action(function ($record, array $data) {
+                            $decisionType = \App\Enums\ProjectDecisionEnum::from($data['decision_type']);
+                            
+                            if ($decisionType === \App\Enums\ProjectDecisionEnum::HYBRID) {
+                                // Store rationale in session and redirect to create suggestion
+                                session([
+                                    'hybrid_decision_project_id' => $record->id,
+                                    'hybrid_decision_rationale' => $data['decision_rationale'],
+                                ]);
+                                
+                                // Redirect to create suggestion page
+                                return redirect()->route('filament.admin.resources.suggestions.create', [
+                                    'project_id' => $record->id,
+                                    'is_hybrid_decision' => true,
+                                ]);
+                            }
+                            
+                            // For MOST_VOTED, use the hidden field; for ADMIN_CHOICE, use the select
+                            $suggestionId = $decisionType === \App\Enums\ProjectDecisionEnum::ADMIN_CHOICE
+                                ? ($data['admin_selected_suggestion_id'] ?? null)
+                                : ($data['selected_suggestion_id'] ?? null);
+                            
                             $record->finalizeVoting(
-                                \App\Enums\ProjectDecisionEnum::from($data['decision_type']),
-                                $data['selected_suggestion_id'] ?? null,
+                                $decisionType,
+                                $suggestionId,
                                 $data['decision_rationale']
                             );
                             
                             \Filament\Notifications\Notification::make()
-                                ->title('Oylama Sonlandırıldı')
+                                ->title(__('common.voting_finalized'))
                                 ->success()
                                 ->send();
                         }),

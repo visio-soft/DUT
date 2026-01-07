@@ -119,12 +119,6 @@ class Location extends Model
             self::query()
                 ->when($ignoreId, fn (Builder $query): Builder => $query->whereKeyNot($ignoreId))
                 ->where('slug', $slug)
-                ->where('type', $this->type)
-                ->when(
-                    $this->parent_id !== null,
-                    fn (Builder $query): Builder => $query->where('parent_id', $this->parent_id),
-                    fn (Builder $query): Builder => $query->whereNull('parent_id')
-                )
                 ->exists()
         ) {
             $slug = "{$baseSlug}-{$counter}";

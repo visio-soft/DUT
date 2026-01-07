@@ -18,26 +18,66 @@ class CommonFilters
         return Filter::make('location')
             ->label(__('common.location'))
             ->form([
+                Forms\Components\Select::make('city')
+                    ->label(__('common.city'))
+                    ->options(\App\Models\Location::query()
+                        ->where('type', \App\Models\Location::TYPE_CITY)
+                        ->pluck('name', 'name'))
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (Forms\Set $set) {
+                        $set('district', null);
+                        $set('neighborhood', null);
+                    }),
+
                 Forms\Components\Select::make('district')
                     ->label(__('common.district'))
-                    ->options(function () {
-                        $keys = array_keys(config('istanbul_neighborhoods', []));
+                    ->options(function (Forms\Get $get) {
+                        $cityName = $get('city');
+                        if (!$cityName) return [];
+                        
+                        // Find city by name to get its ID for children query
+                        $city = \App\Models\Location::where('type', \App\Models\Location::TYPE_CITY)
+                            ->where('name', $cityName)
+                            ->first();
+                            
+                        if (!$city) return [];
 
-                        return array_combine($keys, $keys);
+                        return \App\Models\Location::query()
+                            ->where('type', \App\Models\Location::TYPE_DISTRICT)
+                            ->where('parent_id', $city->id)
+                            ->pluck('name', 'name');
                     })
-                    ->searchable(),
+                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function (Forms\Set $set) {
+                        $set('neighborhood', null);
+                    }),
 
                 Forms\Components\Select::make('neighborhood')
                     ->label(__('common.neighborhood'))
-                    ->options(function (callable $get) {
-                        $district = $get('district');
-                        $map = config('istanbul_neighborhoods', []);
+                    ->options(function (Forms\Get $get) {
+                        $districtName = $get('district');
+                        if (!$districtName) return [];
+                        
+                        $district = \App\Models\Location::where('type', \App\Models\Location::TYPE_DISTRICT)
+                            ->where('name', $districtName)
+                            ->first();
+                            
+                        if (!$district) return [];
 
-                        return $map[$district] ?? [];
+                        return \App\Models\Location::query()
+                            ->where('type', \App\Models\Location::TYPE_NEIGHBORHOOD)
+                            ->where('parent_id', $district->id)
+                            ->pluck('name', 'name');
                     })
                     ->searchable(),
             ])
             ->query(function (Builder $query, array $data) {
+                if (! empty($data['city'])) {
+                    $query->where('city', $data['city']);
+                }
+
                 if (! empty($data['district'])) {
                     $query->where('district', $data['district']);
                 }

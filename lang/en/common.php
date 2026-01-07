@@ -561,5 +561,26 @@ return [
     'feedback_received' => 'Thank you for your feedback.',
     'yes' => 'Yes',
     'no' => 'No',
+
+    // Project Decision translations
+    'decision_most_voted' => 'Most Voted',
+    'decision_municipality_choice' => 'Municipality Choice',
+    'decision_hybrid' => 'Hybrid/New Proposal',
+    'decision_made' => 'Decision Made',
+    'winner' => 'Winner',
+    'eliminated' => 'Eliminated',
+    'new_proposal' => 'New Proposal',
+    'hybrid_proposal' => 'Hybrid Proposal',
+    'eliminated_suggestions' => 'Eliminated Suggestions',
+    'hybrid_title' => 'Hybrid Proposal Title',
+    'hybrid_description' => 'Hybrid Proposal Description',
+    'hybrid_image' => 'Hybrid Proposal Image',
+    'finalize_voting' => 'Finalize Voting',
+    'decision_type' => 'Decision Type',
+    'selected_suggestion' => 'Selected Suggestion',
+    'decision_rationale' => 'Decision Rationale',
+    'voting_finalized' => 'Voting Finalized',
+    'administration_explanation' => 'Administration Explanation',
+    'hybrid_redirect_info' => 'You will be redirected to create a suggestion page. The suggestion you create will be declared as the winner.',
 ];
 

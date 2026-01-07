@@ -12,13 +12,21 @@ class LocationController extends Controller
         $parentId = $request->input('parent_id');
         $type = $request->input('type');
 
-        $data = match ($type) {
-            'city' => \App\Models\City::where('country_id', $parentId)->orderBy('name')->get(['id', 'name']),
-            'district' => \App\Models\District::where('city_id', $parentId)->orderBy('name')->get(['id', 'name']),
-            'neighborhood' => \App\Models\Neighborhood::where('district_id', $parentId)->orderBy('name')->get(['id', 'name']),
-            default => \App\Models\Country::orderBy('name')->get(['id', 'name']),
-        };
+        if (!$type) {
+            // Default to countries if no type specified
+            $query = Location::where('type', Location::TYPE_COUNTRY);
+        } else {
+            // Validate parentId presence for child types if necessary, 
+            // but simplified logic: query by type and parent_id
+            $query = Location::where('type', $type);
+            
+            if ($parentId) {
+                $query->where('parent_id', $parentId);
+            }
+        }
 
-        return response()->json($data);
+        $locations = $query->orderBy('name')->get(['id', 'name']);
+
+        return response()->json($locations);
     }
 }

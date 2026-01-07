@@ -2168,7 +2168,7 @@
             $startCollapsed = $activeFilters->isEmpty();
         @endphp
 
-        <div class="d-grid main-content-grid" style="grid-template-columns: 320px 1fr; gap: 2rem; {{ $project->status === \App\Enums\ProjectStatusEnum::COMPLETED ? 'display: none !important;' : '' }}">
+        <div class="d-grid main-content-grid" style="grid-template-columns: 320px 1fr; gap: 2rem;">
             <div class="filters-sidebar-wrapper">
                 <div id="user-filter-panel" class="filters-card {{ $startCollapsed ? 'collapsed' : '' }}">
                     <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
@@ -2339,9 +2339,34 @@
                     <div class="suggestions-container">
                         <div class="d-flex" style="flex-direction: column; gap: 2rem;">
                             @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $index => $suggestion)
+                                @php
+                                    $isProjectCompleted = $project->status === \App\Enums\ProjectStatusEnum::COMPLETED;
+                                    $isWinner = $isProjectCompleted && $project->selected_suggestion_id === $suggestion->id;
+                                    $isEliminated = $isProjectCompleted && !$isWinner;
+                                @endphp
                                 <div id="suggestion-{{ $suggestion->id }}" 
-                                     class="user-card" 
-                                     style="overflow: hidden; position: relative; min-height: 200px;">
+                                     class="user-card {{ $isEliminated ? 'suggestion-eliminated' : '' }} {{ $isWinner ? 'suggestion-winner' : '' }}" 
+                                     style="overflow: hidden; position: relative; min-height: 200px; {{ $isEliminated ? 'opacity: 0.7; filter: grayscale(30%);' : '' }}">
+                                    
+                                    {{-- Winner/Eliminated Badge --}}
+                                    @if($isProjectCompleted)
+                                        @if($isWinner)
+                                            <div style="position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; padding: 0.5rem 1rem; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);">
+                                                <svg style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                                </svg>
+                                                {{ __('common.winner') }}
+                                            </div>
+                                        @else
+                                            <div style="position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 0.5rem 1rem; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem;">
+                                                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                {{ __('common.eliminated') }}
+                                            </div>
+                                        @endif
+                                    @endif
+
                                     @php
                                         $suggestionImage = null;
                                         $mediaUrl = $suggestion->getFirstMediaUrl('images');

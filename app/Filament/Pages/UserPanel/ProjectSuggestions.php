@@ -100,7 +100,6 @@ class ProjectSuggestions
             $project->setRelation('suggestions', $filteredSuggestions);
         }
 
-        $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
             'city',
@@ -115,7 +114,7 @@ class ProjectSuggestions
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.project-suggestions', array_merge(
-            compact('project', 'projects', 'districts', 'filterValues'),
+            compact('project', 'projects', 'filterValues'),
             $backgroundData
         ));
     }
