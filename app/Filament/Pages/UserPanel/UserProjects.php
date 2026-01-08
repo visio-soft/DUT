@@ -2,7 +2,6 @@
 
 namespace App\Filament\Pages\UserPanel;
 
-use App\Enums\SuggestionStatusEnum;
 use App\Helpers\BackgroundImageHelper;
 use App\Models\Project;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,17 +16,9 @@ class UserProjects
     public function index(Request $request)
     {
         $request = request();
-        $statusFilter = $request->string('status')->toString();
-        if ($statusFilter && ! SuggestionStatusEnum::tryFrom($statusFilter)) {
-            $statusFilter = null;
-        }
 
         $projectsQuery = Project::query()->with([
-            'suggestions' => function ($query) use ($statusFilter) {
-                if ($statusFilter) {
-                    $query->where('status', $statusFilter);
-                }
-
+            'suggestions' => function ($query) {
                 $query->with([
                     'likes',
                     'createdBy',
@@ -45,18 +36,13 @@ class UserProjects
         if ($search = Str::lower($request->string('search')->toString())) {
             $likeTerm = "%{$search}%";
             
-            $projectsQuery->where(function (Builder $query) use ($likeTerm, $statusFilter) {
+            $projectsQuery->where(function (Builder $query) use ($likeTerm) {
                 // 1. Search in Project Title and Description
                 $query->whereRaw('LOWER(title) like ?', [$likeTerm])
                       ->orWhereRaw('LOWER(description) like ?', [$likeTerm]);
 
                 // 2. Search in related Suggestions (Title or Creator Name)
-                $query->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm, $statusFilter) {
-                    // Apply status filter to suggestions search if present
-                    if ($statusFilter) {
-                        $suggestionQuery->where('status', $statusFilter);
-                    }
-
+                $query->orWhereHas('suggestions', function (Builder $suggestionQuery) use ($likeTerm) {
                     $suggestionQuery->where(function (Builder $inner) use ($likeTerm) {
                         $inner->whereRaw('LOWER(title) like ?', [$likeTerm])
                               ->orWhereHas('createdBy', function (Builder $creatorQuery) use ($likeTerm) {
@@ -66,14 +52,6 @@ class UserProjects
                 });
             });
         }
-
-        if ($statusFilter) {
-            $projectsQuery->whereHas('suggestions', function (Builder $query) use ($statusFilter) {
-                $query->where('status', $statusFilter);
-            });
-        }
-
-
 
         if ($city = $request->input('city')) {
             $projectsQuery->where('city', $city);
@@ -118,14 +96,25 @@ class UserProjects
             }
         }
 
+        // Voting Status Filter (based on project end_date)
+        // Projects are "open" if end_date is NULL or in the future
+        // Projects are "closed" if end_date is in the past
+        if ($votingStatus = $request->input('voting_status')) {
+            if ($votingStatus === 'open') {
+                $projectsQuery->where(function ($query) {
+                    $query->whereNull('end_date')
+                          ->orWhere('end_date', '>', now());
+                });
+            } elseif ($votingStatus === 'closed') {
+                $projectsQuery->whereNotNull('end_date')
+                              ->where('end_date', '<=', now());
+            }
+        }
+
         $projects = $projectsQuery
             ->orderByDesc('start_date')
             ->get();
 
-        $statusOptions = collect(SuggestionStatusEnum::cases())
-            ->mapWithKeys(fn ($case) => [$case->value => $case->getLabel()])
-            ->toArray();
-        
         $categories = \App\Models\Category::pluck('name', 'id');
         
         // Location Data
@@ -151,22 +140,21 @@ class UserProjects
 
         $filterValues = $request->only([
             'search',
-            'status',
             'category_id',
             'country',
             'city',
             'has_survey',
+            'voting_status',
             'start_date',
             'end_date',
             'min_budget',
             'max_budget',
         ]);
-        $filterValues['status'] = $statusFilter;
 
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.user-projects', array_merge(
-            compact('projects', 'statusOptions', 'categories', 'countries', 'cities', 'filterValues'),
+            compact('projects', 'categories', 'countries', 'cities', 'filterValues'),
             $backgroundData
         ));
     }

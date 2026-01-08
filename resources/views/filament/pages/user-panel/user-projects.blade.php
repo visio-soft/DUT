@@ -790,7 +790,7 @@
             $activeFilterCount = $activeFilters->count();
             $filterLabelMap = [
                 'search' => __('common.search'),
-                'status' => __('common.status'),
+                'voting_status' => __('common.voting_status'),
                 'category_id' => __('common.project_category'),
                 'country' => __('common.country'),
                 'city' => __('common.city'),
@@ -865,16 +865,15 @@
                                     </div>
                                 </div>
                                 <div class="filter-field">
-                                    <label for="status">{{ __('common.status') }}</label>
+                                    <label for="voting_status">{{ __('common.voting_status') }}</label>
                                     <div class="input-with-icon">
                                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l3.75 3.75 11.25-11.25"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                                         </svg>
-                                        <select id="status" name="status">
+                                        <select id="voting_status" name="voting_status">
                                             <option value="">{{ __('common.select_option') }}</option>
-                                            @foreach($statusOptions as $value => $label)
-                                                <option value="{{ $value }}" @selected(($filterValues['status'] ?? '') === $value)>{{ __($label) }}</option>
-                                            @endforeach
+                                            <option value="open" @selected(($filterValues['voting_status'] ?? '') === 'open')>{{ __('common.voting_open') }}</option>
+                                            <option value="closed" @selected(($filterValues['voting_status'] ?? '') === 'closed')>{{ __('common.voting_closed') }}</option>
                                         </select>
                                     </div>
                                 </div>

@@ -67,6 +67,9 @@ return [
     'suggestion_like_tooltip' => 'In dieser Kategorie kann nur ein Vorschlag geliked werden (Radio-Button-Logik)',
     'selected_proposal' => 'Ausgewählter Vorschlag',
     'view_details' => 'Details anzeigen',
+    'voting_status' => 'Abstimmungsstatus',
+    'voting_open' => 'Abstimmung offen',
+    'voting_closed' => 'Abstimmung geschlossen',
 
     // Auth pages
     'email_address' => 'E-Mail-Adresse',

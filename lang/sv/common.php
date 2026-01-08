@@ -67,6 +67,9 @@ return [
     'suggestion_like_tooltip' => 'Endast ett förslag kan gillas i denna kategori (Radioknapp-logik)',
     'selected_proposal' => 'Valt förslag',
     'view_details' => 'Visa detaljer',
+    'voting_status' => 'Röstningsstatus',
+    'voting_open' => 'Röstning öppen',
+    'voting_closed' => 'Röstning avslutad',
 
     // Auth pages
     'email_address' => 'E-postadress',

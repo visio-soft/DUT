@@ -67,6 +67,9 @@ return [
     'suggestion_like_tooltip' => 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)',
     'selected_proposal' => 'Seçilen Öneri',
     'view_details' => 'Detayları İncele',
+    'voting_status' => 'Oylama Durumu',
+    'voting_open' => 'Oylama Açık',
+    'voting_closed' => 'Oylama Kapandı',
 
     // Auth pages
     'email_address' => 'E-posta Adresi',

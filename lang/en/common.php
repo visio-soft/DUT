@@ -67,6 +67,9 @@ return [
     'suggestion_like_tooltip' => 'Only one suggestion can be liked in this category (Radio button logic)',
     'selected_proposal' => 'Selected Proposal',
     'view_details' => 'View Details',
+    'voting_status' => 'Voting Status',
+    'voting_open' => 'Voting Open',
+    'voting_closed' => 'Voting Closed',
 
     // Auth pages
     'email_address' => 'Email Address',
