@@ -182,4 +182,15 @@
         </div>
     @endforelse
 </div>
+
+@include('partials.success-modal')
+
+<script>
+    // Check for session success message
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('success'))
+            showSuccessModal('{{ __('common.thank_you') }}', '{{ session('success') }}');
+        @endif
+    });
+</script>
 @endsection

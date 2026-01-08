@@ -65,6 +65,11 @@ return [
     'suggestion_liked' => '✓ Suggestion liked! You can like only one suggestion in this category.',
     'project_expired_message' => 'Project deadline has passed - Cannot like',
     'suggestion_like_tooltip' => 'Only one suggestion can be liked in this category (Radio button logic)',
+    'selected_proposal' => 'Selected Proposal',
+    'view_details' => 'View Details',
+    'voting_status' => 'Voting Status',
+    'voting_open' => 'Voting Open',
+    'voting_closed' => 'Voting Closed',
 
     // Auth pages
     'email_address' => 'Email Address',
@@ -556,5 +561,31 @@ return [
     'return_to_list' => 'Return to List',
     'surveys_link' => 'Surveys',
     'click_to_join' => 'Click to Join',
+    'view_survey' => 'View Survey',
+    'thank_you' => 'Thank You!',
+    'feedback_received' => 'Thank you for your feedback.',
+    'yes' => 'Yes',
+    'no' => 'No',
+
+    // Project Decision translations
+    'decision_most_voted' => 'Most Voted',
+    'decision_municipality_choice' => 'Municipality Choice',
+    'decision_hybrid' => 'Hybrid/New Proposal',
+    'decision_made' => 'Decision Made',
+    'winner' => 'Winner',
+    'eliminated' => 'Eliminated',
+    'new_proposal' => 'New Proposal',
+    'hybrid_proposal' => 'Hybrid Proposal',
+    'eliminated_suggestions' => 'Eliminated Suggestions',
+    'hybrid_title' => 'Hybrid Proposal Title',
+    'hybrid_description' => 'Hybrid Proposal Description',
+    'hybrid_image' => 'Hybrid Proposal Image',
+    'finalize_voting' => 'Finalize Voting',
+    'decision_type' => 'Decision Type',
+    'selected_suggestion' => 'Selected Suggestion',
+    'decision_rationale' => 'Decision Rationale',
+    'voting_finalized' => 'Voting Finalized',
+    'administration_explanation' => 'Administration Explanation',
+    'hybrid_redirect_info' => 'You will be redirected to create a suggestion page. The suggestion you create will be declared as the winner.',
 ];
 

@@ -703,6 +703,31 @@
             padding-top: 0.5rem;
             margin-top: 0.25rem;
         }
+
+        /* Disable sticky positioning on mobile */
+        .filters-sidebar-wrapper {
+            position: static !important;
+            max-height: none !important;
+            height: auto !important;
+            overflow-y: visible !important;
+        }
+
+        .sticky-project-header {
+            position: static !important;
+        }
+
+        .sidebar {
+            position: static !important;
+            height: auto !important;
+            max-height: none !important;
+            overflow-y: visible !important;
+        }
+
+        /* Mobile: Single column layout */
+        .content-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+        }
     }
 
     .tree-suggestion.active {
@@ -2075,7 +2100,16 @@
 
         {{-- Survey Link --}}
         @if($project->surveys->where('status', true)->isNotEmpty())
-            <a href="{{ route('user.project.surveys', $project->id) }}" class="sticky-info-box blue" style="text-decoration: none;">
+            @php
+                $activeSurvey = $project->surveys->where('status', true)->first();
+                // Giriş yapmış kullanıcının bu anketi cevaplayıp cevaplayamadığını kontrol et
+                $userHasAnsweredSurvey = auth()->check() && $activeSurvey->responses()
+                    ->where('user_id', auth()->id())
+                    ->exists();
+            @endphp
+            <a href="#" onclick="Livewire.dispatch('openSurveyModal', { surveyId: {{ $activeSurvey->id }} }); return false;" 
+               class="sticky-info-box {{ $userHasAnsweredSurvey ? 'gray' : 'green' }}" 
+               style="text-decoration: none;">
                 <svg class="sticky-info-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
                 </svg>
@@ -2084,7 +2118,7 @@
                         {{ __('common.surveys_link') }}
                     </div>
                     <div style="font-size: 0.875rem; font-weight: 700;">
-                        {{ __('common.click_to_join') }}
+                        {{ $userHasAnsweredSurvey ? __('common.view_survey') : __('common.click_to_join') }}
                     </div>
                 </div>
             </a>
@@ -2117,12 +2151,12 @@
             @include('filament.pages.user-panel._project-decision-banner')
         @endif
         @php
-            $selectedDistrict = $filterValues['district'] ?? null;
-            $neighborhoodOptions = $selectedDistrict ? (config('istanbul_neighborhoods')[$selectedDistrict] ?? []) : [];
             $activeFilters = collect($filterValues)->filter(fn ($value) => filled($value));
             $activeFilterCount = $activeFilters->count();
             $filterLabelMap = [
                 'search' => __('common.search'),
+                'country' => __('common.country'),
+                'city' => __('common.city'),
                 'district' => __('common.district'),
                 'neighborhood' => __('common.neighborhood'),
                 'start_date' => __('common.start_date'),
@@ -2134,7 +2168,7 @@
             $startCollapsed = $activeFilters->isEmpty();
         @endphp
 
-        <div class="d-grid main-content-grid" style="grid-template-columns: 320px 1fr; gap: 2rem; {{ $project->status === \App\Enums\ProjectStatusEnum::COMPLETED ? 'display: none !important;' : '' }}">
+        <div class="d-grid main-content-grid" style="grid-template-columns: 320px 1fr; gap: 2rem;">
             <div class="filters-sidebar-wrapper">
                 <div id="user-filter-panel" class="filters-card {{ $startCollapsed ? 'collapsed' : '' }}">
                     <button type="button" id="filters-collapse-btn" class="filters-collapse-btn">
@@ -2231,6 +2265,34 @@
                                     <label for="max_budget">{{ __('common.max_budget') }}</label>
                                     <input class="compact-filter-input" type="number" step="0.01" id="max_budget" name="max_budget" value="{{ $filterValues['max_budget'] ?? '' }}">
                                 </div>
+                                
+                                <div class="filter-field">
+                                    <label for="voting_status">{{ __('common.voting_status') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                        <select id="voting_status" name="voting_status">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            <option value="open" @selected(($filterValues['voting_status'] ?? '') === 'open')>{{ __('common.voting_open') }}</option>
+                                            <option value="closed" @selected(($filterValues['voting_status'] ?? '') === 'closed')>{{ __('common.voting_closed') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="filter-field">
+                                    <label for="has_survey">{{ __('common.survey') }}</label>
+                                    <div class="input-with-icon">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/>
+                                        </svg>
+                                        <select id="has_survey" name="has_survey">
+                                            <option value="">{{ __('common.select_option') }}</option>
+                                            <option value="yes" @selected(($filterValues['has_survey'] ?? '') === 'yes')>{{ __('common.yes') }}</option>
+                                            <option value="no" @selected(($filterValues['has_survey'] ?? '') === 'no')>{{ __('common.no') }}</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <div class="filters-actions">
                                 <a href="{{ route('user.project.suggestions', $project->id) }}" class="reset-btn">
@@ -2305,9 +2367,34 @@
                     <div class="suggestions-container">
                         <div class="d-flex" style="flex-direction: column; gap: 2rem;">
                             @foreach($project->suggestions->sortByDesc(function($suggestion) { return $suggestion->likes->count(); }) as $index => $suggestion)
+                                @php
+                                    $isProjectCompleted = $project->status === \App\Enums\ProjectStatusEnum::COMPLETED;
+                                    $isWinner = $isProjectCompleted && $project->selected_suggestion_id === $suggestion->id;
+                                    $isEliminated = $isProjectCompleted && !$isWinner;
+                                @endphp
                                 <div id="suggestion-{{ $suggestion->id }}" 
-                                     class="user-card" 
-                                     style="overflow: hidden; position: relative; min-height: 200px;">
+                                     class="user-card {{ $isEliminated ? 'suggestion-eliminated' : '' }} {{ $isWinner ? 'suggestion-winner' : '' }}" 
+                                     style="overflow: hidden; position: relative; min-height: 200px; {{ $isEliminated ? 'opacity: 0.7; filter: grayscale(30%);' : '' }}">
+                                    
+                                    {{-- Winner/Eliminated Badge --}}
+                                    @if($isProjectCompleted)
+                                        @if($isWinner)
+                                            <div style="position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: white; padding: 0.5rem 1rem; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.875rem; box-shadow: 0 2px 8px rgba(34, 197, 94, 0.4);">
+                                                <svg style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                                                </svg>
+                                                {{ __('common.winner') }}
+                                            </div>
+                                        @else
+                                            <div style="position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%); color: white; padding: 0.5rem 1rem; z-index: 10; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.75rem;">
+                                                <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                                {{ __('common.eliminated') }}
+                                            </div>
+                                        @endif
+                                    @endif
+
                                     @php
                                         $suggestionImage = null;
                                         $mediaUrl = $suggestion->getFirstMediaUrl('images');
@@ -3537,6 +3624,14 @@ window.addEventListener('resize', adjustLayout);
         checkSticky();
     }
 });
+
+// Listen for survey completion
+window.addEventListener('survey-completed', event => {
+    showSuccessModal(event.detail.title, event.detail.message);
+});
 </script>
 
+@livewire('take-survey')
+
+@include('partials.success-modal')
 @endsection

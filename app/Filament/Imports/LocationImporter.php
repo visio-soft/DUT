@@ -2,10 +2,7 @@
 
 namespace App\Filament\Imports;
 
-use App\Models\City;
-use App\Models\Country;
-use App\Models\District;
-use App\Models\Neighborhood;
+use App\Models\Location;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -16,43 +13,22 @@ use Illuminate\Validation\ValidationException;
 
 class LocationImporter extends Importer
 {
-    protected static ?string $model = Neighborhood::class;
+    protected static ?string $model = Location::class;
 
-    protected ?Country $country = null;
-
-    protected ?City $city = null;
-
-    protected ?District $district = null;
-
-    protected ?Neighborhood $neighborhood = null;
+    protected ?Location $country = null;
+    protected ?Location $city = null;
+    protected ?Location $district = null;
+    protected ?Location $neighborhood = null;
 
     protected ?string $targetLevel = null;
-
     protected bool $rowPrepared = false;
 
-    /**
-     * @var array<string, Country>
-     */
+    // Caches using slug or unique key combination
     protected array $countryCache = [];
-
-    /**
-     * @var array<string, City>
-     */
     protected array $cityCache = [];
-
-    /**
-     * @var array<string, District>
-     */
     protected array $districtCache = [];
-
-    /**
-     * @var array<string, Neighborhood>
-     */
     protected array $neighborhoodCache = [];
 
-    /**
-     * @return array<ImportColumn>
-     */
     public static function getColumns(): array
     {
         return [
@@ -80,16 +56,32 @@ class LocationImporter extends Importer
         $this->resetRowContext();
         $this->prepareRow();
 
-        $this->country = $this->ensureCountry($this->data['country']);
+        // 1. Ensure Country
+        $this->country = $this->ensureLocation(
+            name: $this->data['country'],
+            type: Location::TYPE_COUNTRY,
+            parent: null
+        );
 
+        // 2. Ensure City
         if (filled($this->data['city'])) {
-            $this->city = $this->ensureCity($this->country, $this->data['city']);
+            $this->city = $this->ensureLocation(
+                name: $this->data['city'],
+                type: Location::TYPE_CITY,
+                parent: $this->country
+            );
         }
 
+        // 3. Ensure District
         if (filled($this->data['district'])) {
-            $this->district = $this->ensureDistrict($this->city, $this->data['district']);
+            $this->district = $this->ensureLocation(
+                name: $this->data['district'],
+                type: Location::TYPE_DISTRICT,
+                parent: $this->city
+            );
         }
 
+        // Return based on target level
         if ($this->targetLevel === 'country') {
             return $this->country;
         }
@@ -102,41 +94,161 @@ class LocationImporter extends Importer
             return $this->district;
         }
 
-        $this->neighborhood = $this->ensureNeighborhood($this->district, $this->data['neighborhood']);
+        // 4. Ensure Neighborhood
+        $this->neighborhood = $this->ensureLocation(
+            name: $this->data['neighborhood'],
+            type: Location::TYPE_NEIGHBORHOOD,
+            parent: $this->district
+        );
 
         return $this->neighborhood;
     }
 
     public function fillRecord(): void
     {
-        if (! $this->rowPrepared) {
-            $this->prepareRow();
+        // Records are created/retrieved in resolveRecord.
+        // We might want to update fields if they changed, strictly speaking Importer handles creation well.
+        // But here we are resolving structural hierarchy.
+        // If we found an existing record, we might want to update its name if it differs slightly?
+        // For now, let's assume if it exists we leave it be, as resolveRecord ensures existence.
+        
+        $record = $this->getRecord();
+        
+        // Update name if needed
+        if ($record && $record->name !== $this->data[$this->targetLevel]) {
+             $record->name = $this->data[$this->targetLevel];
+        }
+    }
+
+    protected function ensureLocation(string $name, string $type, ?Location $parent = null): Location
+    {
+        // Simple caching key
+        $parentId = $parent?->id;
+        $key = "{$type}_{$parentId}_" . Str::slug($name);
+
+        $cacheProp = $type . 'Cache';
+        
+        // Dynamically access cache property if possible or use generic array
+        // Optimized: just use one main cache array keyed by type too
+        
+        if (isset($this->{$cacheProp}[$key])) {
+            return $this->{$cacheProp}[$key];
         }
 
-        if ($this->record instanceof Country) {
-            $this->record->name = $this->data['country'];
+        // Look up existing
+        $query = Location::query()
+            ->where('type', $type)
+            ->where('name', $name);
 
+        if ($parent) {
+            $query->where('parent_id', $parent->id);
+        } else {
+            $query->whereNull('parent_id');
+        }
+
+        $location = $query->first();
+
+        if (!$location) {
+             try {
+                $location = Location::create([
+                    'type' => $type,
+                    'name' => $name,
+                    'parent_id' => $parent?->id,
+                    // slug is handled by model boot
+                ]);
+            } catch (QueryException $e) {
+                // Concurrency fallback
+                $location = $query->first();
+                if (!$location) throw $e;
+            }
+        }
+
+        // Cache it
+        if (property_exists($this, $cacheProp)) {
+            $this->{$cacheProp}[$key] = $location;
+        }
+
+        return $location;
+    }
+
+    protected function prepareRow(): void
+    {
+        if ($this->rowPrepared) {
             return;
         }
 
-        if ($this->record instanceof City) {
-            $this->record->name = $this->data['city'];
-            $this->record->country()->associate($this->country);
+        $this->data['country'] = $this->normalizeValue($this->data['country'] ?? null);
+        $this->data['city'] = $this->normalizeValue($this->data['city'] ?? null);
+        $this->data['district'] = $this->normalizeValue($this->data['district'] ?? null);
+        $this->data['neighborhood'] = $this->normalizeValue($this->data['neighborhood'] ?? null);
 
+        if ($this->allFieldsBlank()) {
+             throw ValidationException::withMessages([
+                'country' => __('common.location_import_row_empty'),
+            ]);
+        }
+
+        $this->validateHierarchy();
+        $this->targetLevel = $this->determineTargetLevel();
+        $this->rowPrepared = true;
+    }
+
+    protected function validateHierarchy(): void
+    {
+        $this->assertParentPresence('city', 'country');
+        $this->assertParentPresence('district', 'city');
+        $this->assertParentPresence('neighborhood', 'district');
+    }
+
+    protected function assertParentPresence(string $childColumn, string $parentColumn): void
+    {
+        if (blank($this->data[$childColumn] ?? null) || filled($this->data[$parentColumn] ?? null)) {
             return;
         }
 
-        if ($this->record instanceof District) {
-            $this->record->name = $this->data['district'];
-            $this->record->city()->associate($this->city);
+        throw ValidationException::withMessages([
+            $childColumn => __('common.location_import_missing_parent', [
+                'child' => __('common.'.$childColumn),
+                'parent' => __('common.'.$parentColumn),
+            ]),
+        ]);
+    }
 
-            return;
+    protected function determineTargetLevel(): string
+    {
+         foreach (['neighborhood', 'district', 'city', 'country'] as $column) {
+            if (filled($this->data[$column] ?? null)) {
+                return $column;
+            }
         }
+        return 'country';
+    }
 
-        if ($this->record instanceof Neighborhood) {
-            $this->record->name = $this->data['neighborhood'];
-            $this->record->district()->associate($this->district);
+    protected function normalizeValue(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
         }
+        $value = trim((string) $value);
+        return $value === '' ? null : $value;
+    }
+
+    protected function allFieldsBlank(): bool
+    {
+        return blank($this->data['country'])
+            && blank($this->data['city'])
+            && blank($this->data['district'])
+            && blank($this->data['neighborhood']);
+    }
+
+    protected function resetRowContext(): void
+    {
+        $this->country = null;
+        $this->city = null;
+        $this->district = null;
+        $this->neighborhood = null;
+        $this->targetLevel = null;
+        $this->rowPrepared = false;
     }
 
     public static function getCompletedNotificationBody(Import $import): string
@@ -159,287 +271,5 @@ class LocationImporter extends Importer
         }
 
         return __('common.location_import_completed');
-    }
-
-    /**
-     * @throws ValidationException
-     */
-    protected function prepareRow(): void
-    {
-        if ($this->rowPrepared) {
-            return;
-        }
-
-        $this->data['country'] = $this->normalizeValue($this->data['country'] ?? null);
-        $this->data['city'] = $this->normalizeValue($this->data['city'] ?? null);
-        $this->data['district'] = $this->normalizeValue($this->data['district'] ?? null);
-        $this->data['neighborhood'] = $this->normalizeValue($this->data['neighborhood'] ?? null);
-
-        if ($this->allFieldsBlank()) {
-            throw ValidationException::withMessages([
-                'country' => __('common.location_import_row_empty'),
-            ]);
-        }
-
-        $this->validateHierarchy();
-        $this->targetLevel = $this->determineTargetLevel();
-        $this->rowPrepared = true;
-    }
-
-    /**
-     * @throws ValidationException
-     */
-    protected function validateHierarchy(): void
-    {
-        $this->assertParentPresence('city', 'country');
-        $this->assertParentPresence('district', 'city');
-        $this->assertParentPresence('neighborhood', 'district');
-    }
-
-    /**
-     * @throws ValidationException
-     */
-    protected function assertParentPresence(string $childColumn, string $parentColumn): void
-    {
-        if (blank($this->data[$childColumn] ?? null) || filled($this->data[$parentColumn] ?? null)) {
-            return;
-        }
-
-        throw ValidationException::withMessages([
-            $childColumn => __('common.location_import_missing_parent', [
-                'child' => __('common.'.$childColumn),
-                'parent' => __('common.'.$parentColumn),
-            ]),
-        ]);
-    }
-
-    protected function determineTargetLevel(): string
-    {
-        foreach (['neighborhood', 'district', 'city', 'country'] as $column) {
-            if (filled($this->data[$column] ?? null)) {
-                return $column;
-            }
-        }
-
-        return 'country';
-    }
-
-    protected function ensureCountry(string $name): Country
-    {
-        $key = $this->cacheKey($name);
-
-        if (isset($this->countryCache[$key])) {
-            return $this->countryCache[$key];
-        }
-
-        $country = Country::query()
-            ->withTrashed()
-            ->where('name', $name)
-            ->first();
-
-        if ($country?->trashed()) {
-            $country->restore();
-        }
-
-        if (! $country) {
-            try {
-                $country = Country::query()->create(['name' => $name]);
-            } catch (QueryException $e) {
-                $country = Country::query()->where('name', $name)->first();
-
-                if (! $country) {
-                    throw $e;
-                }
-            }
-        }
-
-        return $this->countryCache[$key] = $country;
-    }
-
-    protected function ensureCity(Country $country, string $name): City
-    {
-        $key = $this->cacheKey($name, $country->id);
-
-        if (isset($this->cityCache[$key])) {
-            return $this->cityCache[$key];
-        }
-
-        $city = City::query()
-            ->withTrashed()
-            ->where('country_id', $country->id)
-            ->where('name', $name)
-            ->first();
-
-        if ($city?->trashed()) {
-            $city->restore();
-        }
-
-        if (! $city) {
-            try {
-                $city = City::query()->create([
-                    'name' => $name,
-                    'country_id' => $country->id,
-                ]);
-            } catch (QueryException $e) {
-                $city = City::query()
-                    ->where('country_id', $country->id)
-                    ->where('name', $name)
-                    ->first();
-
-                if (! $city) {
-                    throw $e;
-                }
-            }
-        }
-
-        return $this->cityCache[$key] = $city;
-    }
-
-    protected function ensureDistrict(City $city, string $name): District
-    {
-        $key = $this->cacheKey($name, $city->id);
-
-        if (isset($this->districtCache[$key])) {
-            return $this->districtCache[$key];
-        }
-
-        $district = District::query()
-            ->withTrashed()
-            ->where('city_id', $city->id)
-            ->where('name', $name)
-            ->first();
-
-        if ($district?->trashed()) {
-            $district->restore();
-        }
-
-        if (! $district) {
-            try {
-                $district = District::query()->create([
-                    'name' => $name,
-                    'city_id' => $city->id,
-                ]);
-            } catch (QueryException $e) {
-                $district = District::query()
-                    ->where('city_id', $city->id)
-                    ->where('name', $name)
-                    ->first();
-
-                if (! $district) {
-                    throw $e;
-                }
-            }
-        }
-
-        return $this->districtCache[$key] = $district;
-    }
-
-    protected function ensureNeighborhood(District $district, string $name): Neighborhood
-    {
-        $key = $this->cacheKey($name, $district->id);
-
-        if (isset($this->neighborhoodCache[$key])) {
-            return $this->neighborhoodCache[$key];
-        }
-
-        $neighborhood = Neighborhood::query()
-            ->withTrashed()
-            ->where('district_id', $district->id)
-            ->where('name', $name)
-            ->first();
-
-        if ($neighborhood?->trashed()) {
-            $neighborhood->restore();
-        }
-
-        if (! $neighborhood) {
-            try {
-                $neighborhood = Neighborhood::query()->create([
-                    'name' => $name,
-                    'district_id' => $district->id,
-                ]);
-            } catch (QueryException $e) {
-                $neighborhood = Neighborhood::query()
-                    ->where('district_id', $district->id)
-                    ->where('name', $name)
-                    ->first();
-
-                if (! $neighborhood) {
-                    throw $e;
-                }
-            }
-        }
-
-        return $this->neighborhoodCache[$key] = $neighborhood;
-    }
-
-    protected function normalizeValue(mixed $value): ?string
-    {
-        if ($value === null) {
-            return null;
-        }
-
-        $value = trim((string) $value);
-
-        return $value === '' ? null : $value;
-    }
-
-    protected function allFieldsBlank(): bool
-    {
-        return blank($this->data['country'])
-            && blank($this->data['city'])
-            && blank($this->data['district'])
-            && blank($this->data['neighborhood']);
-    }
-
-    protected function cacheKey(string $name, ?int $parentId = null): string
-    {
-        $normalized = $this->lower($name);
-
-        return $parentId ? "{$parentId}:{$normalized}" : $normalized;
-    }
-
-    protected function lower(string $value): string
-    {
-        return (string) Str::of($value)->lower();
-    }
-
-    protected function resetRowContext(): void
-    {
-        $this->country = null;
-        $this->city = null;
-        $this->district = null;
-        $this->neighborhood = null;
-        $this->targetLevel = null;
-        $this->rowPrepared = false;
-    }
-
-    public static function getHeading(): string
-    {
-        return __('common.import_locations');
-    }
-
-    public static function getDescription(): ?string
-    {
-        return __('common.location_import_description');
-    }
-
-    public static function getExampleRows(): array
-    {
-        return [
-            [
-                'country' => 'Türkiye',
-            ],
-            [
-                'country' => 'Türkiye',
-                'city' => 'İstanbul',
-            ],
-            [
-                'country' => 'Türkiye',
-                'city' => 'İstanbul',
-                'district' => 'Sultangazi',
-                'neighborhood' => '50. Yıl Mahallesi',
-            ],
-        ];
     }
 }

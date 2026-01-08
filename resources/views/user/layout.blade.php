@@ -233,6 +233,15 @@
                                     <a href="{{ route('language.switch', 'en') }}" class="mobile-lang-btn {{ app()->getLocale() == 'en' ? 'active' : '' }}">
                                         <span class="mr-2">🇬🇧</span> English
                                     </a>
+                                    <a href="{{ route('language.switch', 'fr') }}" class="mobile-lang-btn {{ app()->getLocale() == 'fr' ? 'active' : '' }}">
+                                        <span class="mr-2">🇫🇷</span> Français
+                                    </a>
+                                    <a href="{{ route('language.switch', 'de') }}" class="mobile-lang-btn {{ app()->getLocale() == 'de' ? 'active' : '' }}">
+                                        <span class="mr-2">🇩🇪</span> Deutsch
+                                    </a>
+                                    <a href="{{ route('language.switch', 'sv') }}" class="mobile-lang-btn {{ app()->getLocale() == 'sv' ? 'active' : '' }}">
+                                        <span class="mr-2">🇸🇪</span> Svenska
+                                    </a>
                                 </div>
                             </div>
                         </div>

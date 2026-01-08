@@ -13,9 +13,9 @@ enum ProjectDecisionEnum: string implements HasLabel
     public function getLabel(): ?string
     {
         return match ($this) {
-            self::MOST_VOTED => 'En Çok Oy Alan',
-            self::ADMIN_CHOICE => 'Yönetim Seçimi',
-            self::HYBRID => 'Karma/Yeni Öneri',
+            self::MOST_VOTED => __('common.decision_most_voted'),
+            self::ADMIN_CHOICE => __('common.decision_municipality_choice'),
+            self::HYBRID => __('common.decision_hybrid'),
         };
     }
 }

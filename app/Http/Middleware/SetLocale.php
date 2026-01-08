@@ -18,7 +18,7 @@ class SetLocale
     {
         $locale = session('locale', config('app.locale', 'tr'));
 
-        if (! in_array($locale, ['tr', 'en'])) {
+        if (! in_array($locale, ['tr', 'en', 'fr', 'de', 'sv'])) {
             $locale = 'tr';
         }
 

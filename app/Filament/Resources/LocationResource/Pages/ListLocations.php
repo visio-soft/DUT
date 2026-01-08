@@ -25,13 +25,10 @@ class ListLocations extends ListRecords
 
                 ->color('info')
                 ->importer(LocationImporter::class),
-            Actions\Action::make('createLocation')
+            Actions\CreateAction::make()
                 ->label(__('common.create_location'))
-                ->modalHeading(__('common.create_location'))
                 ->icon('heroicon-o-plus')
-                ->color('success')
-                ->form(LocationResource::getLocationFormSchema())
-                ->action(fn (array $data) => LocationResource::createBase($data)),
+                ->color('success'),
         ];
     }
 }

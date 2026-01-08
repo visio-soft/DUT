@@ -65,6 +65,11 @@ return [
     'suggestion_liked' => '✓ Öneri beğenildi! Bu kategoride sadece bir öneri beğenilebilir.',
     'project_expired_message' => 'Proje süresi dolmuş - Beğeni yapılamaz',
     'suggestion_like_tooltip' => 'Bu kategoride sadece bir öneri beğenilebilir (Radio buton mantığı)',
+    'selected_proposal' => 'Seçilen Öneri',
+    'view_details' => 'Detayları İncele',
+    'voting_status' => 'Oylama Durumu',
+    'voting_open' => 'Oylama Açık',
+    'voting_closed' => 'Oylama Kapandı',
 
     // Auth pages
     'email_address' => 'E-posta Adresi',
@@ -556,5 +561,31 @@ return [
     'return_to_list' => 'Listeye Dön',
     'surveys_link' => 'Anketler',
     'click_to_join' => 'Katılmak İçin Tıkla',
+    'view_survey' => 'Anketi Görüntüle',
+    'thank_you' => 'Teşekkür Ederiz!',
+    'feedback_received' => 'Geri bildiriminiz için teşekkür ederiz.',
+    'yes' => 'Evet',
+    'no' => 'Hayır',
+
+    // Project Decision translations
+    'decision_most_voted' => 'En Çok Oy Alan',
+    'decision_municipality_choice' => 'Belediye Seçimi',
+    'decision_hybrid' => 'Karma/Yeni Öneri',
+    'decision_made' => 'Karar Verildi',
+    'winner' => 'Kazanan',
+    'eliminated' => 'Elendi',
+    'new_proposal' => 'Yeni Öneri',
+    'hybrid_proposal' => 'Karma Öneri',
+    'eliminated_suggestions' => 'Elenen Öneriler',
+    'hybrid_title' => 'Karma Öneri Başlığı',
+    'hybrid_description' => 'Karma Öneri Açıklaması',
+    'hybrid_image' => 'Karma Öneri Görseli',
+    'finalize_voting' => 'Oylamayı Sonlandır',
+    'decision_type' => 'Karar Türü',
+    'selected_suggestion' => 'Seçilen Öneri',
+    'decision_rationale' => 'Karar Açıklaması',
+    'voting_finalized' => 'Oylama Sonlandırıldı',
+    'administration_explanation' => 'Yönetim Açıklaması',
+    'hybrid_redirect_info' => 'Öneri oluşturma sayfasına yönlendirileceksiniz. Oluşturduğunuz öneri kazanan olarak ilan edilecektir.',
 ];
 

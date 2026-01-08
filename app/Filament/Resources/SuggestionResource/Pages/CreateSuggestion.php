@@ -2,14 +2,32 @@
 
 namespace App\Filament\Resources\SuggestionResource\Pages;
 
+use App\Enums\ProjectDecisionEnum;
 use App\Filament\Helpers\NotificationHelper;
 use App\Filament\Resources\SuggestionResource;
+use App\Models\Project;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Auth;
 
 class CreateSuggestion extends CreateRecord
 {
     protected static string $resource = SuggestionResource::class;
+
+    public function mount(): void
+    {
+        parent::mount();
+        
+        // Check if this is a hybrid decision flow
+        $isHybridDecision = request()->get('is_hybrid_decision');
+        $projectId = request()->get('project_id');
+        
+        if ($isHybridDecision && $projectId) {
+            // Pre-fill the project_id field
+            $this->form->fill([
+                'project_id' => (int) $projectId,
+            ]);
+        }
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
@@ -31,6 +49,34 @@ class CreateSuggestion extends CreateRecord
         return $data;
     }
 
+    protected function afterCreate(): void
+    {
+        // Check if this is a hybrid decision flow
+        $hybridProjectId = session('hybrid_decision_project_id');
+        $hybridRationale = session('hybrid_decision_rationale');
+        
+        if ($hybridProjectId && $this->record->project_id == $hybridProjectId) {
+            // Finalize the voting with this suggestion as the winner
+            $project = Project::find($hybridProjectId);
+            
+            if ($project) {
+                $project->finalizeVoting(
+                    ProjectDecisionEnum::HYBRID,
+                    $this->record->id,
+                    $hybridRationale
+                );
+                
+                // Clear the session data
+                session()->forget(['hybrid_decision_project_id', 'hybrid_decision_rationale']);
+                
+                NotificationHelper::success(
+                    __('common.voting_finalized'),
+                    __('common.hybrid_proposal') . ': ' . $this->record->title
+                );
+            }
+        }
+    }
+
     protected function getFormActions(): array
     {
         return [
@@ -43,10 +89,16 @@ class CreateSuggestion extends CreateRecord
                     try {
                         $this->create();
 
-                        NotificationHelper::success(
-                            __('common.suggestion_created_title'),
-                            __('common.suggestion_created_body')
-                        );
+                        // Check if hybrid decision was finalized
+                        $wasHybridDecision = session()->has('hybrid_decision_project_id') === false 
+                            && request()->get('is_hybrid_decision');
+                        
+                        if (!$wasHybridDecision) {
+                            NotificationHelper::success(
+                                __('common.suggestion_created_title'),
+                                __('common.suggestion_created_body')
+                            );
+                        }
 
                         return redirect($this->getResource()::getUrl('index'));
                     } catch (\Illuminate\Validation\ValidationException $e) {

@@ -55,6 +55,9 @@ class ProjectSuggestions
         }
 
 
+        if ($country = $request->input('country')) {
+            $projectsQuery->where('country', $country);
+        }
 
         if ($city = $request->input('city')) {
             $projectsQuery->where('city', $city);
@@ -83,6 +86,31 @@ class ProjectSuggestions
         if ($maxBudget = $request->input('max_budget')) {
             $projectsQuery->where('max_budget', '<=', $maxBudget);
         }
+        
+        // Voting Status Filter (open/closed)
+        // Matches Project::isExpired() logic: end_date->isPast()
+        if ($votingStatus = $request->input('voting_status')) {
+            if ($votingStatus === 'open') {
+                // Voting is open if end_date is NULL or in the future
+                $projectsQuery->where(function ($query) {
+                    $query->whereNull('end_date')
+                          ->orWhere('end_date', '>', now());
+                });
+            } elseif ($votingStatus === 'closed') {
+                // Voting is closed if end_date is in the past
+                $projectsQuery->whereNotNull('end_date')
+                              ->where('end_date', '<=', now());
+            }
+        }
+        
+        // Survey Filter (has/doesn't have)
+        if ($hasSurvey = $request->input('has_survey')) {
+            if ($hasSurvey === 'yes') {
+                $projectsQuery->whereHas('surveys');
+            } elseif ($hasSurvey === 'no') {
+                $projectsQuery->whereDoesntHave('surveys');
+            }
+        }
 
         $projects = $projectsQuery
             ->orderByDesc('start_date')
@@ -100,9 +128,9 @@ class ProjectSuggestions
             $project->setRelation('suggestions', $filteredSuggestions);
         }
 
-        $districts = array_keys(config('istanbul_neighborhoods', []));
         $filterValues = $request->only([
             'search',
+            'country',
             'city',
             'district',
             'neighborhood',
@@ -110,12 +138,14 @@ class ProjectSuggestions
             'end_date',
             'min_budget',
             'max_budget',
+            'has_survey',
+            'voting_status',
         ]);
 
         $backgroundData = $this->getBackgroundImageData();
 
         return view('filament.pages.user-panel.project-suggestions', array_merge(
-            compact('project', 'projects', 'districts', 'filterValues'),
+            compact('project', 'projects', 'filterValues'),
             $backgroundData
         ));
     }

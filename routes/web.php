@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 // Language switching route
 Route::get('/language/{locale}', function ($locale) {
-    if (in_array($locale, ['tr', 'en'])) {
+    if (in_array($locale, ['tr', 'en', 'fr', 'de', 'sv'])) {
         session(['locale' => $locale]);
     }
 

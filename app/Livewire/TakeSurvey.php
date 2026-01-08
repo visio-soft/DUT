@@ -24,8 +24,20 @@ class TakeSurvey extends Component
         
         // Initialize answers array
         if ($this->survey) {
+            // Check for existing response
+            $existingResponse = SurveyResponse::where('survey_id', $this->survey->id)
+                ->where('user_id', auth()->id())
+                ->with('answers')
+                ->latest()
+                ->first();
+
             foreach ($this->survey->questions as $question) {
-                $this->answers[$question->id] = '';
+                if ($existingResponse) {
+                    $existingAnswer = $existingResponse->answers->where('survey_question_id', $question->id)->first();
+                    $this->answers[$question->id] = $existingAnswer ? $existingAnswer->answer_text : '';
+                } else {
+                    $this->answers[$question->id] = '';
+                }
             }
         }
         
@@ -73,9 +85,7 @@ class TakeSurvey extends Component
 
         $this->closeModal();
         
-        session()->flash('success', 'Anket yanıtlarınız başarıyla kaydedildi!');
-        
-        return redirect()->route('user.projects');
+        $this->dispatch('survey-completed', title: 'Teşekkürler!', message: 'Anket yanıtlarınız başarıyla kaydedildi!');
     }
 
     public function render()
