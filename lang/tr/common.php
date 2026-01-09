@@ -444,7 +444,7 @@ return [
     'minute' => 'dakika|dakika',
     'second' => 'saniye|saniye',
     'best_suggestions_of_expired_projects' => 'Süresi Dolmuş Projelerin En İyi Önerileri',
-    
+
     // Notifications
     'notifications' => 'Bildirimler',
     'notification' => 'Bildirim',
@@ -475,7 +475,7 @@ return [
     'male' => 'Erkek',
     'female' => 'Kadın',
     'anonymous_vote' => 'Anonim Oy',
-    
+
     // Expired Projects Widget
     'no_expired_projects' => 'Süresi Dolmuş Proje Yok',
     'no_expired_projects_desc' => 'Henüz süresi dolmuş proje bulunmuyor.',

@@ -17,7 +17,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ObservedBy([SuggestionObserver::class])]
 class Suggestion extends Model implements HasMedia
 {
-    use InteractsWithMedia,SoftDeletes;
+    use InteractsWithMedia, SoftDeletes;
 
     protected $table = 'suggestions';
 
@@ -200,6 +200,37 @@ class Suggestion extends Model implements HasMedia
     public function getNameAttribute()
     {
         return $this->title;
+    }
+
+    /**
+     * Get translated attribute
+     */
+    public function getTranslatedAttribute(string $field, ?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        // If Turkish or locale is Turkish, return original
+        if ($locale === 'tr') {
+            return $this->$field ?? '';
+        }
+
+        return app(\App\Services\TranslationService::class)->translateModel($this, $field, $locale);
+    }
+
+    /**
+     * Get translated title
+     */
+    public function getTranslatedTitleAttribute(): string
+    {
+        return $this->getTranslatedAttribute('title');
+    }
+
+    /**
+     * Get translated description
+     */
+    public function getTranslatedDescriptionAttribute(): string
+    {
+        return $this->getTranslatedAttribute('description');
     }
 
     // Design status functionality removed
