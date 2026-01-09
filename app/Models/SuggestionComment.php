@@ -106,4 +106,27 @@ class SuggestionComment extends Model
     {
         return $this->likes()->count();
     }
+
+    /**
+     * Get translated attribute
+     */
+    public function getTranslatedAttribute(string $field, ?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        // If Turkish or locale is Turkish, return original
+        if ($locale === 'tr') {
+            return $this->$field ?? '';
+        }
+
+        return app(\App\Services\TranslationService::class)->translateModel($this, $field, $locale);
+    }
+
+    /**
+     * Get translated comment
+     */
+    public function getTranslatedCommentAttribute(): string
+    {
+        return $this->getTranslatedAttribute('comment');
+    }
 }

@@ -38,9 +38,9 @@ class Project extends Model implements HasMedia
         });
     }
 
-// ... imports
+    // ... imports
 
-// ... imports
+    // ... imports
 
     protected $fillable = [
         'category_id',
@@ -237,7 +237,7 @@ class Project extends Model implements HasMedia
 
     public function getRemainingTime(): ?array
     {
-        if (! ($this->end_date instanceof Carbon) || $this->isExpired()) {
+        if (!($this->end_date instanceof Carbon) || $this->isExpired()) {
             return null;
         }
 
@@ -284,5 +284,36 @@ class Project extends Model implements HasMedia
         return $this->end_date instanceof Carbon
             ? $this->end_date->format('d.m.Y H:i')
             : null;
+    }
+
+    /**
+     * Get translated attribute
+     */
+    public function getTranslatedAttribute(string $field, ?string $locale = null): string
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        // If Turkish or locale is Turkish, return original
+        if ($locale === 'tr') {
+            return $this->$field ?? '';
+        }
+
+        return app(\App\Services\TranslationService::class)->translateModel($this, $field, $locale);
+    }
+
+    /**
+     * Get translated title
+     */
+    public function getTranslatedTitleAttribute(): string
+    {
+        return $this->getTranslatedAttribute('title');
+    }
+
+    /**
+     * Get translated description
+     */
+    public function getTranslatedDescriptionAttribute(): string
+    {
+        return $this->getTranslatedAttribute('description');
     }
 }
