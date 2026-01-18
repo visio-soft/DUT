@@ -5,7 +5,8 @@ Bu rapor, 20.08.2025 tarihli ilk commit’ten 09.01.2026 tarihli otomatik çevir
 ## Kısa Özet
 - Laravel tabanlı temel iskelet kuruldu; medya ve kategori yönetimi eklendi.
 - Filament üzerinden kategori/proje kaynakları, statü yapısı ve detaylı filtreleme olgunlaştırıldı.
-- Sürükle-bırak tabanlı tasarım aracı ve görsel yükleme deneyimi iyileştirildi; sonrasında öneri tarafında gereksiz tasarım parçaları temizlendi.
+- Sürükle-bırak tabanlı tasarım aracı ve görsel yükleme deneyimi iyileştirildi.
+- Öneri tarafında eski tasarım bileşenleri temizlenerek akış sadeleştirildi.
 - Kullanıcı paneli, beğeni/yorum, dinamik arka planlar ve responsive tasarım iyileştirmeleri yapıldı.
 - Rol bazlı yetkilendirme, çok dilli arayüz (TR/EN + FR/DE/SV), dil seçiciler ve yerelleştirme dosyaları tamamlandı.
 - Konum hiyerarşisi (ülke→şehir→ilçe→mahalle), güçlü filtreleme ve arama yetenekleri eklendi; CSV destekli içe aktarma geliştirildi.
@@ -19,7 +20,7 @@ Bu rapor, 20.08.2025 tarihli ilk commit’ten 09.01.2026 tarihli otomatik çevir
 - **02-03.09.2025** – Polat dalı birleşmeleri, seed/göç dosyası temizlikleri ve kullanıcı/izin refaktörleri (ed6b610, 7c9cece, 7fa6826).
 - **18-20.09.2025** – Tasarım fonksiyonunun önerilerden temizlenmesi, kapsamlı testler, responsive proje/öneri detay sayfaları, AJAX beğeni ve dinamik arka planlar (92280cb, bbcc5c3, ab76083, 46c2e1f, 43a0889).
 - **30.09-09.10.2025** – Dev4 güncellemeleri, dil seçici ve İngilizce çevirilerle ilk çok dillilik adımı (fa05fb1, 146c628).
-- **08-09.11.2025** – Kod tabanının İngilizceleştirilmesi, ProjectGroup hiyerarşisi, bütçe aralıkları ve proje-öneri ilişki düzeni (61b5564, e3b9903, 0971aed, de7cfc1).
+- **08-09.11.2025** – Kod tabanının İngilizceye çevrilmesi, ProjectGroup hiyerarşisi, bütçe aralıkları ve proje-öneri ilişki düzeni (61b5564, e3b9903, 0971aed, de7cfc1).
 - **14.11.2025** – Kategori hiyerarşisi, kapsamlı filtreler, bütçe modülü, bildirim sistemi ve yorum testleri (0e8de0e, 5751c33, 2263f3d, 6363f9d, 99767a5).
 - **24-25.11.2025** – Arama, konum yönetimi (ülke/şehir/ilçe/mahalle), CSV destekli lokasyon içe aktarımı ve geliştirilmiş çözümleyici (49f2b2a, 6a2ec51, 56f0c7d, fb273e3, 7269abd).
 - **25.11-01.12.2025** – Ortak tablo aksiyonları/refaktörler, dosya yükleme sınırlarının artırılması, konum filtreleme ve öneri yorum kaynağı ile dashboard widget’ları (55658b1, f6c0257, 3d5aff7, 8d332c7, 03ae507, 9cda320).
