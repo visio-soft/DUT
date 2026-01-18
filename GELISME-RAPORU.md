@@ -1,10 +1,10 @@
 # Proje Gelişme Raporu (ilk commit → bugün)
 
-Bu rapor, 20.08.2025 tarihli ilk commit’ten 09.01.2026 tarihli otomatik çeviri geliştirmesine kadar **git geçmişi** temel alınarak hazırlanmıştır. Özet, kilometre taşları ve mevcut durum bilgisi içerir.
+Bu rapor, 20.08.2025 tarihli ilk commit (sürüm kaydı)’ten 09.01.2026 tarihli otomatik çeviri geliştirmesine kadar **git geçmişi** temel alınarak hazırlanmıştır. Özet, kilometre taşları ve mevcut durum bilgisi içerir.
 
 ## Kısa Özet
 - Laravel tabanlı temel iskelet kuruldu; medya ve kategori yönetimi eklendi.
-- Filament üzerinden kategori/proje kaynakları, statü yapısı ve detaylı filtreleme olgunlaştırıldı.
+- Filament (Laravel admin paneli) üzerinden kategori/proje kaynakları, statü yapısı ve detaylı filtreleme olgunlaştırıldı.
 - Sürükle-bırak tabanlı tasarım aracı ve görsel yükleme deneyimi iyileştirildi.
 - Öneri tarafında eski tasarım bileşenleri temizlenerek akış sadeleştirildi.
 - Kullanıcı paneli, beğeni/yorum, dinamik arka planlar ve responsive tasarım iyileştirmeleri yapıldı.
