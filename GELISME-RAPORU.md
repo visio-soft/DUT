@@ -8,7 +8,7 @@ Bu rapor, 20.08.2025 tarihli ilk commit (sürüm kaydı)’ten 09.01.2026 tarihl
 - Sürükle-bırak tabanlı tasarım aracı ve görsel yükleme deneyimi iyileştirildi.
 - Öneri tarafında eski tasarım bileşenleri temizlenerek akış sadeleştirildi.
 - Kullanıcı paneli, beğeni/yorum, dinamik arka planlar ve responsive tasarım iyileştirmeleri yapıldı.
-- Rol bazlı yetkilendirme, çok dilli arayüz (TR/EN + FR/DE/SV [İsveççe]), dil seçiciler ve yerelleştirme dosyaları tamamlandı.
+- Rol bazlı yetkilendirme, çok dilli arayüz (TR [Türkçe], EN [İngilizce], FR [Fransızca], DE [Almanca], SV [İsveççe]), dil seçiciler ve yerelleştirme dosyaları tamamlandı.
 - Konum hiyerarşisi (ülke→şehir→ilçe→mahalle), güçlü filtreleme ve arama yetenekleri eklendi; CSV destekli içe aktarma geliştirildi.
 - Bildirim merkezi, zamanlanmış bildirimler, anket/survey yanıt yönetimi, demografik geri bildirim ve oylama kapandı bildirimleri devreye alındı.
 - Proje karar süreçleri (en çok oy alan, belediye tercihi, hibrit yeni öneri) ve otomatik çeviri sistemi eklendi.
