@@ -8,7 +8,7 @@ Bu rapor, 20.08.2025 tarihli ilk commit (sürüm kaydı)’ten 09.01.2026 tarihl
 - Sürükle-bırak tabanlı tasarım aracı ve görsel yükleme deneyimi iyileştirildi.
 - Öneri tarafında eski tasarım bileşenleri temizlenerek akış sadeleştirildi.
 - Kullanıcı paneli, beğeni/yorum, dinamik arka planlar ve responsive tasarım iyileştirmeleri yapıldı.
-- Rol bazlı yetkilendirme, çok dilli arayüz (TR/EN + FR/DE/SV), dil seçiciler ve yerelleştirme dosyaları tamamlandı.
+- Rol bazlı yetkilendirme, çok dilli arayüz (TR/EN + FR/DE/SV [İsveççe]), dil seçiciler ve yerelleştirme dosyaları tamamlandı.
 - Konum hiyerarşisi (ülke→şehir→ilçe→mahalle), güçlü filtreleme ve arama yetenekleri eklendi; CSV destekli içe aktarma geliştirildi.
 - Bildirim merkezi, zamanlanmış bildirimler, anket/survey yanıt yönetimi, demografik geri bildirim ve oylama kapandı bildirimleri devreye alındı.
 - Proje karar süreçleri (en çok oy alan, belediye tercihi, hibrit yeni öneri) ve otomatik çeviri sistemi eklendi.
@@ -27,7 +27,7 @@ Bu rapor, 20.08.2025 tarihli ilk commit (sürüm kaydı)’ten 09.01.2026 tarihl
 - **08-10.12.2025** – Kullanıcı giriş/kayıt arayüzleri, kategori temelli grup başlıkları, Postgres seeder ve sağlamlaştırılmış ID/sequence düzenleri (f3db62b, 0503fd5, 9ce668a, 017c219, 0f6d4c3).
 - **24-27.12.2025** – Demografik geri bildirim toplama, beğeni grafikleri, survey analitikleri, oy kapanış bildirimleri, RoleResource ve karar değerlendirme/sticky filtre deneyimi (5a1fd2c, 149ba01, cc7601c, fc45725, e9e7ad9, a726327, 39d0867).
 - **28.12.2025-05.01.2026** – Kullanıcı sayfa düzeni iyileştirmeleri, “tüm önerileri gör” bağlantıları ve Fransızca/Almanca/İsveççe dil desteği (83e2f58, 77a5f1b, dc2f77f).
-- **07-08.01.2026** – Proje kararının finalize edilmesi (en çok oylanan/belediye/hibrit), birleşik Location modeliyle arama/filtre refaktörü ve migration adı düzeltmesi (ad427ac, d90c5fc, d24d13f).
+- **07-08.01.2026** – Proje kararının finalize edilmesi (en çok oylanan/belediye/hibrit - karma belediye + topluluk seçimi), birleşik Location modeliyle arama/filtre refaktörü ve migration adı düzeltmesi (ad427ac, d90c5fc, d24d13f).
 - **09.01.2026** – Dinamik içerik için otomatik çeviri sistemi (e18edde).
 
 ## Bugünkü Durum (Özet)
