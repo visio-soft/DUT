@@ -58,11 +58,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 'panels::scripts.after',
-                fn (): string => view('chunks.chunked-upload-scripts')->render()
+                fn(): string => view('chunks.chunked-upload-scripts')->render()
             )
             ->renderHook(
                 'panels::global-search.after',
-                fn (): string => view('components.admin-language-selector')->render()
+                fn(): string => view('components.admin-language-selector')->render()
             )
             ->databaseNotifications()
             ->databaseNotificationsPolling('30s')
