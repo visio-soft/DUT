@@ -5,23 +5,31 @@ namespace App\Services;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Http;
+use Stichoza\GoogleTranslate\GoogleTranslate;
 
 class TranslationService
 {
     protected bool $cacheEnabled;
     protected string $sourceLocale;
     protected array $supportedLocales;
+    protected ?GoogleTranslate $translator = null;
 
     public function __construct()
     {
         $this->cacheEnabled = config('translation.cache_enabled', true);
         $this->sourceLocale = config('translation.source_locale', 'tr');
         $this->supportedLocales = config('translation.supported_locales', ['en', 'fr', 'de', 'sv', 'tr']);
+
+        try {
+            $this->translator = new GoogleTranslate();
+            $this->translator->setSource($this->sourceLocale);
+        } catch (\Exception $e) {
+            Log::error('Failed to initialize GoogleTranslate: ' . $e->getMessage());
+        }
     }
 
     /**
-     * Translate text using MyMemory Free Translation API
+     * Translate text using Stichoza Google Translate
      *
      * @param string $text Text to translate
      * @param string $targetLang Target language code (e.g., 'en', 'fr')
@@ -46,27 +54,15 @@ class TranslationService
         }
 
         try {
-            // Use MyMemory Free Translation API
-            $response = Http::timeout(10)->get('https://api.mymemory.translated.net/get', [
-                'q' => $text,
-                'langpair' => $sourceLang . '|' . $targetLang,
-            ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-
-                if (isset($data['responseData']['translatedText'])) {
-                    return $data['responseData']['translatedText'];
-                }
+            if (!$this->translator) {
+                $this->translator = new GoogleTranslate();
             }
 
-            Log::warning('Translation API returned no result', [
-                'text' => substr($text, 0, 100),
-                'target' => $targetLang,
-                'source' => $sourceLang,
-            ]);
+            $this->translator->setSource($sourceLang);
+            $this->translator->setTarget($targetLang);
 
-            return $text;
+            return $this->translator->translate($text);
+
         } catch (\Exception $e) {
             Log::error('Translation failed: ' . $e->getMessage(), [
                 'text' => substr($text, 0, 100),

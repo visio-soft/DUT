@@ -1191,20 +1191,23 @@
                                                                         @endphp
                                                                         <a href="#"
                                                                             onclick="Livewire.dispatch('openSurveyModal', { surveyId: {{ $activeSurvey->id }} }); return false;"
-                                                                            class="btn-survey {{ $hasUnansweredSurveys ? 'pending' : 'completed' }}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
-                                                                                                                      padding: 0.4rem 0.8rem; border-radius: 2rem; 
-                                                                                                                      font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; 
-                                                                                                                      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                                                                                                                      {{ $hasUnansweredSurveys
+                                                                            class="btn-survey {{ $hasUnansweredSurveys ? 'pending' : 'completed' }}"
+                                                                            style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
+                                                                                                                                                                                              padding: 0.4rem 0.8rem; border-radius: 2rem; 
+                                                                                                                                                                                              font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; 
+                                                                                                                                                                                              transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                                                                                                                                                                                              {{ $hasUnansweredSurveys
                                                     ? 'background: linear-gradient(135deg, #1ABF6B 0%, #16a559 100%); border: 1px solid #16a559; color: white; box-shadow: 0 4px 12px rgba(26, 191, 107, 0.4); animation: pulse-green 2s infinite;'
                                                     : 'background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); color: rgba(255, 255, 255, 0.9);' 
-                                                                                                                      }}" onmouseover="{{ $hasUnansweredSurveys
+                                                                                                                                                                                              }}"
+                                                                            onmouseover="{{ $hasUnansweredSurveys
                                                     ? 'this.style.transform=\'translateY(-1px) scale(1.02)\'; this.style.boxShadow=\'0 6px 16px rgba(26, 191, 107, 0.5)\';'
                                                     : 'this.style.background=\'rgba(255, 255, 255, 0.25)\';' 
-                                                                                                               }}" onmouseout="{{ $hasUnansweredSurveys
+                                                                                                                                                                                       }}"
+                                                                            onmouseout="{{ $hasUnansweredSurveys
                                                     ? 'this.style.transform=\'translateY(0) scale(1)\'; this.style.boxShadow=\'0 4px 12px rgba(26, 191, 107, 0.4)\';'
                                                     : 'this.style.background=\'rgba(255, 255, 255, 0.15)\';' 
-                                                                                                               }}">
+                                                                                                                                                                                       }}">
                                                                             <svg style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor"
                                                                                 stroke-width="2" viewBox="0 0 24 24">
                                                                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -1215,11 +1218,11 @@
                                                 @endif
 
                                                 <a href="{{ route('user.project.suggestions', $project->id) }}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
-                                                                      background: rgba(255, 255, 255, 0.2); 
-                                                                      border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.4rem 0.8rem; 
-                                                                      border-radius: 2rem; color: white; font-size: 0.75rem; font-weight: 600; 
-                                                                      text-transform: uppercase; letter-spacing: 0.05em; 
-                                                                      transition: background 0.2s;"
+                                                                                              background: rgba(255, 255, 255, 0.2); 
+                                                                                              border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.4rem 0.8rem; 
+                                                                                              border-radius: 2rem; color: white; font-size: 0.75rem; font-weight: 600; 
+                                                                                              text-transform: uppercase; letter-spacing: 0.05em; 
+                                                                                              transition: background 0.2s;"
                                                     onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
                                                     onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
                                                     <svg style="width: 0.85rem; height: 0.85rem;" fill="none" stroke="currentColor"
@@ -1537,12 +1540,13 @@
                                                                 </div>
 
                                                                 <!-- Details Button -->
-                                                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
-                                                                                              background: rgba(255, 255, 255, 0.2); 
-                                                                                              border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.4rem 0.8rem; 
-                                                                                              border-radius: 2rem; color: white; font-size: 0.75rem; font-weight: 600; 
-                                                                                              text-transform: uppercase; letter-spacing: 0.05em; 
-                                                                                              transition: background 0.2s;"
+                                                                <a href="{{ route('user.suggestion.detail', $suggestion->id) }}"
+                                                                    style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; 
+                                                                                                                                      background: rgba(255, 255, 255, 0.2); 
+                                                                                                                                      border: 1px solid rgba(255, 255, 255, 0.3); padding: 0.4rem 0.8rem; 
+                                                                                                                                      border-radius: 2rem; color: white; font-size: 0.75rem; font-weight: 600; 
+                                                                                                                                      text-transform: uppercase; letter-spacing: 0.05em; 
+                                                                                                                                      transition: background 0.2s;"
                                                                     onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
                                                                     onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
                                                                     <svg style="width: 0.875rem; height: 0.875rem;" fill="none"
@@ -1558,12 +1562,13 @@
                                                 @endforeach
 
                                                 @if($project->suggestions->count() > 4)
-                                                    <a href="{{ route('user.project.suggestions', $project->id) }}" style="grid-column: span 2; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; 
-                                                                                  background: rgba(255, 255, 255, 0.2); 
-                                                                                  border: 1px solid rgba(255, 255, 255, 0.3); padding: 1rem 2rem; 
-                                                                                  border-radius: 2rem; color: white; font-size: 0.875rem; font-weight: 600; 
-                                                                                  text-transform: uppercase; letter-spacing: 0.05em; 
-                                                                                  transition: background 0.2s;"
+                                                    <a href="{{ route('user.project.suggestions', $project->id) }}"
+                                                        style="grid-column: span 2; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; 
+                                                                                                                          background: rgba(255, 255, 255, 0.2); 
+                                                                                                                          border: 1px solid rgba(255, 255, 255, 0.3); padding: 1rem 2rem; 
+                                                                                                                          border-radius: 2rem; color: white; font-size: 0.875rem; font-weight: 600; 
+                                                                                                                          text-transform: uppercase; letter-spacing: 0.05em; 
+                                                                                                                          transition: background 0.2s;"
                                                         onmouseover="this.style.background='rgba(255, 255, 255, 0.3)'"
                                                         onmouseout="this.style.background='rgba(255, 255, 255, 0.2)'">
                                                         <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor"
@@ -1584,8 +1589,9 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round"
                                                     d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                                             </svg>
-                                            <p style="color: rgba(255,255,255,0.8); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">Bu proje
-                                                için henüz öneri bulunmuyor.</p>
+                                            <p style="color: rgba(255,255,255,0.8); text-shadow: 0 1px 2px rgba(0,0,0,0.5);">
+                                                {{ __('common.no_suggestions_for_project') }}
+                                            </p>
                                         </div>
                                     @endif
                                 </div>
@@ -1977,21 +1983,21 @@
 
             // Position it better for mobile
             messageDiv.style.cssText = `
-                position: fixed;
-                top: 1rem;
-                right: 1rem;
-                left: 1rem;
-                max-width: 400px;
-                margin: 0 auto;
-                padding: 1rem 1.5rem;
-                border-radius: var(--radius-lg);
-                color: white;
-                font-weight: 500;
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-                backdrop-filter: blur(8px);
-            `;
+                        position: fixed;
+                        top: 1rem;
+                        right: 1rem;
+                        left: 1rem;
+                        max-width: 400px;
+                        margin: 0 auto;
+                        padding: 1rem 1.5rem;
+                        border-radius: var(--radius-lg);
+                        color: white;
+                        font-weight: 500;
+                        z-index: 1000;
+                        animation: slideIn 0.3s ease;
+                        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+                        backdrop-filter: blur(8px);
+                    `;
 
             // Apply type-specific styling
             switch (type) {
@@ -2021,130 +2027,130 @@
             const style = document.createElement('style');
             style.id = 'message-styles';
             style.textContent = `
-                /* Like Button Styles */
-                .btn-like {
-                    background: rgba(255,255,255,0.15) !important;
-                    border: 1px solid rgba(255,255,255,0.3) !important;
-                    color: white !important;
-                    padding: 0.375rem 0.75rem !important;
-                    border-radius: var(--radius-md) !important;
-                    font-size: 0.75rem !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    gap: 0.25rem !important;
-                    transition: all 0.2s !important;
-                    backdrop-filter: blur(4px) !important;
-                    cursor: pointer !important;
-                    font-weight: 600 !important;
-                }
-
-                .btn-like-large {
-                    padding: 0.75rem 1.25rem !important;
-                    font-size: 0.875rem !important;
-                    gap: 0.5rem !important;
-                    backdrop-filter: blur(10px) !important;
-                    box-shadow: var(--shadow-md) !important;
-                }
-
-                .btn-like.liked {
-                    background: #ef4444 !important;
-                    border-color: #dc2626 !important;
-                }
-
-                .btn-like:hover:not(.liked) {
-                    background: rgba(255,255,255,0.25) !important;
-                    border-color: rgba(255,255,255,0.5) !important;
-                }
-
-                .btn-like.liked:hover {
-                    background: #dc2626 !important;
-                    border-color: #b91c1c !important;
-                }
-
-                .btn-like.expired {
-                    background: rgba(107, 114, 128, 0.5) !important;
-                    border-color: rgba(107, 114, 128, 0.3) !important;
-                    color: rgba(255, 255, 255, 0.5) !important;
-                    cursor: not-allowed !important;
-                    opacity: 0.6 !important;
-                }
-
-                .btn-like.expired:hover {
-                    background: rgba(107, 114, 128, 0.5) !important;
-                    border-color: rgba(107, 114, 128, 0.3) !important;
-                    transform: none !important;
-                }
-
-                .btn-like .like-icon {
-                    width: 0.875rem !important;
-                    height: 0.875rem !important;
-                    fill: none !important;
-                }
-
-                .btn-like .like-icon-large {
-                    width: 1rem !important;
-                    height: 1rem !important;
-                }
-
-                .btn-like.liked .like-icon {
-                    fill: currentColor !important;
-                }
-
-                /* Message Animations */
-                @keyframes slideIn {
-                    from {
-                        transform: translateY(-100%) translateX(-50%);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateY(0) translateX(-50%);
-                        opacity: 1;
-                    }
-                }
-                @keyframes slideOut {
-                    from {
-                        transform: translateY(0) translateX(-50%);
-                        opacity: 1;
-                    }
-                    to {
-                        transform: translateY(-100%) translateX(-50%);
-                        opacity: 0;
-                    }
-                }
-                .message {
-                    transform: translateX(-50%);
-                }
-
-
-                @media (min-width: 640px) {
-                    .message {
-                        right: 1rem !important;
-                        left: auto !important;
-                        max-width: 400px !important;
-                        transform: none !important;
-                    }
-                    @keyframes slideIn {
-                        from {
-                            transform: translateX(100%);
-                            opacity: 0;
+                        /* Like Button Styles */
+                        .btn-like {
+                            background: rgba(255,255,255,0.15) !important;
+                            border: 1px solid rgba(255,255,255,0.3) !important;
+                            color: white !important;
+                            padding: 0.375rem 0.75rem !important;
+                            border-radius: var(--radius-md) !important;
+                            font-size: 0.75rem !important;
+                            display: flex !important;
+                            align-items: center !important;
+                            gap: 0.25rem !important;
+                            transition: all 0.2s !important;
+                            backdrop-filter: blur(4px) !important;
+                            cursor: pointer !important;
+                            font-weight: 600 !important;
                         }
-                        to {
-                            transform: translateX(0);
-                            opacity: 1;
+
+                        .btn-like-large {
+                            padding: 0.75rem 1.25rem !important;
+                            font-size: 0.875rem !important;
+                            gap: 0.5rem !important;
+                            backdrop-filter: blur(10px) !important;
+                            box-shadow: var(--shadow-md) !important;
                         }
-                    }
-                    @keyframes slideOut {
-                        from {
-                            transform: translateX(0);
-                            opacity: 1;
+
+                        .btn-like.liked {
+                            background: #ef4444 !important;
+                            border-color: #dc2626 !important;
                         }
-                        to {
-                            transform: translateX(100%);
-                            opacity: 0;
+
+                        .btn-like:hover:not(.liked) {
+                            background: rgba(255,255,255,0.25) !important;
+                            border-color: rgba(255,255,255,0.5) !important;
                         }
-                    }
-                }
-            `;
+
+                        .btn-like.liked:hover {
+                            background: #dc2626 !important;
+                            border-color: #b91c1c !important;
+                        }
+
+                        .btn-like.expired {
+                            background: rgba(107, 114, 128, 0.5) !important;
+                            border-color: rgba(107, 114, 128, 0.3) !important;
+                            color: rgba(255, 255, 255, 0.5) !important;
+                            cursor: not-allowed !important;
+                            opacity: 0.6 !important;
+                        }
+
+                        .btn-like.expired:hover {
+                            background: rgba(107, 114, 128, 0.5) !important;
+                            border-color: rgba(107, 114, 128, 0.3) !important;
+                            transform: none !important;
+                        }
+
+                        .btn-like .like-icon {
+                            width: 0.875rem !important;
+                            height: 0.875rem !important;
+                            fill: none !important;
+                        }
+
+                        .btn-like .like-icon-large {
+                            width: 1rem !important;
+                            height: 1rem !important;
+                        }
+
+                        .btn-like.liked .like-icon {
+                            fill: currentColor !important;
+                        }
+
+                        /* Message Animations */
+                        @keyframes slideIn {
+                            from {
+                                transform: translateY(-100%) translateX(-50%);
+                                opacity: 0;
+                            }
+                            to {
+                                transform: translateY(0) translateX(-50%);
+                                opacity: 1;
+                            }
+                        }
+                        @keyframes slideOut {
+                            from {
+                                transform: translateY(0) translateX(-50%);
+                                opacity: 1;
+                            }
+                            to {
+                                transform: translateY(-100%) translateX(-50%);
+                                opacity: 0;
+                            }
+                        }
+                        .message {
+                            transform: translateX(-50%);
+                        }
+
+
+                        @media (min-width: 640px) {
+                            .message {
+                                right: 1rem !important;
+                                left: auto !important;
+                                max-width: 400px !important;
+                                transform: none !important;
+                            }
+                            @keyframes slideIn {
+                                from {
+                                    transform: translateX(100%);
+                                    opacity: 0;
+                                }
+                                to {
+                                    transform: translateX(0);
+                                    opacity: 1;
+                                }
+                            }
+                            @keyframes slideOut {
+                                from {
+                                    transform: translateX(0);
+                                    opacity: 1;
+                                }
+                                to {
+                                    transform: translateX(100%);
+                                    opacity: 0;
+                                }
+                            }
+                        }
+                    `;
             document.head.appendChild(style);
         }
 
@@ -2237,7 +2243,7 @@
 
         // Show expired message for expired projects
         function showExpiredMessage() {
-            showMessage('Bu projenin süresi dolmuştur. Artık beğeni yapılamaz.', 'error');
+            showMessage('{{ __('common.project_expired_no_like') }}', 'error');
         }
     </script>
 
@@ -2578,7 +2584,7 @@
                 return;
             @endguest
 
-            const likeCount = clickedButton.querySelector('.like-count');
+                    const likeCount = clickedButton.querySelector('.like-count');
 
             // Group buttons by project (fallback to category if project id is missing)
             const suggestionProjectId = clickedButton.getAttribute('data-project-id');
