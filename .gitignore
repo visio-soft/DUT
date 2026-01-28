@@ -65,3 +65,6 @@ database/database.sqlite
 # Development files
 .phpunit.cache
 *.cache
+/bootstrap/cache/packages.php
+/bootstrap/cache/services.php
+
