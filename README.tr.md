@@ -1,5 +1,7 @@
 # DUT - Katılım ve Proje Yönetim Sistemi
 
+> 🇬🇧 [Click for English version / İngilizce versiyon için tıklayın](README.md)
+
 Kurumsal projeler için kullanıcı önerilerini toplamak, değerlendirmek ve yönetmek üzere tasarlanmış kapsamlı bir **Katılım ve Proje Yönetim Sistemi**. Laravel ve Filament PHP ile geliştirilmiş bu platform, yöneticilerin (örn. belediyeler, organizasyonlar) kamu geri bildirimi için projeler açmasına, kullanıcıların fikir sunmasına, oy kullanmasına ve tartışmasına olanak tanır.
 
 ## 📋 İçindekiler
