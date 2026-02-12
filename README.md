@@ -1,5 +1,7 @@
 # DUT - Participation and Project Management System
 
+> 🇹🇷 [Türkçe versiyon için tıklayın / Click for Turkish version](README.tr.md)
+
 A comprehensive **Participation and Project Management System** designed to collect, evaluate, and manage user-generated suggestions for institutional projects. Built with Laravel and Filament PHP, this platform allows administrators (e.g., municipalities, organizations) to open projects for public feedback, where users can submit ideas, vote, and discuss.
 
 ## 📋 Table of Contents
