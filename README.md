@@ -355,11 +355,3 @@ php artisan pail
 # Run queue worker
 php artisan queue:work
 ```
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
----
-
-**Made with ❤️ for participatory governance and community engagement**
